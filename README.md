@@ -1,4 +1,4 @@
 Papers
 ======
 
-Repo containing subfolders for all paper source
+Repo containing subfolders for all paper source.
