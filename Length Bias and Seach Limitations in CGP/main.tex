@@ -1,0 +1,892 @@
+% This is "sig-alternate.tex" V2.0 May 2012
+% This file should be compiled with V2.5 of "sig-alternate.cls" May 2012
+%
+% This example file demonstrates the use of the 'sig-alternate.cls'
+% V2.5 LaTeX2e document class file. It is for those submitting
+% articles to ACM Conference Proceedings WHO DO NOT WISH TO
+% STRICTLY ADHERE TO THE SIGS (PUBS-BOARD-ENDORSED) STYLE.
+% The 'sig-alternate.cls' file will produce a similar-looking,
+% albeit, 'tighter' paper resulting in, invariably, fewer pages.
+%
+% ----------------------------------------------------------------------------------------------------------------
+% This .tex file (and associated .cls V2.5) produces:
+%       1) The Permission Statement
+%       2) The Conference (location) Info information
+%       3) The Copyright Line with ACM data
+%       4) NO page numbers
+%
+% as against the acm_proc_article-sp.cls file which
+% DOES NOT produce 1) thru' 3) above.
+%
+% Using 'sig-alternate.cls' you have control, however, from within
+% the source .tex file, over both the CopyrightYear
+% (defaulted to 200X) and the ACM Copyright Data
+% (defaulted to X-XXXXX-XX-X/XX/XX).
+% e.g.
+% \CopyrightYear{2007} will cause 2007 to appear in the copyright line.
+% \crdata{0-12345-67-8/90/12} will cause 0-12345-67-8/90/12 to appear in the copyright line.
+%
+% ---------------------------------------------------------------------------------------------------------------
+% This .tex source is an example which *does* use
+% the .bib file (from which the .bbl file % is produced).
+% REMEMBER HOWEVER: After having produced the .bbl file,
+% and prior to final submission, you *NEED* to 'insert'
+% your .bbl file into your source .tex file so as to provide
+% ONE 'self-contained' source file.
+%
+% ================= IF YOU HAVE QUESTIONS =======================
+% Questions regarding the SIGS styles, SIGS policies and
+% procedures, Conferences etc. should be sent to
+% Adrienne Griscti (griscti@acm.org)
+%
+% Technical questions _only_ to
+% Gerald Murray (murray@hq.acm.org)
+% ===============================================================
+%
+% For tracking purposes - this is V2.0 - May 2012
+
+\documentclass{sig-alternate}
+%\linespread{2.5}
+\usepackage{url}
+\usepackage{verbatim}
+\newcommand{\includegraphicsfit}[1]
+{\includegraphics[width=\columnwidth,height=\textheight,keepaspectratio]{#1}}
+\begin{document}
+%
+% --- Author Metadata here ---
+\conferenceinfo{GECCO'13,} {July 6-10, 2013, Philadelphia, Pennsylvania, USA.}
+\CopyrightYear{2013}
+\crdata{TBA}
+\clubpenalty=10000
+\widowpenalty = 10000
+%\CopyrightYear{2007} % Allows default copyright year (20XX) to be over-ridden - IF NEED BE.
+%\crdata{0-12345-67-8/90/01}  % Allows default copyright data (0-89791-88-6/97/05) to be over-ridden - IF NEED BE.
+% --- End of Author Metadata ---
+
+\title{Length Bias and Search Limitations in Cartesian Genetic Programming}
+\subtitle{[Genetic Programming Track]}
+%
+% You need the command \numberofauthors to handle the 'placement
+% and alignment' of the authors beneath the title.
+%
+% For aesthetic reasons, we recommend 'three authors at a time'
+% i.e. three 'name/affiliation blocks' be placed beneath the title.
+%
+% NOTE: You are NOT restricted in how many 'rows' of
+% "name/affiliations" may appear. We just ask that you restrict
+% the number of 'columns' to three.
+%
+% Because of the available 'opening page real-estate'
+% we ask you to refrain from putting more than six authors
+% (two rows with three columns) beneath the article title.
+% More than six makes the first-page appear very cluttered indeed.
+%
+% Use the \alignauthor commands to handle the names
+% and affiliations for an 'aesthetic maximum' of six authors.
+% Add names, affiliations, addresses for
+% the seventh etc. author(s) as the argument for the
+% \additionalauthors command.
+% These 'additional authors' will be output/set for you
+% without further effort on your part as the last section in
+% the body of your article BEFORE References or any Appendices.
+
+\numberofauthors{2} %
+\begin{comment}
+\author{
+% 1st. author
+\alignauthor
+Brian W. Goldman\\
+       \affaddr{BEACON Center for the Study of Evolution in Action}\\
+       \affaddr{Michigan State University, U.S.A.}\\
+       \email{brianwgoldman@acm.org}
+% 2nd. author
+\alignauthor
+William Punch\\
+       \affaddr{BEACON Center for the Study of Evolution in Action}\\
+       \affaddr{Michigan State University, U.S.A.}\\
+       \email{punch@cse.msu.edu}
+}
+%\end{comment}
+%\begin{comment}
+\author{
+% 1st. author
+\alignauthor
+Anonymous\\
+       \affaddr{Group}\\
+       \affaddr{Organization}\\
+       \email{email@site.com}
+% 2nd. author
+\alignauthor
+Anonymous\\
+       \affaddr{Group}\\
+       \affaddr{Organization}\\
+       \email{email@site.com}
+}
+%\end{comment}
+
+\maketitle
+\begin{abstract}
+%Understanding how configuration decisions can interact with individual representation and
+%evolutionary mechanisms in Cartesian Genetic Programming (CGP) to cause limitations
+%on search is vital to proper algorithm application.  
+In this paper we examine how Cartesian Genetic Programming's (CGP's) method
+for encoding directed acyclic graphs (DAGs) and its mutation operator bias the
+effective length of individuals as well as the distribution of inactive nodes
+in the genome.  We investigate these biases experimentally using two CGP variants as comparisons: \emph{Reorder},
+a method for shuffling node ordering without effecting individual evaluation, and
+\emph{DAG}, a method for removing the concept of node position.
+Experiments were performed on four problems tailored to highlight potential search
+limitations, with further testing on the 3-bit multiplier problem.
+
+Unlike previous work, our experiments show that CGP has an innate parsimony pressure
+that makes it very difficult to evolve individuals with a high percentage of active nodes.  This bias is
+particularly prevalent as the length of an individual increases.  Furthermore, these problems are compounded by CGP's positional
+biases which can make some problems effectively unsolvable.  Both \emph{Reorder}
+and \emph{DAG} appear to avoid these problems and outperform \emph{Normal} CGP
+on preliminary benchmark testing. Finally, these new techniques require more
+reasonable genome sizes than those suggested in current CGP, with some evidence
+that solutions are also more terse.
+
+\end{abstract}
+
+% A category with the (minimum) three required fields
+\category{Computing Methodologies}{Artificial Intelligence}{Search Methodologies}
+%A category including the fourth, optional field follows...
+%\category{D.2.8}{Software Engineering}{Metrics}[complexity measures, performance measures]
+
+\terms{Algorithms}
+
+\keywords{Cartesian Genetic Programming, Neutrality, Bloat}
+\\
+\\
+\section{Introduction}
+In all black box search, search designers must make assumptions about the properties
+of the problem in order to outperform random search.  When these assumptions
+match the application, search time can be greatly reduced.  As such, understanding how design decisions
+effect search effectiveness or even prevent search from finding solutions is very important.
+%
+In Cartesian Genetic Programming (CGP) the maximum genome size of an individual
+is set at initialization.  While this
+requires the maximum genome size to be larger than the problem's solution needs,
+the question remains; how will the maximum genome size effect evolution's
+speed at finding solutions.  As larger genomes inherently represent larger search
+spaces, intuition suggests that using the lowest possible maximum size will have the most efficient search.
+However, in CGP a mounting body of evidence suggests the optimal
+maximum size is much larger than the actual solutions evolved~\cite{miller:2006:redundancy}.
+We examine the cause of this discrepancy by applying CGP and a few
+modified versions of CGP to problems which test specific edge cases in representation.
+The result is a better understanding of the search limitations of CGP.
+
+\section{CGP}
+\label{sec-cgp}
+In Cartesian Genetic Programming (CGP) individuals use a fixed length string of integers to
+encode directed acyclic graphs (DAGs).  
+Each node in the DAG is encoded using multiple genes: one specifying a function and
+the rest specifying node input connections.
+Graph output is determined by additional genes which can connect to any node or
+program input.
+To prevent cycles,
+nodes may only connect to problem inputs or nodes that precede them in the genome.
+Early versions of CGP limited valid connections further through user specified graph
+topologies.
+While specifying topology is still useful
+when evolving circuits with known hardware limitations, the less restricted form
+allows CGP to represent all possible
+DAGs of size \emph{N}, where \emph{N} is the number of nodes in the genome.
+%
+The most common evolutionary mechanism in CGP is a $1+\lambda$ population
+where each generation the best offspring replaces the parent if it is no less
+fit.  CGP almost exclusively uses a form of point mutation to create offspring,
+with no form of crossover commonly being employed.  As such, these are the methods
+considered in our analysis.
+For a more detailed description of CGP, see~\cite{miller:2011:chapter2}.
+
+%\subsection{Graph Size, Bloat, and Inactive Genes}
+While CGP imposes a maximum graph size \emph{N}, the minimum
+effective graph size is variable, as there can be unused portions
+of the genome.  These inactive nodes exist because both output locations and
+internal connections can be changed by evolution.  A trivial example is when all outputs
+are connected directly to problem inputs the entire genome becomes
+inactive.  Thus the active nodes are those nodes used when computing output.
+%With all
+%of these features combined, it should be clear that CGP is capable of evolving
+%variable sized DAGs with a bounded maximum size.
+
+A pernicious problem in the Genetic Programming (GP) community is individual bloat, in which solutions
+become larger with time without substantive improvement in quality~\cite{luke:2006:bloat}.
+Experimental evidence has so far suggests that CGP is able to avoid
+bloat, as the evolved number of active
+nodes does not grow during evolution~\cite{miller:2001:bloat} nor does it grow significantly
+as the maximum number of nodes is raised~\cite{miller:2006:redundancy}.
+
+%\subsection{Neutral Search}
+The existence of inactive genes provides CGP with an explicit form of genetic
+introns, allowing the evolutionary process to perform neutral search.
+CGP's replacement strategy facilitates neutral space
+exploration by ensuring offspring replace their parents if they are no less fit.
+This allows the population to drift,
+which has been shown to be beneficial~\cite{yu:2001:neutrality}.  Furthermore,
+there is evidence that as much as 95\% of the genotype should be inactive
+to allow for sufficient neutral search~\cite{miller:2006:redundancy}.
+
+However, this approach to neutral search may have disadvantages.  In response to a previous claim
+about neutrality's beneficial effects on needle in a haystack style
+problems, Collins~\cite{collins:2006:haystacks} showed that on problems with no search
+gradient, efficient random sampling can significantly outperform CGP with neutral search.
+Collins argued that the benefits CGP claimed to be receiving through neutral search
+may be better attributed to higher maximum genome sizes causing an increase in
+the total number of active genes.
+
+\section{Length and Positional Biasing}
+\label{sec-length-biasing}
+Despite CGP's ability to represent all possible DAGs
+of size \emph{N}, there is little evidence that it uniformly
+searches the space of DAGs. In fact,~\cite{payne:2009:bias} showed that certain types of structures
+are more difficult to evolve than others.  In particular, larger structures may be more difficult to
+evolve as they are less common in the search space. 
+Tree based GP has similar issues,
+with strong evidence that specific types of trees are more difficult to
+evolve even though they are common in the search space~\cite{daida3:2003:treebias}.
+We suggest that
+the mechanics used to initialize and evolve connection genes in CGP
+impose significant biases on the structures of the DAGs evolved, with more bias against
+larger genotypes than should be expected by just representation frequency.
+
+When initializing and mutating a connection gene, its value is randomly set to
+either a preceding node in the genome or to an input.  As was discussed in~\cite{collins:2006:haystacks},
+this means the expected location of a new connection is $\frac{i}{2}$ where \emph{i}
+is the number of nodes and inputs that precede the mutated node.  If all nodes had
+a single connection gene, we would expect random individuals to have a length of $\log_2N$.
+Precise calculation of the expected length is made difficult
+due to node overlap, but the relationship will remain logarithmic to the total genome size.
+
+The probability that a node is active changes greatly depending on where
+in the genome it is encoded.  Consider nodes near the end of the genome.
+The highest index node expected to be active is given by Equation~\ref{eq-active-end}.
+\begin{equation}
+  \left ( N+I \right )\frac{O}{O + 1}
+  \label{eq-active-end}
+\end{equation}
+Here, \emph{N} is the number of nodes in the genome, \emph{I} is the number of input locations,
+and \emph{O} is the number of output locations.  This equation is derived from the fact that
+if numbers are drawn uniformly at random and then ranked, the mean value for each rank
+will be evenly spaced in the range.  As a result, the expected highest output location will be
+the same as if \emph{O} locations were placed evenly on the range $N + I$.
+On problems with a single
+output (such as the commonly used parity problem) this means, on average, nodes
+in the second half of the genome are inactive.  
+%Problems with
+%more outputs will be less effected as Equation~\ref{eq-active-end} approaches $N + I$
+%as \emph{O} grows.
+Some CGP implementations reduce this problem by
+fixing the output locations to the last \emph{O} nodes in the genome, which has the effect
+of scaling \emph{O} in Equation~\ref{eq-active-end} by the arity of the nodes in use.  However, this does not
+remove the probability for large sections of inactive nodes near the end of the genome.
+
+Conversely, nodes near the beginning of the genome are almost always active.
+Equation~\ref{eq-incoming} shows how the expected number of incoming connections
+increases as the number of nodes following node \emph{i} increases and the
+arity (\emph{a}) used increases.  This relationship is non-linear monotonic, with input locations
+and nodes near the inputs likely to have more than one incoming connection while nodes
+near the output location will likely have less than one incoming connection.
+\begin{equation}
+  \sum_{j=i+1}^{N} \frac{a}{j}
+  \label{eq-incoming}
+\end{equation}
+Equation~\ref{eq-incoming} is derived from the fact that all nodes following \emph{i}
+in the genome have \emph{a} connections which each have a $\frac{1}{j}$ chance of
+connecting to \emph{i}.
+
+The probability that a node is active increases as the number of incoming connections
+increases, as each could potentially come from an active node.  This creates a self
+reinforcing cycle:  The closer a node is to the inputs the more incoming connections
+it can receive from other nodes with lots of incoming connections.
+As a result, nodes near the inputs are almost
+always active while nodes near the outputs are almost never active.  Furthermore,
+the output of nodes near the inputs is likely to be used by multiple active nodes.
+
+Having many active nodes near the start and few near the end has important
+implications on CGP's ability to perform neutral search.
+If there are no inactive nodes preceding a given
+node, it cannot benefit from neutral evolution.  Nodes that have a high percentage
+of inactive nodes preceding them will conversely have a high probability of attaching
+to inactive nodes, but will likely be inactive themselves.
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{ThoughtExperiment}
+  \caption{Thought experiment illustrating limitations in \emph{Normal} CGP.
+           Arrows represent the flow of information.} 
+  \label{fig-thought}
+\end{figure}
+
+How this positional bias of active genes effects search can be examined
+using a thought experiment, shown in Figure~\ref{fig-thought}.  
+Each of the three Cases given are of the second best phenotype, in which \emph{Z}
+takes its input from \emph{X}, while in the optimal phenotype \emph{Y} is applied
+on \emph{X}'s output before input to \emph{Z}.  In Case 1 there are inactive nodes
+between \emph{X} and \emph{Z}, so CGP is able to use drift to insert \emph{Y}.
+Unfortunately, because active nodes cluster heavily near the start of the genome,
+this is unlike to happen if even a moderate percentage of the genome is active.
+In Case 2, \emph{X} and \emph{Z} are adjacent nodes, or equivalently all nodes between
+\emph{X} and \emph{Z} are active.  CGP can only solve this case by recreating \emph{X}
+and/or \emph{Z} somewhere else in the genome using drift, converting this back
+to Case 1.  That process is highly unlikely as it involves drift of active genes.
+In Case 3, \emph{Y} already exists in the genome, but in the wrong order relative to \emph{Z}.
+CGP can solve this by either reinventing \emph{Y} as in Case 1 or moving \emph{Z} as in Case 2.
+From a phenotypic standpoint, the first two cases should be equally difficult with the third
+being easier, as \emph{Y} already exists.  However, due to CGP's positional biases, Case 2 is much harder than Case 1,
+as active nodes must be reinvented before \emph{Y} can be evolved and added between \emph{X} and \emph{Z}.
+Furthermore, Case 3 is just as hard as Case 1, as even though \emph{Y} already exists, \emph{Z} cannot connect to it.
+Case 2 and 3 become even more difficult if \emph{X}, \emph{Y}, and \emph{Z} are thought of as
+collections of nodes used to produce a single output, as recreating these complex structures
+increases the difficulty.  They also become more common as interwoven structures in the
+genome act the same as adjacent nodes in this experiment.
+
+\section{Avoiding Search Limitations}
+\label{sec-modifying-cgp}
+In order to experimentally examine how the mechanisms of CGP bias search, we propose two CGP variants.
+The first
+is \emph{Reorder}, which attempts to mitigate positional bias by performing phenotypically
+neutral node shuffling.  The second is \emph{DAG}, which allows nodes to connect
+to any other node in the genome as long as no cycle is created.  For clarity, we will
+refer to standard CGP as \emph{Normal}.  Note that both variants are capable of
+representing the exact same set of graphs as \emph{Normal}.  They only differ
+in how graphs can be modified by evolution.
+
+\subsection{Reorder}
+\label{sec-reorder}
+\emph{Reorder} works identically to normal CGP with a single change:
+Before producing offspring, the parent's nodes are shuffled without changing the phenotype of the individual.
+That is, we perform neutral search on the parent's node ordering.
+This process begins by building bidirectional node dependency sets, such that
+each node's input and output sets can be easily accessed.  First the
+set of \emph{addable} nodes is created, which initially contains all of the
+inputs.  The new node ordering is then determined iteratively using the following
+steps:
+\begin{enumerate}
+  \item Select and remove a node $\alpha$ at random from the \emph{addable} set.
+  \item If $\alpha$ is not an input, map it sequentially to the next genome location.
+  \item For each node $\beta$ which takes output from $\alpha$:
+  \begin{enumerate}
+    \item Mark $\beta$'s dependency on $\alpha$ as satisfied.
+    \item If $\beta$'s dependencies have all been satisfied, add it to \emph{addable}.
+  \end{enumerate}
+\end{enumerate}
+Iteration ends
+when all nodes have been given new locations in the sequence.  At this point, nodes can be moved
+into their new locations, with their connections being updated using the ordering
+map.  Once reordered, nodes maintain the normal CGP requirement that all nodes
+must take their inputs from nodes preceding them in the genome, meaning that
+the mutation and evaluation process remains the same.  As all connections and functions are
+preserved during this process, there is no change in the result obtained by executing
+an individual.  \emph{Reorder} is just a neutral permutation of the node ordering.
+
+Repeating the thought experiment in Figure~\ref{fig-thought} with
+\emph{Reorder} shows how it can differ from \emph{Normal}.  Because inactive nodes
+can be shuffled between \emph{X} and \emph{Z}, Case 1 and 2 become identical.
+Case 3 can be
+solved by \emph{Reorder} without recreating \emph{Y}, as it can
+be shuffled to precede \emph{Z}.
+
+Without breaking connections, a node can be moved forward such that
+it transitively depends on all preceding nodes.  A node can also be moved back until all following nodes
+transitively depend on it.  Furthermore, the distance between a node and
+its input with the highest amount of transitive dependency will be on average smaller
+than in \emph{Normal}.  This is illustrated
+when considering graphs with a node arity of one.  In \emph{Normal} and at initialization
+of \emph{Reorder}, a node is on average $\frac{i}{2}$ indexes away from where it gets its input and $2i$ indexes
+from where its output goes.  In \emph{Reorder}, nodes will on average be equidistant to
+their their inputs and outputs.  In this case, the expected distance is related to the total number
+of nodes in the dependency chain.  This means that an increased number of active nodes can
+occupy higher index locations as they are pushed to the center between their inputs and outputs.
+
+This does not directly translate into \emph{Reorder} being able to create more active graphs,
+or mean that \emph{Reorder} is without length bias.  When creating new connections,
+the expected location is still $\frac{i}{2}$, which means given enough mutations,
+the individual can revert back to all of the expectations for \emph{Normal}.
+In general however, \emph{Reorder} will allow nodes on which
+many nodes transitively depend to increase how many nodes can connect to them, while simultaneously
+allowing nodes with only a few transitive dependencies to gain more dependencies.
+
+A final artificial bias in both \emph{Reorder} and \emph{Normal} is
+that all connections in a node will tend to have the same transitive
+dependencies.  This is because if node $\beta$ is already transitively dependent
+on node $\alpha$, then $\alpha$ is always a valid connection when generating new connections in $\beta$.
+This is because all transitive dependencies to a node always precede that node, even
+when using \emph{Reorder}.  Nodes that $\beta$ is not already transitively dependent
+on have a probability of being unreachable, and therefore are connected to less frequently.
+
+\subsection{DAG}
+\label{sec-dag}
+The concept behind \emph{DAG} is to relax the requirement that nodes must connect
+forward in the genome.
+To accomplish this, only two portions of CGP have to be
+modified: connection gene mutation and evaluation ordering.
+In \emph{Normal}, when a connection gene is mutated, its value is randomly changed
+to any input or node index less than the mutating node's index.  In
+\emph{DAG}, when a connection gene is chosen to be mutated, new connections are
+tried randomly and kept if they do not create a cycle.
+
+At the start of each mutation, a mapping is developed to store which nodes are
+transitively dependent on the mutating node, and which are not.  Initially this map stores that
+the input indexes are not dependent on the mutating node, and
+that the node is dependent on itself.  Nodes are then tested in a random
+order for transitive dependence.  This is performed by recursively applying
+the following rules:
+\begin{itemize}
+  \item If the node's dependency is already known, return the stored information.
+  \item If this node takes input from a dependent node, it is dependent.
+  \item If none of its inputs are dependent, it is not dependent.
+\end{itemize}
+As information is collected, the map is updated to ensure a node is never checked
+for dependency twice.  If the randomly chosen node is not dependent on the mutating
+node, it is used as the new connection value. While this algorithm can result in
+each mutation needing to traverse a large portion of the graph searching for
+dependencies, the growth is at worst linear.  Furthermore, our reason for
+introducing \emph{DAG} is to analyze limitations in \emph{Normal}, not necessarily as
+a computationally efficient alternative.
+
+To determine node ordering during evaluation, \emph{DAG}
+performs a recursive walk of the active nodes starting from the output
+locations, recording for each node its bidirectional dependencies on other active nodes.
+Next, \emph{DAG} builds the ordering of active nodes similar to
+the \emph{Reorder} method in Section~\ref{sec-reorder}, ensuring only active nodes are added
+and that they are added only after all of their dependencies are in the list.
+Using this ordering, which is only built once for each individual, any number of
+input sequences can be evaluated with identical run time as \emph{Normal}.
+
+Removing the forward-only requirement found in \emph{Normal} and \emph{Reorder}
+allows \emph{DAG} to avoid positional bias.
+This is because any node can connect to any structure
+that exists in the graph as long as its not already part of that structure.  
+In contrast, \emph{Reorder} can only connect to nodes currently shuffled
+in front of the mutating node, while in \emph{Normal} structures may have
+to be reinvented to achieve the same connection.  \emph{DAG} can also
+insert inactive nodes between active nodes, as there is
+no concept of adjacency.
+
+As to individual length, \emph{DAG} has a much higher expected percentage of active nodes
+than \emph{Normal} or \emph{Reorder}.  When mutating, a connection can be made to
+any non-dependent node and input.  Using an arity of one as an example, the
+expected number of active nodes is $\frac{N}{I+1}$ where \emph{I} is the number
+of inputs.  Higher arity will increase the active proportion, but overlap makes
+precise estimations difficult.  Note that unlike \emph{Normal}, the number of
+active nodes in \emph{DAG} scales linearly with the total number of nodes.  Also,
+since \emph{DAG} still uses \emph{Normal}'s method of initialization, the actual
+individuals evolved may be less active than expected.
+
+While \emph{DAG}'s reduced search biases do not necessarily result in better results
+on specific problems, it should generally make \emph{DAG} effective on a wider
+range of applications.
+Also note that while evolution of complete DAGs has been done previously~\cite{niehaus:2007:ggp},
+our \emph{DAG} method mirror's CGP more faithfully and allows for more direct comparison.
+
+\section{Tailored Problems}
+\label{sec-tailored}
+To test the search biases of CGP and our variants,
+we propose a few benchmark problems specifically
+tailored to highlight certain types of bias.
+%When performing
+%experiments with any evolutionary system, it is necessary to specify all configuration
+%information in order to improve replicability of results.
+The following experimental configuration is used across all experiments reported here.
+%In order to simplify
+%matters, all experiments reported here use the same configuration.
+Keeping with existing CGP literature, we opted for a $1+4$ strategy using
+mutation as the only variation operator.  To avoid tuning the mutation
+rate, we use the \emph{Single} mutation method described in~\cite{goldman:2013:cgpwaste},
+which mutates genes at random until exactly one active gene is changed.  
+Each run of each experiment used the same initial individual for all algorithms.
+All experiments were replicated 50 times, resulting in 50 different starting individuals per experiment.
+Having all algorithms start with the same initialization was done to reduce noise.
+Each
+run was given 10,000,000 evaluations before being terminated, and runs were stopped
+immediately on success.
+
+For all problems except \emph{Neutral} (Section~\ref{sec-neutral}), we provide a plot of the median
+evaluations until success using different problem sizes.  If the median run
+was unsuccessful, no information is plotted.  Note that both axes in these plots
+use a log scale.  In order to ensure a good sample of scalability we used 20
+evenly spaced problem sizes $\left [ 5 .. 100 \right ]$ at increments of 5.
+This information was then used to calculate each algorithms' order of complexity
+in regards to problem size, with results given in Table~\ref{table-growth}.
+A complete package of our results as well as the source code used in testing
+is available from our website.\footnote{\url{https://name.of.site.removed.com/anonymous-CGP}}
+
+\subsection{Neutral Exploration}
+\label{sec-neutral}
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{neutral}
+  \caption{Genome sizes required to achieve different mode
+           numbers of active nodes on the \emph{Neutral} problem} 
+  \label{fig-neutral}
+\end{figure}
+
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{length_frequencies_100}
+  \caption{Frequency of evolving individuals of different active lengths
+           on the \emph{Neutral} problem} 
+  \label{fig-length}
+\end{figure}
+
+To examine how CGP and our variants bias the active length of individuals
+based on the maximum genome size, we first experiment using the \emph{Neutral} problem.
+Similar to the problems used in~\cite{miller:2001:bloat,collins:2006:haystacks},
+\emph{Neutral} has a completely flat landscape, such that all individuals
+evaluate to the same fitness.  In CGP this means parents are replaced each
+generation with a randomly chosen offspring. Thus there is no evolutionary pressure, only drift.
+This problem highlights what kinds of individuals each variant is biased toward
+creating, independent of the evolutionary pressure.
+In less complex representations, such as those in binary genetic
+algorithms, you would expect all representable
+search points to have an equal probability of being seen given enough evaluations.  As CGP's representation
+involves complex decoding, \emph{Neutral} can help examine the likelihood of searching
+different parts of the search space.  
+In our experiments, \emph{Neutral} has a single input and a single output,
+with a node arity of two.  Furthermore, the function set used is of size one, meaning
+\emph{Single} mutation must change an active node's connection gene or the output location
+in order to produce new offspring.
+
+\begin{table}
+	\centering
+	\begin{tabular}{|r|c|c|c|}
+	  \hline
+& \textbf{\emph{Normal}} & \textbf{\emph{Reorder}} & \textbf{\emph{DAG}} \\ \hline
+    \textbf{Mode} & 15      & 20      & 45 \\ \hline
+ \textbf{95\% CI} & [5, 31] & [6, 44] & [10, 67] \\ \hline
+\textbf{<99.99\%} & 45      & 61      & 81 \\ \hline
+ \textbf{Longest} & 59      & 76      & 92 \\ \hline
+	\end{tabular}
+	\caption{Frequency of different length individuals on \emph{Neutral}. 
+	         Includes the most common length (mode), 95\% confidence interval (CI),
+	         length that 99.99\% of individuals were below, and the longest individual found.}
+	\label{table-length}
+\end{table}
+
+
+We performed two types of experiments on the \emph{Neutral} problem.  The first
+tests how each variant's evolved number of active nodes changes
+with genome size.  The results provided in Figure~\ref{fig-neutral} can be used
+to predict how large of a genome size should be used
+given a user's rough estimate of the number of active nodes required by the problem.  
+This also assumes that search will perform best when the most commonly searched length
+is close to the optimal individual length.  Figure~\ref{fig-neutral} shows that \emph{Normal}
+required the largest genome sizes to achieve each mode number of active nodes.  In
+terms of scaling, \emph{Normal} needs a genome size of $O(n^{1.79})$ with
+$n$ the desired mode number of active nodes.  While \emph{Reorder} only reduced
+this to $O(n^{1.53})$, \emph{DAG} scaled much better at $O(n^{1.18})$.  This implies
+that as true problem size increases, we should expect \emph{Normal} to require nearly
+quadratically increasing genome sizes, while \emph{DAG} scales nearly linearly.
+
+The second experiment looked at the distribution of evolved lengths using a fixed
+genome size of 100. This
+information is shown in Figure~\ref{fig-length} as a probability density curve,
+with numeric results in Table~\ref{table-length}.
+The results for \emph{Normal} match our predictions in Section~\ref{sec-reorder};
+most individuals were highly inactive, with a mode number of
+active nodes of only 15.  The probability of generating an individual drops quickly
+as the number of active nodes deviates from the mode, with none of the 0.5 billion
+generated individuals having more than 59 active nodes, and only one in 10,000 above 45.  This is in contrast
+to the actual number of graphs of each size, which increases exponentially.
+This means that \emph{Normal} is biased toward small graphs even more than
+Figure~\ref{fig-length} indicates.
+\emph{Reorder} and \emph{DAG} show less of a bias, with \emph{DAG}'s mode of 45
+close to the prediction made in Section~\ref{sec-dag}.  The implications of these
+biases is that each is most likely to find solutions fastest when the number of
+active nodes desired by the problem best matches the algorithms search bias, as
+otherwise the algorithm will add artificial pressure to search different sized
+graphs.  The steepness of the bias reflects how much pressure will be applied.
+Combined with the length scaling results in Figure~\ref{fig-neutral}, we would
+predict \emph{Normal} to both require a larger genome size than \emph{Reorder} and \emph{DAG},
+as well as search a much smaller subset of the search space.
+
+%TODO Consider returning to this problem after having done \emph{Depth} and
+%\emph{Flat}, using the optimal versions of those two problems as the
+%starting individual.
+
+
+
+\subsection{Breadth}
+
+\begin{table}
+	\centering
+	\begin{tabular}{|r|c|c|c|}
+	  \hline
+& \textbf{\emph{Normal}} & \textbf{\emph{Reorder}} & \textbf{\emph{DAG}} \\ \hline
+\textbf{\emph{Breadth}} & 3.24 & 2.06 & 2.09 \\ \hline
+  \textbf{\emph{Depth}} & 7.72 & 3.66 & 4.17 \\ \hline
+   \textbf{\emph{Flat}} & 1.86 & 1.87 & 1.94 \\ \hline
+	
+	\end{tabular}
+	\caption{$O(n^x)$ for each variant on each problem, where $n$ is problem size and $x$ is given in
+	         the table.}
+	\label{table-growth}
+\end{table}
+
+
+The \emph{Breadth} problem tests CGP's ability to evolve
+graphs that connect to all inputs using the minimum possible number of nodes.
+The landscape for this test is a problem with \emph{N} nodes which has $N+1$
+inputs and a single output.  The optimal structure is a tree with all nodes in the genome
+active and all inputs used exactly once as leaves.  To evaluate
+an individual, all nodes execute the binary \emph{OR} function,
+and possible program inputs are all strings of length $N+1$ with exactly one bit
+set.  As a result, the fitness of an individual is equal to the number of inputs
+connected to the output.  This problem is similar to the tree graph proposed
+in~\cite{payne:2009:bias}, except the problem scales such that all nodes
+must always be active, multiple inputs are used,
+and the fitness function involves individual execution instead of graph edit distance.
+
+Experimental results for the \emph{Breadth} problem are given in Figure~\ref{fig-breadth}.
+This shows that both \emph{Reorder} and \emph{DAG} scale better than \emph{Normal} when solving \emph{Breadth},
+but have similar behavior to each other.
+From Table~\ref{table-growth} we see that the number of evaluations \emph{Normal} requires
+to solve the \emph{Breadth} problem increases cubically while the other variants scale
+quadratically.  A likely cause of this growth discrepancy is that the solution to \emph{Breadth} requires
+all nodes in the genome to be active, which \emph{Normal} does with difficulty.
+The fact that \emph{Reorder} does not share this issue even though its
+search bias on \emph{Neutral} was relatively similar implies that \emph{Reorder} is better
+able to adapt to problem pressures than \emph{Normal}.  While \emph{DAG} scaled
+slightly worse than \emph{Reorder}, the difference is not significant.
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{breadth}
+  \caption{Median evaluations until success for different sizes of the \emph{Breadth} problem} 
+  \label{fig-breadth}
+\end{figure}
+
+\subsection{Depth}
+The \emph{Depth} problem requires CGP to evolve graphs with the maximum possible node
+reuse.  In this problem, all nodes use the same function, which takes the minimum of
+their inputs, increments it by one, and returns that value.  The fitness function is
+equal to the value returned, and each individual is tested on a single input of zero.
+As a result, the maximum fitness is achieved when all nodes are connected in a chain
+such that all nodes are active and all connections in each node go to the previous node in the graph.
+Where \emph{Breadth} required no node reuse, \emph{Depth} requires the maximum amount of node
+reuse.  Also in contrast to \emph{Breadth}, \emph{Depth} has a unique solution for
+\emph{Normal} and \emph{Reorder}, with \emph{DAG} having multiple ways of representing
+the same graph by encoding nodes in different orders.  This problem is similar to the linear graph proposed
+in~\cite{payne:2009:bias}, except the problem scales such that all nodes
+must always be active and the fitness function involves individual execution instead of graph edit distance.
+
+Figure~\ref{fig-depth} and Table~\ref{table-growth} both show how \emph{Normal}
+is effectively unable to solve this problem.  \emph{Normal} was only able to solve
+the smallest three problem sizes of the twenty tried, with an experimental growth
+rate of $O(n^{7.72})$.  By comparison, \emph{Reorder} and \emph{DAG} solved all
+or almost all, respectively, of the problems tried, with far lower growth rates.
+As \emph{Breadth} also required all nodes to be active, the reason for \emph{Normal}'s
+breakdown must be something else about \emph{Depth}.  A likely explanation is that
+\emph{Normal} requires structures to be evolved in a precise location in the genome,
+in that a node with all connections set to $i$ is only part of the optimal solution
+if that node is at position $i+1$.  If it is not, it must be reinvented at $i+1$ to
+move to optimality.  This is especially problematic in the following case.  Consider
+a fully optimal individual, except that $i+1$ is inactive and $i+2$ is active and
+all of its connections go to $i$.  The only way to improve this individual is to
+set all of $i+1$'s connections to $i$ and change all of $i+2$'s connections to $i+1$.
+What makes this difficult is the absence of fitness gradient, meaning all changes can
+only happen by drift and that changes to $i+2$ can only happen after $i+1$ is relatively
+correct.  Otherwise the individual will decrease in fitness.  This problem is further
+exacerbated by \emph{Normal}'s mutation method, which on average connects $i$ to $\frac{i}{2}$,
+meaning high index nodes are rarely connected to adjacent indexes.
+\emph{Reorder} avoids this problem by allowing structures to be moved to where they are
+needed, while simultaneously decreasing the length of connections.  \emph{DAG} has
+no concept of position, and therefore cannot have this problem.
+
+While \emph{Reorder} and \emph{DAG} have very similar behaviors in Figure~\ref{fig-depth},
+Table~\ref{table-growth} shows that \emph{Reorder} scaled slightly better.  A likely
+cause of this is that \emph{Reorder} has a higher probability of making nodes
+with uniform connections as compared to \emph{DAG}.  This is true
+because nodes with no transitive dependency on the mutating node
+and can still sometimes be unreachable by mutation in \emph{Reorder}.  Conversely, nodes
+that the mutating node is transitively dependent on will always be reachable.  In \emph{DAG}
+there is no bias toward connecting to already transitively dependent nodes.
+As a result, \emph{Reorder} is able to leverage this
+search bias to better make nodes with uniform connection genes, improving search speed.
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{depth}
+  \caption{Median evaluations until success for different sizes of the \emph{Depth} problem} 
+  \label{fig-depth}
+\end{figure}
+
+\subsection{Flat}
+As a counter point to \emph{Breadth} and \emph{Depth}, which require entirely
+active genomes, we propose \emph{Flat}.  Unlike the other problems, \emph{Flat}
+evaluates an individual's genome directly, with the fitness of
+an individual equal to the number of connections made directly to the input.
+In this case the optimal individual is one where all nodes and the output location
+are connected to the only input location.  This tests how well CGP is able to
+create genomes with the least amount of internal structure.
+Similar to \emph{Depth}, \emph{Flat} has exactly one solution. 
+In~\cite{payne:2009:bias} some evidence was found that solutions
+that appear less often in the search space may be harder to find.  If this is the reason
+\emph{Depth} was more difficult than \emph{Breadth}, then \emph{Flat} should also
+be difficult to solve.  As all nodes now
+participate in evaluation regardless of connections, they are all considered active
+when performing \emph{Single} mutation.
+%Note that a more standard fitness function
+%cannot be used as an inverse to \emph{Breadth} and \emph{Depth} as all three methods
+%can equally make fully inactive individuals by directly connecting the output
+%to the input at a probability of $\frac{1}{N+1}$.
+
+On this problem, all three algorithms have approximately the same overall shape, shown
+in Figure~\ref{fig-flat}, and have similar complexities, shown in Table~\ref{table-growth}.
+\emph{DAG} does appear to be slower than the other two, although the difference may
+just be by a constant scalar.  This makes sense as the probability of a connection
+mutating to an input is $\frac{1}{N}$ for \emph{DAG} and $\frac{1}{i}$ for
+\emph{Normal} and \emph{Reorder}, with $i\leq N$.  In \emph{DAG}, if there are nodes with
+transitive dependencies on the mutating node, then the probability
+of connecting to the input increases.  However, it can never surpass that for \emph{Normal}
+and \emph{Reorder}.  More generally, these results support the idea that \emph{Reorder}
+and \emph{DAG} do not have a harder time making highly unconnected structures
+than \emph{Normal}, and that solution rarity in the search space is not why \emph{Normal}
+did so poorly on \emph{Depth}.
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{flat}
+  \caption{Median evaluations until success for different sizes of the \emph{Flat} problem} 
+  \label{fig-flat}
+\end{figure}
+
+\section{Benchmarking}
+\label{sec-benchmarking}
+Understanding length biases and search limitations allows users to
+solve new search problems easier.  In order to examine how our predicted search biases
+interact with standard CGP landscapes, we tested all three algorithms on the 3-bit
+multiplier problem.  In this problem there are six inputs and six outputs with
+a function set of \{AND, OR, NAND, NOR\}.  Instead of scaling problem difficulty
+as in Section~\ref{sec-tailored}, each algorithm was tested with scaling genome
+sizes.  We used the range $\left [ 10 .. 8000 \right ]$, taking 21 points on an
+exponential scale.  Other run parameters were kept the same.
+The median number of evaluations to success is shown in
+Figure~\ref{fig-multiply} on a log-log scale.  The results from the best genome
+size are given in Table~\ref{table-multiply}.
+
+As predicted, both the graphic and tabular results show that \emph{Reorder} and
+\emph{DAG} can perform effective search with much smaller genome sizes than \emph{Normal}:
+The best tested genome size for both novel
+variants had lower median evaluations to success than \emph{Normal}'s best, which
+also required a genome twenty times larger.  \emph{Reorder} was statistically
+better than \emph{Normal} under the single tailed Mann-Whitney U test. While \emph{DAG} was not
+statistically better than \emph{Normal}, the likely reason is \emph{Normal}'s exceptionally large median
+absolute deviation.  We believe this deviation is caused by \emph{Normal}'s occasional need to
+reinvent useful structures in different genome locations.  In the unlikely event that
+active nodes are evolved with the right amount of inactive nodes between them, and in the
+right order relative to each other, \emph{Normal} is likely going to receive far better
+results.  In cases were these properties do not hold, \emph{Normal} will
+have to recreate nodes in new locations, often with no fitness gradient, significantly
+increasing run time.  As the number of nodes in the genome increases, the probability
+that inactive nodes exist between two active nodes increases.  This may be part of
+the reason \emph{Normal} requires such a large genome size to perform well.
+Also, more inactive space in the genome may facilitate structure recreation in new locations.
+As a final advantage to \emph{Reorder} and \emph{DAG}, we see that both evolved
+solutions with half as many median active nodes as \emph{Normal}.  A potential
+reason for this is \emph{Normal}'s need to leverage introns in order to perform
+neutral search more than the other methods.
+
+\begin{table}
+	\centering
+	\begin{tabular}{|c|c|c|c|}
+	  \hline
+& \textbf{\emph{Normal}} & \textbf{\emph{Reorder}} & \textbf{\emph{DAG}} \\ \hline
+\textbf{Genome} & 4000   & 200     & 200 \\ \hline
+  \textbf{MES} & 272,324 & 213,660 & 249,031 \\ \hline
+  \textbf{MAD} & 125,997 & 79,335  & 86,551 \\ \hline
+  \textbf{P value} & N/A & 0.030   & 0.117 \\ \hline
+  \textbf{Active} & 255  & 118     & 120 \\ \hline
+
+	\end{tabular}
+	\caption{Best configuration of each algorithm on 3-bit Multiplier.
+	Includes maximum genome size, Median Evaluations to Success (MES), Median Absolute Deviation (MAD)
+	one tailed P value comparison with \emph{Normal}, and median number of active
+	nodes in the final solutions found.}
+	\label{table-multiply}
+\end{table}
+
+\emph{Reorder} and \emph{DAG} are not without drawbacks.  In Figure~\ref{fig-multiply} we see that
+\emph{Normal} may underperform at peak performance and at lower genome sizes, but
+as the genome size increases it surpasses the other methods.  \emph{DAG} is especially
+sensitive to increasing genome sizes, performing worse than \emph{Normal} on sizes above 600.
+\emph{Reorder} also falls behind \emph{Normal} once sizes exceed 2000.  This
+could indicate that the novel methods are more sensitive to genome size.
+While this is true, we believe it to be less of a flaw and more of an unavoidable side
+effect of these techniques being able to evolve more complex graphs than \emph{Normal}.
+%TODO Consider expanding here.
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{multiply}
+  \caption{Median evaluations until success on the Multiply problem using different genome sizes} 
+  \label{fig-multiply}
+\end{figure}
+
+\section{Conclusions and Future Work}
+\label{sec-conclusion}
+Existing literature suggests CGP performs best when maximum genome sizes
+far exceed actual solution size~\cite{miller:2006:redundancy}, supported by
+evidence that inactive genes improve neutral search~\cite{yu:2001:neutrality},
+and that CGP doesn't suffer from bloat~\cite{miller:2001:bloat}.  We, however, find evidence
+that the need for highly inactive genomes is likely due to limitations in CGP's
+search mechanisms.  When no selective pressure on size exists, CGP highly favors
+short individuals, with this search bias continuing even when the problem structure
+calls for longer individuals.  Furthermore, when combined with CGP's use of node
+positioning, problems requiring significant proportions of the genotype to be
+active were found to be difficult or impossible for CGP to solve.  We showed theoretical
+and experimental evidence that the blame for this problem lies with the way CGP's mutation
+interacts with its representation, as existing mechanisms impose artificial search limitations
+not inherent to the search problem.  \emph{Reorder}, which shuffled node positions
+without changing node expression, and \emph{DAG}, which removed all concept of node
+position, were both able to avoid these limitations and more fully utilize
+genome space.  As these methods were able to achieve better results with less
+inactive genes, we conclude that while inactive genes are useful, the number required
+by \emph{Normal} CGP is a result of the inherent length bias and search limitations in its
+representation and evolutionary mechanisms, and not because that many inactive
+nodes are needed for neutral search.  Similarly, CGP's resistance to bloat is likely
+no more than the work of a previously unexamined form of parsimony pressure, the strength
+of which is determined by the maximum number of nodes.  The drawback of \emph{Reorder} and
+\emph{DAG} is that in removing this parsimony pressure, they are more able to utilize
+all genes in the genome, making them more sensitive to the genome size.  Yet this
+may prove to be an advantage, as it may allow CGP to solve more complex problems without
+explosively increasing the genome size.
+
+Further analysis of \emph{Reorder} and \emph{DAG} should be performed in light
+of the evidence found here.  Both appear to be valid ways of making CGP more flexible
+and powerful, but wider testing needs to be performed to solidify that claim.  As
+an important aspect of those tests, run time comparisons need to be performed, as
+both increase the computational expense of CGP, with \emph{DAG} especially having
+the potential for significant overhead.  It is also possible either could benefit
+from further modification, such as using different initialization or method for mutation.
+
+More analysis on the tailored problems will likely improve the clarity of results.  Specifically
+\emph{Neutral} would likely benefit from further scalability testing to see how search frequencies change
+with respect to genome size, especially at larger genome sizes.  Tests with \emph{Breadth} and \emph{Depth} to see how many inactive
+nodes are needed before \emph{Normal} surpasses \emph{Reorder} and \emph{DAG}, if ever, may
+also help highlight exactly what proportion of inactive nodes \emph{Normal} needs to solve
+problems.
+
+%
+% The following two commands are all you need in the
+% initial runs of your .tex file to
+% produce the bibliography for the citations in your paper.
+\bibliographystyle{abbrv}
+\bibliography{../main}  % sigproc.bib is the name of the Bibliography in this case
+% You must have a proper ".bib" file
+%  and remember to run:
+% latex bibtex latex latex
+% to resolve all references
+%
+% ACM needs 'a single self-contained file'!
+%
+%APPENDICES are optional
+\balancecolumns
+%\balancecolumns % GM June 2007
+% That's all folks!
+\end{document}

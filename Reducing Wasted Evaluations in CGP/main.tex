@@ -1,0 +1,633 @@
+
+%%%%%%%%%%%%%%%%%%%%%%% file typeinst.tex %%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% This is the LaTeX source for the instructions to authors using
+% the LaTeX document class 'llncs.cls' for contributions to
+% the Lecture Notes in Computer Sciences series.
+% http://www.springer.com/lncs       Springer Heidelberg 2006/05/04
+%
+% It may be used as a template for your own input - copy it
+% to a new file with a new name and use it as the basis
+% for your article.
+%
+% NB: the document class 'llncs' has its own and detailed documentation, see
+% ftp://ftp.springer.de/data/pubftp/pub/tex/latex/llncs/latex2e/llncsdoc.pdf
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\documentclass[runningheads,a4paper]{llncs}
+
+\usepackage{amssymb}
+\setcounter{tocdepth}{3}
+\usepackage{graphicx}
+\usepackage{verbatim}
+\usepackage{url}
+\usepackage{hhline}
+\newcommand{\includegraphicsfit}[1]
+{\includegraphics[width=.9\textwidth,height=\textheight,keepaspectratio]{#1}}
+%\urldef{\mailsa}\path|{alfred.hofmann, ursula.barth, ingrid.haas, frank.holzwarth,|
+%\urldef{\mailsb}\path|anna.kramer, leonie.kunz, christine.reiss, nicole.sator,|
+%\urldef{\mailsc}\path|erika.siebert-cole, peter.strasser, lncs}@springer.com|    
+\newcommand{\keywords}[1]{\par\addvspace\baselineskip
+\noindent\keywordname\enspace\ignorespaces#1}
+
+\begin{document}
+
+\mainmatter  % start of an individual contribution
+
+% first the title is needed
+\title{Reducing Wasted Evaluations in Cartesian Genetic Programming}
+
+% a short form should be given in case it is too long for the running head
+%\titlerunning{Lecture Notes in Computer Science: Authors' Instructions}
+
+% the name(s) of the author(s) follow(s) next
+%
+% NB: Chinese authors should write their first names(s) in front of
+% their surnames. This ensures that the names appear correctly in
+% the running heads and the author index.
+%
+\author{Brian W.~Goldman\and William Punch}
+%\author{Anonymous Author\and Anonymous Author}
+%
+%\authorrunning{Lecture Notes in Computer Science: Authors' Instructions}
+% (feature abused for this document to repeat the title also on left hand pages)
+
+% the affiliations are given next; don't give your e-mail address
+% unless you accept that it will be published
+\institute{BEACON Center for the Study of Evolution in Action,\\
+Michigan State University, U.S.A.\\
+brianwgoldman@acm.org, punch@cse.msu.edu}
+%\institute{Department\\ Organization\\ Email}
+
+
+%
+% NB: a more complex sample for affiliations and the mapping to the
+% corresponding authors can be found in the file "llncs.dem"
+% (search for the string "\mainmatter" where a contribution starts).
+% "llncs.dem" accompanies the document class "llncs.cls".
+%
+
+%\toctitle{Lecture Notes in Computer Science}
+%\tocauthor{Authors' Instructions}
+\maketitle
+
+
+\begin{abstract}
+Cartesian Genetic Programming~(CGP) is a form of Genetic Programming~(GP)
+where a large proportion of the genome is identifiably unused
+by the phenotype.  This can lead mutation to create offspring that are 
+genotypically different but phenotypically identical, and therefore do
+not need to be evaluated.  We investigate theoretically and empirically
+the effects of avoiding these otherwise wasted evaluations, and provide
+evidence that doing so reduces the median number of evaluations to solve
+four benchmark problems, as well as reducing CGP's sensitivity to the mutation
+rate.  The similarity of results across the problem set in combination with the
+theoretical conclusions supports the general need for avoiding these unnecessary
+evaluations.
+
+%The abstract should summarize the contents of the paper and should
+%contain at least 70 and at most 150 words. It should be written using the
+%\emph{abstract} environment.
+
+\keywords{cartesian genetic programming, mutation}
+\end{abstract}
+
+
+\section{Introduction}
+%TODO Consider change to "best results"
+In Genetic Programming~(GP) the most common metric for measuring algorithm complexity
+is the number of fitness evaluations required to solve
+a black box problem.  This metric assumes that the cost of evaluating an
+individual will dominate search times on real world problems.  Under this
+metric, search algorithms that best exploit evaluation information and avoid
+unnecessary evaluations will receive the best results.  Cartesian Genetic
+Programming~(CGP), a branch of GP, has a particular structure that allows
+for the detection of some phenotypically identical genotypes without
+requiring fitness evaluation.  No previous work has investigated if this
+property can be exploited to meaningfully improve CGP efficiency.  After discussing the
+potential theoretical gains of avoiding these evaluations, we propose and
+investigate three novel techniques designed to improve CGP's
+search.
+
+
+\section{Cartesian Genetic Programming}
+\label{sec:cgp}
+Cartesian Genetic Programming is a variant of genetic programming in which
+individuals encode directed acyclic graphs (DAG).
+An in-depth explanation of CGP is provided in~\cite{miller:2011:chapter2}, but for
+our purposes the important features are:
+\begin{itemize}
+  \item DAGs are represented by a collection of nodes and genes specifying output locations.
+  \item Nodes contain genes describing both what function they perform
+  and how they connect to other nodes.
+  \item Offspring are created using mutation.
+  \item Offspring replace parents if they are of the same or greater fitness.
+\end{itemize}
+CGP's encoding method does not require a node
+to connect to an output location, which is required for it to
+affect the phenotype of the individual.
+These unconnected nodes and their genes are commonly called ``inactive''
+and the connected nodes and their genes are called ``active.''
+As the topology of the DAG is constantly evolving, the number and location of
+active nodes can change from parent to child.
+There have been numerous studies on the usefulness of inactive nodes~\cite{vassilev2000neutrality,yu:2001:neutrality}
+including an argument that it is desirable to have up
+to $95\%$ of the genome inactive~\cite{miller:2006:redundancy}.
+
+CGP's canonical variation operator is point mutation.  Unfortunately the details
+of this operator are often ambiguously stated.  For instance, in some papers this
+operator chooses a set number of genes at random to be mutated~\cite{miller:2011:chapter2},
+while in other papers each gene can be mutated with a certain probability,
+allowing any number of genes to be mutated at once~\cite{harding:2012:mtcgp}.  Also, mutation in CGP can either
+force a mutated gene's value to change~\cite{harding:2012:mtcgp,miller:2011:chapter2},
+or randomly reset it to any valid value including the genes previous value~\cite{miller:2006:redundancy}.
+As much of our analysis hinges on
+the behavior of mutation, we specify mutation as follows:
+when performing mutation, all genes use the mutation rate as the
+probability that they are changed to a different value.
+%Only if a gene has exactly one valid value\footnote{Genes can have just a single valid
+%value in the case of the first node's connection genes in single input problem
+%or if there is only a single valid function.}
+%will mutation leave the gene unchanged.
+
+The most common form of CGP uses a $1+\lambda$ strategy, where all offspring are
+mutants of the parent.  The most fit offspring replaces the parent only if its
+fitness is no worse than the parent.  Ties between offspring are broken by random selection
+and ties between the offspring and the parent are awarded to the offspring:  in this manner
+inactive genes are allowed to drift, which has been shown to significantly improve
+performance~\cite{yu:2001:neutrality}.  We will refer to this standard form of
+mutation and replacement as \emph{Normal}.
+
+\section{Wasted Evaluations}
+Preventing search from repeatedly evaluating the same search point can improve
+any search that is limited by the number of evaluations it can perform.
+In an evolutionary search employing indirect phenotype encoding, as CGP does,
+the same search point can be represented by multiple different genotypes
+making duplicate detection more difficult.  While it does not catch all
+identical phenotypes, if two CGP individuals are actively identical (contain
+the same active genes) then their phenotypes must be identical.
+Miller~\cite{miller:2011:chapter2} theorized
+that this may lead to wasted evaluations as any number of actively identical
+individuals can be evaluated even though they will receive identical fitnesses.  He did not,
+however, provide any analysis for how frequently these unnecessary evaluations may occur.
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{Probability}
+  \caption{Probability of no active gene being mutated for different mutation rates} 
+  \label{fig:probability}
+\end{figure}
+\subsection{Detection}
+Before evaluating a CGP individual, it is common practice to determine which
+nodes are active allowing inactive nodes to be ignored during
+evaluation, leading to a reduction in runtime~\cite{vasicek:2012:efficient}.
+By storing the set of active genes as part of the individual, it is trivial
+to determine when active genes are mutated.  More generally, it takes $O(N)$ additional time to determine
+if two randomly chosen individuals contain different active genes, where $N$ is
+the number of active nodes, assuming at least one of the individuals has been
+evaluated.  
+
+\begin{comment}
+To exploit this knowledge to its fullest, all newly created individuals could
+be compared against all previously evaluated individuals to determine if they
+need to be evaluated.  While this can be optimized by storing a hash table of
+actively unique individuals, the likelihood that two unrelated individuals are
+actively identical may be too low to warrant the memory overhead required by being
+this thorough.
+\end{comment}
+
+%A reasonable heuristic to reduce this overhead is to only check if
+A reasonable heuristic to avoid duplicate evaluations is to determine if
+a parent's active genes are identical to its offspring.  This will catch the
+majority of cases, as the probability of two individuals being actively identical
+decreases as the number of mutation applications
+between them increases.  This also has the advantage that
+extra individuals need not be stored in memory.  Due
+to these advantages, we only compare an offspring against its parent
+to detect unnecessary evaluations.
+
+
+\subsection{Frequency of Offspring Actively Identical to their Parent}
+\label{sec:freq}
+Using the definition of point mutation given in Section~\ref{sec:cgp},
+it is possible to quantify the probability that an offspring is actively
+identical to its parent.
+\begin{equation}
+  \left (1 - mutation\_rate  \right )^{active\_genes}
+\label{eq:waste}
+\end{equation}
+\begin{comment}
+First, the number of active genes in each individual
+is given by Equation~\ref{eq:active}.  This shows how the number of active genes
+can change greatly with the number of active nodes and the arity used for each node.
+\begin{equation}
+  active\_genes = active\_nodes\cdot\left(arity + 1 \right) + output\_length
+  \label{eq:active}
+\end{equation}
+\end{comment}
+Equation~\ref{eq:waste} shows the probability that none of the active genes are
+mutated at the given mutation rate.  To help display the effects of this relationship,
+Figure~\ref{fig:probability} illustrates the probability that an offspring is actively
+identical to its parent for various mutation rates and number of active genes.
+Figure~\ref{fig:probability} shows that as the mutation rate and the number of active genes decreases,
+the probability of an offspring being actively identical to a parent greatly increases.
+While the other versions of mutation discussed in Section~\ref{sec:cgp} will change the details
+of this equation, the overall relationship between the variables will be the same.
+
+\begin{comment}
+Using the other versions of mutation in Section~\ref{sec:cgp} does not change the
+overall relationship of the number of active genes and the mutation rate to the
+frequency of wasted evaluations.  If mutated genes are not forced to change to a
+new value the probability of actively identical offspring will increase.  While this is intuitively
+straightforward, determining the exact amount of increase is complex as the probability
+that a randomly reset gene returns to its current value depends on which gene is being mutated.
+If mutation is changed to have a set percentage of the genome mutated, the relationship
+changes to use the percentage of the genome that is active, but it will still follow the general
+shape of Figure~\ref{fig:probability}.
+\end{comment}
+
+\section{Methods to Avoid Wasting Evaluations}
+\subsection{Skip}
+The most straightforward method to use existing evaluation results is to
+set the offspring's fitness to the parent's
+if they are actively identical. This method will be referred to as \emph{Skip}.
+As \emph{Skip} makes no modification to evolutionary mechanisms, any problem
+solvable by \emph{Normal} will be solvable by \emph{Skip}, and vice versa. The
+primary difference is only that \emph{Normal} will always use at least as many
+evaluations as \emph{Skip}, with the potential to use significantly more.  As
+a result, \emph{Skip} may solve problems \emph{Normal} cannot if given a
+maximum number of evaluations.
+
+A significant theoretic advantage to this technique is that it lowers CGP's
+sensitivity to the mutation rate.  In \emph{Normal}, as the mutation rate
+decreases the potential for wasted evaluations
+increases creating an evaluation penalty.  As the mutation rate increases the expected
+number of modified active genes increases making small
+changes in phenotype less probable. From this, \emph{Normal} will likely
+be most effective when the mutation rate
+is high enough to expect at least one active gene to be modified by
+mutation, but low enough to allow the small phenotypic moves required
+to reach optimal values.
+Unlike \emph{Normal}, \emph{Skip} can use mutation rates expected to produce
+frequent offspring that are not actively different from their parents without
+penalty.  As such \emph{Skip} can use very fine grained mutation allowing it to potentially
+hill climb much more effectively.
+
+\subsection{Accumulating Mutation}
+As was stated in Section~\ref{sec:cgp}, some of CGP's success stems
+from allowing genetic drift of inactive genes~\cite{yu:2001:neutrality}.
+%Inactive gene modification can build structures which can potentially be made active
+%by later mutations.
+This raises the following question: will evolution in CGP improve
+if inactive genes are allowed to change at an increased rate?
+
+To test this possibility we propose a method of mutation called \emph{Accumulate}.
+The primary concept behind this technique is to allow inactive genes to drift
+multiple generations worth of distance in a single actual generation of CGP.
+For our example we will refer to one of the offspring produced by the parent as $F_0$.  If $F_0$
+is actively identical to its parent, $F_0$ produces a mutant offspring $F_1$ in the same generation.
+This chain continues with $F_i$ mutating to produce $F_{i+1}$ until an individual
+is produced that has one or more active genes different from the original parent.
+This actively different individual is called $F_n$.  $F_n$ is then evaluated.
+If $F_n$ is no worse than the original parent, it replaces $F_0$ and CGP continues
+evolution and selection as normal.  If $F_n$ is worse than the original parent
+$F_{n-1}$ replaces $F_0$.  Thus accumulate's offspring can have zero to multiple
+active genes changed.
+
+By chaining mutations each $F_i$ will probabilistically have more changes to
+inactive genes than $F_{i-1}$ when compared with the original parent.  By using
+$F_{n-1}$ or $F_n$ instead of $F_0$, \emph{Accumulate} can drift faster than
+\emph{Normal} and \emph{Skip}.  This can be advantageous on problems that benefit
+from high exploration of the neutral space, with the potential drawback that
+previously active useful structures are less likely to survive to be reintegrated.
+
+\subsection{Single Active Mutation}
+%An alternative method for avoiding unnecessary evaluations is to
+%modify mutation to ensure offspring
+%are actively different from their parents. 
+\emph{Skip}
+and \emph{Accumulate} have the potential, similar to \emph{Normal}, to generate large numbers of individuals
+with no active differences, which can be computationally expensive even if they
+are not evaluated. To avoid
+this potential overhead, we propose a method to ensure a \emph{Single} active
+gene is mutated every time an offspring is generated.
+%
+Creating an offspring using \emph{Single} is an iterative process.  Until an
+active gene has been mutated, select a gene at random in the individual and
+mutate its value.  This has the following properties:
+\begin{itemize}
+\item Exactly one active gene is mutated for all offspring.
+\item Zero or more inactive genes can be mutated.
+\item A gene that is active will be mutated more frequently than one that is not.
+\item No mutation rate is required.
+\end{itemize}
+Many of these properties make \emph{Single} distinct from the other described mutation
+methods.  By forcing only a single active gene to change, \emph{Single} may have
+better results on problems where incremental improvements are possible with single
+gene changes and worse results on problems where larger changes are necessary.
+This is in contrast to all of the other methods that have the potential to change
+multiple active genes.
+Limiting mutation to a single active gene change does not, however, prevent \emph{Single}
+from making large phenotypic changes, which are still possible by connecting
+in inactive nodes.
+
+\emph{Single} has the property that the effective mutation rate is always
+$\frac{1}{a}$ for active genes and $\frac{1}{a + 1}$ for
+inactive genes, resulting in $\frac{n - a}{a + 1} + 1$ expected mutations, where
+$a$ is the number of active genes and $n$ is the total number of genes.  This
+means that the number of inactive genes does not affect the probability of an
+inactive gene being mutated, just the expected number of inactive genes that are
+mutated.  Furthermore, as the number of active genes approaches zero, the expected
+number of mutations increases dramatically, even though it is still limited to
+changing a single active gene.  As the evolved number of active genes is likely to be
+highly problem dependent, the behavior of \emph{Single} will likely change significantly
+from problem to problem, with some problems having very little changes to inactive
+genes, and others changing a great deal.  It is also possible that this will create
+a selective pressure on the number of active genes which may only become apparent
+if multiple parents are used.
+
+In comparison with \emph{Skip}, \emph{Single} is even easier to apply to new problems
+as it completely removes the need to set the mutation rate, but does so at the
+potential expense of lower maximum effectiveness.  In comparison with \emph{Accumulate},
+\emph{Single} mutates inactive genes less often with respect to active genes, making it
+better at preserving useful inactive structures but worse at exploring the inactive
+space.
+
+\section{Experimental Setup}
+In order to empirically test the suggested benefits of \emph{Skip},
+\emph{Accumulate}, and \emph{Single} in comparison with \emph{Normal}, we evaluated their performance on
+four benchmarks: Parity, Multiplier, Binary Decode and Binary Encode.
+Both Parity and Multiplier have been used extensively to test
+CGP~\cite{walker:2008:cgpmodules,miller:2006:redundancy}.
+The 3-bit even parity is included as it is the most commonly used benchmark for CGP and to
+help provide some level of comparability with previous work.  In order to try a
+more challenging binary problem, we chose to do the 3-bit multiplier, which has
+6 inputs and 6 outputs.
+
+Binary Decode is effectively a demultiplexer, where $N$
+input lines specify which of the $2^N$ output lines should have a value of one, with
+all others set to zero.  For example, if $101$ is the input to a 3-bit Binary Decode
+problem, the output is $00100000$.  Binary Encode is the reverse of Binary Decode.
+Given $2^N$ input lines, where exactly one line has a bit set to one and all others
+are zero, the binary value index of the one bit is output using $N$ lines.
+An example of this mapping is that $00100000$
+should return the output of $101$.  The reason we use Binary Decode and Binary Encode
+as benchmarks is their asymmetric number of inputs to outputs and their relatively
+small number of test cases.  For example, on the 16 to 4 Binary Encode and the 4 to 16 Binary
+Decode (the instances we use) only 16 test cases are needed.
+
+All problems used the operators \{and, or, nand, nor\} and determine fitness as the average
+percentage of correct bits across all possible inputs.  While this is a common function set used
+by CGP for these problems,~\cite{walker:2008:cgpmodules} used a different set of operators
+for Multiplier.  Preliminary testing shows our operator set makes Multiplier harder than theirs,
+but, as always, conclusions drawn by comparing experiments using different operator sets should
+be minimal.
+
+While a few of these benchmarks may be overly simple, with parity especially
+being considered for obsolescence~\cite{mcdermott:2012:benchmarks}, they are used here
+for the specific reason of their simplicity.  The primary
+difference between \emph{Normal} and \emph{Skip}
+is not that one can solve harder problems than the other, rather it is that \emph{Skip} is thought
+to solve problems in less evaluations than \emph{Normal}.  Being able to compare each method's
+median number of evaluations until success makes for the most logical metric in this case,
+so these problems are useful in that they can be solved often.  While much of the
+previous work on CGP uses Koza's \emph{computational effort} to analyze experimental
+results,~\cite{christensen:2002:comp_effort} explains how that can introduce
+significant underestimates, especially when using small population sizes.
+
+In order to compare with the effective standard CGP, we use the $1+4$
+evolutionary strategy.  We use a
+genotype size of 3000 nodes, similar to those found optimal in~\cite{miller:2006:redundancy}.
+Each run was allowed up to
+10 million evaluations before being terminated, and 50 runs of each experiment
+were performed.  To help focus the differences between each mutation method,
+all starting individuals on the same problem were identical for the same run number,
+meaning that the 50 different individuals \emph{Normal} started with were identical
+to the 50 starting individuals for \emph{Skip}, \emph{Accumulate}, and \emph{Single}.
+For statistical purposes this means all results should be compared as paired tests.
+As the number of evaluations to success is likely not normally distributed, we choose
+the Wilcoxon signed-rank test to compare each mutation method with \emph{Normal}.
+As an attempt to cover a wide range of mutation rates, the 16 mutation rates listed
+in Figure~\ref{fig:probability} were used for each method.  These cover from 0.0001
+to 0.8 on a log scale, and should encompass all previous levels of mutation used
+with CGP.
+
+\begin{comment}
+We had intended to include Koza-1 and Pagie-1 from~\cite{mcdermott:2012:benchmarks}
+as sample regression problems, but we had difficulty achieving acceptable success
+rates to allow for comparisons here.  Future work may be needed to understand why
+these problems were significantly harder when using our configuration settings
+than the four binary problems. 
+\end{comment}
+
+\section{Results}
+To summarize the results of testing each mutation rate, Figures~\ref{fig:parity},
+\ref{fig:multiply}, \ref{fig:encode}, and \ref{fig:decode} show the median number of evaluations
+required over 50 runs to solve the Parity, Multiply, Binary Encode, and Binary Decode problems.  Note
+that both axes are presented on a log scale.  In the event that the median run of a configuration
+did not find the optimal value before termination, the value is not displayed in the graph.  This can be
+clearly observed in Figure~\ref{fig:multiply} for mutation rates greater than 0.01.  As \emph{Single}
+does not use a mutation rate, its data is assumed constant for all mutation rates.
+%
+Table~\ref{table:results} shows fine details
+about the best configurations found for each mutation method.  This includes the mutation rate
+with the lowest median evaluations until success and the median evaluations it required, the median absolute
+deviation from that median, the single tailed P-value received from comparing with the best \emph{Normal}
+configuration using the Wilcoxon signed-rank test, and the median number of active genes in the solution.
+Note that the number of active genes is a different measure from the number of active nodes, which has
+been reported in other work, and is used here for compatibility with Equation~\ref{eq:waste}.
+%
+A complete package of our results as well as the source code used in testing
+is available from our website.\footnote{\url{https://github.com/brianwgoldman/ReducingWastedEvaluationsCGP}}
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{parity}
+  \caption{Median evaluations to success for each method on the Parity problem} 
+  \label{fig:parity}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{multiply}
+  \caption{Median evaluations to success for each method on the Multiply problem} 
+  \label{fig:multiply}
+\end{figure}
+
+\begin{comment}
+\begin{figure}
+  \centering
+  \includegraphicsfit{quartic}
+  \caption{Mean Evaluations to Success for each method on the Quartic problem} 
+  \label{fig:quartic}
+\end{figure}
+\end{comment}
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{encode}
+  \caption{Median evaluations to success for each method on the Binary Encode problem} 
+  \label{fig:encode}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{decode}
+  \caption{Median evaluations to success for each method on the Binary Decode problem} 
+  \label{fig:decode}
+\end{figure}
+
+\section{Discussion}
+Even though the Parity, Multiplier, Binary Encode, and Binary Decode problems have
+very different numbers of inputs and outputs, different input to output ratios, 
+different evolved numbers of active genes (see Table~\ref{table:results}), and
+different levels of difficulty, Figures~\ref{fig:parity}, \ref{fig:multiply},
+\ref{fig:encode}, and \ref{fig:decode} present surprisingly similar results.  
+\begin{comment}
+On all four
+problems \emph{Normal} has a fairly clear quadratic shape which at its lowest point
+approaches or sometimes crosses the line of \emph{Single}.  As the mutation rate increases
+beyond the optimal value for \emph{Normal} all techniques except \emph{Single} share
+very similar if not identical progressions.  Below \emph{Normal}'s optimal mutation
+rate, \emph{Normal} gets significantly worse while \emph{Skip} and \emph{Accumulate}
+diverge from \emph{Normal} by maintaining similar qualities as the optimal value.
+At exceptionally low mutation rates \emph{Normal} takes over an order of magnitude
+more evaluations to find success than all of the other techniques.
+
+The shape of these features is as expected.
+\end{comment}
+  The steep increases in median evaluations
+for \emph{Normal} corresponds with the prediction that overly high mutation rates will
+significantly increase the number of evaluations until success, 
+while low mutation rates will create a significant portion of
+wasted evaluations.  On Multiply, Binary Encode, and Binary Decode, overly high mutation rates
+prevent \emph{Normal} from reaching the optimum.
+Parity is the only problem CGP could solve using exceptionally high mutation rates, with even
+a slight improvement at the very top of the tested range.  This likely happens as the Parity problem
+we are using is so simple that a CGP using effectively random search is able to solve it.
+\emph{Skip} and \emph{Accumulate}'s tendency to mirror \emph{Normal}'s effectiveness as the
+mutation rate increases is because the probability of creating actively identical offspring
+approaches zero.  As the divergence point is always near
+\emph{Normal}'s optimum mutation rate, it can be inferred that \emph{Normal}'s significant decrease in
+quality when using lower mutation rates is likely caused by wasted evaluations.
+As \emph{Skip} also decreases
+somewhat in quality, some of the impaired fitness can also likely be attributed
+to improbability of making large enough genotypic changes to escape local optima
+with small mutation rates.
+
+All four figures suggest that \emph{Skip} and \emph{Accumulate}
+have a lower sensitivity to the mutation rate than \emph{Normal}.
+As the mutation rate goes below the optimal value,
+\emph{Skip} and \emph{Accumulate} encounter a relatively minor increase in their median number of evaluations
+when compared with \emph{Normal}. As confirmation of Equation~\ref{eq:waste}
+we recorded the predicted number of wasted evaluations and found
+the aggregate predicted waste was nearly identical to the differences between \emph{Normal} and \emph{Skip}.
+
+\emph{Single}, the only method without a mutation rate, is clearly not as generally effective as
+the other methods where mutation rate can be optimized.  However, when the optimal mutation rate is
+not known, \emph{Single} does show significant advantages.  When compared against the entire
+space of tested mutation rates, \emph{Single} almost always requires
+the least number of evaluations to succeed.  Below the optimum mutation rates for each, \emph{Skip}
+and \emph{Accumulate} are reasonable approximations of \emph{Single}, but come with the disadvantage
+that they are more computationally expensive.
+%
+As the number of evaluations required to solve a problem increases, \emph{Single}
+appears to improve in performance relative to \emph{Normal}.  Parity required the
+least number of evaluations to be solved, followed by Binary Encode and Binary Decode,
+with Multiply requiring by far the most.
+This ordering mirror's \emph{Single}'s relative scaling with \emph{Normal}, 
+as it goes from a lower peak performance than \emph{Normal}
+on Parity and Binary Encode to surpassing it on Binary Decode and Multiply.
+
+\begin{table}
+	\centering
+	\caption{Comparisons of Best Mutation Rate for Each Mutation Method on Each Benchmark.
+	  All results are from 100\% successful configurations.}
+	\begin{tabular}{r|c|c|c|c|c|c|c|c|c|c|c|}
+	  \cline{3-6}
+		 \multicolumn{2}{r|}{}    & \textbf{\emph{Normal}} & \textbf{\emph{Skip}} & \textbf{\emph{Accumulate}} & \textbf{\emph{Single}} \\ \cline{2-6} 
+		                    & Mutation Rate & 0.02 & 0.02 & 0.01 & N/A \\ \cline{2-6}
+	       \textbf{3-bit} & Median Evaluations & 1,018 & 959 & 928 & 1358 \\ \cline{2-6}
+        \textbf{Parity} & Median Absolute Deviation & 614 & 564 & 416 & 733 \\ \cline{2-6}
+	                      & P value  & N/A & 0.0000 & 0.4875 & 0.0790 \\ \cline{2-6}
+	                      & Median Final Active Genes & 250 & 250 & 262 & 223 \\ \hhline{~=====}
+
+		                    & Mutation Rate & 0.004 & 0.002 & 0.0008 & N/A \\ \cline{2-6}
+	       \textbf{3-bit} & Median Evaluations & 503,424 & 398,354 & 421,859 & 340,165 \\ \cline{2-6}
+	  \textbf{Multiplier} & Median Absolute Deviation & 191,037 & 184,979 & 165,218 & 151,063 \\ \cline{2-6}
+	                      & P value  & N/A & 0.0212 & 0.3632 & 0.0065 \\ \cline{2-6}
+	                      & Median Final Active Genes & 627 & 629 & 684 & 620 \\ \hhline{~=====}
+
+                        & Mutation Rate & 0.004 & 0.004 & 0.008 & N/A \\ \cline{2-6}
+	     \textbf{16 to 4} & Median Evaluations & 24,057 & 19,732 & 21,563 & 26,031 \\ \cline{2-6}
+	      \textbf{Encode} & Median Absolute Deviation & 8,829 & 7,425 & 7,449 & 10,170 \\ \cline{2-6}
+	                      & P value  & N/A & 0.0000 & 0.0864 & 0.3578 \\ \cline{2-6}
+	                      & Median Final Active Genes & 472 & 472 & 499 & 510 \\ \hhline{~=====}
+
+	                      & Mutation Rate & 0.004 & 0.002 & 0.004 & N/A \\ \cline{2-6} \cline{2-6}
+       \textbf{4 to 16} & Median Evaluations & 73,351 & 70,023 & 65,347 & 69,564 \\ \cline{2-6}
+        \textbf{Decode} & Median Absolute Deviation & 17,889 & 17,036 & 18,411 & 21,131 \\ \cline{2-6}
+	                      & P value  & N/A & 0.415 & 0.3276 & 0.2398 \\ \cline{2-6}
+	                      & Median Final Active Genes & 1,117 & 1,027 & 1,050 & 1,090 \\ \cline{2-6}
+
+  \end{tabular}
+  \label{table:results}
+\end{table}
+
+Using Table~\ref{table:results}, it is clear that \emph{Normal} is never the best option.
+In all cases \emph{Skip} and \emph{Accumulate} can obtain better results,
+with even \emph{Single} doing better on Binary Decode and Multiply.  Furthermore, \emph{Skip} always
+had a lower median absolute deviation than \emph{Normal}, with \emph{Accumulate} lower
+on all problems except Binary Decode.  The statistical analysis is less clear as the deviations
+are so large, but \emph{Skip}'s improvements are definitely significant on all problems except
+Binary Decode, with \emph{Single} statistically better than \emph{Normal} on Multiply.
+As support that our configuration
+for \emph{Normal} is valid to compare against, our peak quality is approximately 6 times
+better than results published in~\cite{walker:2008:cgpmodules} for their standard CGP and ECGP
+on Parity.
+%TODO Discuss length stuff
+
+While the true complexity measure for a GP implementation is how many evaluations
+it requires to solve a problem, we also performed preliminary timing tests to ensure
+our new techniques were less computationally complex than the evaluations they avoid.
+When using the best found mutation rate on Multiply, \emph{Normal} required the most time (4597 minutes)
+to complete all 50 runs, with \emph{Skip} using 9\% less time, \emph{Accumulate} 16\% less,
+and \emph{Single} 29\% less.
+
+\section{Conclusions and Future Work}
+CGP's current mutation operator has the potential to create offspring which can
+be identified as phenotypically identical to their parents without invoking
+the evaluation function.  Evaluating these offspring creates waste, as we can
+assign their fitness to be identical to their parent.  Through careful definition
+of how the mutation operator works, we have shown how the probability of having
+wasted evaluations is dependent on the mutation rate and the number of active genes.
+We predicted and then provided empirical evidence that avoiding this waste can
+reduce how many evaluations CGP requires to solve problems as well as reduce
+CGP's sensitivity to the mutation rate parameter.
+
+We proposed \emph{Skip} and \emph{Accumulate} as two methods for what to do when
+actively identical offspring are detected, and \emph{Single} as a method to ensure
+they are never created.  On four fairly diverse benchmark problems we showed that
+\emph{Skip} and \emph{Accumulate} do at least as well as \emph{Normal} using a
+variety of mutation rates and are frequently vastly more efficient than \emph{Normal}.
+As there was little discernible difference in their overall quality, for now we suggest \emph{Skip}
+be used as a replacement to \emph{Normal}, as it is less complex than \emph{Accumulate},
+although future experimentation may suggest otherwise.  In situations where the mutation
+rate cannot be optimized, we suggest \emph{Single}, as while it did not achieve
+the best peak performance on all problems, it has the least overhead with the widest applicability.
+Furthermore, \emph{Single} achieved the best results on the hardest test problem, suggesting more
+extensive testing of this method on difficult problems should be performed.
+
+Even though the results appear to be problem independent, \emph{Skip}, \emph{Accumulate},
+and \emph{Single} should be tested on a wider range of problem classes to make sure.
+More advanced techniques for handling or avoiding wasted evaluations may also improve
+results, such as a modified version of \emph{Single} to allow multiple active genes
+to be mutated at once.  Nevertheless, we feel that the theoretic and empirical evidence
+sufficiently supports a need to avoid wasting evaluations on actively identical
+individuals.
+
+\bibliographystyle{splncs}
+\bibliography{../main}
+\end{document}
