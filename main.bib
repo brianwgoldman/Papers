@@ -714,41 +714,39 @@
 }
 
 @InProceedings{goldman:2013:cgpwaste,
-  title =	"Title Removed To Make More Anonymous",
-  author =	"Anonymous Author and Anonymous Author",
-  booktitle =	"Genetic Programming, Proceedings of the 5th European
-		 Conference, EuroGP 2013",
-  volume =	"2278",
-  series =	"LNCS",
-  pages =	"182--191",
-  publisher =	"Springer-Verlag",
-  address =	"Kinsale, Ireland",
-  publisher_address = "Berlin",
-  month =	"3-5 " # apr,
-  year = 	"2013",
-  keywords =	"genetic algorithms, genetic programming",
-  ISBN = 	"3-540-43378-3",
-  URL =  	"http://link.springer-ny.com/link/service/series/0558/bibs/2278/22780182.htm",
-  URL =  	"http://link.springer-ny.com/link/service/series/0558/papers/2278/22780182.pdf",
-  abstract =	"As research into the theory of genetic programming
-		 progresses, more effort is being placed on
-		 systematically comparing results to give an indication
-		 of the effectiveness of sundry modifications to
-		 traditional GP. The statistic that is commonly used to
-		 report the amount of computational effort to solve a
-		 particular problem with 99% probability is Koza's I(M,
-		 i, z) statistic. This paper analyzes this measure from
-		 a statistical perspective. In particular, Koza's I
-		 tends to underestimate the true computational effort,
-		 by 25% or more for commonly used GP parameters and run
-		 sizes. The magnitude of this underestimate is
-		 nonlinearly decreasing with increasing run count,
-		 leading to the possibility that published results based
-		 on few runs may in fact be unmatchable when replicated
-		 at higher resolution. Additional analysis shows that
-		 this statistic also under reports the generation at
-		 which optimal results are achieved.",
-  notes =	"EuroGP'2002, part of \cite{lutton:2002:GP}",
+  author =       "Brian W. Goldman and William Punch",
+  title =        "Reducing Wasted Evaluations in Cartesian Genetic
+                 Programming",
+  booktitle =    "Proceedings of the 16th European Conference on Genetic
+                 Programming, EuroGP 2013",
+  year =         "2013",
+  month =        "3-5 " # apr,
+  series =       "LNCS",
+  volume =       "7831",
+  publisher =    "Springer Verlag",
+  address =      "Vienna, Austria",
+  pages =        "61--72",
+  organisation = "EvoStar",
+  keywords =     "genetic algorithms, genetic programming, Cartesian
+                 Genetic Programming",
+  abstract =     "Cartesian Genetic Programming~(CGP) is a form of
+                 Genetic Programming~(GP) where a large proportion of
+                 the genome is identifiably unused by the phenotype.
+                 This can lead mutation to create offspring that are
+                 genotypically different but phenotypically identical,
+                 and therefore do not need to be evaluated. We
+                 investigate theoretically and empirically the effects
+                 of avoiding these otherwise wasted evaluations, and
+                 provide evidence that doing so reduces the median
+                 number of evaluations to solve four benchmark problems,
+                 as well as reducing CGP's sensitivity to the mutation
+                 rate. The similarity of results across the problem set
+                 in combination with the theoretical conclusions
+                 supports the general need for avoiding these
+                 unnecessary evaluations.",
+  notes =        "Part of \cite{Krawiec:2013:GP} EuroGP'2013 held in
+                 conjunction with EvoCOP2013, EvoBIO2013, EvoMusArt2013
+                 and EvoApplications2013",
 }
 
 @InProceedings{vassilev2000neutrality,
