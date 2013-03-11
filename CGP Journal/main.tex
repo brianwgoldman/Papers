@@ -493,6 +493,65 @@ TODO Keywords
 % You must have at least 2 lines in the paragraph with the drop letter
 % (should never be an issue)
 
+\section{Cartesian Genetic Programming}
+
+\section{Duplicate Evaluation Avoidance}
+
+\subsection{Skip}
+
+\subsection{Accumulate}
+
+\subsection{Single}
+
+\section{Genome Ordering}
+
+\subsection{Reorder}
+
+\subsection{DAG}
+
+\section{Qualitative Comparisons}
+
+TODO All possible combinations of Skip, Accumulate, Single, with Normal, Reorder, Dag.
+
+\subsection{Problem Set}
+TODO 3-bit Parity, 6-bit Multiply, 4-16-bit Decode, 16-4-bit Encode
+
+TODO Consider adding 5-bit Parity or Equality
+
+\subsection{Parameter Setting}
+TODO Mutation Rate / Genome Size grid
+
+TODO Method for choosing parameter values.
+
+\subsection{Results}
+TODO Compare using a table the best parameters found for each configuration.
+One table per problem.
+
+\subsection{Generalization}
+TODO Consider dropping this section due to computational limits. 
+
+\section{Analysis of Evolutionary Mechanisms}
+TODO Explain footprint concept here.
+\subsection{Inactive Nodes and Node Duplication}
+TODO Look at how much of the genome is duplicated in both active and inactive
+
+TODO Look at how much of the genome is unused.
+
+\subsection{Node Reactivation and Active Node Mutation}
+TODO For each node that was active, then inactive, then active again, see how its changed.
+
+TODO For each node that is active, look at how successful mutations change its behavior.
+
+\subsection{Source of High Variance}
+TODO Look for general indicators of high evaluation runs.
+
+TODO Look for footprint moving.
+
+TODO Look for active node clustering.
+
+TODO Look into how often children replace parents.
+
+\section{Conclusions}
 
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
