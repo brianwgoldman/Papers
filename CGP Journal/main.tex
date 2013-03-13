@@ -497,13 +497,100 @@ TODO Keywords
 
 \section{Duplicate Evaluation Avoidance}
 
+TODO Explain here why only compared with parent, not global history.
+
 \subsection{Skip}
+The \emph{Skip} method for avoiding duplicate evaluations involves the least
+amount of modification from CGP's normal behavior.  After an offspring is produced
+and its set of active nodes is determined but before it is evaluated, it is compared
+with its parent.  Each gene in each active node is compared for equivalence with
+the corresponding gene in the offspring's parent.  If all genes are found to be equal
+than the individual is not evaluated.  Instead the offspring is given the same fitness
+as its parent, as there is no way for it to be phenotypically different from its parent.
+Note that since inactive genes are not compared for equivalence it is still possible
+for offspring to genetically differ from their parents.
+
+Because \emph{Skip} does not modify any evolutionary mechanisms from normal CGP,
+in all possible cases it can do no worse.  If the mutation rate is high enough relative
+to the number of active genes, \emph{Skip} will act identically to normal CGP as
+the probability of an offspring being actively identical to its parent is effectively zero.
+When the mutation rate is low enough relative to the number of active genes, some number of
+offspring will be actively identical to their parents, resulting in a reduction in evaluations
+but no change in the evolutionary trajectory.
+
+From a tuning perspective we would expect both intuitively and from initial
+experimentation~\cite{goldman:2013:cgpwaste} that \emph{Skip} will be less sensitive
+to the mutation rate and will perform best using a lower mutation rate than normal CGP.
+The former comes from the fact that in normal CGP any mutation rate that has a significant
+probability of creating offspring actively identical to their parents will be penalized
+by wasting evaluations.  In \emph{Skip} there are only two penalties for reducing the
+mutation rate.  First, if search becomes trapped in a local optima, low mutation
+rates may have increased difficulty escaping to find the global optimum.  Second,
+exceptionally low mutation rates may result in large computational overhead as
+more and more time is spent attempting to produce an evaluable useful offspring.
+Note these penalties also exist in normal CGP.
 
 \subsection{Accumulate}
+Similar to \emph{Skip}, \emph{Accumulate} works by adding a step between offspring
+creation and offspring evaluation.  Instead of skipping evaluations with offspring
+are determined to be actively identical to their parents, \emph{Accumulate} enters
+into a cycle of repeated mutation until an individual worth evaluating is created.
+While the working offspring is actively identical to the
+parent, a new individual is produced by applying mutation to the working offspring.
+Note that each mutation step can probabilistically mutate any number of genes, just
+as in the mutation used by normal CGP.
+In this way each iteration the working offspring accumulates mutations to inactive
+genes until an individual is produced that differs by one or more active genes from
+the parent.  This repeatedly mutated offspring is then evaluated.  If its fitness
+is less than the original parent, the final set of mutations are reverted
+and the offspring's fitness is set to the same as the original parent.
+
+Viewed in another way, \emph{Accumulate} performs a micro evolution on each offspring
+before it is fully produced.  The final result of each offspring step is to produce
+an offspring which is either actively identical to its parent, but with mutations
+to its inactive genes, or an offspring which is at least as fit as the parent but
+not actively identical.
+
+Previous experimentation has shown that \emph{Accumulate} acts very similarly to
+\emph{Skip}~\cite{goldman:2013:cgpwaste}, with the exception that \emph{Accumulate}
+favors lower mutation rates. While at first these algorithms may appear
+quite different, further consideration shows how they are similar.  In \emph{Skip}
+an actively identical offspring is likely to be selected as we expect mutations to
+active genes to more often reduce fitness than in prove it.  In the next generation
+this actively identical offspring is then mutated again, with its lineage likely
+continuing until it finally does mutate an active gene.  At this point if the
+mutant is better it replaces the parent, otherwise the parent, which has been accumulating
+mutations to inactive genes, is kept.  In this way \emph{Skip} mirrors \emph{Accumulate},
+except over multiple generations instead of compressed into a single generation.
 
 \subsection{Single}
+While \emph{Skip} and \emph{Accumulate} focus on what to do when offspring are
+produced which are actively identical to their parents, \emph{Skip} changes
+how mutation works to ensure only evaluable offspring are created.  Instead
+of mutating each gene at a set probability, \emph{Single} chooses genes at
+random to mutate until exactly one active gene is mutated.
+
+This modification gives \emph{Single} three properties distinct from the other
+forms of duplicate avoidance.  First, \emph{Single} forces offspring to have
+an active gene which is different than there parent.  This limits drift as the
+mutated active gene must either be to an intron or represent another way to
+code a solution of equal quality.  Second, as a benefit of forced changes
+\emph{Single} avoids the overhead of repeatedly generating individuals without
+creating an evaluable offspring.  Third, \emph{Single} does not require a mutation
+rate parameter, effectively setting the mutation rate to $\frac{1}{a}$ for active
+genes and $\frac{1}{a+1}$ for inactive genes, where $a$ is the number of active genes.
+
+In encodings without inactive genes, limiting mutation to changing exactly one gene
+could prevent an algorithm from escaping some types of local maxima.  Yet because
+CGP allows for inactive genes, \emph{Single} is still able to escape most local
+maxima using sufficient drift of inactive genes.  When a high percentage of
+the genome becomes active or when \emph{Single} is otherwise limited in its ability
+to drift due to lack of introns, it does have an increased potential to become stuck.
+As will be discussed in Section~\ref{sec-ordering} and was shown in~\cite{goldman:2013:ordering}
+this problem of highly active genomes is very unlikely.
 
 \section{Genome Ordering}
+\label{sec-ordering}
 
 \subsection{Reorder}
 
@@ -512,6 +599,8 @@ TODO Keywords
 \section{Qualitative Comparisons}
 
 TODO All possible combinations of Skip, Accumulate, Single, with Normal, Reorder, Dag.
+
+TODO Explain why you never use normal CGP mutation.
 
 \subsection{Problem Set}
 TODO 3-bit Parity, 6-bit Multiply, 4-16-bit Decode, 16-4-bit Encode
