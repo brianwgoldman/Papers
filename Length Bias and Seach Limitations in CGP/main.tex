@@ -54,7 +54,7 @@
 \begin{document}
 %
 % --- Author Metadata here ---
-\conferenceinfo{GECCO'13,} {July 6-10, 2013, Philadelphia, Pennsylvania, USA.}
+\conferenceinfo{GECCO'13,} {July 6-10, 2013, Amsterdam, The Netherlands.}
 \CopyrightYear{2013}
 \crdata{TBA}
 \clubpenalty=10000
@@ -91,7 +91,7 @@
 % the body of your article BEFORE References or any Appendices.
 
 \numberofauthors{2} %
-\begin{comment}
+%\begin{comment}
 \author{
 % 1st. author
 \alignauthor
@@ -107,7 +107,7 @@ William F. Punch\\
        \email{punch@msu.edu}
 }
 %\end{comment}
-%\begin{comment}
+\begin{comment}
 \author{
 % 1st. author
 \alignauthor
@@ -150,15 +150,16 @@ that solutions are also more terse.
 \end{abstract}
 
 % A category with the (minimum) three required fields
-\category{Computing Methodologies}{Artificial Intelligence}{Search Methodologies}
+%\category{Computing Methodologies}{Artificial Intelligence}{Search Methodologies}
+\category{I.2.8}{Artificial Intelligence}{Problem Solving, Control Methods, and Search}
+\category{I.2.2}{Artificial Intelligence}{Automatic Programming}
 %A category including the fourth, optional field follows...
 %\category{D.2.8}{Software Engineering}{Metrics}[complexity measures, performance measures]
 
 \terms{Algorithms}
 
 \keywords{Cartesian Genetic Programming, Neutrality, Bloat}
-\\
-\\
+
 \section{Introduction}
 In all black box search, search designers must make assumptions about the properties
 of the problem in order to outperform random search.  When these assumptions
@@ -512,7 +513,7 @@ evenly spaced problem sizes $\left [ 5 .. 100 \right ]$ at increments of 5.
 This information was then used to calculate each algorithms' order of complexity
 in regards to problem size, with results given in Table~\ref{table-growth}.
 A complete package of our results as well as the source code used in testing
-is available from our website.\footnote{\url{https://name.of.site.removed.com/anonymous-CGP}}
+is available from our website.\footnote{\url{https://github.com/brianwgoldman/LengthBiasCGP}}
 
 \subsection{Neutral Exploration}
 \label{sec-neutral}
@@ -767,17 +768,23 @@ as in Section~\ref{sec-tailored}, each algorithm was tested with scaling genome
 sizes.  We used the range $\left [ 10 .. 8000 \right ]$, taking 21 points on an
 exponential scale.  Other run parameters were kept the same.
 The median number of evaluations to success is shown in
-Figure~\ref{fig-multiply} on a log-log scale.  The results from the best genome
-size are given in Table~\ref{table-multiply}.
+Figure~\ref{fig-multiply} on a log-log scale.  The runs using the best genome size for each 
+algorithm were then repeated to allow for statistical comparison free from selection bias.
+The results from the repeated runs are given in Table~\ref{table-multiply}.
 
 As predicted, both the graphic and tabular results show that \emph{Reorder} and
 \emph{DAG} can perform effective search with much smaller genome sizes than \emph{Normal}:
 The best tested genome size for both novel
 variants had lower median evaluations to success than \emph{Normal}'s best, which
-also required a genome twenty times larger.  \emph{Reorder} was statistically
-better than \emph{Normal} under the single tailed Mann-Whitney U test. While \emph{DAG} was not
-statistically better than \emph{Normal}, the likely reason is \emph{Normal}'s exceptionally large median
-absolute deviation.  We believe this deviation is caused by \emph{Normal}'s occasional need to
+also required a genome twenty times larger.  A Kruskal-Wallis Test was first used
+to determine that at least one of the three algorithms had a different median than the others,
+with a resulting p-value of 0.00006.
+Both \emph{Reorder} and \emph{DAG} were statistically better than \emph{Normal} under
+the single tailed Mann-Whitney~U test, even after accounting for multiple comparisons
+using the Bonferroni correction.
+Beyond the difference in median evaluations to success, \emph{Normal} also had
+a much higher median absolute deviation.
+We believe this deviation is caused by \emph{Normal}'s occasional need to
 reinvent useful structures in different genome locations.  In the unlikely event that
 active nodes are evolved with the right amount of inactive nodes between them, and in the
 right order relative to each other, \emph{Normal} is likely going to receive far better
@@ -787,10 +794,22 @@ increasing run time.  As the number of nodes in the genome increases, the probab
 that inactive nodes exist between two active nodes increases.  This may be part of
 the reason \emph{Normal} requires such a large genome size to perform well.
 Also, more inactive space in the genome may facilitate structure recreation in new locations.
+The higher number of evaluations, higher deviation, and larger optimal genome size
+also combined to make \emph{Normal} take almost three times more computational time
+than either of the other algorithms to complete all runs.
 As a final advantage to \emph{Reorder} and \emph{DAG}, we see that both evolved
 solutions with half as many median active nodes as \emph{Normal}.  A potential
 reason for this is \emph{Normal}'s need to leverage introns in order to perform
 neutral search more than the other methods.
+
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{multiply}
+  \caption{Median evaluations until success on the Multiply problem using different genome sizes} 
+  \label{fig-multiply}
+\end{figure}
+
 
 \begin{table}
 	\centering
@@ -798,10 +817,10 @@ neutral search more than the other methods.
 	  \hline
 & \textbf{\emph{Normal}} & \textbf{\emph{Reorder}} & \textbf{\emph{DAG}} \\ \hline
 \textbf{Genome} & 4000   & 200     & 200 \\ \hline
-  \textbf{MES} & 272,324 & 213,660 & 249,031 \\ \hline
-  \textbf{MAD} & 125,997 & 79,335  & 86,551 \\ \hline
-  \textbf{P value} & N/A & 0.030   & 0.117 \\ \hline
-  \textbf{Active} & 255  & 118     & 120 \\ \hline
+  \textbf{MES} & 467,621 & 236,438 & 265,997 \\ \hline
+  \textbf{MAD} & 215,993 & 82,966  & 66,930 \\ \hline
+  \textbf{P-value} & N/A & 0.00012 & 0.00006 \\ \hline
+  \textbf{Active} & 245  & 115     & 116 \\ \hline
 
 	\end{tabular}
 	\caption{Best configuration of each algorithm on 3-bit Multiplier.
@@ -821,17 +840,10 @@ While this is true, we believe it to be less of a flaw and more of an unavoidabl
 effect of these techniques being able to evolve more complex graphs than \emph{Normal}.
 %TODO Consider expanding here.
 
-\begin{figure}
-  \centering
-  \includegraphicsfit{multiply}
-  \caption{Median evaluations until success on the Multiply problem using different genome sizes} 
-  \label{fig-multiply}
-\end{figure}
-
 \section{Conclusions and Future Work}
 \label{sec-conclusion}
-Existing literature suggests CGP performs best when maximum genome sizes
-far exceed actual solution size~\cite{miller:2006:redundancy}, supported by
+Existing literature suggests CGP performs best when the maximum genome size
+far exceeds the actual solution size~\cite{miller:2006:redundancy}, supported by
 evidence that inactive genes improve neutral search~\cite{yu:2001:neutrality},
 and that CGP doesn't suffer from bloat~\cite{miller:2001:bloat}.  We, however, find evidence
 that the need for highly inactive genomes is likely due to limitations in CGP's
@@ -860,7 +872,7 @@ explosively increasing the genome size.
 Further analysis of \emph{Reorder} and \emph{DAG} should be performed in light
 of the evidence found here.  Both appear to be valid ways of making CGP more flexible
 and powerful, but wider testing needs to be performed to solidify that claim.  As
-an important aspect of those tests, run time comparisons need to be performed, as
+an important aspect of those tests, run time comparisons using equal genome sizes need to be performed, as
 both increase the computational expense of CGP, with \emph{DAG} especially having
 the potential for significant overhead.  It is also possible either could benefit
 from further modification, such as using different initialization or method for mutation.
