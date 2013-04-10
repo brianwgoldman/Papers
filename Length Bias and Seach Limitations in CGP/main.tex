@@ -170,7 +170,7 @@ In Cartesian Genetic Programming (CGP) the maximum genome size of an individual
 is set at initialization.  While this
 requires the maximum genome size to be larger than the problem's solution needs,
 the question remains; how will the maximum genome size effect evolution's
-speed at finding solutions.  As larger genomes inherently represent larger search
+speed at finding solutions?  As larger genomes inherently represent larger search
 spaces, intuition suggests that using the lowest possible maximum size will have the most efficient search.
 However, in CGP a mounting body of evidence suggests the optimal
 maximum size is much larger than the actual solutions evolved~\cite{miller:2006:redundancy}.
@@ -194,6 +194,7 @@ While specifying topology is still useful
 when evolving circuits with known hardware limitations, the less restricted form
 allows CGP to represent all possible
 DAGs of size \emph{N}, where \emph{N} is the number of nodes in the genome.
+
 %
 The most common evolutionary mechanism in CGP is a $1+\lambda$ population
 where each generation the best offspring replaces the parent if it is no less
@@ -258,7 +259,7 @@ either a preceding node in the genome or to an input.  As was discussed in~\cite
 this means the expected location of a new connection is $\frac{i}{2}$ where \emph{i}
 is the number of nodes and inputs that precede the mutated node.  If all nodes had
 a single connection gene, we would expect random individuals to have a length of $\log_2N$.
-Precise calculation of the expected length is made difficult
+Precise calculation of the expected length when using more connection genes is made difficult
 due to node overlap, but the relationship will remain logarithmic to the total genome size.
 
 The probability that a node is active changes greatly depending on where
@@ -599,7 +600,7 @@ Figure~\ref{fig-length} indicates.
 \emph{Reorder} and \emph{DAG} show less of a bias, with \emph{DAG}'s mode of 45
 close to the prediction made in Section~\ref{sec-dag}.  The implications of these
 biases is that each is most likely to find solutions fastest when the number of
-active nodes desired by the problem best matches the algorithms search bias, as
+active nodes desired by the problem best matches the algorithm's search bias, as
 otherwise the algorithm will add artificial pressure to search different sized
 graphs.  The steepness of the bias reflects how much pressure will be applied.
 Combined with the length scaling results in Figure~\ref{fig-neutral}, we would
