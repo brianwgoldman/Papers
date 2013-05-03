@@ -194,7 +194,7 @@
 
 % *** SPECIALIZED LIST PACKAGES ***
 %
-%\usepackage{algorithmic}
+\usepackage{algorithmic}
 % algorithmic.sty was written by Peter Williams and Rogerio Brito.
 % This package provides an algorithmic environment fo describing algorithms.
 % You can use the algorithmic environment in-text or within a figure
@@ -366,7 +366,7 @@
 % correct bad hyphenation here
 %\hyphenation{op-tical net-works semi-conduc-tor}
 
-
+\usepackage{verbatim}
 \begin{document}
 %
 % paper title
@@ -593,6 +593,62 @@ this problem of highly active genomes is very unlikely.
 \label{sec-ordering}
 
 \subsection{Reorder}
+The concept behind \emph{Reorder} is to randomly shuffled node ordering without
+impacting gene expression.  This is possible because for a given node, there can
+be a large number of other nodes which neither have no required ordering,
+as they neither directly or indirectly take input from the node nor provide their
+output to the node.  In general, this process works by assigning nodes new
+locations in the genome at random once all of the nodes they take input from have been assigned
+locations earlier in the genome.
+
+The first step in performing \emph{Reorder} on a genome is to create convenience
+data structures to store direct connection relationships, such that given a node
+we can determine in constant time where it gets its input and which nodes read
+its output.  These structures can be build in order $O(N)$ time, where $N$ is the
+number of nodes.
+
+With this preprocessing complete, the algorithm given in Figure~\ref{fig:reorder}
+is used to assign each node a new location in the modified genome.
+It starts by constructing the \emph{addable} set, which contains all nodes who's direct
+dependencies have already been added.  Initially this contains only the input locations.
+Once a node is assigned a location, all of the nodes that depend on its output
+have that dependency marked as satisfied.  Once all of a nodes dependencies
+are satisfied, it can be put into \emph{addable}.  In this way, nodes are
+randomly removed from \emph{addable}, assigned the next possible location
+in the genome, with new nodes added to \emph{addable} as it becomes semantically
+viable.  Iteration ends when all nodes have been assigned new locations.
+This algorithm requires $O(AN)$, where $A$ is the arity used by the nodes
+and $N$ is the number of nodes.
+
+\begin{figure}
+  \begin{algorithmic}
+
+    \STATE $addable \leftarrow input\_locations$
+    \STATE $index \leftarrow |input\_locations|$
+    \STATE $new\_loc \leftarrow \emptyset$
+    \WHILE{$|addable| > 0$}
+      \STATE $working \leftarrow randpop(addable)$
+      \IF{$working \notin input\_locations$}
+        \STATE $new\_loc[working] \leftarrow index$
+        \STATE $index \leftarrow index + 1$
+      \ENDIF
+      \FORALL{$link \in feeds\_to(working)$}
+        \STATE Satisfy $link$'s dependence on $working$
+        \IF{$|unsatisfied(link)| = 0$}
+          \STATE $addable \leftarrow addable \cup \{link\}$
+        \ENDIF
+      \ENDFOR
+      \RETURN $new\_loc$
+    \ENDWHILE
+  \end{algorithmic}
+  \caption{Algorithm used by \emph{Reorder} to determine new node locations.}
+  \label{fig:reorder}
+\end{figure}
+
+The final step in \emph{Reorder} is to use the list of new locations to convert
+the existing genome into the reordered genome.  This can be done in the straight
+forward manner by converting connection genes and output location genes using
+the $new_loc$ map returned from the algorithm in Figure~\ref{fig:reorder}.
 
 \subsection{DAG}
 
@@ -612,6 +668,8 @@ TODO Mutation Rate / Genome Size grid
 
 TODO Method for choosing parameter values.
 
+TODO Explain reruning.
+
 \subsection{Results}
 TODO Compare using a table the best parameters found for each configuration.
 One table per problem.
@@ -621,6 +679,7 @@ TODO Consider dropping this section due to computational limits.
 
 \section{Analysis of Evolutionary Mechanisms}
 TODO Explain footprint concept here.
+
 \subsection{Inactive Nodes and Node Duplication}
 TODO Look at how much of the genome is duplicated in both active and inactive
 
