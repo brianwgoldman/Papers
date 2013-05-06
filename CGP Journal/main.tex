@@ -194,7 +194,8 @@
 
 % *** SPECIALIZED LIST PACKAGES ***
 %
-\usepackage{algorithmic}
+%\usepackage{algorithmic}
+\usepackage{algpseudocode}
 % algorithmic.sty was written by Peter Williams and Rogerio Brito.
 % This package provides an algorithmic environment fo describing algorithms.
 % You can use the algorithmic environment in-text or within a figure
@@ -494,6 +495,7 @@ TODO Keywords
 % (should never be an issue)
 
 \section{Cartesian Genetic Programming}
+TODO Explain basic CGP, use~\cite{miller:2011:chapter2}.
 
 \section{Duplicate Evaluation Avoidance}
 
@@ -591,8 +593,11 @@ this problem of highly active genomes is very unlikely.
 
 \section{Genome Ordering}
 \label{sec-ordering}
+TODO General stuff about ordering, including normal CGP.
+
 
 \subsection{Reorder}
+\label{sec:reorder}
 The concept behind \emph{Reorder} is to randomly shuffled node ordering without
 impacting gene expression.  This is possible because for a given node, there can
 be a large number of other nodes which neither have no required ordering,
@@ -622,24 +627,25 @@ and $N$ is the number of nodes.
 
 \begin{figure}
   \begin{algorithmic}
-
-    \STATE $addable \leftarrow input\_locations$
-    \STATE $index \leftarrow |input\_locations|$
-    \STATE $new\_loc \leftarrow \emptyset$
-    \WHILE{$|addable| > 0$}
-      \STATE $working \leftarrow randpop(addable)$
-      \IF{$working \notin input\_locations$}
-        \STATE $new\_loc[working] \leftarrow index$
-        \STATE $index \leftarrow index + 1$
-      \ENDIF
-      \FORALL{$link \in feeds\_to(working)$}
-        \STATE Satisfy $link$'s dependence on $working$
-        \IF{$|unsatisfied(link)| = 0$}
-          \STATE $addable \leftarrow addable \cup \{link\}$
-        \ENDIF
-      \ENDFOR
-      \RETURN $new\_loc$
-    \ENDWHILE
+    \Procedure{NewOrder}{}
+    \State $addable \leftarrow input\_locations$
+    \State $index \leftarrow |input\_locations|$
+    \State $new\_loc \leftarrow \emptyset$
+    \While{$|addable| > 0$}
+      \State $working \leftarrow randpop(addable)$
+      \If{$working \notin input\_locations$}
+        \State $new\_loc[working] \leftarrow index$
+        \State $index \leftarrow index + 1$
+      \EndIf
+      \ForAll{$link \in feeds\_to(working)$}
+        \State Satisfy $link$'s dependence on $working$
+        \If{$|unsatisfied(link)| = 0$}
+          \State $addable \leftarrow addable \cup \{link\}$
+        \EndIf
+      \EndFor
+    \EndWhile
+    \State\Return $new\_loc$
+    \EndProcedure
   \end{algorithmic}
   \caption{Algorithm used by \emph{Reorder} to determine new node locations.}
   \label{fig:reorder}
@@ -649,8 +655,153 @@ The final step in \emph{Reorder} is to use the list of new locations to convert
 the existing genome into the reordered genome.  This can be done in the straight
 forward manner by converting connection genes and output location genes using
 the $new_loc$ map returned from the algorithm in Figure~\ref{fig:reorder}.
+This also requires $O(AN)$ time, as all connection genes in all nodes must
+be converted.  As this is the final step unique to \emph{Reorder}, and
+no previous steps were of higher complexity, it is also the complexity of
+the algorithm as a whole.  Furthermore it is of the same complexity class
+of copying the entire genome, meaning it does not change CGP's overall complexity.
+
+\emph{Reorder} is used once each generation to shuffle the nodes of the parent
+organism.  As the shuffling does not semantically change the parent, it does
+not need to be reevaluated.  Furthermore, as shuffling does not change the requirement
+that nodes only depend on those preceding them in the genome, shuffling does not
+require any changes to any other CGP methods, such as evaluation and mutation.
+Yet after shuffling, the potential mutations that can be applied to the parent
+have changed.  Consider two nodes $X$ and $Y$ which are in the genome, but
+have no dependence relationship.  As $X$ does not take input from $Y$ and
+$Y$ does not take input from $X$, either can be placed preceding the other
+in the genome.  Without shuffling, the ordering in which these two nodes originally
+evolved will be preserved indefinitely, such that if $X$ precedes $Y$ at node creation,
+$X$ will always precede $Y$.  No mutation in \emph{Normal} is capable of making $X$
+take input from $Y$.  Yet CGP using \emph{Reorder} is capable of shuffling $Y$ to
+precede $X$, allowing subsequent mutations to make the connection.
+
+This node movement has the potential to reduce node reinvention.  If evolution created
+$X$ and $Y$, and mutating $X$ to depend on $Y$ would improve fitness, mutation's
+ability to make that improvement would depend on happenstance.  If $X$ evolved
+preceding $Y$, mutation would have to recreate either $X$ or $Y$ in new locations
+in order to make the required connection.  \emph{Reorder} could achieve the same
+effect through shuffling, and without costly node reinvention.
+
+The price \emph{Reorder} pays for this potential improvement is increased mutational search
+space and minor runtime costs.  Even though \emph{Reorder} is not capable of representing
+different individuals that \emph{Normal}, their mutational adjacency is significantly different.
+By mutational adjacency, we mean the set of individual's which are most likely to be created
+when mutating a given individual.  For instance in \emph{Normal} if $X$ precedes $Y$, individuals
+containing $Y$ dependent on $X$ could be adjacent to the original individual, but those containing
+$X$ dependent on $Y$ would not.  As \emph{Reorder} can shuffle node order, both sets would be
+adjacent.  In this way ordering limits how \emph{Normal} performs its search.  This limitation
+will benefit \emph{Normal} any time making $X$ dependent on $Y$ is detrimental, as
+\emph{Normal} won't waste evaluations on individuals having that mutation.
+
 
 \subsection{DAG}
+The principle behind \emph{DAG} is to remove the traditional CGP requirement that
+nodes can only take input from nodes that precede them in the genome.  Instead
+this is replaced with the relaxed requirement than the genome cannot encode for
+any cycles.  To accomplish this goal, modifications must be made to how CGP
+performs mutation and evaluation.
+
+When a connection gene is chosen for mutation, its value is still chosen randomly
+from all possible alternative values.  To achieve this, we incrementally determine
+which nodes transitively depend on the mutating node and which are not, with
+information stored in the $known$ map.  Initially, we know that the node
+is dependent on itself and that input locations and the nodes current inputs
+are not dependent on the mutating node.  Nodes are then
+tested in a random order for dependence using the algorithm given in Figure~\ref{fig:dag}.
+The first node returned that is not dependent on the mutating node is then
+used as the new connection gene value.
+
+\begin{figure}
+  \begin{algorithmic}
+  \Procedure{IsDependent}{$working$, $known$}
+    \If{$working \in known$}
+      \State\Return{$known[working]$}
+    \EndIf
+    \ForAll{$link \in reads\_from(working)$}
+      \If{\Call{IsDependent}{$link$, $known$}}
+        \State $known[working] \leftarrow True$
+        \State\Return{$True$}
+      \EndIf
+    \EndFor
+    \State $known[working] \leftarrow False$
+    \State\Return{$False$}
+  \EndProcedure
+  \end{algorithmic}
+  \caption{Algorithm used by \emph{DAG} to determine valid connection gene values.}
+  \label{fig:dag}
+\end{figure}
+
+The algorithm given in Figure~\ref{fig:dag} is a non-repeated recursive depth
+first search of the individual's DAG.  Search terminates as soon as a dependent
+node is found, and information from previous searches is recorded to prevent
+repeated search.  Each recursion level results in a node having its dependency
+set, meaning early calls will likely result in lots of recursion, but subsequent
+calls will find answers faster.  In the worst case, this algorithm may need
+to examine all nodes in the genome to determine if $working$ is dependent on the
+mutating node, giving it a complexity of $O(N)$.  In the worst case, this algorithm
+may be called on all possible nodes in the genome to check their dependence.
+Yet cumulatively those calls can only take $O(N)$ time due to the non-repeating
+nature of the search.  As a result, the expected worst case run time for \emph{DAG}
+mutation is $O(mAN^2)$, as when $m$ is the mutation rate we expect $mAN$
+connection genes to be mutated, each requiring a worst case of $N$ dependency checks.
+This is in contrast to \emph{Normal} and \emph{Reorder} which require $O(mAN)$ to perform
+mutation, as individual mutations can be performed in constant time.
+
+The method for evaluating \emph{DAG} individuals is very similar to the method for
+efficiently evaluating \emph{Normal} and \emph{Reorder} individuals.  Just as before,
+preprocessing is done to determine which nodes are active, and only those nodes are
+executed during evaluation.  Just as before the process begins from the output locations,
+recursively following connection genes and marking nodes as active until the input locations
+are reached.  Here the process diverges, as in \emph{DAG} we must determine not only the set of
+nodes that are active, but the order in which those nodes should be executed.
+
+The algorithm given in Figure~\ref{fig:reorder} can be reused to determine the order
+in which nodes should be executed during evaluation.  Instead of using $new\_loc$
+to reorder the genome, we can use this map to specify what order nodes should be
+executed in.  For instance, if a node was given the new location of $X$, we know
+that once all nodes at locations preceding $X$ have been evaluated, the node at $X$
+can be evaluated.  Stripping the inactive nodes from $new\_loc$ and inverting the map
+results in an efficient, valid ordering in which to execute the nodes.
+
+The process of determining which nodes are active requires $O(AN)$ time, regardless
+of how the node ordering is handled.  As was discussed in Section~\ref{sec:reorder},
+getting the $new\_loc$ map requires $O(AN)$ time.  Finally, converting the map
+into an ordering of the active nodes takes $O(N)$ time.  Each of these steps are
+sequential, meaning \emph{DAG} does not increase the runtime complexity of evaluation
+preprocessing.  Furthermore, once the preprocessing step is done, \emph{DAG} takes
+identical time to evaluate than the other methods, regardless of the number of
+input combinations the individual is evaluated on.
+
+With these modifications, there is no longer any meaning to the position of a node
+in the genome.  In \emph{Normal} a node near the input locations will always
+have a highly restricted set of values.  More completely, the number of valid
+values for a connection gene in \emph{Normal} is related to the number of nodes
+preceding that gene, and independent of the number of nodes following that gene.
+In \emph{DAG} a connection gene's valid values only depends on the current solution
+represented by the individual, independent of the genes location in the genome.
+As such, there are far less artificial limitations on how \emph{DAG} can modify
+solutions.
+
+While both reduce mutational limitations, \emph{DAG}'s changes are more broad that
+\emph{Reorder}.  While both have the possibility to use mutation to connect any two
+nodes such that no cycle is created, \emph{Reorder} still maintains a bias about
+how often some types of connection can happen.  Consider again two nodes $X$ and $Y$,
+such that neither is dependent on the other.  If $X$ is transitively dependent on very
+few nodes, and $Y$ is transitively dependent on many nodes, in general \emph{Reorder}
+will shuffle the genome such that $X$ is before $Y$.  This is true because the probability
+that all of $X$'s dependencies are added at any point of building the new order is always
+higher than for $Y$'s dependencies.  As a result we expect $X$ to be put into $addable$ sooner,
+and as a result we expect it to be added sooner.  The greater the discrepancy in these
+set sizes the less likely the order between the nodes will be reversed.
+Conversely, \emph{DAG} has no such bias.  It is always possible to mutate $X$ to connect to $Y$.
+
+The probability of connecting $X$ to $Y$ is also influenced by how many nodes transitively depend on each.
+In this example, let us assume $X$ has more nodes transitively dependent on it than $Y$ has.
+In \emph{Reorder}, $X$ would again appear closer to the start of the genome, this time because the number
+of possible nodes preceding it is reduced.  \emph{DAG} is biased in the reverse, such that $X$ will
+have a higher chance of connecting to $Y$ that $Y$ to $X$.  This is because $X$ can connect to fewer
+nodes, so each mutation has a higher chance of choosing $Y$.
 
 \section{Qualitative Comparisons}
 
@@ -664,9 +815,45 @@ TODO 3-bit Parity, 6-bit Multiply, 4-16-bit Decode, 16-4-bit Encode
 TODO Consider adding 5-bit Parity or Equality
 
 \subsection{Parameter Setting}
-TODO Mutation Rate / Genome Size grid
+In order to fairly compare each method, we should ensure proper parameter configuration.
+This is to avoid the potential criticism that the parameter settings chosen benefit
+a specific method more than others.  While tuning can lead to the alternative issue
+of methods only being effective after extensive problem specific tuning, we set out to use
+rough grained values and provide each technique with equal tuning time to alleviate that bias.
 
-TODO Method for choosing parameter values.
+We focus on two parameter values in our configuration: mutation rate and genome size.
+While there are other potential configurable parameters (population size, offspring size, etc),
+we feel the CGP literature has converged on settings for those parameters (1, 4).
+Furthermore, as duplication detection explicitly deals with the relationship between
+mutation rate and number of active genes, and the number of active genes depends
+on the genome size and ordering method, mutation rate and genome size seem to be
+the most likely to impact results.
+
+To set parameter values, we started by defining a grid of parameter values:
+50, 100, 200, 500, 1000, 2000, 5000, 10000 for genome size and 0.05, 0.02, 0.01,
+0.005, 0.002, 0.001, 0.0005, 0.0002 for mutation rate.  Note that here a genome
+size of 50 means there are 50 nodes, each composed of multiple genes, plus the
+required genes to specify output locations.  Also note that mutation rate of 0.05
+is used here to mean each gene has a 5\% probability of being mutated in a single
+application of mutation.  The grid is formed by trying all possible mutation rates
+with all possible genome sizes, resulting in 64 potential configurations for each
+of the algorithmic configurations.  Finally note that as \emph{Single} does not
+use a mutation rate, only the eight configurations with different genome sizes were
+used when \emph{Single} was employed.
+
+To choose which parameter configuration to use with each algorithmic configuration
+for each problem, we used an iterative process of performing runs, comparing means, removing configurations,
+and repeating.  For each algorithm configuration and problem, we first run all
+potential parameter configurations 5 times (320 runs if not using \emph{Single}, 40 otherwise).
+The parameter configurations are then sorted based on their median.  The best half are then
+each run 4 more times, with the best half of that group chosen.  In this way, 32 configurations
+are run 5 times, 16 are run 9 times, 8 are run 13 times, 4 are run 17 times, 2 are run 21 times,
+and 2 are run 25 times.  For configuration with single, all 8 parameter configurations are run 17 times
+before any are removed.  This iterative reduction allows us to focus tuning on
+those parameter configurations most likely to be effective, with more information
+gathered before choosing between high quality configurations.  In total this means
+3924 complete runs are required to set the parameter configuration for all
+algorithm configurations for a single problem.
 
 TODO Explain reruning.
 
