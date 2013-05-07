@@ -373,7 +373,7 @@
 % paper title
 % can use linebreaks \\ within to get better formatting as desired
 % Do not put math or special symbols in the title.
-\title{TODO Title}
+\title{Analysis of Cartesian Genetic Programming's Evolutionary Mechanisms}
 %
 %
 % author names and IEEE memberships
@@ -886,7 +886,10 @@ To set parameter values, we started by defining a grid of parameter values:
 size of 50 means there are 50 nodes, each composed of multiple genes, plus the
 required genes to specify output locations.  Also note that mutation rate of 0.05
 is used here to mean each gene has a 5\% probability of being mutated in a single
-application of mutation.  The grid is formed by trying all possible mutation rates
+application of mutation.  These values were chosen as they completely cover the
+range of previously used parameter settings, with each value having at least
+one paired value for the other parameter which is feasibly effective.
+The grid is formed by trying all possible mutation rates
 with all possible genome sizes, resulting in 64 potential configurations for each
 of the algorithmic configurations.  Finally note that as \emph{Single} does not
 use a mutation rate, only the eight configurations with different genome sizes were
@@ -906,7 +909,18 @@ gathered before choosing between high quality configurations.  In total this mea
 3924 complete runs are required to set the parameter configuration for all
 algorithm configurations for a single problem.
 
-TODO Explain reruning.
+To ensure termination, all runs were limited to 10,000,000 evaluations, well beyond
+the expected time to completion.  As the median was used to compare configurations,
+and not the mean, selection should be insensitive to this limit unless a large
+portion of runs are failing to optimize.
+
+To prevent undue biasing in the final results, none of these tuning runs were
+used for any other data analysis.  This helps reduce selection's effect on
+result distribution, similar to how it is common to split training and testing
+runs.  In this case, the runs used to set the parameter configuration are considered
+the training runs for that configuration.  As a result, our final results were gather
+from a completely independent set of runs to test the configurations general characteristics.
+Each configuration was run 50 times to ensure statistical power.
 
 \subsection{Results}
 TODO Compare using a table the best parameters found for each configuration.
@@ -917,7 +931,38 @@ TODO Consider dropping this section due to computational limits.
 
 \section{Analysis of Evolutionary Mechanisms}
 \label{sec:analysis}
-TODO Explain footprint concept here.
+Comparing how many evaluations each algorithm takes to solve a set of benchmark
+problems only provides us with a limited amount of understanding about how
+those algorithms actually function.  We propose here to look for further detail,
+both to check on theorized capabilities of each variant and CGP in general, and
+to look for previously hidden aspects of CGP.
+To do so we have devised a number of novel metrics to examine what makes a
+CGP run successful.
+
+As a primary concept to our analysis, we determine the \emph{footprint} of nodes
+in the genome.  What we mean by \emph{footprint} is a measure the semantic use
+of a node.  For each input that is given to an individual, all of its nodes
+will produce a single output.  These output values can be recorded an ordered.
+As the domain in use in binary, the outputs can be viewed as a bit string, with
+each bit the value that a node outputs when an individual is presented with a
+specific input.  Similar recording can be done for other domains, but binary
+allows for by far the simplest encoding.
+
+The \emph{footprint} of a node is a complete description of its functionality.
+Any two nodes with identical \emph{footprint} values have identical behavior,
+even if their method for encoding that behavior is drastically different.  From
+this perspective, we can view CGP evolution as attempting to evolve a node who's
+\emph{footprint} matches the desired output \emph{footprint}.  Doing so allows
+us to examine how the evolutionary operators change the behavior of nodes,
+not just their gene values.
+
+Utilizing \emph{footprint} analysis, we can extract the semantically useful
+portions of an individual, a subset of the active nodes.  Consider two active
+nodes with the same \emph{footprint}.  As CGP is a graph representation, only
+one of these nodes is actually necessary.  Given one in the genome, any node that reads
+from the other can have its connection changed without changing its behavior.
+
+TODO Explain simplify algorithm
 
 \subsection{Inactive Nodes and Node Duplication}
 TODO Look at how much of the genome is duplicated in both active and inactive
