@@ -926,6 +926,11 @@ Each configuration was run 50 times to ensure statistical power.
 TODO Compare using a table the best parameters found for each configuration.
 One table per problem.
 
+
+\subsection{Scalability}
+TODO Discuss using tuned parameters on different problem sizes and analyze
+results.  Include O(N) table similar to previous paper.
+
 \subsection{Generalization}
 TODO Consider dropping this section due to computational limits. 
 
@@ -961,6 +966,77 @@ portions of an individual, a subset of the active nodes.  Consider two active
 nodes with the same \emph{footprint}.  As CGP is a graph representation, only
 one of these nodes is actually necessary.  Given one in the genome, any node that reads
 from the other can have its connection changed without changing its behavior.
+
+\begin{figure}
+  \begin{algorithmic}
+  \Procedure{RepeatedFootprint}{}
+    %\State $reachable \leftarrow \{i \mapsto \{ footprint(i) \} | i \in input\_locations\}$
+    \State $reachable \leftarrow \emptyset$
+    \ForAll{$i \in input\_locations$}
+      \State $reachable[i] \leftarrow footprint(i)$
+    \EndFor
+    \State $repeated \leftarrow \emptyset$
+    \ForAll{$node \in active$}
+      \State $working \leftarrow footprint(node)$
+      \State $direct \leftarrow \emptyset$
+      \ForAll{$link \in reads\_from(node)$}
+        \State $direct \leftarrow direct \cup reachable[link]$
+      \EndFor
+      \If{$working \in direct$}
+        \State $repeated \leftarrow repeated \cup \{working\}$
+      \Else
+        \State $direct \leftarrow direct \cup \{working\}$
+      \EndIf
+      \State $reachable[node] \leftarrow direct$
+    \EndFor
+    \State\Return{$repeated$}
+  \EndProcedure
+  \end{algorithmic}
+  \caption{Algorithm to determine which nodes transitively depend on their
+  own footprint.}
+  \label{fig:repeated}
+\end{figure}
+
+\begin{figure}
+  \begin{algorithmic}
+  \Procedure{Simplify}{$p\_r$, $p\_c$, $p\_i$, $best$}
+    \If{$|p\_r| = 0$}
+      \State\Return{$p\_i$}
+    \ElsIf{$|p\_i| + |p\_r| \geq |best|$}
+      \State\Return{$best$}
+    \EndIf
+    \State $working, p\_a \leftarrow randpop(p\_r)$
+    \State $covrd \leftarrow p\_c \cup {working}$
+    \State $ansc \leftarrow p\_a \cup {working}$
+    \ForAll{$node \in has\_footprint(working)$}
+      \State $node\_valid \leftarrow True$
+      \State $incd \leftarrow p\_i \cup {node}$
+      \State $reqd \leftarrow p\_r$
+      \ForAll{$link \in reads\_from(node)$}
+        \State $foot \leftarrow footprint(link)$
+        \If{$foot \in ansc$}
+          \State $node\_valid \leftarrow False$
+          \State \textbf{break}
+        \ElsIf{$foot \notin covrd$}
+          \State $reqd[foot] \leftarrow reqd[foot] \cup ansc$
+        \EndIf
+      \EndFor
+      \If{$node\_valid$}
+        \State $solution \leftarrow \Call{Simplify}{reqd, covrd, incd, best}$
+        \If{$|solution| < |best|$}
+          \State $best \leftarrow solution$
+        \EndIf
+      \EndIf
+    \EndFor
+    \State\Return{$best$}
+  \EndProcedure
+  \end{algorithmic}
+  \caption{Recursive algorithm which determines the minimum set of nodes required
+    to generate a set of required outputs.}
+  \label{fig:simplify}
+\end{figure}
+
+
 
 TODO Explain simplify algorithm
 
