@@ -368,6 +368,8 @@
 %\hyphenation{op-tical net-works semi-conduc-tor}
 
 \usepackage{verbatim}
+\usepackage{color, colortbl}
+\definecolor{Gray}{gray}{0.9}
 \begin{document}
 %
 % paper title
@@ -923,6 +925,89 @@ from a completely independent set of runs to test the configurations general cha
 Each configuration was run 50 times to ensure statistical power.
 
 \subsection{Results}
+
+\begin{table*}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|c|c|c|}
+	  \hline
+\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{p-value} \\ \hline
+\emph{Accumulate} & \emph{Normal} & 10,000 & 0.02 & 682 & 348 & 122 & 0.5602 \\ \hline
+\emph{Accumulate} & \emph{Reorder}&  5,000 & 0.01 & 796 & 434 & 331 & 0.7174 \\ \hline
+\rowcolor{Gray}
+\emph{Skip} & \emph{Normal}       & 10,000 & 0.02 & 823 & 363 & 119 & NA \\ \hline
+\emph{Skip} & \emph{Reorder}      &  2,000 & 0.01 & 870 & 362 & 198 & 0.3125 \\ \hline
+\emph{Accumulate} & \emph{Dag}    &  5,000 & 0.01 & 964 & 499 & 1,174 & 0.3310 \\ \hline
+\emph{Skip} & \emph{Dag}          & 10,000 & 0.02 & 1,042 & 620 & 2,083 & 0.0248 \\ \hline
+\emph{Single} & \emph{Normal}     & 500 & NA & 1,214 & 497 & 39 & 0.0046 \\ \hline
+\emph{Single} & \emph{Reorder}    & 200 & NA & 1,506 & 823 & 57 & 0 \\ \hline
+\emph{Single} & \emph{Dag}        & 100 & NA & 2,569 & 1,313 & 43 & 0 \\ \hline
+	\end{tabular}
+	\caption{Parity, 5.9956882435042246e-14}
+	\label{tab:parity}
+\end{table*}
+
+\begin{table*}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|c|c|c|}
+	  \hline
+\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{p-value} \\ \hline
+\rowcolor{Gray}
+\emph{Skip} & \emph{Normal}        & 10,000 & 0.005 & 16,226 & 7,455 & 283 & NA \\ \hline
+\emph{Skip} & \emph{Reorder}       & 10,000 & 0.005 & 17,883 & 8,378 & 2,070 & 0.6918 \\ \hline
+\emph{Accumulate} & \emph{Reorder} & 10,000 & 0.002 & 18,132 & 8,926 & 2,027 & 0.8822 \\ \hline
+\emph{Accumulate} & \emph{Normal}  & 10,000 & 0.005 & 21,428 & 6,379 & 279 & 0.2525 \\ \hline
+\emph{Accumulate} & \emph{Dag}     & 10,000 & 0.002 & 24,855 & 12,512 & 4,059 & 0.0736 \\ \hline
+\emph{Skip} & \emph{Dag}           & 10,000 & 0.002 & 25,678 & 12,034 & 4,178 & 0.0211 \\ \hline
+\emph{Single} & \emph{Reorder}     & 100 & NA & 26,558 & 7,858 & 52 & 0.0076 \\ \hline
+\emph{Single} & \emph{Normal}      & 2,000 & NA & 31,057 & 14,475 & 141 & 0.0085 \\ \hline
+\emph{Single} & \emph{Dag}         & 100 & NA & 34,208 & 10,069 & 59 & 0 \\ \hline
+	\end{tabular}
+	\caption{Encode 1.1926088284917749e-06}
+	\label{tab:encode}
+\end{table*}
+
+\begin{table*}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|c|c|c|}
+	  \hline
+\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{p-value} \\ \hline
+\emph{Skip} & \emph{Reorder}       & 2,000 & 0.002 & 62,853 & 2,023 & 757  & 0.5247 \\ \hline
+\emph{Single} & \emph{Reorder}     & 500 & NA & 63,731 & 13,119 & 245 & 0.3610 \\ \hline
+\emph{Accumulate} & \emph{Normal}  & 1,000 & 0.002 & 67,390 & 11,991 & 211 & 0.8767 \\ \hline
+\rowcolor{Gray}
+\emph{Skip} & \emph{Normal}        & 1,000 & 0.002 & 68,231 & 15,115 & 202 & NA \\ \hline
+\emph{Single} & \emph{Normal}      & 1,000 & NA & 68,819 & 14,590 & 203 & 0.7695 \\ \hline
+\emph{Accumulate} & \emph{Reorder} & 2,000 & 0.002 & 72,991 & 18,650 & 760 & 0.1868 \\ \hline
+\emph{Skip} & \emph{Dag}           & 10,000 & 0.001 & 132,821 & 29,432 & 4,983 & 0 \\ \hline
+\emph{Accumulate} & \emph{Dag}     & 5,000 & 0.002 & 133,188 & 29,326 & 2,542 & 0 \\ \hline
+\emph{Single} & \emph{Dag}         & 500 & NA & 160,696 & 392,242 & 299 & 0 \\ \hline
+	\end{tabular}
+	\caption{Decode 1.0182688124966139e-36}
+	\label{tab:decode}
+\end{table*}
+
+\begin{table*}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|c|c|c|}
+	  \hline
+\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{p-value} \\ \hline
+\emph{Skip} & \emph{Reorder}      & 10,000 & 0.0005  & 196,116  & 60,326  & 3,175 & 0  \\ \hline
+\emph{Accumulate} & \emph{Reorder}& 10,000 & 0.001 & 199,193 & 85,970 & 3,117 & 0  \\ \hline
+\emph{Single} & \emph{Dag} & 200  & NA & 239,844 & 78,739 & 114 & 0 \\ \hline
+\emph{Single} & \emph{Reorder}    & 500   & NA & 243,664 & 91,935 & 266 & 0 \\ \hline
+\emph{Skip} & \emph{Dag}          & 2,000 & 0.002 & 369,931 & 174,408 & 952 & 0.0100 \\ \hline
+\emph{Accumulate} & \emph{Dag}    & 2,000 & 0.002  & 379,202 & 147,289 & 973 & 0.0053  \\ \hline
+\emph{Single} & \emph{Normal}     & 5,000  & NA & 399,911 & 194,384 & 273 & 0.0047 \\ \hline
+\emph{Accumulate} & \emph{Normal} & 2,000 & 0.002 & 483,938 & 227,686 & 168 & 0.45 \\ \hline
+\rowcolor{Gray}
+\emph{Skip} & \emph{Normal} & 2,000 & 0.002 & 657,121 & 311,376 & 175 & NA \\ \hline
+
+	\end{tabular}
+	\caption{Multiply 5.1429910779824196e-18}
+	\label{tab:Multiply}
+\end{table*}
+
+
 TODO Compare using a table the best parameters found for each configuration.
 One table per problem.
 
