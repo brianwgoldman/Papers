@@ -656,7 +656,7 @@ and $N$ is the number of nodes.
 The final step in \emph{Reorder} is to use the list of new locations to convert
 the existing genome into the reordered genome.  This can be done in the straight
 forward manner by converting connection genes and output location genes using
-the $new_loc$ map returned from the algorithm in Figure~\ref{fig:reorder}.
+the $new\_loc$ map returned from the algorithm in Figure~\ref{fig:reorder}.
 This also requires $O(AN)$ time, as all connection genes in all nodes must
 be converted.  As this is the final step unique to \emph{Reorder}, and
 no previous steps were of higher complexity, it is also the complexity of
