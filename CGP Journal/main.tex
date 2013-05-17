@@ -1057,6 +1057,50 @@ from the other can have its connection changed without changing its behavior.
 
 \begin{figure}
   \begin{algorithmic}
+  \Procedure{Simplify}{}
+    \State $reconnect \leftarrow \emptyset$
+    \ForAll{$node \in reversed(active)$}
+      \State $reconnect[footprint(node)] \leftarrow node$
+    \EndFor
+    \ForAll{$i \in input\_locations$}
+      \State $reconnect[footprint(i)] \leftarrow i$
+    \EndFor
+    \ForAll{$g \in genes$}
+      \If{$g$ is a connection gene}
+        \If{$g \in reconnect$}
+          \State $g \leftarrow reconnect[footprint(g)]$
+        \EndIf
+      \EndIf
+    \EndFor
+  \EndProcedure
+  \end{algorithmic}
+  \caption{Algorithm to ensure each active \emph{footprint} is only
+           calculated once.}
+  \label{fig:simplify}
+\end{figure}
+
+The \Call{Simplify}{} algorithm given in Figure~\ref{fig:simplify} is designed
+to efficiently reduce the redundancy encoded in a genome.  Generally, this
+algorithm will move all connections to the first node that produces the desired
+\emph{footprint}.  After application, and recalculation of which nodes are still
+active, each active node produces a unique \emph{footprint}.  Any node that is
+transitively dependent on its own \emph{footprint} will always be removed from
+the active set.  In general, if a set of nodes all produce the same \emph{footprint},
+whichever has the least transitive dependencies will be kept.  Note that this
+does guarantee the minimum possible genome, an algorithm capable of that requires
+exponential runtime.  The \Call{Simplify}{} algorithm requires $O(AN)$ time,
+as the final for loop is the most expensive step.  As before, this means
+\Call{Simplify}{} is no more complex than copying a genome.
+
+By examining which nodes remain active after simplification, we can discuss
+the usefulness of each node as either being part of the minimum solution, a
+duplicate of a node in the minimum solution, or irrelevant to the solution.
+As such we can then examine how redundancy is being used, how frequently useful
+structures exist in the inactive nodes, and how useful nodes are constructed by evolution.
+
+\begin{comment}
+\begin{figure}
+  \begin{algorithmic}
   \Procedure{RepeatedFootprint}{}
     \State $reachable \leftarrow \emptyset$
     \ForAll{$i \in input\_locations$}
@@ -1170,7 +1214,7 @@ As such we can then examine how redundancy is being used, how frequently useful
 structures exist in the inactive nodes, and how useful nodes are constructed by evolution.
 This algorithm can also be used to construct simplified genomes when combined
 with the algorithm given in Figure~\ref{fig:reorder}.
-
+\end{comment}
 \subsection{Inactive Nodes and Node Duplication}
 TODO Look at how much of the genome is duplicated in both active and inactive
 
