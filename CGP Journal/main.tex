@@ -629,7 +629,7 @@ and $N$ is the number of nodes.
 
 \begin{figure}
   \begin{algorithmic}
-    \Procedure{NewOrder}{}
+    \Procedure{RandomSerialization}{}
     \State $addable \leftarrow input\_locations$
     \State $index \leftarrow |input\_locations|$
     \State $new\_loc \leftarrow \emptyset$
@@ -649,7 +649,10 @@ and $N$ is the number of nodes.
     \State\Return $new\_loc$
     \EndProcedure
   \end{algorithmic}
-  \caption{Algorithm used by \emph{Reorder} to determine new node locations.}
+  \caption{Algorithm which converts any DAG into a random serial ordering such
+           that all nodes take input from nodes that precede them in the genome.
+           Used by \emph{Reorder} to determine new node locations and \emph{DAG} to
+           determine node evaluation ordering.}
   \label{fig:reorder}
 \end{figure}
 
@@ -1032,7 +1035,7 @@ CGP run successful.
 As a primary concept to our analysis, we determine the \emph{footprint} of nodes
 in the genome.  What we mean by \emph{footprint} is a measure the semantic use
 of a node.  For each input that is given to an individual, all of its nodes
-will produce a single output.  These output values can be recorded an ordered.
+will produce a single output.  These output values can be recorded and ordered.
 As the domain in use in binary, the outputs can be viewed as a bit string, with
 each bit the value that a node outputs when an individual is presented with a
 specific input.  Similar recording can be done for other domains, but binary
