@@ -497,7 +497,51 @@ TODO Keywords
 % (should never be an issue)
 
 \section{Cartesian Genetic Programming}
-TODO Explain basic CGP, use~\cite{miller:2011:chapter2}.
+Cartesian Genetic Programming (CGP) was originally proposed as a method for general
+genetic programming in~\cite{miller:2000:CGPorigin}.  While its beginnings and
+its name come from evolving circuits on a two dimensional grid, modern CGP can
+represent any directed acyclic graph (DAG), with applications in evolving binary
+circuits~\cite{walker:2008:cgpmodules},
+robot controllers~\cite{harding:2005:robots},
+neural networks~\cite{khan:2010:cgpann},
+image classifiers~\cite{harding:2012:mtcgp},
+and regression~\cite{harding:2009:smcgp}.
+
+CGP represents DAGs using a linear genome of integer values.  Each node in the
+DAG is encoded using a collection of genes, with one gene specifying the function
+the node applies to its inputs, and the remaining genes expressing where the
+node takes input from.  Nodes can take input from any problem input and from
+any node preceding them in the genome.  To complete the representation, a set
+of extra genes are included at the end of the genome to specify which nodes or
+input locations to use as function outputs.
+
+Unlike tree based GP encodings, CGP is able to perform value reuse.  This means
+that the output of a node can be reused by any number of other nodes as input values.
+CGP's requirement that nodes connect forward in the genome prevents this ability
+from causing cycles.
+
+As output locations and information flow in the DAG are evolvable, there are often
+large portions of the genome which do not participate in creating any of the
+output values.  These nodes are referred to as inactive, with the nodes currently
+being used to create output values referred to as active.  Inactive nodes
+allow CGP individuals to drift genetically, as they can be mutated without effecting
+the fitness of the individual.  This genetic drift can then be incorporated, as
+mutation can change the DAG structure causing previously inactive nodes to become
+active.  Previous work suggests CGP is most efficient when up to 95\% of the genome
+is inactive~\cite{miller:2006:redundancy}, yet other work suggests this may
+be a result of hidden parsimony pressure in CGP~\cite{goldman:2013:ordering}.
+
+CGP uses very simple evolutionary mechanisms.  By far the most common strategy
+is $1+4$, in which each generation a single parent produces four offspring using
+mutation.  The best offspring then competes with the parent, with the offspring
+replacing the parent if it is no less fit.  This replacement strategy encourages
+drift, as completely neutral mutations are always preferred to stagnation.  Mutation
+is commonly performed by mutating each gene at a set probability, where mutation
+involves changing a gene randomly to some different valid value.  For instance,
+if a function gene is chosen for mutation, its new value is randomly chosen from
+all possible functions, with the exception of the genes current value.  Combined,
+this form of CGP can be viewed as a stochastic hill climber with neutrality.
+For a more in depth description of CGP, see~\cite{miller:2011:chapter2}.
 
 \section{Duplicate Evaluation Avoidance}
 
@@ -1018,6 +1062,8 @@ One table per problem.
 \subsection{Scalability}
 TODO Discuss using tuned parameters on different problem sizes and analyze
 results.  Include O(N) table similar to previous paper.
+
+TODO Include scaling comparison with~\cite{walker:2008:cgpmodules}.
 
 \subsection{Generalization}
 TODO Consider dropping this section due to computational limits. 
