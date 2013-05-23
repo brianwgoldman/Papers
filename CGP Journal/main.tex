@@ -492,11 +492,34 @@ TODO Keywords
 % 
 % Here we have the typical use of a "T" for an initial drop letter
 % and "HIS" in caps to complete the first word.
-\IEEEPARstart{T}{ODO this} section.
-% You must have at least 2 lines in the paragraph with the drop letter
-% (should never be an issue)
+\IEEEPARstart{W}{hile effective} evolutionary methods are often simple to design
+and implement, it can sometimes be difficult to discern the reason a technique
+or behavior in that system leads to effective search.  This can be exceptionally
+true for Genetic Programming (GP) systems, as they often include nontrivial
+genotype to phenotype maps and operators that act on genotypes without regard to
+phenotypic impact.  Yet understanding the root causes of evolutionary success
+and failure is critical to improving existing techniques, designing new techniques,
+and understanding how and where to apply each optimization system.
+
+TODO Previous work on understanding evolution, especially CGP.
+
+In this work we set out to develop a deeper understanding of what makes Cartesian
+Genetic Programming (CGP) an effective evolutionary optimizer.  Our primary focus is
+on how mutation and genome ordering interact.  In Section~\ref{sec:cgp} we provide
+an introduction to CGP, with sufficient background to put later sections into
+context.  Section~\ref{sec:duplicate} explains previous work about mutation's potential
+to create identifiably wasted evaluations, and proposed methods to prevent that
+waste.  Section~\ref{sec:ordering} discusses the impact of CGP's genome ordering,
+with methods to both examine and bypass the limitations imposed by that ordering.
+Each technique is then rigorously tuned and qualitatively compared on a collection
+of benchmarks in Section~\ref{sec:quality}.  Section~\ref{sec:analysis} then
+provides a deep look into the details of CGP's search, and how each method impacts
+search, with final remarks given in Section~\ref{sec:conclusion}.
+
+
 
 \section{Cartesian Genetic Programming}
+\label{sec:cgp}
 Cartesian Genetic Programming (CGP) was originally proposed as a method for general
 genetic programming in~\cite{miller:2000:CGPorigin}.  While its beginnings and
 its name come from evolving circuits on a two dimensional grid, modern CGP can
@@ -544,8 +567,28 @@ this form of CGP can be viewed as a stochastic hill climber with neutrality.
 For a more in depth description of CGP, see~\cite{miller:2011:chapter2}.
 
 \section{Duplicate Evaluation Avoidance}
+\label{sec:duplicate}
+CGP's mutation operator is traditionally applied to all genes equally, with no
+consideration if genes are part of an active or inactive node.  This has the
+potential to lead offspring who's only mutated genes are part of inactive nodes.
+These offspring are actively identical (contain identical active genes) to their
+parents, and therefore by definition have identical fitness to their parents.
+As such, evaluating these individuals is wasteful, as their fitness can be
+assigned without the computational complexity of performing an evaluation.
+Previous work~\cite{goldman:2013:cgpwaste} has taken an initial look at the
+effect this waste can have, and proposed \emph{Skip}, \emph{Accumulate}, and
+\emph{Single} as methods for avoiding or preventing these duplicate evaluations.
 
-TODO Explain here why only compared with parent, not global history.
+TODO Explain that inactive / active is knowable before evaluation.
+
+The amount of evaluations wasted on these actively identical individuals is
+directly related to the mutation rate and the number of active genes.  With
+sufficiently high mutation rates and enough active genes, the probability of
+creating an offspring which is actively identical to its parent is very low.
+Yet such configuration make make it difficult for CGP to optimize, as mutation
+is likely to change many active genes in each application.  As was discussed
+in~\cite{goldman:2013:cgpwaste}, this can make normal CGP very sensitive to the
+mutation rate in use.
 
 \subsection{Skip}
 The \emph{Skip} method for avoiding duplicate evaluations involves the least
@@ -634,13 +677,36 @@ CGP allows for inactive genes, \emph{Single} is still able to escape most local
 maxima using sufficient drift of inactive genes.  When a high percentage of
 the genome becomes active or when \emph{Single} is otherwise limited in its ability
 to drift due to lack of introns, it does have an increased potential to become stuck.
-As will be discussed in Section~\ref{sec-ordering} and was shown in~\cite{goldman:2013:ordering}
+As will be discussed in Section~\ref{sec:ordering} and was shown in~\cite{goldman:2013:ordering}
 this problem of highly active genomes is very unlikely.
 
 \section{Genome Ordering}
-\label{sec-ordering}
-TODO General stuff about ordering, including normal CGP.
+\label{sec:ordering}
+As was discussed in Section~\ref{sec:cgp}, CGP uses node ordering in the genome
+to prevent cycles, as nodes are only able to receive input from sources that
+precede them in the genome.  This restriction does not limit CGP's ability
+to represent DAGs, as all DAGs can be serialized to fit this requirement.
+Yet this likely has an impact on CGP's ability to evolve specific
+DAGs~\cite{goldman:2013:ordering}.
 
+Primarily, enforcing node ordering adds artificial limitations CGP's ability to
+connect nodes.  Beyond preventing cycles, it also prevents nodes from connecting
+which would not create a cycle based solely on the evolutionary happenstance of
+where those nodes were evolved.  Similarly, it is impossible for adjacent nodes
+to ever be connected through an intermediate node.  As a result, useful structures
+in the genome may need to be evolved repeatedly in order to find the best
+location for that structure in the genome.
+
+Ordering combined with the random reset mutation method may be the cause of CGP's
+immensely inactive genomes.  As was rigorously defined in~\cite{goldman:2013:ordering},
+the number of active genes in a genome is expected to scale logarithmically
+with genome size, independent of problem application.  Furthermore, the less
+active a genome, the lower the likelihood of structure ordering preventing structure
+connection.
+
+To rectify these issues an examine CGP without ordering bias, \cite{goldman:2013:ordering}
+created \emph{Reorder} and \emph{DAG} as methods for genome ordering, and defined
+\emph{Normal} as CGP's historical ordering method.
 
 \subsection{Reorder}
 \label{sec:reorder}
@@ -853,6 +919,7 @@ have a higher chance of connecting to $Y$ that $Y$ to $X$.  This is because $X$ 
 nodes, so each mutation has a higher chance of choosing $Y$.
 
 \section{Qualitative Comparisons}
+\label{sec:quality}
 While it is possible to theorize the effects of each CGP variant on search, and
 how those effects may interact with each other, without empirical evidence it is
 mostly speculation.  Therefore we propose to start by testing the effectiveness
@@ -1364,6 +1431,7 @@ TODO Look into how often children replace parents.
 
 
 \section{Conclusion}
+\label{sec:conclusion}
 TODO The conclusion goes here.
 
 
