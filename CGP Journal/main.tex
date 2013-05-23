@@ -501,8 +501,6 @@ phenotypic impact.  Yet understanding the root causes of evolutionary success
 and failure is critical to improving existing techniques, designing new techniques,
 and understanding how and where to apply each optimization system.
 
-TODO Previous work on understanding evolution, especially CGP.
-
 In this work we set out to develop a deeper understanding of what makes Cartesian
 Genetic Programming (CGP) an effective evolutionary optimizer.  Our primary focus is
 on how mutation and genome ordering interact.  In Section~\ref{sec:cgp} we provide
@@ -516,6 +514,13 @@ of benchmarks in Section~\ref{sec:quality}.  Section~\ref{sec:analysis} then
 provides a deep look into the details of CGP's search, and how each method impacts
 search, with final remarks given in Section~\ref{sec:conclusion}.
 
+There have been a number of previous studies into various aspects of GP evolution.
+For instance~\cite{daida3:2003:treebias} looked into how trees of specific shapes,
+which helped inspire the use of new grammar based operations~\cite{xuan:2006:grammar}.
+Analysis of the root cause of bloat has helped to inform methods for controlling
+bloat~\cite{luke:2006:bloat}.  A few studies of evolutionary mechanisms have also
+been done in CGP directly, related to bloat~\cite{miller:2001:bloat},
+neutrality~\cite{vassilev:2000:neutrality}, and structural bias~\cite{payne:2009:bias}.
 
 
 \section{Cartesian Genetic Programming}
@@ -575,11 +580,12 @@ These offspring are actively identical (contain identical active genes) to their
 parents, and therefore by definition have identical fitness to their parents.
 As such, evaluating these individuals is wasteful, as their fitness can be
 assigned without the computational complexity of performing an evaluation.
+Furthermore, calculating which nodes are active before evaluating an individual
+improves evaluation speed~\cite{vasicek:2012:efficient}, meaning detecting when duplicated individuals are
+created can be done without significant computational overhead.
 Previous work~\cite{goldman:2013:cgpwaste} has taken an initial look at the
 effect this waste can have, and proposed \emph{Skip}, \emph{Accumulate}, and
 \emph{Single} as methods for avoiding or preventing these duplicate evaluations.
-
-TODO Explain that inactive / active is knowable before evaluation.
 
 The amount of evaluations wasted on these actively identical individuals is
 directly related to the mutation rate and the number of active genes.  With
@@ -979,7 +985,7 @@ the largest number of test points.
 
 
 
-TODO Consider adding 5-bit Parity or Equality, 11-bit Multiplexer.
+%TODO Consider adding 5-bit Parity or Equality, 11-bit Multiplexer.
 
 \subsection{Parameter Setting}
 In order to fairly compare each method, we should ensure proper parameter configuration.
