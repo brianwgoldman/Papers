@@ -817,6 +817,7 @@ will benefit \emph{Normal} any time making $X$ dependent on $Y$ is detrimental, 
 
 
 \subsection{DAG}
+\label{sec:dag}
 The principle behind \emph{DAG} is to remove the traditional CGP requirement that
 nodes can only take input from nodes that precede them in the genome.  Instead
 this is replaced with the relaxed requirement than the genome cannot encode for
@@ -988,6 +989,7 @@ the largest number of test points.
 %TODO Consider adding 5-bit Parity or Equality, 11-bit Multiplexer.
 
 \subsection{Parameter Setting}
+\label{sec:parameter}
 In order to fairly compare each method, we should ensure proper parameter configuration.
 This is to avoid the potential criticism that the parameter settings chosen benefit
 a specific method more than others.  While tuning can lead to the alternative issue
@@ -1124,14 +1126,114 @@ Each configuration was run 50 times to ensure statistical power.
 
 	\end{tabular}
 	\caption{Multiply 5.1429910779824196e-18}
-	\label{tab:Multiply}
+	\label{tab:multiply}
 \end{table*}
 
+The results from running each tuned parameter configuration for each algorithm
+combination on each problem are summarized by Table~\ref{tab:parity},
+Table~\ref{tab:encode}, Table~\ref{tab:decode}, and Table~\ref{tab:multiply}.
+Rows in each table are ordered by that algorithm combination's median evaluations to
+success (MES), with the best algorithm combination appearing at the top of each table.
+The highlighted row marks \emph{Skip Normal}, the control algorithm combination
+representing traditional CGP's performance.  All configurations for each problem
+were then testing using Kruskal-Wallis to determine if any configuration is
+statistically different from any other.  All problems received highly significant
+values.  As such, each algorithm combination was then compared with the control
+to determine statistical significance using pairwise Mann-Whitney~U tests. The
+resulting p-value for each test is reported in the table.
 
-TODO Compare using a table the best parameters found for each configuration.
-One table per problem.
+As discussed in Section~\ref{sec:parameter}, the genome size and mutation rate
+for each algorithm combination was extensively optimized.  In line with previous
+research~\cite{miller:2006:redundancy}, this led to massive genome sizes for
+almost all algorithm combinations on all problems.  With the exception of 
+some combinations using \emph{Single}, all algorithm combinations used over
+1,000 nodes.  Half of those configurations used 10,000 nodes, the maximum allowed
+by our tuning, which may imply these combinations work best with even larger
+genomes.
 
+Of the 12 configurations including \emph{Single}, 11 used a genome size smaller
+than all configurations not using \emph{Single}.  The exception was \emph{Single Normal}
+on Multiply.  No other algorithm had as much impact on genome size tuning as
+the inclusion or exclusion of \emph{Single}.  In previous work~\cite{goldman:2013:ordering}
+it appeared \emph{Reorder} and \emph{DAG} were allowing CGP to use smaller genomes.
+In light of our results, this conclusion should be amended.
+It appears that \emph{Single} is most effective when the genome size is small and
+that \emph{Reorder} and \emph{DAG} are best able to cope with smaller genome sizes.
+Independent of duplication method, the ordering methods do not seem to create any
+pressure on which genome size is chosen.
 
+\begin{comment}
+Genome size explosion seems most prevalent on easier problems, with Parity and
+Encode having much higher genome sizes than Decode and Multiply.  Initially
+this seems counter intuitive, as we would expect harder problems to require
+larger solutions which in turn should require larger genomes.  Yet the genome
+sizes in use are so far beyond what a solution to these problems require that
+solution size is likely not the cause of this behavior.  Instead, consider
+the usefulness of unexplored nodes.
+
+On simple enough problems, exploring lots of randomly generated nodes may be
+sufficient to generate high quality solutions.  At relatively low numbers of
+evaluations, large genotypes likely mean each mutation to a connection gene
+will activate nodes that have never been active, resulting in exploration.
+At higher numbers of evaluations, mutations to connection genes that are not currently
+active have a high chance of connecting to a node that was tested previously
+and found ineffective.  As a result, having a smaller genome size on harder problems
+may reduce the chance of exploratory mutations when optimizing near the global optimum.
+
+Under this theory, we should expect Parity to have the largest genome sizes
+\end{comment}
+
+Unlike genome size, all configurations choose approximately the same mutation rate,
+with different rates for each problem.  With the exception of Parity, there appears
+to be a general consensus that each gene should be mutated with probability 0.002,
+independent of genome size.  Parity used a higher mutation rate, but this is likely
+because 3-bit Parity is by far the easiest problem tested and therefore likely benefits
+from higher exploration.
+
+On many of the problems, many of the configurations have little to no statistical
+difference from the control in their evaluations required to reach the global optimum.
+On Parity and Encode it is probably safe to conclude that \emph{Single} is worse than
+the control, although as these are the easiest problems tested that difference may have
+little real world meaning.  \emph{DAG} is almost certainly worse than the control on
+Decode.  Its results are so much worse that we can also likely conclude that \emph{DAG}
+is worse than all non \emph{DAG} configuration on that problem, even though no statistical
+tests are presented here.  The control on multiply did by far the worst of all configurations,
+with only \emph{Accumulate Normal} likely failing statistical significance.
+
+By ordering the algorithm combinations by MES and examining that ordering across each
+problem, we can look for general trends.  From the tables, it appears on easier problems
+which method of duplication is in use is the strongest predictor of rank, while
+the ordering methods are more important on harder problems.  This comes from the
+observation that in for Parity and Encode (Table~\ref{tab:parity} and Table~\ref{tab:encode})
+the first column is effectively sorted, while for Decode and Multiply
+(Table~\ref{tab:decode} and Table~\ref{tab:multiply}) the second column is sorted.
+Each table includes coincidentally one exception to these rules.  On Parity and
+Encode pairings with \emph{DAG} are ranked lower than other ordering methods, so much
+so as to break the ordering once on both problems.  On Decode \emph{Reorder Duplicate}
+ranks worse than expected.  Finally on Multiply \emph{Single DAG} does far better
+than expected.
+
+On almost every problem, \emph{DAG} required
+more evaluations to success than \emph{Reorder}, and it only outperformed \emph{Normal}
+on Multiply.  Combined with its's algorithmic overhead described in
+Section~\ref{sec:dag}, \emph{DAG} is therefore not likely to be useful for anything
+but comparison purposes.
+
+On all four problems, \emph{Reorder} either finds the solution in comparable
+or significantly less evaluations than \emph{Normal} ordering, independent of
+the duplicate method in use.  Combined with the complexity analysis in
+Section~\ref{sec:reorder} which shows it is no more asymptotically complex,
+we would suggest \emph{Reorder} as an alternative to \emph{Normal} on hard
+problems.
+
+The difference between using \emph{Skip} and \emph{Accumulate} remains
+negligible~\cite{goldman:2013:cgpwaste}, even in combination with different ordering
+methods.  As \emph{Accumulate} is far more complex in terms of algorithm function
+than \emph{Skip}, we would suggest \emph{Skip} be used over \emph{Accumulate} for
+any real world application.
+
+TODO Discuss actual runtime analysis, and how \emph{Single Reorder} is likely
+the fastest method in that regard.
 \subsection{Scalability}
 TODO Discuss using tuned parameters on different problem sizes and analyze
 results.  Include O(N) table similar to previous paper.
