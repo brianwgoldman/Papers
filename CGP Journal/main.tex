@@ -1232,8 +1232,40 @@ methods.  As \emph{Accumulate} is far more complex in terms of algorithm functio
 than \emph{Skip}, we would suggest \emph{Skip} be used over \emph{Accumulate} for
 any real world application.
 
-TODO Discuss actual runtime analysis, and how \emph{Single Reorder} is likely
-the fastest method in that regard.
+Our parameter tuning focused on minimizing the number of evaluations each algorithm
+combination required to solve problems, as that is the primary measure of runtime
+for CGP and GP in general.  As such, comparing the true runtime of the tuned parameters
+is likely to give potentially misleading results.  In using profilers and examining
+general trends, one of the largest indicators of runtime per evaluation was genome size.
+This makes sense as each time an offspring is generated all of the parent's genes
+must first be copied.  Also, larger genome sizes correlate with more active nodes,
+each of which must be executed on each input tested during individual evaluation.
+
+With these caveats, the observed runtime for each algorithm combination follows
+what we would expect given the number of evaluations performed and the genome size.
+When \emph{Reorder} and \emph{Normal} use the same genome sizes, they require
+nearly the same amount of time per evaluation, with \emph{Reorder}'s added
+steps and increased number of active nodes constituting a relatively small increase.
+In general this difference in time per evaluation is trumped by differences in
+actual number of evaluations, which remains the primary cause of differential total runtime.
+As predicted \emph{DAG} does take longer than the other algorithms to perform each evaluation,
+reinforcing the conclusion that \emph{DAG} should not be used for applications.
+
+As our implementation of \emph{Skip} and \emph{Accumulate} required each gene
+to generate a random number to determine if it should mutate, these methods took
+significantly longer per evaluation than \emph{Single}.  Utilizing a binomial
+distribution, identical behavior could have been achieved in effectively constant
+instead of linear time.  Further skewing the comparison is that \emph{Single}'s
+tuning resulted in far smaller genomes, giving it a significant edge over the other
+techniques in runtime per evaluation.
+
+If we had selected on runtime as apposed to evaluations during tuning, we would expect whichever
+technique is most effective at small genome sizes to obtain the best results.
+From theoretical work in~\cite{goldman:2013:ordering}, we would expect \emph{Reorder}
+to work better with this limitation than \emph{Normal}.  Assuming the tuned values
+we obtained are any gauge, \emph{Single Reorder} will likely require the least
+amount of runtime when tuned to reduce runtime.
+
 \subsection{Scalability}
 TODO Discuss using tuned parameters on different problem sizes and analyze
 results.  Include O(N) table similar to previous paper.
