@@ -1475,8 +1475,28 @@ structures exist in the inactive nodes, and how useful nodes are constructed by 
 This algorithm can also be used to construct simplified genomes when combined
 with the algorithm given in Figure~\ref{fig:reorder}.
 \end{comment}
-\subsection{Active, Inactive, and Never Active Nodes}
-TODO Look at how much of the genome is unused.
+\subsection{Never Active Nodes}
+In line with the suggestions made in~\cite{miller:2006:redundancy}, the evolved
+number of active nodes across all problems and all algorithm configurations
+in Table~\ref{tab:parity}, Table~\ref{tab:encode}, Table~\ref{tab:decode}, and Table~\ref{tab:multiply}
+was significantly lower than the genome size.  With the exception of a few combinations
+with \emph{DAG} and \emph{Single}, the evolved results were over 50\% inactive.
+\emph{Skip Normal}, our control representing normal CGP, had only 1\%, 3\%, 20\%,
+and 9\% of nodes in the genome active in the median runs of Parity, Encode, Decode,
+and Multiply, respectively.  These final results fall in line with the predictions
+made in~\cite{goldman:2013:ordering}, in that if the problems are ordered based on
+their number of output locations, their evolved percentage of active nodes is also ordered.
+
+With how inactive the final genomes are, we ask ``what is the rest for?''
+Just because a node is not active in the final solution does not mean it was never
+useful.  For a node to be truly of no use to search, we must consider nodes that
+were never active.  Never active nodes are nodes such that for all parents of the
+final solution (the line of descent), no parent had that node active.  Note that
+for \emph{Reorder} this demarcation of node activity follows the node through
+each shuffle, such that if a node was marked as never active before the genome
+was shuffled it is marked as never active after the shuffle, and vice versa.
+This is in contrast to marking locations as never active, which was not done in
+this study.
 
 \begin{table*}
 	\centering
@@ -1490,6 +1510,73 @@ TODO Look at how much of the genome is unused.
 	\caption{Location of never active nodes across all 50 runs for all nine algorithm combinations on the Multiply problem.}
 	\label{tab:never_active}
 \end{table*}
+
+Table~\ref{tab:never_active} provides information about never active nodes for
+each algorithm combination on the 3-bit Multiply problem.  The horizontal axis
+in each of the nine plots shows different genome locations, while the vertical
+axis denotes the level of fitness the recorded individual obtained.  The shading
+of each coordinate gives the percentage of 50 runs that had an individual of
+the given fitness level such that the node at the given location had never
+previously been active.  While only Multiply is shown here, all of the
+other problems tested had similar behavior, with allowances for differences in
+number of evaluations performed.
+
+Examining the columns of Table~\ref{tab:never_active} makes it clear that
+each of the ordering methods had significantly different never active behavior.
+Looking at \emph{Normal} we see that only at very high fitness levels does evolution
+begin to activate nodes in the latter half of the genome.  Even by the final solution
+large percentages of the genome were never activated, with \emph{Skip}, \emph{Accumulate},
+and \emph{Single} having median percentages of never active nodes of 43.35\%, 42.05\%, and
+56.17\%, respectively.  This is in stark contrast to \emph{Reorder} and \emph{DAG},
+which never had a median higher than 0.05\%.
+
+Compared to the difference in columns, the difference in the rows of Table~\ref{tab:never_active}
+caused by the different duplication methods were almost non-existent.  Only
+\emph{Single} has a distinguishable behavior, but this is almost certainly the result
+of the genome size and not the duplication method.  \emph{Single Normal} used
+a genome size 2.5 times larger than \emph{Normal} did with the other techniques,
+so the resulting increase in never active nodes makes sense.  When \emph{Single}
+was paired with \emph{Reorder} and \emph{DAG} the genome sizes were far smaller,
+resulting in noisier graphs with less never active nodes.
+
+So now the question is why does \emph{Normal} use so little of its genome?  To
+answer this we must consider what can prevent a node from becoming active.  For
+a node to never be active all tested offspring with mutations that result in that node being activated
+must have been less fit than their parent.  Even if those offspring are no more fit, the selection method
+used by CGP would have allowed that offspring to replace its parent.  This leads
+to two possible causes for a node never being active: bad genes or infrequently tried.
+
+The bad genes cause for a node never being active suggests the behavior encoded
+by a node is simply useless on the problem landscape.  If this was the root cause
+of never active nodes, we would expect \emph{Reorder} and \emph{DAG} to have
+similar problems, as neither technique explicitly changes the likelihood of node
+behaviors.  Furthermore, we would expect the location of never active nodes to be
+uniform in the genome, which is obviously not the case.  Finally, even if bad
+genes were the problem, we would expect the mutational drift allowed by CGP's
+selection method to change their bad genes and eventually allow them to be active.
+
+The infrequently tried cause for a node never being active suggests that few
+individuals are ever produced which have that node active, limiting the likelihood
+of those individuals being selected regardless of potential fitness.  Under this
+cause and combined with the theory given in~\cite{goldman:2013:ordering}, we
+expect a strong positional bias in the location of the never active nodes.  Furthermore,
+we would expect nodes near the end of the genome to be the most likely to be never active.
+Finally we would expect \emph{Reorder} and \emph{DAG} to have less or no positional bias.
+All of these expectations match the results given in Table~\ref{tab:never_active}.
+
+Examining the progression in fitness across the different ordering methods shows
+the effect of initialization on each.  All three methods share the same initialization
+method, and as such all have very similar never active node behavior early in
+evolution.  This initialization similarity explains why \emph{DAG} has any positional
+bias at all, even though its evolutionary mechanisms have none.  Similarly \emph{Reorder}
+diverges from \emph{Normal} given sufficient time, eventually losing its positional
+bias.
+
+This early similarity may be part of the reason \emph{Normal} and \emph{Reorder}
+have such similar behavior on relatively easy problems.  After relatively few
+evaluations both have explored similar sections of their genome.  Yet on hard
+problems that require further exploration \emph{Reorder} is able to do so, while
+\emph{Normal} remains positionally limited.
 
 \subsection{Node Behaviors}
 TODO High amount of TF.
