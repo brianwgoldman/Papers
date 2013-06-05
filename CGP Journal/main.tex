@@ -1062,7 +1062,7 @@ Each configuration was run 50 times to ensure statistical power.
 	\centering
 	\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
 	  \hline
-\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Reduced} & \textbf{p-value} \\ \hline
+\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
 \emph{Accumulate} & \emph{Normal} & 10,000 & 0.02 & 682 & 348 & 122 & 20 & 0.5602 \\ \hline
 \emph{Accumulate} & \emph{Reorder}&  5,000 & 0.01 & 796 & 434 & 331 & 23 & 0.7174 \\ \hline
 \rowcolor{Gray}
@@ -1082,7 +1082,7 @@ Each configuration was run 50 times to ensure statistical power.
 	\centering
 	\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
 	  \hline
-\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Reduced} & \textbf{p-value} \\ \hline
+\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
 \rowcolor{Gray}
 \emph{Skip} & \emph{Normal}        & 10,000 & 0.005 & 16,226 & 7,455  &   283 & 49 & NA \\ \hline
 \emph{Skip} & \emph{Reorder}       & 10,000 & 0.005 & 17,883 & 8,378  & 2,070 & 62 & 0.6918 \\ \hline
@@ -1102,7 +1102,7 @@ Each configuration was run 50 times to ensure statistical power.
 	\centering
 	\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
 	  \hline
-\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Reduced} & \textbf{p-value} \\ \hline
+\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
 \emph{Skip} & \emph{Reorder}       &  2,000 & 0.002 &  62,853 & 20,023 &   757 & 114 & 0.5247 \\ \hline
 \emph{Single} & \emph{Reorder}     &    500 &    NA &  63,731 & 13,119 &   245 &  97 & 0.3610 \\ \hline
 \emph{Accumulate} & \emph{Normal}  &  1,000 & 0.002 &  67,390 & 11,991 &   211 &  87 & 0.8767 \\ \hline
@@ -1122,7 +1122,7 @@ Each configuration was run 50 times to ensure statistical power.
 	\centering
 	\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
 	  \hline
-\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Reduced} & \textbf{p-value} \\ \hline
+\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
 \emph{Skip} & \emph{Reorder}      & 10,000 & 0.0005  & 196,116  & 60,326  & 3,175 & 484 & 0  \\ \hline
 \emph{Accumulate} & \emph{Reorder}& 10,000 & 0.001 & 199,193 & 85,970 & 3,117 & 489 & 0  \\ \hline
 \emph{Single} & \emph{Dag} & 200  & NA & 239,844 & 78,739 & 114 & 74 & 0 \\ \hline
@@ -1631,17 +1631,88 @@ problems that require further exploration \emph{Reorder} is able to do so, while
 	\label{tab:multiply_behavior}
 \end{table*}
 
-Normal has the highest "used" bar unless its Single, likely because it also has the least active nodes
+In CGP it is common to report what fraction of the genome is active, as this represents
+the easiest estimate of solution size.  By utilizing \emph{footprint} comparison
+and the \Call{Simplify}{} algorithm, we can get a much better estimate of what
+purpose each node in the genome serves.
+Table~\ref{tab:parity}, Table~\ref{tab:encode}, Table~\ref{tab:decode},
+and Table~\ref{tab:multiply} provide two column relevant to node behavior: Active
+and Used.  The former gives the traditional measure of the median amount of
+active nodes in the solution found.  The latter is the median number of nodes
+still active after applying the \Call{Simplify}{} algorithm.
 
-TODO High amount of TF.
+On all problems and for all algorithm combinations, the number of active nodes is
+far smaller than the genome size, and the number of Used nodes
+is far smaller than the number of Active nodes.  In some extreme cases less
+than 1\% of active nodes in the evolved solution are actually necessary.  Only the
+most extreme configurations have even 50\% of active nodes in use by the
+simplified solution.
 
-TODO Breakdown of Active Nodes.
+Table~\ref{tab:encode_behavior} and Table~\ref{tab:multiply_behavior} help illustrate
+the behavioral breakdown of nodes for each algorithm combination on the Encode
+and Multiply problems, respectively.  These two problems were chosen as they
+represent different ends of the quality spectrum for \emph{Skip Normal} and
+because together the are sufficiently representative of behaviors seen on the other
+problems.
 
-TODO Breakdown of Inactive Nodes.
+Each diagram describes node behavior as falling into eight distinct categories.
+The first category are the constant nodes, both active and inactive.  These nodes
+return the same value for all tested inputs.  The ``Used'' bar is the average
+number of nodes which are part of the simplified solution.  The ``Useful'' bars
+express how many nodes, either active or inactive, have identical \emph{footprint}
+values to used nodes.  These nodes represent either independent methods of calculating
+the same behavior or are effectively pass through nodes which mimic the behavior
+of their inputs.  Active ``Intron'' nodes are those active nodes that do not
+fall into either the constant or used categories, with inactive ``Intron'' nodes
+being those inactive nodes that have identical \emph{footprint} values to active
+intron nodes.  The final bar is ``Explore'', which marks how many nodes on
+average produce a \emph{footprint} not part of any previous category.  Note that
+all never active nodes are ignored by these plots, as their behavior is meaningless.
 
-TODO Look at how much of the genome is duplicated in both active and inactive
+The first striking feature of these tables is how many nodes produce constant
+outputs.  As the instruction set used in our genomes never require constant values
+to produce any non constant behavior (TRUE NAND X $\Leftrightarrow$ X NAND X)
+and most operations with constants result in pass through nodes
+(FALSE OR X $\Leftrightarrow$ X), we would not expect evolution to proliferate
+these constant nodes.  If these constants are in fact of no use, future work
+could likely improve CGP's performance by reducing their prevalence.  Yet
+it is possible they serve an evolutionary function by allowing mutation more
+flexibility.  For instance, pass through nodes may be allowing mutation to create
+adjustments not easily done if this behavior was forbidden.
 
+As with previous analysis, \emph{Skip} and \emph{Accumulate} have nearly identical
+plots, regardless of ordering method and problem.  \emph{Single} again has
+a significantly different plot when paired with \emph{Reorder} or \emph{DAG},
+with some hits of a change on Encode with \emph{Normal}.  These combinations
+were also the most likely to have significantly smaller genome sizes.  From the
+results tables we see that the number of used nodes on each problem is relatively
+constant across the combinations even though the number of active nodes and the
+genome sizes changed significantly.  As such, the proportion of nodes in the
+used category will vary as these other features change.
 
+From Table~\ref{tab:encode_behavior} and Table~\ref{tab:multiply_behavior}, having
+the plurality of active nodes in the used category appears to correlate with
+increase evaluations to success.  Notice that in all \emph{Single} plots the
+tallest bar for active nodes is ``Used,'' and the only non \emph{Single} plots
+where this is true are \emph{Normal} on Multiply.  On Encode, \emph{Single}
+runs had the highest median evaluations to success, with \emph{Normal} runs
+doing similarly on Multiply.  This appears to imply that having duplication
+of node behavior in the active nodes, and not just inactive nodes, is beneficial
+to search.  If this is true, it may help explain CGP uses such large genomes,
+as \emph{Normal} is only able to achieve enough active nodes to allow duplication
+when the genome size significantly exceeds the actual solution size.  Also
+the success of \emph{Reorder} and \emph{DAG} on Multiply may also be partially be attributable
+to this ability to increase the number of active nodes.
+
+One significant difference in behavior between the two problems is proportion of
+explore nodes.  A potential explanation is that on 16-4-bit Encode there are only
+$2^{16} = 65,536$ \emph{footprints} while on 3-bit Multiply there are $2^{64} = 1.845\cdot 10^{19}$
+\emph{footprints}.  Combined with the fact that not all \emph{footprints} are equally
+likely to be produced, the difference may just be that on Encode nodes are
+that much more likely to recreate existing behavior.  Another possibility is that
+CGP increases the diversity of behavior of inactive nodes over evolutionary time.
+As such, the fact that Multiply required approximately an order of magnitude more
+evaluations to solve would lead to the discrepancy.
 
 \subsection{Node Reactivation and Active Node Mutation}
 TODO For each node that was active, then inactive, then active again, see how its changed.
