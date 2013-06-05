@@ -1596,6 +1596,26 @@ problems that require further exploration \emph{Reorder} is able to do so, while
   \begin{tabular}{c|c|c|c|}
     \cline{2-4}
     & \textbf{\em Normal} & \textbf{\em Reorder} & \textbf{\em DAG} \\ \hline
+    \thirdlabel{Skip} & \graphicthird{bar_encode_skip_normal} &
+                        \graphicthird{bar_encode_skip_reorder} &
+                        \graphicthird{bar_encode_skip_dag}\\ \hline
+    \thirdlabel{Accumulate} & \graphicthird{bar_encode_accumulate_normal} &
+                              \graphicthird{bar_encode_accumulate_reorder} &
+                              \graphicthird{bar_encode_accumulate_dag}\\ \hline
+    \thirdlabel{Single} & \graphicthird{bar_encode_single_normal} &
+                          \graphicthird{bar_encode_single_reorder} &
+                          \graphicthird{bar_encode_single_dag}\\ \hline
+	\end{tabular}
+	\caption{Average node behavior for all nine algorithm combinations on the Encode problem.
+	         Excludes never active nodes.}
+	\label{tab:encode_behavior}
+\end{table*}
+
+\begin{table*}
+	\centering
+  \begin{tabular}{c|c|c|c|}
+    \cline{2-4}
+    & \textbf{\em Normal} & \textbf{\em Reorder} & \textbf{\em DAG} \\ \hline
     \thirdlabel{Skip} & \graphicthird{bar_multiply_skip_normal} &
                         \graphicthird{bar_multiply_skip_reorder} &
                         \graphicthird{bar_multiply_skip_dag}\\ \hline
@@ -1608,7 +1628,7 @@ problems that require further exploration \emph{Reorder} is able to do so, while
 	\end{tabular}
 	\caption{Average node behavior for all nine algorithm combinations on the Multiply problem.
 	         Excludes never active nodes.}
-	\label{tab:behavior}
+	\label{tab:multiply_behavior}
 \end{table*}
 
 Normal has the highest "used" bar unless its Single, likely because it also has the least active nodes
