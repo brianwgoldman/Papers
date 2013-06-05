@@ -1505,9 +1505,17 @@ this study.
   \begin{tabular}{c|c|c|c|}
     \cline{2-4}
     & \textbf{\em Normal} & \textbf{\em Reorder} & \textbf{\em DAG} \\ \hline
-    \thirdlabel{Skip} &\graphicthird{multiply_skip_normal} & \graphicthird{multiply_skip_reorder} & \graphicthird{multiply_skip_dag}\\ \hline
-    \thirdlabel{Accumulate}&\graphicthird{multiply_accumulate_normal} & \graphicthird{multiply_accumulate_reorder} & \graphicthird{multiply_accumulate_dag}\\ \hline
-    \thirdlabel{Single}&\graphicthird{multiply_single_normal} & \graphicthird{multiply_single_reorder} & \graphicthird{multiply_single_dag}\\ \hline
+    %\begin{comment}
+    \thirdlabel{Skip} & \graphicthird{multiply_skip_normal} &
+                        \graphicthird{multiply_skip_reorder} &
+                        \graphicthird{multiply_skip_dag}\\ \hline
+    \thirdlabel{Accumulate} & \graphicthird{multiply_accumulate_normal} &
+                              \graphicthird{multiply_accumulate_reorder} &
+                              \graphicthird{multiply_accumulate_dag}\\ \hline
+    \thirdlabel{Single} & \graphicthird{multiply_single_normal} &
+                          \graphicthird{multiply_single_reorder} &
+                          \graphicthird{multiply_single_dag}\\ \hline
+    %\end{comment}
 	\end{tabular}
 	\caption{Location of never active nodes across all 50 runs for all nine algorithm combinations on the Multiply problem.}
 	\label{tab:never_active}
@@ -1581,6 +1589,30 @@ problems that require further exploration \emph{Reorder} is able to do so, while
 \emph{Normal} remains positionally limited.
 
 \subsection{Node Behaviors}
+
+
+\begin{table*}
+	\centering
+  \begin{tabular}{c|c|c|c|}
+    \cline{2-4}
+    & \textbf{\em Normal} & \textbf{\em Reorder} & \textbf{\em DAG} \\ \hline
+    \thirdlabel{Skip} & \graphicthird{bar_multiply_skip_normal} &
+                        \graphicthird{bar_multiply_skip_reorder} &
+                        \graphicthird{bar_multiply_skip_dag}\\ \hline
+    \thirdlabel{Accumulate} & \graphicthird{bar_multiply_accumulate_normal} &
+                              \graphicthird{bar_multiply_accumulate_reorder} &
+                              \graphicthird{bar_multiply_accumulate_dag}\\ \hline
+    \thirdlabel{Single} & \graphicthird{bar_multiply_single_normal} &
+                          \graphicthird{bar_multiply_single_reorder} &
+                          \graphicthird{bar_multiply_single_dag}\\ \hline
+	\end{tabular}
+	\caption{Average node behavior for all nine algorithm combinations on the Multiply problem.
+	         Excludes never active nodes.}
+	\label{tab:behavior}
+\end{table*}
+
+Normal has the highest "used" bar unless its Single, likely because it also has the least active nodes
+
 TODO High amount of TF.
 
 TODO Breakdown of Active Nodes.
