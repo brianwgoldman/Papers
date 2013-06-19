@@ -1714,10 +1714,165 @@ CGP increases the diversity of behavior of inactive nodes over evolutionary time
 As such, the fact that Multiply required approximately an order of magnitude more
 evaluations to solve would lead to the discrepancy.
 
-\subsection{Node Reactivation and Active Node Mutation}
-TODO For each node that was active, then inactive, then active again, see how its changed.
+\subsection{Parent Replacement}
 
-TODO For each node that is active, look at how successful mutations change its behavior.
+
+\begin{table*}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|}
+	  \hline
+\textbf{Duplicate} & \textbf{Ordering} & \textbf{Active Unchanged} & \textbf{No Reactivation} & \textbf{Reactivated Changed} \\ \hline
+       \emph{Skip} &     \emph{DAG} & 0.00\% & 3.48\% & 55.63\% \\ \hline
+ \emph{Accumulate} &     \emph{DAG} & 0.00\% & 8.48\% & 52.82\% \\ \hline
+ \emph{Accumulate} & \emph{Reorder} & 2.09\% & 33.26\% & 58.46\% \\ \hline
+   \rowcolor{Gray}
+       \emph{Skip} &  \emph{Normal} & 2.25\% & 39.35\% & 67.17\% \\ \hline
+ \emph{Accumulate} &  \emph{Normal} & 2.69\% & 39.99\% & 67.27\% \\ \hline
+       \emph{Skip} & \emph{Reorder} & 11.46\% & 53.99\% & 59.47\% \\ \hline
+     \emph{Single} & \emph{Reorder} & 24.94\% & 80.49\% & 60.63\% \\ \hline
+     \emph{Single} &  \emph{Normal} & 26.44\% & 83.55\% & 59.96\% \\ \hline
+     \emph{Single} &     \emph{DAG} & 27.80\% & 83.73\% & 59.92\% \\ \hline
+	\end{tabular}
+	\caption{Parity}
+	\label{tab:parity_reactivate}
+\end{table*}
+
+
+\begin{table*}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|}
+	  \hline
+\textbf{Duplicate} & \textbf{Ordering} & \textbf{Active Unchanged} & \textbf{No Reactivation} & \textbf{Reactivated Changed} \\ \hline
+ \emph{Accumulate} &     \emph{DAG} & 0.05\% & 4.06\% & 48.70\% \\ \hline
+       \emph{Skip} &     \emph{DAG} & 0.06\% & 3.85\% & 48.33\% \\ \hline
+ \emph{Accumulate} & \emph{Reorder} & 1.77\% & 19.24\% & 55.47\% \\ \hline
+       \emph{Skip} & \emph{Reorder} & 2.02\% & 19.80\% & 56.15\% \\ \hline
+   \rowcolor{Gray}
+       \emph{Skip} &  \emph{Normal} & 14.16\% & 54.78\% & 64.14\% \\ \hline
+ \emph{Accumulate} &  \emph{Normal} & 14.52\% & 54.79\% & 64.17\% \\ \hline
+     \emph{Single} &  \emph{Normal} & 33.77\% & 79.34\% & 59.86\% \\ \hline
+     \emph{Single} &     \emph{DAG} & 35.98\% & 80.91\% & 58.39\% \\ \hline
+     \emph{Single} & \emph{Reorder} & 39.95\% & 78.91\% & 59.72\% \\ \hline
+	\end{tabular}
+	\caption{Encode}
+	\label{tab:encode_reactivate}
+\end{table*}
+
+\begin{table*}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|}
+	  \hline
+\textbf{Duplicate} & \textbf{Ordering} & \textbf{Active Unchanged} & \textbf{No Reactivation} & \textbf{Reactivated Changed} \\ \hline
+ \emph{Accumulate} &     \emph{DAG} & 0.03\% & 10.10\% & 54.99\% \\ \hline
+       \emph{Skip} &     \emph{DAG} & 0.05\% & 10.21\% & 51.33\% \\ \hline
+ \emph{Accumulate} & \emph{Reorder} & 9.98\% & 49.65\% & 70.57\% \\ \hline
+       \emph{Skip} & \emph{Reorder} & 12.53\% & 51.63\% & 70.24\% \\ \hline
+     \emph{Single} & \emph{Reorder} & 28.38\% & 79.73\% & 66.85\% \\ \hline
+     \emph{Single} &  \emph{Normal} & 29.43\% & 80.86\% & 65.85\% \\ \hline
+     \emph{Single} &     \emph{DAG} & 32.60\% & 81.73\% & 57.70\% \\ \hline
+ \emph{Accumulate} &  \emph{Normal} & 51.11\% & 84.54\% & 72.57\% \\ \hline
+   \rowcolor{Gray}
+       \emph{Skip} &  \emph{Normal} & 65.47\% & 89.17\% & 72.21\% \\ \hline
+
+	\end{tabular}
+	\caption{Decode}
+	\label{tab:decode_reactivate}
+\end{table*}
+
+\begin{table*}
+	\centering
+	\begin{tabular}{|c|c|c|c|c|}
+	  \hline
+\textbf{Duplicate} & \textbf{Ordering} & \textbf{Active Unchanged} & \textbf{No Reactivation} & \textbf{Reactivated Changed} \\ \hline
+ \emph{Accumulate} & \emph{Reorder} & 1.14\% & 22.09\% & 71.75\% \\ \hline
+ \emph{Accumulate} &     \emph{DAG} & 4.52\% & 45.38\% & 63.42\% \\ \hline
+       \emph{Skip} &     \emph{DAG} & 5.05\% & 45.58\% & 63.03\% \\ \hline
+       \emph{Skip} & \emph{Reorder} & 10.40\% & 47.67\% & 71.79\% \\ \hline
+     \emph{Single} &  \emph{Normal} & 18.85\% & 78.19\% & 70.11\% \\ \hline
+     \emph{Single} &     \emph{DAG} & 20.72\% & 80.20\% & 65.10\% \\ \hline
+     \emph{Single} & \emph{Reorder} & 22.14\% & 80.21\% & 69.76\% \\ \hline
+ \emph{Accumulate} &  \emph{Normal} & 57.69\% & 87.27\% & 78.95\% \\ \hline
+   \rowcolor{Gray}
+       \emph{Skip} &  \emph{Normal} & 73.46\% & 92.04\% & 79.07\% \\ \hline
+	\end{tabular}
+	\caption{Multiply}
+	\label{tab:multiply_reactivate}
+\end{table*}
+
+An important aspect of CGP is its replacement strategy that allows for neutral drift.
+Each generation the best offspring replaces its parent if it is no less fit.  Previous
+research has shown the impact removing this feature can have on
+performance~\cite{yu:2001:neutrality}, but how it interacts with the different variants
+of CGP has not been investigated previously.
+
+Table~\ref{tab:parity_reactivate}, Table~\ref{tab:encode_reactivate},
+Table~\ref{tab:decode_reactivate}, and Table~\ref{tab:multiply_reactivate} provide a
+novel look at CGP's replacement behavior.  Each time an offspring replaced a parent
+in the final runs, we recorded how the behavior of each node differed between the
+parent and the offspring.
+
+The \textbf{Active Unchanged} reports how often all active nodes in the offspring
+have identical \emph{footprints} to the corresponding nodes in the offspring's parent.
+This goes beyond the concept of actively identical offspring and checks of the behavior
+of any active node was modified by the mutation.  The rows in each of the four
+tables are sorted using this column.  Smaller values indicate an algorithm
+combination that produced more changes in active node behavior.
+
+The \textbf{No Reactivation} column uses the word reactivation to refer to nodes
+that were active in some ancestor of the offspring, were inactive in the offspring's
+parent, but are active in the offspring.  Reactivation is a measure of how
+often CGP reuses previously useful active nodes.  Reported in the table is how
+frequently an offspring replaces its parent with no reactivated nodes.  Smaller
+values indicate an algorithm combination that reuses nodes, as opposed to
+including randomly generated nodes (never active nodes) or ignoring inactive nodes
+entirely.
+
+The \textbf{Reactivated Changed} column states the percentage of reactivated nodes
+that have a different \emph{footprint} from the last time they were active.  Conversely,
+reactivated nodes without a change mean that CGP has taken a previously useful behavior,
+stored it in the inactive space, and reactivated it in later mutations.  Smaller values
+indicate an algorithm combination that more often preserve node behaviors while
+inactive.
+
+Combined these three measures provide somewhat surprising evidence.  Most notably
+is that \emph{Single}, a technique designed to force offspring to be actively different
+than their parents, produces offspring with no changes in active node behavior
+20\%-40\% of the time.  The further exposes CGP's ability to have genetically different
+yet phenotypically identical individuals.  Even more surprising is that \emph{Single}
+appears to increase the chance of producing offspring without changing active behavior.
+Somewhat unexpectedly \emph{Normal} appears to also reduce changes to active node behavior,
+causing the most effect after \emph{Single}.
+
+The likely cause of both is the number
+of active nodes receiving mutations each generation.  Even though \emph{Single}
+forces a gene in an active node to be mutated, it limits mutation to only one change.
+If this one change does not change that node's behavior, the offspring will be marked
+as active unchanged.  Conversely, \emph{Skip} and \emph{Accumulate} can mutate any
+number of active genes each generation, improving their chance of a change in behavior.
+Similarly, even though \emph{Normal} makes no explicit change in mutation, it is characterized
+by a significantly smaller number of active nodes than \emph{Reorder} or \emph{DAG}.  More
+active nodes means more chances for mutation to change the behavior of at least one.
+
+Somewhat unintuitively, node reactivation and active node \emph{footprint} changes appear
+to be highly correlated.  This is apparent in the fact that the \textbf{No Reactivation}
+column in each table is almost perfectly sorted, even though rows were sorted using the
+\textbf{Active Unchanged} column.  Again the number of active nodes seems the likely
+cause.  Having fewer active nodes reduces the number of introns, making it more
+difficult for inactive nodes to become active.  Fewer active nodes also decreases
+how many inactive nodes could have ever been active.
+
+Potentially the most interesting results come from the control combination of
+\emph{Skip Normal}.  As problem difficulty increases, \emph{Skip Normal} produces
+an increasingly large number of offspring with no change in active node behavior,
+with little to no node reactivation, and a high chance of changing nodes before
+they are reactivated.  This suggests two important features: \emph{Skip} is likely
+saving a significant number of evaluations, and \emph{Normal} CGP is likely using
+inactive nodes primarily to inject random behavior.  The former comes from the
+argument that a large part of the active unchanged individuals are also likely
+actively identical to their parents.  The latter is supported by the fact that
+\emph{Skip Normal} so infrequently reactivates a node with tested behavior.  More
+often than not offspring connecting in inactive nodes are testing that node's behavior
+for the first time.
 
 \subsection{Source of High Variance}
 TODO Look for general indicators of high evaluation runs.
