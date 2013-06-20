@@ -524,17 +524,31 @@ Cartesian genetic programming (CGP), Analysis
 % Here we have the typical use of a "T" for an initial drop letter
 % and "HIS" in caps to complete the first word.
 \IEEEPARstart{W}{hile effective} evolutionary methods are often simple to design
-and implement, it can sometimes be difficult to discern the reason a technique
-or behavior in that system leads to effective search.  This can be exceptionally
-true for Genetic Programming (GP) systems, as they often include nontrivial
+and implement, discerning the reason that system
+leads to effective search can be challenging.
+This is exceptionally
+true for Genetic Programming (GP), which often employs nontrivial
 genotype to phenotype maps and operators that act on genotypes without regard to
 phenotypic impact.  Yet understanding the root causes of evolutionary success
 and failure is critical to improving existing techniques, designing new techniques,
 and understanding how and where to apply each optimization system.
 
+There have been a number of previous studies into various aspects of GP evolution.
+For instance~\cite{daida3:2003:treebias} looked into a tree's shape effects is evolvability
+regardless of phenotype,
+which helped inspire the use of new grammar based operations~\cite{xuan:2006:grammar}.
+Analysis of the root cause of bloat has helped to inform methods for controlling
+bloat~\cite{luke:2006:bloat}.
+
 In this work we set out to develop a deeper understanding of what makes Cartesian
-Genetic Programming (CGP) an effective evolutionary optimizer.  Our primary focus is
-on how mutation and genome ordering interact.  In Section~\ref{sec:cgp} we provide
+Genetic Programming (CGP) an effective evolutionary optimizer.
+A few studies of CGP's evolutionary mechanisms have
+been done previously, related to bloat~\cite{miller:2001:bloat},
+neutrality~\cite{vassilev:2000:neutrality}, and structural bias~\cite{payne:2009:bias}.
+Our primary focus is
+on how mutation and genome ordering interact.
+
+In Section~\ref{sec:cgp} we provide
 an introduction to CGP, with sufficient background to put later sections into
 context.  Section~\ref{sec:duplicate} explains previous work about mutation's potential
 to create identifiably wasted evaluations, and proposed methods to prevent that
@@ -545,20 +559,12 @@ of benchmarks in Section~\ref{sec:quality}.  Section~\ref{sec:analysis} then
 provides a deep look into the details of CGP's search, and how each method impacts
 search, with final remarks given in Section~\ref{sec:conclusion}.
 
-There have been a number of previous studies into various aspects of GP evolution.
-For instance~\cite{daida3:2003:treebias} looked into how trees of specific shapes,
-which helped inspire the use of new grammar based operations~\cite{xuan:2006:grammar}.
-Analysis of the root cause of bloat has helped to inform methods for controlling
-bloat~\cite{luke:2006:bloat}.  A few studies of evolutionary mechanisms have also
-been done in CGP directly, related to bloat~\cite{miller:2001:bloat},
-neutrality~\cite{vassilev:2000:neutrality}, and structural bias~\cite{payne:2009:bias}.
-
 
 \section{Cartesian Genetic Programming}
 \label{sec:cgp}
 Cartesian Genetic Programming (CGP) was originally proposed as a method for general
-genetic programming in~\cite{miller:2000:CGPorigin}.  While its beginnings and
-its name come from evolving circuits on a two dimensional grid, modern CGP can
+genetic programming in~\cite{miller:2000:CGPorigin}.  While its name comes from
+its original application evolving circuits on a two dimensional grid, modern CGP can
 represent any directed acyclic graph (DAG), with applications in evolving binary
 circuits~\cite{walker:2008:cgpmodules},
 robot controllers~\cite{harding:2005:robots},
@@ -576,8 +582,8 @@ input locations to use as function outputs.
 
 Unlike tree based GP encodings, CGP is able to perform value reuse.  This means
 that the output of a node can be reused by any number of other nodes as input values.
-CGP's requirement that nodes connect forward in the genome prevents this ability
-from causing cycles.
+CGP's requirement that nodes connect forward in the genome prevents the formation
+of cycles.
 
 As output locations and information flow in the DAG are evolvable, there are often
 large portions of the genome which do not participate in creating any of the
@@ -606,7 +612,7 @@ For a more in depth description of CGP, see~\cite{miller:2011:chapter2}.
 \label{sec:duplicate}
 CGP's mutation operator is traditionally applied to all genes equally, with no
 consideration if genes are part of an active or inactive node.  This has the
-potential to lead offspring who's only mutated genes are part of inactive nodes.
+potential to create offspring who's only mutated genes are part of inactive nodes.
 These offspring are actively identical (contain identical active genes) to their
 parents, and therefore by definition have identical fitness to their parents.
 As such, evaluating these individuals is wasteful, as their fitness can be
@@ -622,7 +628,7 @@ The amount of evaluations wasted on these actively identical individuals is
 directly related to the mutation rate and the number of active genes.  With
 sufficiently high mutation rates and enough active genes, the probability of
 creating an offspring which is actively identical to its parent is very low.
-Yet such configuration make make it difficult for CGP to optimize, as mutation
+Yet such a configuration may make it difficult for CGP to optimize, as mutation
 is likely to change many active genes in each application.  As was discussed
 in~\cite{goldman:2013:cgpwaste}, this can make normal CGP very sensitive to the
 mutation rate in use.
@@ -633,7 +639,7 @@ amount of modification from CGP's normal behavior.  After an offspring is produc
 and its set of active nodes is determined but before it is evaluated, it is compared
 with its parent.  Each gene in each active node is compared for equivalence with
 the corresponding gene in the offspring's parent.  If all genes are found to be equal
-than the individual is not evaluated.  Instead the offspring is given the same fitness
+than the offspring is not evaluated.  Instead the offspring is given the same fitness
 as its parent, as there is no way for it to be phenotypically different from its parent.
 Note that since inactive genes are not compared for equivalence it is still possible
 for offspring to genetically differ from their parents.
@@ -656,11 +662,11 @@ mutation rate.  First, if search becomes trapped in a local optima, low mutation
 rates may have increased difficulty escaping to find the global optimum.  Second,
 exceptionally low mutation rates may result in large computational overhead as
 more and more time is spent attempting to produce an evaluable useful offspring.
-Note these penalties also exist in normal CGP.
+Note that these penalties also exist in normal CGP.
 
 \subsection{Accumulate}
 Similar to \emph{Skip}, \emph{Accumulate} works by adding a step between offspring
-creation and offspring evaluation.  Instead of skipping evaluations with offspring
+creation and offspring evaluation.  Instead of skipping evaluations when offspring
 are determined to be actively identical to their parents, \emph{Accumulate} enters
 into a cycle of repeated mutation until an individual worth evaluating is created.
 While the working offspring is actively identical to the
@@ -684,7 +690,7 @@ Previous experimentation has shown that \emph{Accumulate} acts very similarly to
 favors lower mutation rates. While at first these algorithms may appear
 quite different, further consideration shows how they are similar.  In \emph{Skip}
 an actively identical offspring is likely to be selected as we expect mutations to
-active genes to more often reduce fitness than in prove it.  In the next generation
+active genes to more often reduce fitness than improve it.  In the next generation
 this actively identical offspring is then mutated again, with its lineage likely
 continuing until it finally does mutate an active gene.  At this point if the
 mutant is better it replaces the parent, otherwise the parent, which has been accumulating
@@ -693,14 +699,14 @@ except over multiple generations instead of compressed into a single generation.
 
 \subsection{Single}
 While \emph{Skip} and \emph{Accumulate} focus on what to do when offspring are
-produced which are actively identical to their parents, \emph{Skip} changes
+produced which are actively identical to their parents, \emph{Single} changes
 how mutation works to ensure only evaluable offspring are created.  Instead
 of mutating each gene at a set probability, \emph{Single} chooses genes at
 random to mutate until exactly one active gene is mutated.
 
 This modification gives \emph{Single} three properties distinct from the other
 forms of duplicate avoidance.  First, \emph{Single} forces offspring to have
-an active gene which is different than there parent.  This limits drift as the
+an active gene which is differs from their parent's gene.  This limits drift as the
 mutated active gene must either be to an intron or represent another way to
 code a solution of equal quality.  Second, as a benefit of forced changes
 \emph{Single} avoids the overhead of repeatedly generating individuals without
@@ -709,9 +715,9 @@ rate parameter, effectively setting the mutation rate to $\frac{1}{a}$ for activ
 genes and $\frac{1}{a+1}$ for inactive genes, where $a$ is the number of active genes.
 
 In encodings without inactive genes, limiting mutation to changing exactly one gene
-could prevent an algorithm from escaping some types of local maxima.  Yet because
+could prevent an algorithm from escaping some types of local optima.  Yet because
 CGP allows for inactive genes, \emph{Single} is still able to escape most local
-maxima using sufficient drift of inactive genes.  When a high percentage of
+optima using sufficient drift of inactive genes.  When a high percentage of
 the genome becomes active or when \emph{Single} is otherwise limited in its ability
 to drift due to lack of introns, it does have an increased potential to become stuck.
 As will be discussed in Section~\ref{sec:ordering} and was shown in~\cite{goldman:2013:ordering}
@@ -720,16 +726,17 @@ this problem of highly active genomes is very unlikely.
 \section{Genome Ordering}
 \label{sec:ordering}
 As was discussed in Section~\ref{sec:cgp}, CGP uses node ordering in the genome
-to prevent cycles, as nodes are only able to receive input from sources that
+to prevent cycles, by ensuring nodes only receive input from sources that
 precede them in the genome.  This restriction does not limit CGP's ability
 to represent DAGs, as all DAGs can be serialized to fit this requirement.
 Yet this likely has an impact on CGP's ability to evolve specific
 DAGs~\cite{goldman:2013:ordering}.
 
 Primarily, enforcing node ordering adds artificial limitations CGP's ability to
-connect nodes.  Beyond preventing cycles, it also prevents nodes from connecting
-which would not create a cycle based solely on the evolutionary happenstance of
-where those nodes were evolved.  Similarly, it is impossible for adjacent nodes
+connect nodes.  Nodes which can be connected without creating a cycle may
+still be prevented from forming that connection because evolutionary happenstance
+has placed one behind the other.
+Similarly, it is impossible for adjacent nodes
 to ever be connected through an intermediate node.  As a result, useful structures
 in the genome may need to be evolved repeatedly in order to find the best
 location for that structure in the genome.
@@ -741,7 +748,7 @@ with genome size, independent of problem application.  Furthermore, the less
 active a genome, the lower the likelihood of structure ordering preventing structure
 connection.
 
-To rectify these issues an examine CGP without ordering bias, \cite{goldman:2013:ordering}
+To rectify these issues and examine CGP without ordering bias, \cite{goldman:2013:ordering}
 created \emph{Reorder} and \emph{DAG} as methods for genome ordering, and defined
 \emph{Normal} as CGP's historical ordering method.
 
@@ -749,8 +756,8 @@ created \emph{Reorder} and \emph{DAG} as methods for genome ordering, and define
 \label{sec:reorder}
 The concept behind \emph{Reorder} is to randomly shuffled node ordering without
 impacting gene expression.  This is possible because for a given node, there can
-be a large number of other nodes which neither have no required ordering,
-as they neither directly or indirectly take input from the node nor provide their
+be a large number of other nodes which have no required ordering,
+as they neither take input (directly or indirectly) from the node nor provide their
 output to the node.  In general, this process works by assigning nodes new
 locations in the genome at random once all of the nodes they take input from have been assigned
 locations earlier in the genome.
@@ -758,10 +765,10 @@ locations earlier in the genome.
 The first step in performing \emph{Reorder} on a genome is to create convenience
 data structures to store direct connection relationships, such that given a node
 we can determine in constant time where it gets its input and which nodes read
-its output.  These structures can be build in order $O(N)$ time, where $N$ is the
-number of nodes.
+its output.  These structures can be build in order $O(AN)$ time, where $A$ is the arity used by the nodes
+and $N$ is the number of nodes.
 
-With this preprocessing complete, the algorithm given in Figure~\ref{fig:reorder}
+With this preprocessing complete, the \Call{RandomSerialization}{} algorithm given in Figure~\ref{fig:reorder}
 is used to assign each node a new location in the modified genome.
 It starts by constructing the \emph{addable} set, which contains all nodes who's direct
 dependencies have already been added.  Initially this contains only the input locations.
@@ -769,10 +776,10 @@ Once a node is assigned a location, all of the nodes that depend on its output
 have that dependency marked as satisfied.  Once all of a nodes dependencies
 are satisfied, it can be put into \emph{addable}.  In this way, nodes are
 randomly removed from \emph{addable}, assigned the next possible location
-in the genome, with new nodes added to \emph{addable} as it becomes semantically
+in the genome, with new nodes added to \emph{addable} as they becomes semantically
 viable.  Iteration ends when all nodes have been assigned new locations.
-This algorithm requires $O(AN)$, where $A$ is the arity used by the nodes
-and $N$ is the number of nodes.
+\Call{RandomSerialization}{} requires $O(AN)$, as there can be only $N$ iterations,
+with each iteration updating a distinct subset of the $AN$ dependencies.
 
 \begin{figure}
   \begin{algorithmic}
@@ -806,15 +813,15 @@ and $N$ is the number of nodes.
 The final step in \emph{Reorder} is to use the list of new locations to convert
 the existing genome into the reordered genome.  This can be done in the straight
 forward manner by converting connection genes and output location genes using
-the $new\_loc$ map returned from the algorithm in Figure~\ref{fig:reorder}.
+the $new\_loc$ map returned from \Call{RandomSerialization}{}.
 This also requires $O(AN)$ time, as all connection genes in all nodes must
 be converted.  As this is the final step unique to \emph{Reorder}, and
 no previous steps were of higher complexity, it is also the complexity of
-the algorithm as a whole.  Furthermore it is of the same complexity class
+the \emph{Reorder} algorithm as a whole.  Furthermore, it is of the same complexity class
 of copying the entire genome, meaning it does not change CGP's overall complexity.
 
-\emph{Reorder} is used once each generation to shuffle the nodes of the parent
-organism.  As the shuffling does not semantically change the parent, it does
+\emph{Reorder} is used once each generation to shuffle the nodes of the parent's
+genome.  As the shuffling does not semantically change the parent, it does
 not need to be reevaluated.  Furthermore, as shuffling does not change the requirement
 that nodes only depend on those preceding them in the genome, shuffling does not
 require any changes to any other CGP methods, such as evaluation and mutation.
@@ -830,7 +837,7 @@ precede $X$, allowing subsequent mutations to make the connection.
 
 This node movement has the potential to reduce node reinvention.  If evolution created
 $X$ and $Y$, and mutating $X$ to depend on $Y$ would improve fitness, mutation's
-ability to make that improvement would depend on happenstance.  If $X$ evolved
+ability to make that improvement in \emph{Normal} would depend on happenstance.  If $X$ evolved
 preceding $Y$, mutation would have to recreate either $X$ or $Y$ in new locations
 in order to make the required connection.  \emph{Reorder} could achieve the same
 effect through shuffling, and without costly node reinvention.
