@@ -461,12 +461,12 @@
 % As a general rule, do not put math, special symbols or citations
 % in the abstract or keywords.
 \begin{abstract}
-The abstract goes here.
+TODO The abstract goes here.
 \end{abstract}
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-TODO Keywords
+Cartesian genetic programming (CGP), Analysis
 \end{IEEEkeywords}
 
 
@@ -1062,6 +1062,7 @@ Each configuration was run 50 times to ensure statistical power.
 	\centering
 	\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
 	  \hline
+	  \multicolumn{9}{|c|}{\textbf{3-bit Parity}, Kruskal-Wallis=$5.99\cdot 10^{-14}$} \\ \hline
 \textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
 \emph{Accumulate} & \emph{Normal} & 10,000 & 0.02 & 682 & 348 & 122 & 20 & 0.5602 \\ \hline
 \emph{Accumulate} & \emph{Reorder}&  5,000 & 0.01 & 796 & 434 & 331 & 23 & 0.7174 \\ \hline
@@ -1072,16 +1073,10 @@ Each configuration was run 50 times to ensure statistical power.
 \emph{Skip} & \emph{Dag}          & 10,000 & 0.02 & 1,042 & 620 & 2,083 & 24 & 0.0248 \\ \hline
 \emph{Single} & \emph{Normal}     & 500 & NA & 1,214 & 497 & 39 & 17 & 0.0046 \\ \hline
 \emph{Single} & \emph{Reorder}    & 200 & NA & 1,506 & 823 & 57 & 18 & 0 \\ \hline
-\emph{Single} & \emph{Dag}        & 100 & NA & 2,569 & 1,313 & 43 & 15 & 0 \\ \hline
-	\end{tabular}
-	\caption{Parity, 5.9956882435042246e-14}
-	\label{tab:parity}
-\end{table*}
+\emph{Single} & \emph{Dag}        & 100 & NA & 2,569 & 1,313 & 43 & 15 & 0 \\ \hline\hline
 
-\begin{table*}
-	\centering
-	\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
-	  \hline
+	  \multicolumn{9}{|c|}{\textbf{16-4-bit Encode}, Kruskal-Wallis=$1.19\cdot 10^{-6}$} \\ \hline
+
 \textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
 \rowcolor{Gray}
 \emph{Skip} & \emph{Normal}        & 10,000 & 0.005 & 16,226 & 7,455  &   283 & 49 & NA \\ \hline
@@ -1092,16 +1087,11 @@ Each configuration was run 50 times to ensure statistical power.
 \emph{Skip} & \emph{Dag}           & 10,000 & 0.002 & 25,678 & 12,034 & 4,178 & 62 & 0.0211 \\ \hline
 \emph{Single} & \emph{Reorder}     & 100    & NA    & 26,558 & 7,858  &    52 & 32 & 0.0076 \\ \hline
 \emph{Single} & \emph{Normal}      & 2,000  & NA    & 31,057 & 14,475 &   141 & 43 & 0.0085 \\ \hline
-\emph{Single} & \emph{Dag}         & 100    & NA    & 34,208 & 10,069 &    59 & 34 & 0 \\ \hline
-	\end{tabular}
-	\caption{Encode 1.1926088284917749e-06}
-	\label{tab:encode}
-\end{table*}
+\emph{Single} & \emph{Dag}         & 100    & NA    & 34,208 & 10,069 &    59 & 34 & 0 \\ \hline\hline
 
-\begin{table*}
-	\centering
-	\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
-	  \hline
+	  \multicolumn{9}{|c|}{\textbf{4-16-bit Decode}, Kruskal-Wallis=$1.02\cdot 10^{-36}$} \\ \hline
+
+
 \textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
 \emph{Skip} & \emph{Reorder}       &  2,000 & 0.002 &  62,853 & 20,023 &   757 & 114 & 0.5247 \\ \hline
 \emph{Single} & \emph{Reorder}     &    500 &    NA &  63,731 & 13,119 &   245 &  97 & 0.3610 \\ \hline
@@ -1112,16 +1102,10 @@ Each configuration was run 50 times to ensure statistical power.
 \emph{Accumulate} & \emph{Reorder} &  2,000 & 0.002 &  72,991 & 18,650 &   760 & 115 & 0.1868 \\ \hline
 \emph{Skip} & \emph{Dag}           & 10,000 & 0.001 & 132,821 & 29,432 & 4,983 & 125 & 0 \\ \hline
 \emph{Accumulate} & \emph{Dag}     &  5,000 & 0.002 & 133,188 & 29,326 & 2,542 & 125 & 0 \\ \hline
-\emph{Single} & \emph{Dag}         &    500 &    NA & 160,696 & 39,242 &   299 &  97 & 0 \\ \hline
-	\end{tabular}
-	\caption{Decode 1.0182688124966139e-36}
-	\label{tab:decode}
-\end{table*}
+\emph{Single} & \emph{Dag}         &    500 &    NA & 160,696 & 39,242 &   299 &  97 & 0 \\ \hline\hline
 
-\begin{table*}
-	\centering
-	\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
-	  \hline
+	  \multicolumn{9}{|c|}{\textbf{3-bit Multiply}, Kruskal-Wallis=$5.14\cdot 10^{-18}$} \\ \hline
+
 \textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
 \emph{Skip} & \emph{Reorder}      & 10,000 & 0.0005  & 196,116  & 60,326  & 3,175 & 484 & 0  \\ \hline
 \emph{Accumulate} & \emph{Reorder}& 10,000 & 0.001 & 199,193 & 85,970 & 3,117 & 489 & 0  \\ \hline
@@ -1135,13 +1119,15 @@ Each configuration was run 50 times to ensure statistical power.
 \emph{Skip} & \emph{Normal} & 2,000 & 0.002 & 657,121 & 311,376 & 175 & 84 & NA \\ \hline
 
 	\end{tabular}
-	\caption{Multiply 5.1429910779824196e-18}
-	\label{tab:multiply}
+	\caption{Results for algorithm configuration on each problem.  Highlighted row
+	is the control configuration \emph{Skip Normal}.  MES=Median Evaluations to Success; MAD=Median
+	Absolute Deviation; p-value=Result from Mann-Whitney~U comparison with control.
+	}
+	\label{tab:results}
 \end{table*}
 
 The results from running each tuned parameter configuration for each algorithm
-combination on each problem are summarized by Table~\ref{tab:parity},
-Table~\ref{tab:encode}, Table~\ref{tab:decode}, and Table~\ref{tab:multiply}.
+combination on each problem are summarized by Table~\ref{tab:results}.
 Rows in each table are ordered by that algorithm combination's median evaluations to
 success (MES), with the best algorithm combination appearing at the top of each table.
 The highlighted row marks \emph{Skip Normal}, the control algorithm combination
@@ -1214,9 +1200,10 @@ By ordering the algorithm combinations by MES and examining that ordering across
 problem, we can look for general trends.  From the tables, it appears on easier problems
 which method of duplication is in use is the strongest predictor of rank, while
 the ordering methods are more important on harder problems.  This comes from the
-observation that in for Parity and Encode (Table~\ref{tab:parity} and Table~\ref{tab:encode})
+observation that in for Parity and Encode (Upper half of Table~\ref{tab:results})
 the first column is effectively sorted, while for Decode and Multiply
-(Table~\ref{tab:decode} and Table~\ref{tab:multiply}) the second column is sorted.
+(Lower half of Table~\ref{tab:results})
+the second column is sorted.
 Each table includes coincidentally one exception to these rules.  On Parity and
 Encode pairings with \emph{DAG} are ranked lower than other ordering methods, so much
 so as to break the ordering once on both problems.  On Decode \emph{Reorder Duplicate}
@@ -1480,7 +1467,7 @@ with the algorithm given in Figure~\ref{fig:reorder}.
 %which is probably related to how many never become active
 In line with the suggestions made in~\cite{miller:2006:redundancy}, the evolved
 number of active nodes across all problems and all algorithm configurations
-in Table~\ref{tab:parity}, Table~\ref{tab:encode}, Table~\ref{tab:decode}, and Table~\ref{tab:multiply}
+in Table~\ref{tab:results}
 was significantly lower than the genome size.  With the exception of a few combinations
 with \emph{DAG} and \emph{Single}, the evolved results were over 50\% inactive.
 \emph{Skip Normal}, our control representing normal CGP, had only 1\%, 3\%, 20\%,
@@ -1635,8 +1622,7 @@ In CGP it is common to report what fraction of the genome is active, as this rep
 the easiest estimate of solution size.  By utilizing \emph{footprint} comparison
 and the \Call{Simplify}{} algorithm, we can get a much better estimate of what
 purpose each node in the genome serves.
-Table~\ref{tab:parity}, Table~\ref{tab:encode}, Table~\ref{tab:decode},
-and Table~\ref{tab:multiply} provide two column relevant to node behavior: Active
+Table~\ref{tab:results} provides two columns relevant to node behavior: Active
 and Used.  The former gives the traditional measure of the median amount of
 active nodes in the solution found.  The latter is the median number of nodes
 still active after applying the \Call{Simplify}{} algorithm.
@@ -1716,11 +1702,11 @@ evaluations to solve would lead to the discrepancy.
 
 \subsection{Parent Replacement}
 
-
 \begin{table*}
 	\centering
 	\begin{tabular}{|c|c|c|c|c|}
 	  \hline
+	  \multicolumn{5}{|c|}{\textbf{3-bit Parity}} \\ \hline
 \textbf{Duplicate} & \textbf{Ordering} & \textbf{Active Unchanged} & \textbf{No Reactivation} & \textbf{Reactivated Changed} \\ \hline
        \emph{Skip} &     \emph{DAG} & 0.00\% & 3.48\% & 55.63\% \\ \hline
  \emph{Accumulate} &     \emph{DAG} & 0.00\% & 8.48\% & 52.82\% \\ \hline
@@ -1731,17 +1717,10 @@ evaluations to solve would lead to the discrepancy.
        \emph{Skip} & \emph{Reorder} & 11.46\% & 53.99\% & 59.47\% \\ \hline
      \emph{Single} & \emph{Reorder} & 24.94\% & 80.49\% & 60.63\% \\ \hline
      \emph{Single} &  \emph{Normal} & 26.44\% & 83.55\% & 59.96\% \\ \hline
-     \emph{Single} &     \emph{DAG} & 27.80\% & 83.73\% & 59.92\% \\ \hline
-	\end{tabular}
-	\caption{Parity}
-	\label{tab:parity_reactivate}
-\end{table*}
+     \emph{Single} &     \emph{DAG} & 27.80\% & 83.73\% & 59.92\% \\ \hline\hline
 
+  \multicolumn{5}{|c|}{\textbf{16-4-bit Encode}} \\ \hline
 
-\begin{table*}
-	\centering
-	\begin{tabular}{|c|c|c|c|c|}
-	  \hline
 \textbf{Duplicate} & \textbf{Ordering} & \textbf{Active Unchanged} & \textbf{No Reactivation} & \textbf{Reactivated Changed} \\ \hline
  \emph{Accumulate} &     \emph{DAG} & 0.05\% & 4.06\% & 48.70\% \\ \hline
        \emph{Skip} &     \emph{DAG} & 0.06\% & 3.85\% & 48.33\% \\ \hline
@@ -1752,16 +1731,10 @@ evaluations to solve would lead to the discrepancy.
  \emph{Accumulate} &  \emph{Normal} & 14.52\% & 54.79\% & 64.17\% \\ \hline
      \emph{Single} &  \emph{Normal} & 33.77\% & 79.34\% & 59.86\% \\ \hline
      \emph{Single} &     \emph{DAG} & 35.98\% & 80.91\% & 58.39\% \\ \hline
-     \emph{Single} & \emph{Reorder} & 39.95\% & 78.91\% & 59.72\% \\ \hline
-	\end{tabular}
-	\caption{Encode}
-	\label{tab:encode_reactivate}
-\end{table*}
+     \emph{Single} & \emph{Reorder} & 39.95\% & 78.91\% & 59.72\% \\ \hline\hline
 
-\begin{table*}
-	\centering
-	\begin{tabular}{|c|c|c|c|c|}
-	  \hline
+  \multicolumn{5}{|c|}{\textbf{4-16-bit Decode}} \\ \hline
+
 \textbf{Duplicate} & \textbf{Ordering} & \textbf{Active Unchanged} & \textbf{No Reactivation} & \textbf{Reactivated Changed} \\ \hline
  \emph{Accumulate} &     \emph{DAG} & 0.03\% & 10.10\% & 54.99\% \\ \hline
        \emph{Skip} &     \emph{DAG} & 0.05\% & 10.21\% & 51.33\% \\ \hline
@@ -1772,17 +1745,10 @@ evaluations to solve would lead to the discrepancy.
      \emph{Single} &     \emph{DAG} & 32.60\% & 81.73\% & 57.70\% \\ \hline
  \emph{Accumulate} &  \emph{Normal} & 51.11\% & 84.54\% & 72.57\% \\ \hline
    \rowcolor{Gray}
-       \emph{Skip} &  \emph{Normal} & 65.47\% & 89.17\% & 72.21\% \\ \hline
+       \emph{Skip} &  \emph{Normal} & 65.47\% & 89.17\% & 72.21\% \\ \hline\hline
 
-	\end{tabular}
-	\caption{Decode}
-	\label{tab:decode_reactivate}
-\end{table*}
+  \multicolumn{5}{|c|}{\textbf{3-bit Multiply}} \\ \hline
 
-\begin{table*}
-	\centering
-	\begin{tabular}{|c|c|c|c|c|}
-	  \hline
 \textbf{Duplicate} & \textbf{Ordering} & \textbf{Active Unchanged} & \textbf{No Reactivation} & \textbf{Reactivated Changed} \\ \hline
  \emph{Accumulate} & \emph{Reorder} & 1.14\% & 22.09\% & 71.75\% \\ \hline
  \emph{Accumulate} &     \emph{DAG} & 4.52\% & 45.38\% & 63.42\% \\ \hline
@@ -1795,8 +1761,9 @@ evaluations to solve would lead to the discrepancy.
    \rowcolor{Gray}
        \emph{Skip} &  \emph{Normal} & 73.46\% & 92.04\% & 79.07\% \\ \hline
 	\end{tabular}
-	\caption{Multiply}
-	\label{tab:multiply_reactivate}
+	\caption{Behavior of offspring replacement for each algorithm combination
+	         on each problem.}
+	\label{tab:reactivate}
 \end{table*}
 
 An important aspect of CGP is its replacement strategy that allows for neutral drift.
@@ -1805,8 +1772,7 @@ research has shown the impact removing this feature can have on
 performance~\cite{yu:2001:neutrality}, but how it interacts with the different variants
 of CGP has not been investigated previously.
 
-Table~\ref{tab:parity_reactivate}, Table~\ref{tab:encode_reactivate},
-Table~\ref{tab:decode_reactivate}, and Table~\ref{tab:multiply_reactivate} provide a
+Table~\ref{tab:reactivate} provides a
 novel look at CGP's replacement behavior.  Each time an offspring replaced a parent
 in the final runs, we recorded how the behavior of each node differed between the
 parent and the offspring.
@@ -1991,7 +1957,7 @@ TODO The conclusion goes here.
 % starts a section numbered zero.)
 %
 
-
+\begin{comment}
 \appendices
 \section{Example Appendix}
 Appendix one text goes here.
@@ -2001,7 +1967,7 @@ Appendix one text goes here.
 \section{}
 Appendix two text goes here.
 
-
+\end{comment}
 % use section* for acknowledgement
 \section*{Acknowledgment}
 
