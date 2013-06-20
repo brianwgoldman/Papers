@@ -1840,16 +1840,6 @@ actively identical to their parents.  The latter is supported by the fact that
 often than not offspring connecting in inactive nodes are testing that node's behavior
 for the first time.
 
-\subsection{Source of High Variance}
-TODO Look for general indicators of high evaluation runs.
-
-TODO Look for footprint moving.
-
-TODO Look for active node clustering.
-
-TODO Look into how often children replace parents.
-
-
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
 % For figures, \caption should occur after the \includegraphics.
@@ -1937,11 +1927,81 @@ TODO Look into how often children replace parents.
 
 \section{Conclusion}
 \label{sec:conclusion}
-TODO The conclusion goes here.
+Even with CGP's relatively simple evolutionary mechanisms, fully understanding
+the effects those mechanisms have on search takes concerted effort.  By examining
+the effectiveness as well as the actual behavior of traditional CGP and
+a handful of variants we have helped advance this understanding.
 
+Generally, CGP appears to require the least number of evaluations when the genome
+size far exceeds what is necessary for the problem at hand.  When properly tuned,
+almost all variants had only a tiny fraction of the genome active in their final
+solution.  Furthermore, a significant portion of these active nodes were found
+to be redundant, removable using a very simple reduction algorithm.  The only
+variant that preferred more reasonable genome sizes were those using \emph{Single},
+especially when paired with \emph{Reorder} or \emph{DAG}.  Yet we theorize this may
+have more to do with \emph{Single} scaling poorly with the number of active nodes
+than with it overcoming whatever causes traditional CGP to prefer enormous genomes.
+While \emph{Reorder} and \emph{DAG} were able to use smaller genomes than \emph{Normal}
+when paired with \emph{Single}, this decrease in size was not observed in any other
+pairings.  As such, the suggestion in~\cite{goldman:2013:ordering} that these
+techniques generally reduce genome size should be discarded.  Instead it is likely
+more correct to say that \emph{Reorder} and \emph{DAG} are less detrimentally effected
+by reducing the genome size.
 
+Compared on median evaluations to success, \emph{Normal} and \emph{Reorder} are
+likely to be equally good for simple problems, with some suggestion that \emph{Reorder}
+performs better as problems become more difficult.  In general \emph{DAG} was found
+to be unnecessarily time consuming, as it required higher algorithmic complexity
+without any performance gain.  As such we would suggest \emph{Reorder} for general
+future CGP use.
 
+In line with the results from~\cite{goldman:2013:cgpwaste}, \emph{Skip} and
+\emph{Accumulate} continued to show no significant difference in effectiveness
+or behavior.  As \emph{Skip} is simpler to understand and implement, we suggest
+\emph{Accumulate} be ignored in all future CGP applications.  \emph{Single}'s
+behavior continues to be enough different from \emph{Skip} to warrant further
+study, especially with problems requiring higher numbers of active genes.  In
+general though, if evaluation time is significantly impacted by the number of
+active nodes or the total size of the genome, we suggest \emph{Single}.  While
+mutation rate appears relatively variant and problem independent (all of our tuning
+resulted in 0.002 being optimal or close to it), \emph{Single} still has the
+advantage of not requiring this parameter at all.
 
+As to actual behavior, CGP genomes include a surprising amount of redundant and
+unused nodes.  As theoretically predicted in~\cite{goldman:2013:ordering},
+\emph{Normal} ordering leaves large sections of the genome completely unused
+while \emph{Reorder} and \emph{DAG} are more likely to utilize the whole genome.
+Further analysis showed that CGP, at least with our function set, produced a large
+number of constant nodes, such that their output is independent of problem
+inputs.  As the binary domain only has two constants (always true and always false),
+each genome at most should require two constant nodes.  Even so these behaviors
+were found duplicated in both the active and inactive portions of final solutions
+for all algorithm variants.  Also common was duplication of node behavior, even
+though CGP's encoding does not require any duplication to produce any value.  Yet
+attempting to prevent or remove this behavioral duplication may hinder CGP's evolutionary
+success, as it will limit neutral drift.
+
+CGP's use of neutrality has become one of its cornerstone arguments for its success.
+Yet the reason for neutrality's importance appears to be different from previous
+arguments.  In our testing of traditional CGP we found large sections of the
+genome were never used by any ancestor of the final solution.  Furthermore,
+offspring almost never include active nodes that were inactive in their direct
+parent, but active in a previous ancestor.  Even when reactivation does happen,
+the node has almost always changed behavior significantly from when it was active.
+As such we suggest the advantages of neutrality in regards to inactive nodes is
+not that it allows the storage of previously useful structures, but that it allows
+inactive nodes to be constantly changed facilitating mutational inclusion of what
+are effectively random nodes.  Under this theory, CGP would likely benefit from randomly resetting
+all inactive nodes just before they become active.  Note that with \emph{Reorder}
+and \emph{DAG} these conclusions do not hold as a reasonable amount of node
+reactivation occurs.
+
+While this analysis was limited to boolean problems by necessity of some of
+the analysis methods, most of the conclusions have no obvious reason to be
+limited to the boolean domain.  Still, applying \emph{footprint} analysis
+to detect changes in behavior and behavior duplication, along with looking at
+never active nodes and tuned parameter settings, on other domains will help
+solidify our conclusions.
 
 % if have a single appendix:
 %\appendix[Proof of the Zonklar Equations]
