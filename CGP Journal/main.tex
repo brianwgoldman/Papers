@@ -461,7 +461,28 @@
 % As a general rule, do not put math, special symbols or citations
 % in the abstract or keywords.
 \begin{abstract}
-TODO The abstract goes here.
+Understanding how search operators interact with solution representation is
+a critical step to search improvement.  For many search algorithms this may
+be trivial, but in Cartesian Genetic Programming (CGP), and Genetic Programming (GP)
+in general, the complex genotype to phenotype map makes achieving understanding
+challenging.  By examining tuned parameter values, variant success on different
+problem difficulties, node behavior, and offspring replacement properties we
+seek to comprehend observed characteristics of CGP search.  We focus our study
+around methods to prevent wasted CGP evaluations (\emph{Skip}, \emph{Accumulate},
+and \emph{Single}) and methods to overcome CGP's search limitations imposed by
+genome ordering (\emph{Reorder} and \emph{DAG}).
+
+We find strong evidence that currently most CGP techniques evolve genomes that
+are highly inactive, very redundant, and full of seemingly useless constants.
+In some instances we found less than 1\% of the genome was actually required to
+encode the evolved solution.
+Without \emph{Reorder} or \emph{DAG} almost the entire latter portion of the genome
+is never used by any ancestor of the evolved solution.  More generally, our
+results lead us to conclude that \emph{Skip Reorder} and \emph{Single Reorder}
+are most likely to solve hard problems in the least number of evaluations and
+the least amount of time, respectively, with the least amount of degenerate
+behavior.
+
 \end{abstract}
 
 % Note that keywords are not normally used for peerreview papers.
