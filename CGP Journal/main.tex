@@ -868,8 +868,8 @@ which nodes transitively depend on the mutating node and which are not, with
 information stored in the $known$ map.  Initially, we know that the node
 is dependent on itself and that input locations and the nodes current inputs
 are not dependent on the mutating node.  Nodes are then
-tested in a random order for dependence using the algorithm given in Figure~\ref{fig:dag}.
-The first node returned that is not dependent on the mutating node is then
+tested in a random order for dependence using the \Call{IsDependent}{} algorithm given in Figure~\ref{fig:dag}.
+The first node returned at the top level that is not dependent on the mutating node is then
 used as the new connection gene value.
 
 \begin{figure}
@@ -892,19 +892,20 @@ used as the new connection gene value.
   \label{fig:dag}
 \end{figure}
 
-The algorithm given in Figure~\ref{fig:dag} is a non-repeated recursive depth
+\Call{IsDependent}{} is a non-repeated recursive depth
 first search of the individual's DAG.  Search terminates as soon as a dependent
 node is found, and information from previous searches is recorded to prevent
 repeated search.  Each recursion level results in a node having its dependency
 set, meaning early calls will likely result in lots of recursion, but subsequent
 calls will find answers faster.  In the worst case, this algorithm may need
 to examine all nodes in the genome to determine if $working$ is dependent on the
-mutating node, giving it a complexity of $O(N)$.  In the worst case, this algorithm
+mutating node, giving it a complexity of $O(AN)$.  In the worst case, this algorithm
 may be called on all possible nodes in the genome to check their dependence.
-Yet cumulatively those calls can only take $O(N)$ time due to the non-repeating
+Yet cumulatively those calls can only take $O(AN)$ time due to the non-repeating
 nature of the search.  As a result, the expected worst case run time for \emph{DAG}
-mutation is $O(mAN^2)$, as when $m$ is the mutation rate we expect $mAN$
-connection genes to be mutated, each requiring a worst case of $N$ dependency checks.
+mutation is $O(mA^2N^2)$, as when $m$ is the mutation rate we expect $mAN$
+connection genes to be mutated, each requiring a worst case of $N$ dependency checks
+each taking $A$ time.
 This is in contrast to \emph{Normal} and \emph{Reorder} which require $O(mAN)$ to perform
 mutation, as individual mutations can be performed in constant time.
 
@@ -916,7 +917,7 @@ recursively following connection genes and marking nodes as active until the inp
 are reached.  Here the process diverges, as in \emph{DAG} we must determine not only the set of
 nodes that are active, but the order in which those nodes should be executed.
 
-The algorithm given in Figure~\ref{fig:reorder} can be reused to determine the order
+\Call{RandomSerialization}{} can be reused to determine the order
 in which nodes should be executed during evaluation.  Instead of using $new\_loc$
 to reorder the genome, we can use this map to specify what order nodes should be
 executed in.  For instance, if a node was given the new location of $X$, we know
@@ -930,7 +931,7 @@ getting the $new\_loc$ map requires $O(AN)$ time.  Finally, converting the map
 into an ordering of the active nodes takes $O(N)$ time.  Each of these steps are
 sequential, meaning \emph{DAG} does not increase the runtime complexity of evaluation
 preprocessing.  Furthermore, once the preprocessing step is done, \emph{DAG} takes
-identical time to evaluate than the other methods, regardless of the number of
+identical time to evaluate as the other methods, regardless of the number of
 input combinations the individual is evaluated on.
 
 With these modifications, there is no longer any meaning to the position of a node
@@ -952,7 +953,7 @@ few nodes, and $Y$ is transitively dependent on many nodes, in general \emph{Reo
 will shuffle the genome such that $X$ is before $Y$.  This is true because the probability
 that all of $X$'s dependencies are added at any point of building the new order is always
 higher than for $Y$'s dependencies.  As a result we expect $X$ to be put into $addable$ sooner,
-and as a result we expect it to be added sooner.  The greater the discrepancy in these
+and therefore we expect it to be added sooner.  The greater the discrepancy in these
 set sizes the less likely the order between the nodes will be reversed.
 Conversely, \emph{DAG} has no such bias.  It is always possible to mutate $X$ to connect to $Y$.
 
@@ -965,7 +966,7 @@ nodes, so each mutation has a higher chance of choosing $Y$.
 
 \section{Qualitative Comparisons}
 \label{sec:quality}
-While it is possible to theorize the effects of each CGP variant on search, and
+While it is possible to theorize about how the effects of each CGP variant on search and
 how those effects may interact with each other, without empirical evidence it is
 mostly speculation.  Therefore we propose to start by testing the effectiveness
 of the variants and their combinations in problem solving.  Deeper analysis of
@@ -981,7 +982,7 @@ if applied alone.  Similar measures are not needed in testing the ordering techn
 as \emph{Skip} has no impact on evolutionary search, and is a strict improvement
 to using no duplication detection at all.
 
-In total this creates 9 algorithmic configurations.  Of these previous work
+In total this creates 9 algorithm combinations.  Of these previous work
 has been done testing the duplication methods with \emph{Normal} ordering~\cite{goldman:2013:cgpwaste}
 as well as analysis of all three ordering methods with \emph{Single}~\cite{goldman:2013:ordering}.
 This means there are 4 novel combinations, beyond this being the first time a cross
@@ -994,7 +995,7 @@ In order to provide test landscapes for evolution, we chose problems common to
 CGP literature and previous work with the duplication prevention and ordering
 techniques.  We have chosen 4 binary circuit problems, as the binary representation
 allows for some of the precise analysis performed in Section~\ref{sec:analysis}.
-For all problems, we used the function set \{and, or, nand, nor\}.
+For all problems, we used the function set \{AND, OR, NAND, NOR\}.
 To cover a range of different binary problems, each of the four chosen have
 different numbers of inputs, different number of outputs, and different levels
 of difficulty.
@@ -1008,7 +1009,7 @@ Yet as part of the group it may help yield understanding about how each variant
 performs on simple problems.
 
 As representatives of binary problems with varying input and output sizes, we
-reuse the 4-16-bit Decode and 16-4-bit Encode proposed in~\cite{goldman:2013:cgpwaste}.
+reuse the 16-4-bit Encode and 4-16-bit Decode proposed in~\cite{goldman:2013:cgpwaste}.
 In these problems, the circuit evolved must either convert a 4-bit encoded integer
 to a 1 on the corresponding output line (Decode), or take a 1 on one of the 16
 input lines and convert it back into a 4-bit encoded integer (Encode).  These
@@ -1028,7 +1029,7 @@ the largest number of test points.
 
 \subsection{Parameter Setting}
 \label{sec:parameter}
-In order to fairly compare each method, we should ensure proper parameter configuration.
+To perform a fair comparison, we should ensure proper parameter configuration.
 This is to avoid the potential criticism that the parameter settings chosen benefit
 a specific method more than others.  While tuning can lead to the alternative issue
 of methods only being effective after extensive problem specific tuning, we set out to use
@@ -1053,23 +1054,23 @@ range of previously used parameter settings, with each value having at least
 one paired value for the other parameter which is feasibly effective.
 The grid is formed by trying all possible mutation rates
 with all possible genome sizes, resulting in 64 potential configurations for each
-of the algorithmic configurations.  Finally note that as \emph{Single} does not
+of the algorithm combinations.  Finally note that as \emph{Single} does not
 use a mutation rate, only the eight configurations with different genome sizes were
 used when \emph{Single} was employed.
 
-To choose which parameter configuration to use with each algorithmic configuration
-for each problem, we used an iterative process of performing runs, comparing means, removing configurations,
-and repeating.  For each algorithm configuration and problem, we first run all
+To choose which parameter configuration to use with each algorithm combination
+for each problem, we used an iterative process of performing runs, comparing medians, removing configurations,
+and repeating.  For each algorithm combination and problem, we first ran all
 potential parameter configurations 5 times (320 runs if not using \emph{Single}, 40 otherwise).
 The parameter configurations are then sorted based on their median.  The best half are then
-each run 4 more times, with the best half of that group chosen.  In this way, 32 configurations
-are run 5 times, 16 are run 9 times, 8 are run 13 times, 4 are run 17 times, 2 are run 21 times,
-and 2 are run 25 times.  For configuration with single, all 8 parameter configurations are run 17 times
+each run 4 more times, with the best half of that group chosen.  In this way, 64 configurations
+are run 5 times, 32 are run 9 times, 16 are run 13 times, 8 are run 17 times, 4 are run 21 times,
+and 2 are run 25 times.  For algorithm combinations using \emph{Single}, all 8 parameter configurations were run 17 times
 before any are removed.  This iterative reduction allows us to focus tuning on
 those parameter configurations most likely to be effective, with more information
 gathered before choosing between high quality configurations.  In total this means
-3924 complete runs are required to set the parameter configuration for all
-algorithm configurations for a single problem.
+15,696 complete runs are required to set the parameter configuration for all
+algorithm configurations for all problems.
 
 To ensure termination, all runs were limited to 10,000,000 evaluations, well beyond
 the expected time to completion.  As the median was used to compare configurations,
@@ -1081,7 +1082,7 @@ used for any other data analysis.  This helps reduce selection's effect on
 result distribution, similar to how it is common to split training and testing
 runs.  In this case, the runs used to set the parameter configuration are considered
 the training runs for that configuration.  As a result, our final results were gather
-from a completely independent set of runs to test the configurations general characteristics.
+from a completely independent set of runs to test the configuration's general characteristics.
 Each configuration was run 50 times to ensure statistical power.
 
 \subsection{Results}
@@ -1156,9 +1157,9 @@ Each configuration was run 50 times to ensure statistical power.
 
 The results from running each tuned parameter configuration for each algorithm
 combination on each problem are summarized by Table~\ref{tab:results}.
-Rows in each table are ordered by that algorithm combination's median evaluations to
-success (MES), with the best algorithm combination appearing at the top of each table.
-The highlighted row marks \emph{Skip Normal}, the control algorithm combination
+Rows for each problem are ordered by that algorithm combination's median evaluations to
+success (MES), with the best algorithm combination appearing at the top of each section.
+The highlighted rows mark \emph{Skip Normal}, the control algorithm combination
 representing traditional CGP's performance.  All configurations for each problem
 were then testing using Kruskal-Wallis to determine if any configuration is
 statistically different from any other.  All problems received highly significant
@@ -1171,8 +1172,8 @@ for each algorithm combination was extensively optimized.  In line with previous
 research~\cite{miller:2006:redundancy}, this led to massive genome sizes for
 almost all algorithm combinations on all problems.  With the exception of 
 some combinations using \emph{Single}, all algorithm combinations used over
-1,000 nodes.  Half of those configurations used 10,000 nodes, the maximum allowed
-by our tuning, which may imply these combinations work best with even larger
+1,000 nodes.  Half of all combinations without \emph{Single} used 10,000 nodes.
+As this was the maximum allowed by our tuning, these combinations may work better with even larger
 genomes.
 
 Of the 12 configurations including \emph{Single}, 11 used a genome size smaller
@@ -1217,7 +1218,7 @@ from higher exploration.
 On many of the problems, many of the configurations have little to no statistical
 difference from the control in their evaluations required to reach the global optimum.
 On Parity and Encode it is probably safe to conclude that \emph{Single} is worse than
-the control, although as these are the easiest problems tested that difference may have
+the control.  As these are the easiest problems tested that difference may have
 little real world meaning.  \emph{DAG} is almost certainly worse than the control on
 Decode.  Its results are so much worse that we can also likely conclude that \emph{DAG}
 is worse than all non \emph{DAG} configuration on that problem, even though no statistical
@@ -1225,7 +1226,7 @@ tests are presented here.  The control on multiply did by far the worst of all c
 with only \emph{Accumulate Normal} likely failing statistical significance.
 
 By ordering the algorithm combinations by MES and examining that ordering across each
-problem, we can look for general trends.  From the tables, it appears on easier problems
+problem, we can look for general trends.  From the table, it appears on easier problems
 which method of duplication is in use is the strongest predictor of rank, while
 the ordering methods are more important on harder problems.  This comes from the
 observation that in for Parity and Encode (Upper half of Table~\ref{tab:results})
