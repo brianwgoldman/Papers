@@ -464,8 +464,8 @@
 Understanding how search operators interact with solution representation is
 a critical step to search improvement.  For many search algorithms this may
 be trivial, but in Cartesian Genetic Programming (CGP), and Genetic Programming (GP)
-in general, the complex genotype to phenotype map makes achieving understanding
-challenging.  By examining tuned parameter values, variant success on different
+in general, complex genotype to phenotype map makes achieving this understanding a
+challenge.  By examining tuned parameter values, variant success on different
 problem difficulties, node behavior, and offspring replacement properties we
 seek to comprehend observed characteristics of CGP search.  We focus our study
 around methods to prevent wasted CGP evaluations (\emph{Skip}, \emph{Accumulate},
@@ -1300,36 +1300,37 @@ TODO Include scaling comparison with~\cite{walker:2008:cgpmodules}.
 
 \section{Analysis of Evolutionary Mechanisms}
 \label{sec:analysis}
-Comparing how many evaluations each algorithm takes to solve a set of benchmark
-problems only provides us with a limited amount of understanding about how
-those algorithms actually function.  We propose here to look for further detail,
-both to check on theorized capabilities of each variant and CGP in general, and
-to look for previously hidden aspects of CGP.
-To do so we have devised a number of novel metrics to examine what makes a
+Comparing how many evaluations each algorithm requires to solve benchmark
+problems provides very little understanding of why one is more efficient than another.
+Thus we must turn to a more detailed view
+to support theorized capabilities of each variant and
+to discover hidden aspects of CGP.
+To accomplish this task we have devised novel metrics to expose what makes a
 CGP run successful.
 
-As a primary concept to our analysis, we determine the \emph{footprint} of nodes
-in the genome.  What we mean by \emph{footprint} is a measure the semantic use
-of a node.  For each input that is given to an individual, all of its nodes
+As a primary concept to our analysis, we determine the semantics of nodes
+in the genome~\cite{mcphee:2008:treesemantics}.
+For each input that is given to an individual, all of its nodes
 will produce a single output.  These output values can be recorded and ordered.
 As the domain in use in binary, the outputs can be viewed as a bit string, with
 each bit the value that a node outputs when an individual is presented with a
 specific input.  Similar recording can be done for other domains, but binary
 allows for by far the simplest encoding.
 
-The \emph{footprint} of a node is a complete description of its functionality.
-Any two nodes with identical \emph{footprint} values have identical behavior,
+The semantics of a node is a complete description of its functionality.
+Any two nodes with identical semantic values have identical behavior,
 even if their method for encoding that behavior is drastically different.  From
 this perspective, we can view CGP evolution as attempting to evolve a node who's
-\emph{footprint} matches the desired output \emph{footprint}.  Doing so allows
+semantics match the desired output semantics.  Doing so allows
 us to examine how the evolutionary operators change the behavior of nodes,
 not just their gene values.
 
-Utilizing \emph{footprint} analysis, we can extract the semantically useful
+Utilizing semantic analysis, we can extract the useful
 portions of an individual, a subset of the active nodes.  Consider two active
-nodes with the same \emph{footprint}.  As CGP is a graph representation, only
-one of these nodes is actually necessary.  Given one in the genome, any node that reads
-from the other can have its connection changed without changing its behavior.
+nodes X and Y with the same semantics such that X proceeds Y in the genome.
+As CGP is a graph representation, only
+one of these nodes is actually necessary.  Any node that reads the output of Y
+can instead read the output of X, removing the need to include Y in the solution.
 
 \begin{figure}
   \begin{algorithmic}
@@ -1350,29 +1351,23 @@ from the other can have its connection changed without changing its behavior.
     \EndFor
   \EndProcedure
   \end{algorithmic}
-  \caption{Algorithm to ensure each active \emph{footprint} is only
-           calculated once.}
+  \caption{Algorithm to ensure each active node calculates
+           a unique semantic.}
   \label{fig:simplify}
 \end{figure}
 
 The \Call{Simplify}{} algorithm given in Figure~\ref{fig:simplify} is designed
 to efficiently reduce the redundancy encoded in a genome.  Generally, this
 algorithm will move all connections to the first node that produces the desired
-\emph{footprint}.  After application, and recalculation of which nodes are still
-active, each active node produces a unique \emph{footprint}.  Any node that is
-transitively dependent on its own \emph{footprint} will always be removed from
-the active set.  In general, if a set of nodes all produce the same \emph{footprint},
+semantic.  After application, and recalculation of which nodes are still
+active, each active node produces a unique semantic string.  Any node that is
+transitively dependent on its own semantic will always be removed from
+the active set.  In general, if a set of nodes all produce the same semantic,
 whichever has the least transitive dependencies will be kept.  Note that this
-does guarantee the minimum possible genome, an algorithm capable of that requires
+does not guarantee the minimum possible genome, as that would require
 exponential runtime.  The \Call{Simplify}{} algorithm requires $O(AN)$ time,
-as the final for loop is the most expensive step.  As before, this means
+since the final \textbf{for all} loop is the most expensive step.  As before, this means
 \Call{Simplify}{} is no more complex than copying a genome.
-
-By examining which nodes remain active after simplification, we can discuss
-the usefulness of each node as either being part of the minimum solution, a
-duplicate of a node in the minimum solution, or irrelevant to the solution.
-As such we can then examine how redundancy is being used, how frequently useful
-structures exist in the inactive nodes, and how useful nodes are constructed by evolution.
 
 \begin{comment}
 \begin{figure}
@@ -1508,7 +1503,7 @@ their number of output locations, their evolved percentage of active nodes is al
 With how inactive the final genomes are, we ask ``what is the rest for?''
 Just because a node is not active in the final solution does not mean it was never
 useful.  For a node to be truly of no use to search, we must consider nodes that
-were never active.  Never active nodes are nodes such that for all parents of the
+were never active.  Never active nodes are nodes such that for all ancestors of the
 final solution (the line of descent), no parent had that node active.  Note that
 for \emph{Reorder} this demarcation of node activity follows the node through
 each shuffle, such that if a node was marked as never active before the genome
@@ -1569,7 +1564,7 @@ So now the question is why does \emph{Normal} use so little of its genome?  To
 answer this we must consider what can prevent a node from becoming active.  For
 a node to never be active all tested offspring with mutations that result in that node being activated
 must have been less fit than their parent.  Even if those offspring are no more fit, the selection method
-used by CGP would have allowed that offspring to replace its parent.  This leads
+used by CGP would have allowed that offspring to replace its parent, at least probabilistically.  This leads
 to two possible causes for a node never being active: bad genes or infrequently tried.
 
 The bad genes cause for a node never being active suggests the behavior encoded
@@ -1585,7 +1580,7 @@ The infrequently tried cause for a node never being active suggests that few
 individuals are ever produced which have that node active, limiting the likelihood
 of those individuals being selected regardless of potential fitness.  Under this
 cause and combined with the theory given in~\cite{goldman:2013:ordering}, we
-expect a strong positional bias in the location of the never active nodes.  Furthermore,
+expect a strong positional bias in the location of the never active nodes;
 we would expect nodes near the end of the genome to be the most likely to be never active.
 Finally we would expect \emph{Reorder} and \emph{DAG} to have less or no positional bias.
 All of these expectations match the results given in Table~\ref{tab:never_active}.
@@ -1648,17 +1643,17 @@ problems that require further exploration \emph{Reorder} is able to do so, while
 \end{table*}
 
 In CGP it is common to report what fraction of the genome is active, as this represents
-the easiest estimate of solution size.  By utilizing \emph{footprint} comparison
+the easiest estimate of solution size.  By utilizing semantic comparison
 and the \Call{Simplify}{} algorithm, we can get a much better estimate of what
 purpose each node in the genome serves.
-Table~\ref{tab:results} provides two columns relevant to node behavior: Active
-and Used.  The former gives the traditional measure of the median amount of
+Table~\ref{tab:results} provides two columns relevant to node behavior: \textbf{Active}
+and \textbf{Used}.  The former gives the traditional measure of the median amount of
 active nodes in the solution found.  The latter is the median number of nodes
 still active after applying the \Call{Simplify}{} algorithm.
 
 On all problems and for all algorithm combinations, the number of active nodes is
-far smaller than the genome size, and the number of Used nodes
-is far smaller than the number of Active nodes.  In some extreme cases less
+far smaller than the genome size, and the number of used nodes
+is far smaller than the number of active nodes.  In some extreme cases less
 than 1\% of active nodes in the evolved solution are actually necessary.  Only the
 most extreme configurations have even 50\% of active nodes in use by the
 simplified solution.
@@ -1670,18 +1665,18 @@ represent different ends of the quality spectrum for \emph{Skip Normal} and
 because together the are sufficiently representative of behaviors seen on the other
 problems.
 
-Each diagram describes node behavior as falling into eight distinct categories.
-The first category are the constant nodes, both active and inactive.  These nodes
-return the same value for all tested inputs.  The ``Used'' bar is the average
-number of nodes which are part of the simplified solution.  The ``Useful'' bars
-express how many nodes, either active or inactive, have identical \emph{footprint}
-values to used nodes.  These nodes represent either independent methods of calculating
-the same behavior or are effectively pass through nodes which mimic the behavior
-of their inputs.  Active ``Intron'' nodes are those active nodes that do not
-fall into either the constant or used categories, with inactive ``Intron'' nodes
-being those inactive nodes that have identical \emph{footprint} values to active
-intron nodes.  The final bar is ``Explore'', which marks how many nodes on
-average produce a \emph{footprint} not part of any previous category.  Note that
+Each diagram describes node behavior as falling into eight distinct categories
+split between active and inactive nodes.  Nodes are put into the first category
+they satisfy.
+\begin{enumerate}
+\item ``Constant'' - Independent of problem input, constant nodes produce a fixed output.
+\item ``Used'' - Nodes still active after applying \Call{Simplify}{}.
+\item ``Useful'' - Nodes with identical semantics to a ``Used'' node.
+\item ``Intron'' - Any node with semantics identical to an active node.
+\item ``Explore'' - All remaining nodes.
+\end{enumerate}
+Used nodes are by definition only in the active portion of the genome.  Similarly
+explore nodes can only be in the inactive portion of the genome.   Note that
 all never active nodes are ignored by these plots, as their behavior is meaningless.
 
 The first striking feature of these tables is how many nodes produce constant
@@ -1699,8 +1694,8 @@ As with previous analysis, \emph{Skip} and \emph{Accumulate} have nearly identic
 plots, regardless of ordering method and problem.  \emph{Single} again has
 a significantly different plot when paired with \emph{Reorder} or \emph{DAG},
 with some hits of a change on Encode with \emph{Normal}.  These combinations
-were also the most likely to have significantly smaller genome sizes.  From the
-results tables we see that the number of used nodes on each problem is relatively
+were also the most likely to have significantly smaller genome sizes.  From
+Table~\ref{tab:results} we see that the number of used nodes on each problem is relatively
 constant across the combinations even though the number of active nodes and the
 genome sizes changed significantly.  As such, the proportion of nodes in the
 used category will vary as these other features change.
@@ -1721,11 +1716,11 @@ to this ability to increase the number of active nodes.
 
 One significant difference in behavior between the two problems is proportion of
 explore nodes.  A potential explanation is that on 16-4-bit Encode there are only
-$2^{16} = 65,536$ \emph{footprints} while on 3-bit Multiply there are $2^{64} = 1.845\cdot 10^{19}$
-\emph{footprints}.  Combined with the fact that not all \emph{footprints} are equally
+$2^{16} = 65,536$ unique semantics while on 3-bit Multiply there are $2^{64} = 1.845\cdot 10^{19}$
+unique semantics.  Combined with the fact that not all semantics are equally
 likely to be produced, the difference may just be that on Encode nodes are
 that much more likely to recreate existing behavior.  Another possibility is that
-CGP increases the diversity of behavior of inactive nodes over evolutionary time.
+CGP increases the semantic diversity of inactive nodes over evolutionary time.
 As such, the fact that Multiply required approximately an order of magnitude more
 evaluations to solve would lead to the discrepancy.
 
@@ -1797,18 +1792,18 @@ evaluations to solve would lead to the discrepancy.
 
 An important aspect of CGP is its replacement strategy that allows for neutral drift.
 Each generation the best offspring replaces its parent if it is no less fit.  Previous
-research has shown the impact removing this feature can have on
+research has shown the negative impact removing this feature can have on
 performance~\cite{yu:2001:neutrality}, but how it interacts with the different variants
 of CGP has not been investigated previously.
 
 Table~\ref{tab:reactivate} provides a
 novel look at CGP's replacement behavior.  Each time an offspring replaced a parent
-in the final runs, we recorded how the behavior of each node differed between the
+in 50 runs, we recorded how the behavior of each node differed between the
 parent and the offspring.
 
-The \textbf{Active Unchanged} reports how often all active nodes in the offspring
-have identical \emph{footprints} to the corresponding nodes in the offspring's parent.
-This goes beyond the concept of actively identical offspring and checks of the behavior
+The \textbf{Active Unchanged} column reports how often all active nodes in the offspring
+have identical semantics to the corresponding nodes in the offspring's parent.
+This goes beyond the concept of actively identical offspring and checks if the behavior
 of any active node was modified by the mutation.  The rows in each of the four
 tables are sorted using this column.  Smaller values indicate an algorithm
 combination that produced more changes in active node behavior.
@@ -1818,21 +1813,21 @@ that were active in some ancestor of the offspring, were inactive in the offspri
 parent, but are active in the offspring.  Reactivation is a measure of how
 often CGP reuses previously useful active nodes.  Reported in the table is how
 frequently an offspring replaces its parent with no reactivated nodes.  Smaller
-values indicate an algorithm combination that reuses nodes, as opposed to
+values indicate an algorithm combination that frequently reuses nodes, as opposed to
 including randomly generated nodes (never active nodes) or ignoring inactive nodes
 entirely.
 
 The \textbf{Reactivated Changed} column states the percentage of reactivated nodes
-that have a different \emph{footprint} from the last time they were active.  Conversely,
-reactivated nodes without a change mean that CGP has taken a previously useful behavior,
+that have a different semantic from the last time they were active.  Conversely,
+reactivated nodes without a change mean that CGP has taken a previously active behavior,
 stored it in the inactive space, and reactivated it in later mutations.  Smaller values
 indicate an algorithm combination that more often preserve node behaviors while
 inactive.
 
 Combined these three measures provide somewhat surprising evidence.  Most notably
 is that \emph{Single}, a technique designed to force offspring to be actively different
-than their parents, produces offspring with no changes in active node behavior
-20\%-40\% of the time.  The further exposes CGP's ability to have genetically different
+from their parents, produces offspring with no changes in active node behavior
+20\%-40\% of the time.  This further exposes CGP's ability to have genetically different
 yet phenotypically identical individuals.  Even more surprising is that \emph{Single}
 appears to increase the chance of producing offspring without changing active behavior.
 Somewhat unexpectedly \emph{Normal} appears to also reduce changes to active node behavior,
@@ -1848,7 +1843,7 @@ Similarly, even though \emph{Normal} makes no explicit change in mutation, it is
 by a significantly smaller number of active nodes than \emph{Reorder} or \emph{DAG}.  More
 active nodes means more chances for mutation to change the behavior of at least one.
 
-Somewhat unintuitively, node reactivation and active node \emph{footprint} changes appear
+Somewhat unintuitively, node reactivation and active node semantic changes appear
 to be highly correlated.  This is apparent in the fact that the \textbf{No Reactivation}
 column in each table is almost perfectly sorted, even though rows were sorted using the
 \textbf{Active Unchanged} column.  Again the number of active nodes seems the likely
@@ -1966,7 +1961,7 @@ size far exceeds what is necessary for the problem at hand.  When properly tuned
 almost all variants had only a tiny fraction of the genome active in their final
 solution.  Furthermore, a significant portion of these active nodes were found
 to be redundant, removable using a very simple reduction algorithm.  The only
-variant that preferred more reasonable genome sizes were those using \emph{Single},
+algorithm combinations that preferred more reasonable genome sizes were those using \emph{Single},
 especially when paired with \emph{Reorder} or \emph{DAG}.  Yet we theorize this may
 have more to do with \emph{Single} scaling poorly with the number of active nodes
 than with it overcoming whatever causes traditional CGP to prefer enormous genomes.
@@ -1992,7 +1987,7 @@ behavior continues to be enough different from \emph{Skip} to warrant further
 study, especially with problems requiring higher numbers of active genes.  In
 general though, if evaluation time is significantly impacted by the number of
 active nodes or the total size of the genome, we suggest \emph{Single}.  While
-mutation rate appears relatively variant and problem independent (all of our tuning
+mutation rate appears relatively independent of problem and algorithm combination (all of our tuning
 resulted in 0.002 being optimal or close to it), \emph{Single} still has the
 advantage of not requiring this parameter at all.
 
@@ -2027,7 +2022,7 @@ reactivation occurs.
 
 While this analysis was limited to boolean problems by necessity of some of
 the analysis methods, most of the conclusions have no obvious reason to be
-limited to the boolean domain.  Still, applying \emph{footprint} analysis
+limited to the boolean domain.  Still, applying semantic analysis
 to detect changes in behavior and behavior duplication, along with looking at
 never active nodes and tuned parameter settings, on other domains will help
 solidify our conclusions.
