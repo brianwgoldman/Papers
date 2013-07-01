@@ -725,6 +725,8 @@ this problem of highly active genomes is very unlikely.
 
 \section{Genome Ordering}
 \label{sec:ordering}
+%TODO Add formula for probability node is active based on index
+%p(i) \leftarrow 1 - (\frac{N+I-1}{N+I})^O \cdot \prod_{j=i+1}^{N} 1 - p(j) \cdot (1-(\frac{j+I-1}{j+I})^a)
 As was discussed in Section~\ref{sec:cgp}, CGP uses node ordering in the genome
 to prevent cycles, by ensuring nodes only receive input from sources that
 precede them in the genome.  This restriction does not limit CGP's ability
@@ -963,8 +965,8 @@ nodes, so each mutation has a higher chance of choosing $Y$.
 
 \section{Qualitative Comparisons}
 \label{sec:quality}
+%TODO Hook here the table of descriptions.
 Empirical results are an important step in confirming our examinations.
-
 We accomplish this by testing the effectiveness
 of the described variants and their combination in problem solving.  Deeper analysis of
 evolutionary side effects are given in Section~\ref{sec:analysis}.
@@ -1494,6 +1496,7 @@ and 9\% of nodes in the genome active in the median runs of Parity, Encode, Deco
 and Multiply, respectively.  These final results fall in line with the predictions
 made in~\cite{goldman:2013:ordering}, in that if the problems are ordered based on
 their number of output locations, their evolved percentage of active nodes is also ordered.
+%TODO Reference here again the probability function, and its ability to predict values
 
 With such a small percentage of the final genome active, what is the rest of the
 genome for?
