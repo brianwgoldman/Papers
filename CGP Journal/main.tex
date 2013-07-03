@@ -1072,10 +1072,6 @@ by~\cite{vassilev:2000:neutrality,miller:2006:redundancy,walker:2008:cgpmodules}
 This problem is very difficult by comparison to the other problems, and has
 the largest number of test points.
 
-
-
-%TODO Consider adding 5-bit Parity or Equality, 11-bit Multiplexer.
-
 \subsection{Parameter Setting}
 \label{sec:parameter}
 To perform a fair comparison, we ensure proper parameter configuration
@@ -1351,70 +1347,7 @@ to discover hidden aspects of CGP.
 To accomplish this task we have devised novel metrics to expose what makes a
 CGP run successful.
 
-As a primary concept to our analysis, we determine the semantics of nodes
-in the genome~\cite{mcphee:2008:treesemantics}.
-For each input that is given to an individual, all of its nodes
-will produce a single output.  These output values can be recorded and ordered.
-As the domain in use is binary, the outputs can be viewed as a bit string, where
-each bit indicates the value a node outputs when an individual is presented with a
-specific input.  Similar recording can be done for other domains, but binary
-allows for by far the simplest encoding.
-
-This semantics representation of a node is a complete description of its functionality.
-Any two nodes with an identical semantic representation have identical behavior,
-even if their method for encoding that behavior is drastically different.  From
-this perspective, we can view CGP evolution as attempting to evolve a node who's
-semantics match the desired output semantics.  Doing so allows
-us to examine how the evolutionary operators change the behavior of nodes,
-not just their gene values.
-
-Utilizing semantic analysis, we can extract the useful
-portions of an individual, a subset of the active nodes.  Consider two active
-nodes X and Y with the same semantics such that X proceeds Y in the genome.
-As CGP is a graph representation, only
-one of these nodes is actually necessary.  Any node that reads the output of Y
-can instead read the output of X, removing the need to include Y in the solution.
-
-\begin{figure}
-  \begin{algorithmic}
-  \Procedure{Simplify}{}
-    \State $reconnect \leftarrow \emptyset$
-    \ForAll{$node \in reversed(active)$}
-      \State $reconnect[footprint(node)] \leftarrow node$
-    \EndFor
-    \ForAll{$i \in input\_locations$}
-      \State $reconnect[footprint(i)] \leftarrow i$
-    \EndFor
-    \ForAll{$g \in genes$}
-      \If{$g$ is a connection gene}
-        \If{$g \in reconnect$}
-          \State $g \leftarrow reconnect[footprint(g)]$
-        \EndIf
-      \EndIf
-    \EndFor
-  \EndProcedure
-  \end{algorithmic}
-  \caption{Algorithm to ensure each active node calculates
-           a unique semantic.}
-  \label{fig:simplify}
-\end{figure}
-
-The \Call{Simplify}{} algorithm given in Figure~\ref{fig:simplify} is designed
-to efficiently reduce redundancy encoded in a genome.  Generally, this
-algorithm will move all connections to the first node that produces the desired
-semantic.  After application, and recalculation of which nodes are still
-active, each active node produces a unique semantic string.  Any node that is
-transitively dependent on its own semantic will always be removed from
-the active set.  In general, if a set of nodes all produce the same semantic,
-whichever has the least transitive dependencies will be kept.  Note that this
-does not guarantee the minimum possible genome, as that would require
-exponential runtime.  The \Call{Simplify}{} algorithm requires $O(AN)$ time,
-since the final \textbf{for all} loop is the most expensive step.  As before, this means
-\Call{Simplify}{} is no more complex than copying a genome.
-
 \subsection{Never Active Nodes}
-%TODO Somewhere in here you should talk about how Normal has the least number of active,
-%which is probably related to how many never become active
 In line with the suggestions made in~\cite{miller:2006:redundancy}, the evolved
 number of active nodes across all problems and all algorithm configurations
 in Table~\ref{tab:results}
@@ -1425,7 +1358,9 @@ and 9\% of nodes in the genome active in the median runs of Parity, Encode, Deco
 and Multiply, respectively.  These final results fall in line with the predictions
 made in~\cite{goldman:2013:ordering}, in that if the problems are ordered based on
 their number of output locations, their evolved percentage of active nodes is also ordered.
-%TODO Reference here again the probability function, and its ability to predict values
+Furthermore, if Equation~\ref{eq:prob} is used to calculate the expected number of
+active nodes for configurations using \emph{Normal} ordering, we find that in all
+cases the evolved number is only marginally higher than the expectation.
 
 With such a small percentage of the final genome active, what is the rest of the
 genome for?
@@ -1505,11 +1440,15 @@ selection method to change their bad genes and eventually allow them to be activ
 The infrequently tried cause for a node never being active suggests that few
 individuals are ever produced which have that node active, limiting the likelihood
 of those individuals being selected regardless of potential fitness.  Under this
-cause and combined with the theory given in~\cite{goldman:2013:ordering}, we
+cause and combined with Equation~\ref{eq:prob}, we
 expect a strong positional bias in the location of the never active nodes;
 we would expect nodes near the end of the genome to be the most likely to be never active.
-Finally we would expect \emph{Reorder} and \emph{DAG} to have less or no positional bias.
-All of these expectations match the results given in Table~\ref{tab:never_active}.
+Figure~\ref{fig:prob} shows the expected probability given by Equation~\ref{eq:prob},
+using the same genome size, arity, number of inputs, and number of outputs as our
+3-bit multiply.  This curve bears a striking resemblance to all three \emph{Normal}
+plots in Table~\ref{tab:never_active}.
+Finally, from~\cite{goldman:2013:ordering} we would expect \emph{Reorder} and \emph{DAG}
+to have less or no positional bias, which also matches the results given in Table~\ref{tab:never_active}.
 
 Examining the progression in fitness across the different ordering methods shows
 the effect of initialization on each.  All three order methods share the same initialization
@@ -1527,6 +1466,66 @@ problems that require further exploration, \emph{Reorder} is able to do so, whil
 
 \subsection{Node Behaviors}
 
+In order to understand how each node is being used by CGP,
+we first determine the semantics of each node~\cite{mcphee:2008:treesemantics}.
+For each input that is given to an individual, all of its nodes
+will produce a single output.  These output values can be recorded and ordered.
+As the domain in use is binary, the outputs can be viewed as a bit string, where
+each bit indicates the value a node outputs when an individual is presented with a
+specific input.  Similar recording can be done for other domains, but binary
+allows for by far the simplest encoding.
+
+This semantics representation of a node is a complete description of its functionality.
+Any two nodes with an identical semantic representation have identical behavior,
+even if their method for encoding that behavior is drastically different.  From
+this perspective, we can view CGP evolution as attempting to evolve a node who's
+semantics match the desired output semantics.  Doing so allows
+us to examine how the evolutionary operators change the behavior of nodes,
+not just their gene values.
+
+Utilizing semantic analysis, we can extract the useful
+portions of an individual, a subset of the active nodes.  Consider two active
+nodes X and Y with the same semantics such that X proceeds Y in the genome.
+As CGP is a graph representation, only
+one of these nodes is actually necessary.  Any node that reads the output of Y
+can instead read the output of X, removing the need to include Y in the solution.
+
+\begin{figure}
+  \begin{algorithmic}
+  \Procedure{Simplify}{}
+    \State $reconnect \leftarrow \emptyset$
+    \ForAll{$node \in reversed(active)$}
+      \State $reconnect[footprint(node)] \leftarrow node$
+    \EndFor
+    \ForAll{$i \in input\_locations$}
+      \State $reconnect[footprint(i)] \leftarrow i$
+    \EndFor
+    \ForAll{$g \in genes$}
+      \If{$g$ is a connection gene}
+        \If{$g \in reconnect$}
+          \State $g \leftarrow reconnect[footprint(g)]$
+        \EndIf
+      \EndIf
+    \EndFor
+  \EndProcedure
+  \end{algorithmic}
+  \caption{Algorithm to ensure each active node calculates
+           a unique semantic.}
+  \label{fig:simplify}
+\end{figure}
+
+The \Call{Simplify}{} algorithm given in Figure~\ref{fig:simplify} is designed
+to efficiently reduce redundancy encoded in a genome.  Generally, this
+algorithm will move all connections to the first node that produces the desired
+semantic.  After application, and recalculation of which nodes are still
+active, each active node produces a unique semantic string.  Any node that is
+transitively dependent on its own semantic will always be removed from
+the active set.  In general, if a set of nodes all produce the same semantic,
+whichever has the least transitive dependencies will be kept.  Note that this
+does not guarantee the minimum possible genome, as that would require
+exponential runtime.  The \Call{Simplify}{} algorithm requires $O(AN)$ time,
+since the final \textbf{for all} loop is the most expensive step.  As before, this means
+\Call{Simplify}{} is no more complex than copying a genome.
 
 \begin{table*}
 	\centering
@@ -1887,7 +1886,7 @@ Generally, CGP appears to require the least number of evaluations when the genom
 size far exceeds what is necessary for the problem at hand.  When properly tuned,
 almost all variants had only a tiny fraction of the genome active in their final
 solution.  Furthermore, a significant portion of these active nodes were found
-to be redundant, removable using a very simple reduction algorithm.  The only
+to be redundant; removable using a very simple reduction algorithm.  The only
 algorithm combinations that preferred more reasonable genome sizes were those using \emph{Single},
 especially when paired with \emph{Reorder} or \emph{DAG}.  Yet we theorize this may
 have more to do with \emph{Single} scaling poorly with the number of active nodes
