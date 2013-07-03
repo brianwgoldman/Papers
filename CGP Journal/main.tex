@@ -1236,27 +1236,6 @@ that \emph{Reorder} and \emph{DAG} are best able to cope with smaller genome siz
 Independent of duplication method, the ordering methods do not seem to create any
 pressure on which genome size is chosen.
 
-\begin{comment}
-Genome size explosion seems most prevalent on easier problems, with Parity and
-Encode having much higher genome sizes than Decode and Multiply.  Initially
-this seems counter intuitive, as we would expect harder problems to require
-larger solutions which in turn should require larger genomes.  Yet the genome
-sizes in use are so far beyond what a solution to these problems require that
-solution size is likely not the cause of this behavior.  Instead, consider
-the usefulness of unexplored nodes.
-
-On simple enough problems, exploring lots of randomly generated nodes may be
-sufficient to generate high quality solutions.  At relatively low numbers of
-evaluations, large genotypes likely mean each mutation to a connection gene
-will activate nodes that have never been active, resulting in exploration.
-At higher numbers of evaluations, mutations to connection genes that are not currently
-active have a high chance of connecting to a node that was tested previously
-and found ineffective.  As a result, having a smaller genome size on harder problems
-may reduce the chance of exploratory mutations when optimizing near the global optimum.
-
-Under this theory, we should expect Parity to have the largest genome sizes
-\end{comment}
-
 Unlike genome size, all configurations choose approximately the same mutation rate,
 with different rates for each problem.  With the exception of Parity, there appears
 to be a general consensus that each gene should be mutated with probability 0.002,
@@ -1433,123 +1412,6 @@ exponential runtime.  The \Call{Simplify}{} algorithm requires $O(AN)$ time,
 since the final \textbf{for all} loop is the most expensive step.  As before, this means
 \Call{Simplify}{} is no more complex than copying a genome.
 
-\begin{comment}
-\begin{figure}
-  \begin{algorithmic}
-  \Procedure{RepeatedFootprint}{}
-    \State $reachable \leftarrow \emptyset$
-    \ForAll{$i \in input\_locations$}
-      \State $reachable[i] \leftarrow footprint(i)$
-    \EndFor
-    \State $repeated \leftarrow \emptyset$
-    \ForAll{$node \in active$}
-      \State $working \leftarrow footprint(node)$
-      \State $direct \leftarrow \emptyset$
-      \ForAll{$link \in reads\_from(node)$}
-        \State $direct \leftarrow direct \cup reachable[link]$
-      \EndFor
-      \If{$working \in direct$}
-        \State $repeated \leftarrow repeated \cup \{working\}$
-      \Else
-        \State $direct \leftarrow direct \cup \{working\}$
-      \EndIf
-      \State $reachable[node] \leftarrow direct$
-    \EndFor
-    \State\Return{$repeated$}
-  \EndProcedure
-  \end{algorithmic}
-  \caption{Algorithm to determine which nodes transitively depend on their
-  own footprint.}
-  \label{fig:repeated}
-\end{figure}
-
-An efficient algorithm to remove some of the redundancy in the genome is given
-in Figure~\ref{fig:repeated}.  This algorithm finds the set of nodes which are
-transitively dependent on their own footprint.  In other words, in order for
-each node in the $repeated$ set, some other node in the genome has to produce
-the same output.  As an example, consider node $Y$ which is in the $repeated$
-set.  There must exist some node $X$ which $Y$ transitively depends on that has
-the same footprint as $Y$.  As a result, $Y$ can always be remove, with anything
-previously dependent on $Y$ now dependent on $X$.  All nodes in the $repeated$
-set can therefore be removed from the genome without effecting its ability to
-calculate any value.  This also has the potential to cause cascading removals
-if there are intermediary nodes which are no longer useful once all of the
-$repeated$ nodes have been removed.  In total this algorithm runs in $O(AN^2)$
-time for an arbitrary individual.  Note that this is an offline algorithm,
-so it only needs to be run on individuals used in production or for analysis.
-
-\begin{figure}
-  \begin{algorithmic}
-  \Procedure{Simplify}{$p\_r$, $p\_c$, $p\_i$, $best$}
-    \If{$|p\_r| = 0$}
-      \State\Return{$p\_i$}
-    \ElsIf{$|p\_i| + |p\_r| \geq |best|$}
-      \State\Return{$best$}
-    \EndIf
-    \State $working, p\_a \leftarrow randpop(p\_r)$
-    \State $covrd \leftarrow p\_c \cup {working}$
-    \State $ansc \leftarrow p\_a \cup {working}$
-    \ForAll{$node \in has\_footprint(working)$}
-      \State $node\_valid \leftarrow True$
-      \State $incd \leftarrow p\_i \cup {node}$
-      \State $reqd \leftarrow p\_r$
-      \ForAll{$link \in reads\_from(node)$}
-        \State $foot \leftarrow footprint(link)$
-        \If{$foot \in ansc$}
-          \State $node\_valid \leftarrow False$
-          \State \textbf{break}
-        \ElsIf{$foot \notin covrd$}
-          \State $reqd[foot] \leftarrow reqd[foot] \cup ansc$
-        \EndIf
-      \EndFor
-      \If{$node\_valid$}
-        \State $solution \leftarrow \Call{Simplify}{reqd, covrd, incd, best}$
-        \If{$|solution| < |best|$}
-          \State $best \leftarrow solution$
-        \EndIf
-      \EndIf
-    \EndFor
-    \State\Return{$best$}
-  \EndProcedure
-  \end{algorithmic}
-  \caption{Recursive algorithm which determines the minimum set of nodes required
-    to generate a set of required outputs.}
-  \label{fig:simplify}
-\end{figure}
-
-While the previous algorithm is guaranteed to only remove redundant nodes, it
-does not remove all redundant nodes.  In order to remove redundant nodes without
-any transitive relationships, we must use the algorithm given in
-Figure~\ref{fig:simplify}.  This is a recursive algorithm that tries all possible
-choices of nodes that produce each footprint to see which combination results
-in the fewest active nodes.  The algorithm takes in a mapping of footprints
-required by previous calls to all ancestor footprints of those requirements ($p\_r$), footprints previously covered ($p\_c$),
-nodes that have been previously included in the solution ($p\_i$), and smallest
-set of nodes found so far which produces all required footprints ($best$).  Initially
-$p\_c$ contains the set of input footprints, with $p\_r$ mapping each of the output
-footprints to empty sets unless that footprint is already in $p\_c$.  $p\_i$
-is initialized to the empty set, and $best$ starts out as the set of all $active$ nodes.
-Recursion ends when the the nodes in $p\_i$ have no unsatisfied requirements or
-all possible solutions containing $p\_i$ that can satisfy all requirements are
-no better than the current best solution.  While this algorithm is exponential
-in nature, in practice it has a reasonable runtime.  Using the algorithm in
-Figure~\ref{fig:repeated} to prevent $repeated$ nodes from being returned by
-$has\_footprint$ significantly reduces the number of combinations that need
-to be tested.  Furthermore, by preventing recursion from exploring solutions
-worse than the current known best, significant time can be saved.  Lastly, as
-with the algorithm in Figure~\ref{fig:repeated}, this is an offline algorithm,
-and has no impact on evolutionary speed.
-
-Using the algorithm given in Figure~\ref{fig:simplify}, we can determine the
-absolute minimum set of nodes in a genome's solution that are necessary to
-reproduce the original output of that genome.  This allows us to discuss
-the usefulness of each node as either being part of the minimum solution, a
-duplicate of a node in the minimum solution, or irrelevant to the solution.
-As such we can then examine how redundancy is being used, how frequently useful
-structures exist in the inactive nodes, and how useful nodes are constructed by evolution.
-This algorithm can also be used to construct simplified genomes when combined
-with the algorithm given in Figure~\ref{fig:reorder}.
-\end{comment}
 \subsection{Never Active Nodes}
 %TODO Somewhere in here you should talk about how Normal has the least number of active,
 %which is probably related to how many never become active
@@ -1582,7 +1444,6 @@ this study.
   \begin{tabular}{c|c|c|c|}
     \cline{2-4}
     & \textbf{\em Normal} & \textbf{\em Reorder} & \textbf{\em DAG} \\ \hline
-    %\begin{comment}
     \thirdlabel{Skip} & \graphicthird{multiply_skip_normal} &
                         \graphicthird{multiply_skip_reorder} &
                         \graphicthird{multiply_skip_dag}\\ \hline
@@ -1592,7 +1453,6 @@ this study.
     \thirdlabel{Single} & \graphicthird{multiply_single_normal} &
                           \graphicthird{multiply_single_reorder} &
                           \graphicthird{multiply_single_dag}\\ \hline
-    %\end{comment}
 	\end{tabular}
 	\caption{Location of never active nodes across all 50 runs for all nine algorithm combinations on the Multiply problem.}
 	\label{tab:never_active}
