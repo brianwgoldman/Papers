@@ -725,13 +725,11 @@ this problem of highly active genomes is very unlikely.
 
 \section{Genome Ordering}
 \label{sec:ordering}
-%TODO Add formula for probability node is active based on index
-%p(i) \leftarrow 1 - (\frac{N+I-1}{N+I})^O \cdot \prod_{j=i+1}^{N} 1 - p(j) \cdot (1-(\frac{j+I-1}{j+I})^a)
 As was discussed in Section~\ref{sec:cgp}, CGP uses node ordering in the genome
 to prevent cycles, by ensuring nodes only receive input from sources that
 precede them in the genome.  This restriction does not limit CGP's ability
 to represent DAGs, as all DAGs can be serialized to fit this requirement.
-Yet this likely has an impact on CGP's ability to evolve specific
+However, this representation likely has an impact on CGP's ability to evolve specific
 DAGs~\cite{goldman:2013:ordering}.
 
 Primarily, enforcing node ordering adds artificial limitations to CGP's ability to
@@ -748,6 +746,38 @@ the number of active genes in a genome is expected to scale logarithmically
 with genome size, independent of problem application.  Furthermore, the less
 active a genome, the lower the likelihood of structure ordering preventing structure
 connection.
+
+As an extension to the theory presented in~\cite{goldman:2013:ordering}, we have
+derived the formula which predicts the probability a node is active based on its
+index, given in Equation~\ref{eq:prob} and shown in Figure~\ref{fig:prob}.
+\begin{equation}
+p(i) \leftarrow 1 - (\frac{N+I-1}{N+I})^O \cdot \prod_{j=i+1}^{N} 1 - p(j) \cdot (1-(\frac{j+I-1}{j+I})^a)
+\label{eq:prob}
+\end{equation}
+In this equation, $i$ is the index of the working node, $N$ is the genome size, $I$ is the number of input locations,
+$O$ is the number of output locations, and $a$ is the arity of each node.
+This equation is constructed as a negation, such that we determine the probability
+the node is not active due to each potential source that could make it active.
+The product term calculates the probability that the node at index $j$ is connected to the
+node at index $i$, times the probability that the node at index $j$ is active.  This is
+negated to determine the probability node $i$ is not active because of node $j$.
+All together, the product term calculates the probability that no active node is
+connected to the node at index $i$.  Nodes can also become active if they are directly
+connected to by an output location.  As such the product is scaled by the probability
+that all output locations connect to inputs or nodes not at index $i$.  This
+formula assumes only operator bias, not selective pressure, is acting on the
+genome.
+
+\begin{figure}
+\includegraphics[width=\columnwidth,height=\textheight,keepaspectratio]{active_prob}
+\caption{Plot of Equation~\ref{eq:prob} describing the probability that a node
+         at a given index will be active.  $N=2000, a=2, I=6, O=6$.}
+\label{fig:prob}
+\end{figure}
+
+From Figure~\ref{fig:prob} it is clear that nodes near the beginning of the genome
+are almost certainly going to be active, while nodes in the last three quarters
+of the genome are almost never going to be active.
 
 To rectify these issues and examine CGP without ordering bias, \cite{goldman:2013:ordering}
 created \emph{Reorder} and \emph{DAG} as methods for genome ordering, and defined
@@ -965,11 +995,31 @@ nodes, so each mutation has a higher chance of choosing $Y$.
 
 \section{Qualitative Comparisons}
 \label{sec:quality}
-%TODO Hook here the table of descriptions.
+
+\begin{table}
+	\centering
+	\begin{tabular}{|c|p{6cm}|}
+	\hline
+  \multicolumn{2}{|c|}{\textbf{Duplication}} \\ \hline
+	\textbf{\emph{Skip}} & Whenever an actively identical offspring is detected, assign it its parent's fitness. \\ & \\
+	\textbf{\emph{Accumulate}} & Repeatedly perform full genome mutation until \textbf{one or more} active genes change. \\ & \\
+	\textbf{\emph{Single}} & Select and mutate individual genes until \textbf{exactly one} active gene changes. \\
+	\hline \multicolumn{2}{|c|}{\textbf{Ordering}} \\ \hline
+	\textbf{\emph{Normal}} & Nodes must take input from other nodes or inputs that precede them in the genome. \\ & \\
+	\textbf{\emph{Reorder}} & Each generation the parent's node ordering is shuffled without effecting node behavior. \\ & \\
+	\textbf{\emph{DAG}} & Connection genes can mutate to make any connection as long as no cycle is formed. \\
+	  \hline
+	\end{tabular}
+	\caption{Short descriptions of each of the algorithm variants.}
+	\label{tab:glossary}
+\end{table}
+
+
 Empirical results are an important step in confirming our examinations.
 We accomplish this by testing the effectiveness
 of the described variants and their combination in problem solving.  Deeper analysis of
 evolutionary side effects are given in Section~\ref{sec:analysis}.
+Table~\ref{tab:glossary} gives a summary of what each variant means.
 
 All told we have proposed three new methods for avoiding duplicate evaluations
 (\emph{Skip}, \emph{Accumulate}, and \emph{Single}) and two new methods for
@@ -1080,7 +1130,9 @@ not used in the subsequent data analysis.  Effectively, the runs used to set
 the parameter configuration were considered
 the training runs for that configuration.  As a result, our final results were gathered
 from a completely independent set of runs to test the configuration's general characteristics.
-Each configuration was run 50 times to ensure statistical power.
+Each configuration was run 50 times to ensure statistical power.  All told over
+11.5 billion evaluations were performed to gather our results.
+
 
 \subsection{Results}
 
@@ -1255,6 +1307,19 @@ methods.  As \emph{Accumulate} is far more complex in terms of algorithm functio
 than \emph{Skip}, we would suggest \emph{Skip} be used over \emph{Accumulate} for
 any real world application.
 
+As a final check that our results do not somehow unfairly handicap traditional CGP,
+we compared our median evaluations to success with previous publications.  The results
+reported for traditional CGP and CGP using modules in~\cite{walker:2008:cgpmodules}
+for 3-bit parity required 6 times as many evaluations as \emph{Skip-Normal}.
+The same source had traditional CGP requiring 4 million evaluations to success,
+as opposed to our \emph{Skip-Normal} requiring 600 thousand, also a factor of 6 improvement.
+CGP with modules required over 800 thousand evaluations, worse than our \emph{Skip-Normal},
+and approximately 4 times more than \emph{Skip-Reorder}.  We must be wary about comparisons
+to their 3-bit multiplier though, as their version used a different function set.
+That said the function set they used appears to have been chosen explicitly to improve
+CGP's performance on that problem, so we suggest that if we had used a the same function
+set our results would still be significantly better.
+
 Our parameter tuning focused on minimizing the number of evaluations each algorithm
 combination required to solve problems, as that is the primary measure of runtime
 for CGP and GP in general.  As such, comparing the true runtime of the tuned parameters
@@ -1289,11 +1354,13 @@ to work better with this limitation than \emph{Normal}.  Assuming the tuned valu
 we obtained are any gauge, \emph{Single-Reorder} will likely require the least
 amount of runtime when tuned to reduce runtime.
 
+\begin{comment}
 \subsection{Scalability}
 TODO Discuss using tuned parameters on different problem sizes and analyze
 results.  Include O(N) table similar to previous paper.
 
 TODO Include scaling comparison with~\cite{walker:2008:cgpmodules}.
+\end{comment}
 
 \section{Analysis of Evolutionary Mechanisms}
 \label{sec:analysis}
@@ -1671,7 +1738,8 @@ they satisfy.
 \item ``Constant'' - Independent of problem input, constant nodes produce a fixed output.
 \item ``Used'' - Nodes still active after applying \Call{Simplify}{}.
 \item ``Useful'' - Nodes with identical semantics to a ``Used'' node.
-\item ``Intron'' - Any node with semantics identical to an active node.
+\item ``Intron'' - Any node with semantics identical to a node that was
+                   active before applying \Call{Simplify}{}, but was inactive afterward.
 \item ``Explore'' - All remaining nodes.
 \end{enumerate}
 Used nodes are by definition only in the active portion of the genome.  Similarly
