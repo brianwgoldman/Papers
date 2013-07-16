@@ -373,6 +373,7 @@
 \usepackage{graphicx}
 \usepackage{rotating}
 \usepackage{multirow}
+\usepackage{url}
 
 \newcommand{\graphicthird}[1]
 {\includegraphics[width=.3\textwidth,height=.3\textheight,keepaspectratio]{#1}}
@@ -464,7 +465,7 @@
 Understanding how search operators interact with solution representation is
 a critical step to improving search.
 In Cartesian Genetic Programming (CGP), and Genetic Programming (GP)
-in general, complex genotype to phenotype map makes achieving this understanding a
+in general, the complex genotype to phenotype map makes achieving this understanding a
 challenge.  By examining tuned parameter values, the search quality of CGP variants at different
 problem difficulties, node behavior, and offspring replacement properties we
 seek to comprehend observed characteristics of CGP search.  Our focus is twofold:
@@ -545,8 +546,7 @@ Genetic Programming (CGP) an effective evolutionary optimizer.
 A few studies of CGP's evolutionary mechanisms have
 been done previously, related to bloat~\cite{miller:2001:bloat},
 neutrality~\cite{vassilev:2000:neutrality}, and structural bias~\cite{payne:2009:bias}.
-Our primary focus is
-on how mutation and genome ordering interact.
+We shall focus on the interaction between mutation and genome ordering.
 
 In Section~\ref{sec:cgp} we provide
 an introduction to CGP, with sufficient background to put later sections into
@@ -596,7 +596,7 @@ be a result of hidden parsimony pressure in CGP~\cite{goldman:2013:ordering}.
 
 CGP uses very simple evolutionary mechanisms.  The most common evolutionary strategy
 is $\mu + \lambda$ where $\mu \leftarrow 1$ and $\lambda \leftarrow 4$.
-This means generation a single parent produces four offspring using
+This means each generation a single parent produces four offspring using
 mutation.  The best offspring then competes with the parent,\footnote{Ties are broken
 randomly.} with the offspring
 replacing the parent if it is no less fit.  This replacement strategy encourages
@@ -610,8 +610,8 @@ For a more in depth description of CGP, see~\cite{miller:2011:chapter2}.
 
 \section{Duplicate Evaluation Avoidance}
 \label{sec:duplicate}
-CGP's mutation operator is traditionally applied to genes in active and inactive
-node's uniformly. This has the
+CGP's mutation operator is traditionally applied to both active and inactive genes uniformly.
+This has the
 potential to create offspring who's only mutated genes are in inactive nodes.
 These offspring are actively identical (contain identical active genes) to their
 parents, and therefore by definition have identical fitness to their parents.
@@ -631,7 +631,7 @@ creating an offspring which is actively identical to its parent is very low.
 Yet such a configuration may make it difficult for CGP to optimize, as mutation
 is likely to change many active genes in each application.  As was discussed
 in~\cite{goldman:2013:cgpwaste}, this can make normal CGP very sensitive to the
-mutation rate in use.
+mutation rate.
 
 \subsection{Skip}
 The \emph{Skip} method for avoiding duplicate evaluations involves the least
@@ -680,7 +680,7 @@ $F_0$, and evolution continues as though $P$ had produced $F_n$ directly.  If
 $F_n$ is worse than $P$, $F_{n-1}$ replaces $F_0$, as $F_{n-1}$ has accumulated
 the most mutations to inactive genes without reducing fitness.  Note that
 the mutation used each time is identical to normal CGP's mutation, such that
-$F_n$ can have one or more active genes different from $P$.  Furthermore, even
+$F_n$ will have one or more active genes different from $P$.  Furthermore, even
 though this technique produces $n+1$ individuals, only $F_n$ is evaluated.
 Viewed in another way, \emph{Accumulate} performs a micro evolution on each offspring
 before it is evaluated, with an emphasis on encouraging neutral drift.
@@ -689,7 +689,7 @@ Previous experimentation has shown that \emph{Accumulate} acts very similarly to
 \emph{Skip}~\cite{goldman:2013:cgpwaste}, with the exception that \emph{Accumulate}
 favors lower mutation rates when tuned to reduce evaluations to success. While at first these algorithms may appear
 quite different, further consideration shows how they are similar.  In \emph{Skip}
-an actively identical offspring is likely to be selected as we expect mutations to
+any actively identical offspring that is produced is likely to be selected as we expect mutations to
 active genes to more often reduce fitness than improve it.  In the next generation
 this actively identical offspring is then mutated again, with its lineage likely
 continuing until it finally does mutate one or more active genes.  At this point, if the
@@ -751,15 +751,15 @@ As an extension to the theory presented in~\cite{goldman:2013:ordering}, we have
 derived the formula which predicts the probability a node is active based on its
 index, given in Equation~\ref{eq:prob} and shown in Figure~\ref{fig:prob}.
 \begin{equation}
-p(i) \leftarrow 1 - (\frac{N+I-1}{N+I})^O \cdot \prod_{j=i+1}^{N} 1 - p(j) \cdot (1-(\frac{j+I-1}{j+I})^a)
+p(i) \leftarrow 1 - (\frac{N+I-1}{N+I})^O \cdot \prod_{j=i+1}^{N} 1 - p(j) \cdot (1-(\frac{j+I-1}{j+I})^A)
 \label{eq:prob}
 \end{equation}
 In this equation, $i$ is the index of the working node, $N$ is the genome size, $I$ is the number of input locations,
-$O$ is the number of output locations, and $a$ is the arity of each node.
+$O$ is the number of output locations, and $A$ is the arity of each node.
 This equation is constructed as a negation, such that we determine the probability
 the node is not active due to each potential source that could make it active.
 The product term calculates the probability that the node at index $j$ is connected to the
-node at index $i$, times the probability that the node at index $j$ is active.  This is
+node at index $i$, multiplied by the probability that the node at index $j$ is active.  This is
 negated to determine the probability node $i$ is not active because of node $j$.
 All together, the product term calculates the probability that no active node is
 connected to the node at index $i$.  Nodes can also become active if they are directly
@@ -771,7 +771,9 @@ genome.
 \begin{figure}
 \includegraphics[width=\columnwidth,height=\textheight,keepaspectratio]{active_prob}
 \caption{Plot of Equation~\ref{eq:prob} describing the probability that a node
-         at a given index will be active.  $N=2000, a=2, I=6, O=6$.}
+         at a given index will be active.  $N=2000, A=2, I=6, O=6$.
+         Predicts approximately 160 total active nodes, with 80\% of the first
+         100 nodes active and 4\% of the remaining 1900 nodes active.}
 \label{fig:prob}
 \end{figure}
 
@@ -789,14 +791,14 @@ The \emph{Reorder} method shuffles an existing genome's node ordering without
 changing node behavior.  This is possible because for a given node, there can
 be a large number of other nodes which have no required ordering,
 as they neither take input (directly or indirectly) from the node nor provide their
-output to the node.  In general, this process works by assigning nodes new
+output (directly or indirectly) to the node.  In general, this process works by assigning nodes new
 locations in the genome at random once all of the nodes they take input from have been assigned
 locations earlier in the genome.
 
 The first step in performing \emph{Reorder} on a genome is to create convenience
 data structures to store direct connection relationships.  These structures are used
 to determine in constant time all connections incident on a node, and 
-can be build in order $O(AN)$ time, where $A$ is the arity of the nodes
+can be built in order $O(AN)$ time, where $A$ is the arity of the nodes
 and $N$ is the number of nodes.
 
 With this preprocessing complete, the \Call{RandomSerialization}{} algorithm given in Figure~\ref{fig:reorder}
@@ -871,7 +873,7 @@ in order to make the required connection.  \emph{Reorder} provides the opportuni
 to examine different orderings of the genome without such costs.
 
 The price \emph{Reorder} pays for this potential improvement is increased mutational search
-space and runtime costs.  Though a shuffled individual is phenotypically unchanged,
+space.  Though a shuffled individual is phenotypically unchanged,
 its mutational adjacency is significantly different.  As such the variety of offspring
 an individual can create is increased when using \emph{Reorder}.  While this increase
 makes finding a specific offspring that improves upon the parent less likely, the
@@ -891,7 +893,7 @@ As in \emph{Normal} and \emph{Reorder}, when a connection gene is chosen for mut
 However, the options to choose from are only limited to those connections which do not
 create cycles.
 To achieve this, we incrementally determine
-which nodes transitively depend on the mutating node and which are not, with
+which nodes transitively depend on the mutating node and which do not, with
 information stored in the $known$ map.  This data structure is initialized with
 the information that the node is dependent on itself and that all input locations
 are not dependent on the mutating node.  Nodes are then
@@ -963,9 +965,8 @@ identical time to evaluate as the other methods, regardless of the number of
 input combinations.
 
 With these modifications, there is no longer any meaning to the location of a node
-in the genome.  In \emph{Normal} a node near the input locations will always
-have a highly restricted set of values.  More completely, the number of valid
-values for a connection gene in \emph{Normal} is related to the number of nodes
+in the genome.  In \emph{Normal} the number of valid
+values for a connection gene is related to the number of nodes
 preceding that gene, and independent of the number of nodes following that gene.
 In \emph{DAG} a connection gene's valid values only depends on the current solution
 represented by the individual, independent of the genes location in the genome.
@@ -1014,18 +1015,21 @@ nodes, so each mutation has a higher chance of choosing $Y$.
 	\label{tab:glossary}
 \end{table}
 
-
-Empirical results are an important step in confirming our examinations.
-We accomplish this by testing the effectiveness
+\begin{comment}
+Empirical results are an important step in confirming our theoretical examinations.
+Therefore we have tested the effectiveness
 of the described variants and their combination in problem solving.  Deeper analysis of
 evolutionary side effects are given in Section~\ref{sec:analysis}.
 Table~\ref{tab:glossary} gives a summary of what each variant means.
+\end{comment}
 
 All told we have proposed three new methods for avoiding duplicate evaluations
 (\emph{Skip}, \emph{Accumulate}, and \emph{Single}) and two new methods for
-genome ordering (\emph{Reorder} and \emph{DAG}).  As these two
-sets are non overlapping, and there is no intuitive groupings, we chose to try
-all possible combinations.  As a control we included \emph{Normal} genome ordering,
+genome ordering (\emph{Reorder} and \emph{DAG}).
+See Table~\ref{tab:glossary} for a short description each variant.
+As these two
+sets are non overlapping, and there is no intuitive groupings, we chose to test
+all possible combinations in our empirical analysis.  As a control we included \emph{Normal} genome ordering,
 as it provides insight to how each of the duplicate prevention techniques work
 if applied alone.  Similar measures are not needed in testing the genome ordering techniques,
 as \emph{Skip} has no impact on evolutionary search, and is a strict improvement
@@ -1107,8 +1111,8 @@ for each problem, we used an iterative process of performing runs, comparing med
 and repeating.  For each algorithm combination and problem, we first ran all
 potential parameter configurations 5 times (320 runs if not using \emph{Single}, 40 otherwise).
 The parameter configurations are then sorted based on their median.  The best half are then
-each run 4 more times, with the best half of that group chosen.  In this way, 64 configurations
-are run 5 times, 32 are run 9 times, 16 are run 13 times, 8 are run 17 times, 4 are run 21 times,
+each run 4 more times, with the best half of that group chosen.  In this way, 32 configurations
+are run 5 times, 16 are run 9 times, 8 are run 13 times, 4 are run 17 times, 2 are run 21 times,
 and 2 are run 25 times.  For algorithm combinations using \emph{Single}, all 8 parameter configurations were run 17 times
 before any were removed.  This iterative reduction allows us to focus tuning on
 those parameter configurations most likely to be effective, with more information
@@ -1127,7 +1131,8 @@ the parameter configuration were considered
 the training runs for that configuration.  As a result, our final results were gathered
 from a completely independent set of runs to test the configuration's general characteristics.
 Each configuration was run 50 times to ensure statistical power.  All told over
-11.5 billion evaluations were performed to gather our results.
+11.5 billion evaluations were performed to gather our results.  The source code
+used to produce our results is available from our website.\footnote{\url{https://website.name.removed.com/AnonymousCGP}}
 
 
 \subsection{Results}
@@ -1301,7 +1306,8 @@ for CGP and GP in general.  As such, comparing the true runtime of the tuned par
 is likely to give potentially misleading results.  In using profilers and examining
 general trends, one of the largest indicators of runtime per evaluation was genome size.
 This makes sense as each time an offspring is generated all of the parent's genes
-must first be copied.  Also, larger genome sizes correlate with more active nodes,
+must first be copied.  Furthermore, all genetic operations in CGP scale with genome size.
+Also, larger genome sizes correlate with more active nodes,
 each of which must be executed on each input tested during individual evaluation.
 
 With these caveats, the observed runtime for each algorithm combination follows
@@ -1397,9 +1403,9 @@ Table~\ref{tab:never_active} provides information about never active nodes for
 each algorithm combination on the 3-bit Multiply problem.  The horizontal axis
 in each of the nine plots shows different genome locations, while the vertical
 axis denotes the level of fitness the recorded individual obtained.  The shading
-of each coordinate gives the percentage of 50 runs that had an individual of
-the given fitness level such that the node at the given location had never
-previously been active.  While only Multiply is shown here, all of the
+of each coordinate gives the percentage of 50 runs in which the first individual of
+the given fitness level had no ancestor in which the node at a given location was active.
+While only Multiply is shown here, all of the
 other problems tested had similar behavior, with allowances for differences in
 number of evaluations performed.
 
@@ -1502,7 +1508,7 @@ can instead read the output of X, removing the need to include Y in the solution
     \EndFor
     \ForAll{$g \in genes$}
       \If{$g$ is a connection gene}
-        \If{$g \in reconnect$}
+        \If{$footprint(g) \in reconnect$}
           \State $g \leftarrow reconnect[footprint(g)]$
         \EndIf
       \EndIf
@@ -1521,7 +1527,7 @@ semantic.  After application, and recalculation of which nodes are still
 active, each active node produces a unique semantic string.  Any node that is
 transitively dependent on its own semantic will always be removed from
 the active set.  In general, if a set of nodes all produce the same semantic,
-whichever has the least transitive dependencies will be kept.  Note that this
+whichever is predicted to have the least transitive dependencies will be kept.  Note that this
 does not guarantee the minimum possible genome, as that would require
 exponential runtime.  The \Call{Simplify}{} algorithm requires $O(AN)$ time,
 since the final \textbf{for all} loop is the most expensive step.  As before, this means
@@ -1941,8 +1947,8 @@ the node has almost always changed behavior significantly from when it was activ
 As such we suggest the advantages of neutrality in regards to inactive nodes is
 not that it allows the storage of previously useful structures, but that it allows
 inactive nodes to be constantly changed facilitating mutational inclusion of what
-are effectively random nodes.  Under this theory, CGP would likely benefit from randomly resetting
-all inactive nodes just before they become active.  Note that with \emph{Reorder}
+are effectively random nodes.  Under this theory, CGP would likely benefit from periodically resetting
+all inactive nodes.  Note that with \emph{Reorder}
 and \emph{DAG} these conclusions do not hold as a reasonable amount of node
 reactivation occurs.
 
