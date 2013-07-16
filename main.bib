@@ -829,37 +829,43 @@
 
 @InProceedings{goldman:2013:ordering,
   author =       "Brian W. Goldman and William F. Punch",
-  title =        "{TODO PLACE HOLDER UNTIL ACTUAL LENGTH BIAS PUBLICAION OUT}",
-  booktitle =    "Proceedings of the 16th European Conference on Genetic
-                 Programming, EuroGP 2013",
-  year =         "2013",
-  month =        "3-5 " # apr,
-  series =       "LNCS",
-  volume =       "7831",
-  publisher =    "Springer Verlag",
-  address =      "Vienna, Austria",
-  pages =        "61--72",
-  organisation = "EvoStar",
-  keywords =     "genetic algorithms, genetic programming, Cartesian
-                 Genetic Programming",
-  abstract =     "Cartesian Genetic Programming~(CGP) is a form of
-                 Genetic Programming~(GP) where a large proportion of
-                 the genome is identifiably unused by the phenotype.
-                 This can lead mutation to create offspring that are
-                 genotypically different but phenotypically identical,
-                 and therefore do not need to be evaluated. We
-                 investigate theoretically and empirically the effects
-                 of avoiding these otherwise wasted evaluations, and
-                 provide evidence that doing so reduces the median
-                 number of evaluations to solve four benchmark problems,
-                 as well as reducing CGP's sensitivity to the mutation
-                 rate. The similarity of results across the problem set
-                 in combination with the theoretical conclusions
-                 supports the general need for avoiding these
-                 unnecessary evaluations.",
-  notes =        "Part of \cite{Krawiec:2013:GP} EuroGP'2013 held in
-                 conjunction with EvoCOP2013, EvoBIO2013, EvoMusArt2013
-                 and EvoApplications2013",
+  title =        "Length Bias and Search Limitations in Cartesian Genetic Programming",
+  booktitle =	"GECCO '13: Proceedings of the fifteenth international
+		 conference on Genetic and Evolutionary computation
+		 conference",
+	year =         "2013",
+	isbn13 = "978-1-4503-1963-8",
+  pages =	"933--940",
+  keywords =	"Cartesian Genetic Programming, Neutrality, Bloat",
+  month =	"6-10 " # jul,
+  organisation = "SIGEVO",
+  address =	"Amsterdam, The Netherlands",
+  doi =  	"doi:10.1145/2463372.2463482",
+  publisher =	"ACM",
+  publisher_address = "New York, NY, USA",
+  abstract =	"In this paper we examine how Cartesian
+    Genetic Programming’s (CGP’s) method for encoding directed acyclic graphs
+    (DAGs) and its mutation operator bias the effective length
+    of individuals as well as the distribution of inactive nodes
+    in the genome. We investigate these biases experimentally
+    using two CGP variants as comparisons: Reorder, a method
+    for shuffling node ordering without effecting individual evaluation,
+    and DAG, a method for removing the concept of
+    node position. Experiments were performed on four problems
+    tailored to highlight potential search limitations, with
+    further testing on the 3-bit multiplier problem.
+    Unlike previous work, our experiments show that CGP
+    has an innate parsimony pressure that makes it very difficult
+    to evolve individuals with a high percentage of active nodes.
+    This bias is particularly prevalent as the length of an individual
+    increases. Furthermore, these problems are compounded
+    by CGP’s positional biases which can make some problems
+    effectively unsolvable. Both Reorder and DAG appear to
+    avoid these problems and outperform Normal CGP on preliminary
+    benchmark testing. Finally, these new techniques
+    require more reasonable genome sizes than those suggested
+    in current CGP, with some evidence that solutions are also
+    more terse."
 }
 
 @InProceedings{miller:2000:CGPorigin,
