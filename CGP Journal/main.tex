@@ -1428,6 +1428,7 @@ so the resulting increase in never active nodes makes sense.  When \emph{Single}
 was paired with \emph{Reorder} and \emph{DAG} the genome sizes were far smaller,
 resulting in noisier graphs with less never active nodes.
 
+\begin{comment}
 So now the question is why does \emph{Normal} use so little of its genome?  To
 answer this we must consider what can prevent a node from becoming active.  For
 a node to never be active, all tested offspring with mutations that result in that node being activated
@@ -1456,6 +1457,16 @@ using the same genome size, arity, number of inputs, and number of outputs as ou
 plots in Table~\ref{tab:never_active}.
 Finally, from~\cite{goldman:2013:ordering} we would expect \emph{Reorder} and \emph{DAG}
 to have less or no positional bias, which also matches the results given in Table~\ref{tab:never_active}.
+%\end{comment}
+
+%The above paragraphs were replaced by the below paragraph.
+In Section~\ref{sec:ordering} we used Equation~\ref{eq:prob} to suggest \emph{Normal}
+as a strong bias on the location of active nodes regardless of fitness landscape, and that
+\emph{Reorder} and \emph{DAG} would likely have less or no bias.
+Figure~\ref{fig:prob} shows the expected probability given by Equation~\ref{eq:prob},
+using the same genome size, arity, number of inputs, and number of outputs as our
+3-bit multiply.  This curve bears a striking resemblance to all three \emph{Normal}
+plots in Table~\ref{tab:never_active}.
 
 Examining the progression in fitness across the different ordering methods shows
 the effect of initialization on each.  All three order methods share the same initialization
@@ -1660,12 +1671,13 @@ evaluations to solve would lead to the discrepancy.
 
 \subsection{Parent Replacement}
 
-\begin{table*}
+\begin{table}
 	\centering
 	\begin{tabular}{|c|c|c|c|c|}
 	  \hline
 	  \multicolumn{5}{|c|}{\textbf{3-bit Parity}} \\ \hline
-\textbf{Duplicate} & \textbf{Ordering} & \textbf{Active Unchanged} & \textbf{No Reactivation} & \textbf{Reactivated Changed} \\ \hline
+%\textbf{Duplicate} & \textbf{Ordering} & \textbf{Active Unchanged} & \textbf{No Reactivation} & \textbf{Reactivated Changed} \\ \hline
+\textbf{Duplicate} & \textbf{Ordering} & \textbf{Act-Un} & \textbf{No React} & \textbf{React Changed} \\ \hline
        \emph{Skip} &     \emph{DAG} & 0.00\% & 3.48\% & 55.63\% \\ \hline
  \emph{Accumulate} &     \emph{DAG} & 0.00\% & 8.48\% & 52.82\% \\ \hline
  \emph{Accumulate} & \emph{Reorder} & 2.09\% & 33.26\% & 58.46\% \\ \hline
@@ -1679,7 +1691,8 @@ evaluations to solve would lead to the discrepancy.
 
   \multicolumn{5}{|c|}{\textbf{16-4-bit Encode}} \\ \hline
 
-\textbf{Duplicate} & \textbf{Ordering} & \textbf{Active Unchanged} & \textbf{No Reactivation} & \textbf{Reactivated Changed} \\ \hline
+%\textbf{Duplicate} & \textbf{Ordering} & \textbf{Active Unchanged} & \textbf{No Reactivation} & \textbf{Reactivated Changed} \\ \hline
+\textbf{Duplicate} & \textbf{Ordering} & \textbf{Act-Un} & \textbf{No React} & \textbf{React Changed} \\ \hline
  \emph{Accumulate} &     \emph{DAG} & 0.05\% & 4.06\% & 48.70\% \\ \hline
        \emph{Skip} &     \emph{DAG} & 0.06\% & 3.85\% & 48.33\% \\ \hline
  \emph{Accumulate} & \emph{Reorder} & 1.77\% & 19.24\% & 55.47\% \\ \hline
@@ -1693,7 +1706,8 @@ evaluations to solve would lead to the discrepancy.
 
   \multicolumn{5}{|c|}{\textbf{4-16-bit Decode}} \\ \hline
 
-\textbf{Duplicate} & \textbf{Ordering} & \textbf{Active Unchanged} & \textbf{No Reactivation} & \textbf{Reactivated Changed} \\ \hline
+%\textbf{Duplicate} & \textbf{Ordering} & \textbf{Active Unchanged} & \textbf{No Reactivation} & \textbf{Reactivated Changed} \\ \hline
+\textbf{Duplicate} & \textbf{Ordering} & \textbf{Act-Un} & \textbf{No React} & \textbf{React Changed} \\ \hline
  \emph{Accumulate} &     \emph{DAG} & 0.03\% & 10.10\% & 54.99\% \\ \hline
        \emph{Skip} &     \emph{DAG} & 0.05\% & 10.21\% & 51.33\% \\ \hline
  \emph{Accumulate} & \emph{Reorder} & 9.98\% & 49.65\% & 70.57\% \\ \hline
@@ -1707,7 +1721,8 @@ evaluations to solve would lead to the discrepancy.
 
   \multicolumn{5}{|c|}{\textbf{3-bit Multiply}} \\ \hline
 
-\textbf{Duplicate} & \textbf{Ordering} & \textbf{Active Unchanged} & \textbf{No Reactivation} & \textbf{Reactivated Changed} \\ \hline
+%\textbf{Duplicate} & \textbf{Ordering} & \textbf{Active Unchanged} & \textbf{No Reactivation} & \textbf{Reactivated Changed} \\ \hline
+\textbf{Duplicate} & \textbf{Ordering} & \textbf{Act-Un} & \textbf{No React} & \textbf{React Changed} \\ \hline
  \emph{Accumulate} & \emph{Reorder} & 1.14\% & 22.09\% & 71.75\% \\ \hline
  \emph{Accumulate} &     \emph{DAG} & 4.52\% & 45.38\% & 63.42\% \\ \hline
        \emph{Skip} &     \emph{DAG} & 5.05\% & 45.58\% & 63.03\% \\ \hline
@@ -1720,9 +1735,10 @@ evaluations to solve would lead to the discrepancy.
        \emph{Skip} &  \emph{Normal} & 73.46\% & 92.04\% & 79.07\% \\ \hline
 	\end{tabular}
 	\caption{Behavior of offspring replacement for each algorithm combination
-	         on each problem.}
+	         on each problem.
+	         Act-Un=Active Unchanged; No React=No Reactivation; React Changed=Reactivation Changed}
 	\label{tab:reactivate}
-\end{table*}
+\end{table}
 
 An important aspect of CGP is its replacement strategy that allows for neutral drift.
 In each generation the best offspring replaces its parent if it is no less fit.  Previous
