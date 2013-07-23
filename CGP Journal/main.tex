@@ -453,9 +453,6 @@
 % use for special paper notices
 %\IEEEspecialpapernotice{(Invited Paper)}
 
-
-
-
 % make the title area
 \maketitle
 
@@ -466,22 +463,24 @@ Understanding how search operators interact with solution representation is
 a critical step to improving search.
 In Cartesian Genetic Programming (CGP), and Genetic Programming (GP)
 in general, the complex genotype to phenotype map makes achieving this understanding a
-challenge.  By examining tuned parameter values, the search quality of CGP variants at different
+challenge.  By examining aspects such as tuned parameter values, the search quality of CGP variants at different
 problem difficulties, node behavior, and offspring replacement properties we
-seek to comprehend observed characteristics of CGP search.  Our focus is twofold:
-methods to prevent wasted CGP evaluations (\emph{Skip}, \emph{Accumulate},
-and \emph{Single}) and methods to overcome CGP's search limitations imposed by
+seek to better understand the characteristics of CGP search.  Our focus is twofold:
+creating methods to prevent wasted CGP evaluations (\emph{Skip}, \emph{Accumulate},
+and \emph{Single}) and creating methods to overcome CGP's search limitations imposed by
 genome ordering (\emph{Reorder} and \emph{DAG}).
 
 Our results show that most CGP techniques evolve genomes that
 are highly inactive, very redundant, and full of seemingly useless constants.
 On some tested problems we found less than 1\% of the genome was actually required to
 encode the evolved solution.
-Without \emph{Reorder} or \emph{DAG} almost the entire latter portion of the genome
-is never used by any ancestor of the evolved solution.  More generally, our
+Furthermore, traditional CGP ordering results in large portions of the genome
+that are never used by any ancestor of the evolved solution.
+\emph{Reorder} and \emph{DAG} allow evolution to utilize the entire genome.
+More generally, our
 results suggest that \emph{Skip-Reorder} and \emph{Single-Reorder}
-are most likely to solve hard problems in the least number of evaluations and
-the least amount of time with the least amount of degenerate
+are most likely to solve hard problems using the least number of evaluations and
+the least amount of time while better avoiding degenerate
 behavior.
 
 \end{abstract}
@@ -528,7 +527,7 @@ Cartesian genetic programming (CGP), Analysis
 and implement, discerning the reason that system
 leads to effective search can be challenging.
 This is exceptionally
-true for Genetic Programming (GP), which often employs nontrivial
+true for Genetic Programming (GP), which often employs both nontrivial
 genotype to phenotype maps and operators that act on genotypes without regard to
 phenotypic impact.  Yet understanding the root causes of evolutionary success
 and failure is critical to improving existing techniques, designing new techniques,
@@ -543,8 +542,8 @@ bloat~\cite{luke:2006:bloat}.
 
 In this work we set out to develop a deeper understanding of what makes Cartesian
 Genetic Programming (CGP) an effective evolutionary optimizer.
-A few studies of CGP's evolutionary mechanisms have
-been done previously, related to bloat~\cite{miller:2001:bloat},
+Previous studies of CGP's evolutionary mechanisms have
+focused on bloat~\cite{miller:2001:bloat},
 neutrality~\cite{vassilev:2000:neutrality}, and structural bias~\cite{payne:2009:bias}.
 We shall focus on the interaction between mutation and genome ordering.
 
@@ -578,7 +577,7 @@ the node applies to its inputs, and the remaining genes expressing where the
 node takes input from.  Nodes can take input from either a problem input or
 any node preceding them in the linear genome.  Restricting connections in this way
 prevents the creation of cycles, while still allowing CGP to reuse values.  This is
-in contrast to tree based GP, which must recalculate a value everywhere it is needed.
+in contrast to tree based GP, which must duplicate functionality everywhere the same value is needed.
 To complete the representation, a set
 of extra genes are included at the end of the genome to specify which nodes or
 input locations to use as function outputs.
@@ -587,7 +586,7 @@ As both output locations and information flow in the DAG are evolvable, often
 only a tiny fraction of the genome participates in creating the
 output values.  These nodes are referred to as ``active,'' with the nodes not
 being used to create output values referred to as ``inactive.''  Inactive nodes
-allow CGP individuals to drift genetically, as they can be mutated without effecting
+allow CGP individuals to drift genetically, as they can be mutated without affecting
 the fitness of the individual.  This genetic drift can then be incorporated, as
 mutation can change the DAG structure causing previously inactive nodes to become
 active.  Previous work suggests CGP is most efficient when up to 95\% of the genome
@@ -596,7 +595,7 @@ be a result of hidden parsimony pressure in CGP~\cite{goldman:2013:ordering}.
 
 CGP uses very simple evolutionary mechanisms.  The most common evolutionary strategy
 is $\mu + \lambda$ where $\mu \leftarrow 1$ and $\lambda \leftarrow 4$.
-This means each generation a single parent produces four offspring using
+This means during each generation a single parent produces four offspring using
 mutation.  The best offspring then competes with the parent,\footnote{Ties are broken
 randomly.} with the offspring
 replacing the parent if it is no less fit.  This replacement strategy encourages
@@ -604,7 +603,7 @@ neutral drift.  Mutation
 is commonly performed by mutating each gene of each node at a set probability, where mutation
 involves changing a gene randomly to some different valid value.  For example,
 if a function gene is chosen for mutation, its new value is randomly chosen from
-all possible functions, with the exception of the genes current value.  Combined,
+all possible functions, excluding the gene's current value.  Combined,
 this form of CGP can be viewed as a stochastic hill climber with neutrality.
 For a more in depth description of CGP, see~\cite{miller:2011:chapter2}.
 
@@ -615,12 +614,12 @@ This has the
 potential to create offspring who's only mutated genes are in inactive nodes.
 These offspring are actively identical (contain identical active genes) to their
 parents, and therefore by definition have identical fitness to their parents.
-As such, re-evaluating these individuals is computationally wasteful, as their fitness
+As such, re-evaluating these individuals is computationally wasteful as their fitness
 is known.
-Detecting duplicated individuals can be done without significant overhead as
+Detecting duplicated individuals can be done without significant overhead since
 finding the set of active nodes is already done prior to
 evaluation~\cite{vasicek:2012:efficient}.
-Previous work~\cite{goldman:2013:cgpwaste} has taken an initial look at the
+Our previous work~\cite{goldman:2013:cgpwaste} has taken an initial look at the
 effect this waste can have, and proposed \emph{Skip}, \emph{Accumulate}, and
 \emph{Single} as methods for avoiding or preventing these duplicate evaluations.
 
@@ -647,13 +646,13 @@ for offspring to genetically differ from their parents.
 Because \emph{Skip} does not modify any evolutionary mechanisms found in traditional CGP,
 it will produce identical individuals, with a potential reduction in evaluations.
 If the mutation rate is high enough relative
-to the number of active genes, \emph{Skip} will require the same number of evaluations as traditional CGP. This is because
+to the number of active genes, \emph{Skip} will require the same number of evaluations as traditional CGP, since
 the probability of an offspring being actively identical to its parent is effectively zero.
 When the mutation rate is low enough relative to the number of active genes, some number of
 offspring will be actively identical to their parents, resulting in a reduction in evaluations
 but no change in the evolutionary trajectory.
 
-We would expect both intuitively and from initial
+We would expect both intuitively and from our initial
 experimentation~\cite{goldman:2013:cgpwaste} that \emph{Skip} will be less sensitive
 to the mutation rate than normal CGP.  We would also expect \emph{Skip} to use a lower
 mutation rate than normal CGP when both are optimized to reduce evaluations.
@@ -708,7 +707,7 @@ This modification gives \emph{Single} three properties distinct from the other
 forms of duplicate avoidance.  First, \emph{Single} forces offspring to have
 an active gene which differs from their parent.  This limits drift as the
 mutated active gene must either be to an intron or represent another way to
-code a solution of equal quality.  Second, as a benefit of forced changes
+code a solution of equal quality.  Second, as a benefit of forced changes,
 \emph{Single} avoids the overhead of repeatedly generating individuals without
 creating an evaluable offspring.  Third, \emph{Single} does not require a mutation
 rate parameter, effectively setting the mutation rate to $\frac{1}{a}$ for active
@@ -741,7 +740,7 @@ in the genome may need to be evolved repeatedly in order to find the best
 location for that structure in the genome.
 
 Ordering, when combined with the mutation's uniform resetting of connection genes, may be the cause of CGP's
-immensely inactive genomes.  As was rigorously defined in~\cite{goldman:2013:ordering},
+immensely inactive genomes.  As was rigorously defined in our work~\cite{goldman:2013:ordering},
 the number of active genes in a genome is expected to scale logarithmically
 with genome size, independent of problem application.  Furthermore, the less
 active a genome, the lower the likelihood of structure ordering preventing structure
@@ -749,7 +748,7 @@ connection.
 
 As an extension to the theory presented in~\cite{goldman:2013:ordering}, we have
 derived the formula which predicts the probability a node is active based on its
-index, given in Equation~\ref{eq:prob} and shown in Figure~\ref{fig:prob}.
+index, given in Equation~\ref{eq:prob} and plotted in Figure~\ref{fig:prob}.
 \begin{equation}
 p(i) \leftarrow 1 - (\frac{N+I-1}{N+I})^O \cdot \prod_{j=i+1}^{N} 1 - p(j) \cdot (1-(\frac{j+I-1}{j+I})^A)
 \label{eq:prob}
@@ -855,12 +854,12 @@ as copying the entire genome, meaning it does not change CGP's overall complexit
 
 \emph{Reorder} is used once each generation to shuffle the nodes of the parent's
 genome.  As the shuffling does not semantically change the parent, it does
-not require re-evaluated.  Furthermore, as shuffling does not change the requirement
+not require re-evaluation.  Furthermore, as shuffling does not change the requirement
 that nodes only depend on those preceding them in the genome, shuffling does not
 require any changes to any other CGP methods, such as evaluation and mutation.
 It is important to note, however, that the potential mutations that can be applied to the parent
 have changed.  Consider two nodes $X$ and $Y$ which are in the genome, and
-have no dependence relationship.  As $X$ does not take input from $Y$ and
+have no dependent relationship.  As $X$ does not take input from $Y$ and
 $Y$ does not take input from $X$, either can be placed before the other
 in the genome.  Without shuffling, the initial ordering of nodes is fixed.
 No operation in \emph{Normal} is capable of making $X$
@@ -872,9 +871,9 @@ $X$ preceded $Y$, mutation would have to recreate either $X$ or $Y$ in new locat
 in order to make the required connection.  \emph{Reorder} provides the opportunity
 to examine different orderings of the genome without such costs.
 
-The price \emph{Reorder} pays for this potential improvement is increased mutational search
+The price \emph{Reorder} pays for this potential improvement is a larger mutational search
 space.  Though a shuffled individual is phenotypically unchanged,
-its mutational adjacency is significantly different.  As such the variety of offspring
+its mutational adjacency can be significantly different.  As such the variety of offspring
 an individual can create is increased when using \emph{Reorder}.  While this increase
 makes finding a specific offspring that improves upon the parent less likely, the
 general likelihood of producing an offspring that improves upon the parent may 
@@ -885,7 +884,7 @@ more than offset this drawback.
 \label{sec:dag}
 \emph{Normal} and \emph{Reorder} use node location in a linear genome to create
 an efficient protection against cycles: nodes must connect forward.  \emph{DAG}
-removes this scheme of location, relying on more complex methodologies to
+removes this restriction and allows forward and backward connections, relying on other, more complex, methodologies to
 prevent cycles.  To accomplish this goal, modifications must be made to how CGP
 performs mutation and evaluation.
 
@@ -894,7 +893,7 @@ However, the options to choose from are only limited to those connections which 
 create cycles.
 To achieve this, we incrementally determine
 which nodes transitively depend on the mutating node and which do not, with
-information stored in the $known$ map.  This data structure is initialized with
+information stored in a $known$ map data structure.  This data structure is initialized with
 the information that the node is dependent on itself and that all input locations
 are not dependent on the mutating node.  Nodes are then
 tested in a random order for dependence using the \Call{IsDependent}{} algorithm given in Figure~\ref{fig:dag}.
@@ -945,7 +944,7 @@ preprocessing is done to determine which nodes are active, and only those nodes 
 executed during evaluation.  Also as before, the process begins from the output locations,
 recursively following connection genes and marking nodes as active until the input locations
 are reached.  At this point, the process changes.  In \emph{DAG}, we must determine not only the set of
-nodes that are active, but the order in which those nodes should be executed.
+nodes that are active, but also the order in which those nodes should be executed.
 
 \Call{RandomSerialization}{} can be reused to determine the order
 in which nodes should be executed during evaluation.  Instead of using $new\_loc$
@@ -974,7 +973,7 @@ As such, there are fewer artificial limitations on how \emph{DAG} can modify
 solutions.
 
 While \emph{Reorder} and \emph{DAG} both reduce mutational limitations, \emph{DAG}'s changes are more sweeping.
-Though both can create any connect that does not form a cycle,
+Though both can create any connection that does not form a cycle,
 \emph{Reorder} maintains a bias toward certain kinds of connections.
 Consider again two nodes $X$ and $Y$
 such that neither is dependent on the other.  If $X$ is transitively dependent on very
@@ -987,7 +986,7 @@ and therefore we expect it to be added sooner.  The greater the discrepancy in t
 set sizes the less likely the order between the nodes will be reversed.
 Conversely, \emph{DAG} has no such bias.  It is always possible to mutate $X$ to connect to $Y$.
 
-The probability of connecting $X$ to $Y$ is also influenced by how many nodes transitively depend $X$ and $Y$.
+The probability of connecting $X$ to $Y$ is also influenced by how many nodes transitively depend on $X$ and $Y$.
 For example, assume $X$ has more nodes transitively dependent on it than $Y$.
 In \emph{Reorder}, $X$ is again more likely to be placed before $Y$, this time because the number
 of possible nodes preceding it is reduced.  \emph{DAG} is biased in the reverse, such that $X$ will
@@ -1032,10 +1031,10 @@ sets are non overlapping, and there is no intuitive groupings, we chose to test
 all possible combinations in our empirical analysis.  As a control we included \emph{Normal} genome ordering,
 as it provides insight to how each of the duplicate prevention techniques work
 if applied alone.  Similar measures are not needed in testing the genome ordering techniques,
-as \emph{Skip} has no impact on evolutionary search, and is a strict improvement
+as \emph{Skip} has no impact on evolutionary search, and is strictly an improvement
 to using no duplication detection at all.
 
-In total this creates 9 algorithm combinations.  Of these, previous work
+In total this creates 9 algorithm combinations.  Of these, our previous work
 has been reported showing the effectiveness of the duplication methods with \emph{Normal} ordering~\cite{goldman:2013:cgpwaste}
 as well as analysis of all three ordering methods with \emph{Single}~\cite{goldman:2013:ordering}.
 This means there remain 4 novel combinations to be tested.
@@ -1082,7 +1081,7 @@ To perform a fair comparison, we ensure proper parameter configuration
 to avoid potential bias that might benefit
 a specific method.  While tuning can lead to the alternative issue
 of methods only being effective after extensive problem specific tuning, we set out to use
-rough grained values and provide each technique with equal tuning time to alleviate that bias.
+rough-grained values and provide each technique with equal tuning time to alleviate that bias.
 
 We focus on two parameter values in our configuration: mutation rate and genome size.
 While there are other potential configurable parameters (population size, offspring size, etc),
@@ -1200,7 +1199,9 @@ used to produce our results is available from our website.\footnote{\url{https:/
 	\end{tabular}
 	\caption{Results for algorithm configuration on each problem.  Highlighted row
 	is the control configuration \emph{Skip-Normal}.  MES=Median Evaluations to Success; MAD=Median
-	Absolute Deviation; p-value=Result from Mann-Whitney~U comparison with control.
+	Absolute Deviation; Active=Median number of active nodes in evolved solution;
+	Used=Median number of nodes active in evolved solution after applying SIMPLIFY (See Section~\ref{sec:behavior});
+	p-value=Result from Mann-Whitney~U comparison with control.
 	}
 	\label{tab:results}
 \end{table*}
@@ -1229,16 +1230,16 @@ genomes.
 Of the 12 configurations including \emph{Single}, 11 used a genome size smaller
 than all configurations not using \emph{Single}.  The exception was \emph{Single-Normal}
 on Multiply.  No other algorithm had as much impact on genome size tuning as
-the inclusion or exclusion of \emph{Single}.  In previous work~\cite{goldman:2013:ordering}
+the inclusion or exclusion of \emph{Single}.  In our previous work~\cite{goldman:2013:ordering}
 it appeared that \emph{Reorder} and \emph{DAG} allowed CGP to use smaller genomes.
-In light of our results, this conclusion should be amended.
+In light of our current results, this conclusion should be amended.
 It appears that \emph{Single} is most effective when the genome size is small and
 that \emph{Reorder} and \emph{DAG} are best able to cope with smaller genome sizes.
 Independent of duplication method, the ordering methods do not seem to create any
 pressure on which genome size is chosen.
 
-Unlike genome size, all configurations choose approximately the same mutation rate,
-with different rates for each problem.  With the exception of Parity, there appears
+Unlike genome size, all configurations choose approximately the same mutation rate
+for each problem.  With the exception of Parity, there appears
 to be a general consensus that each gene should be mutated with probability 0.002,
 independent of genome size.  Parity used a higher mutation rate, but this is likely
 because 3-bit Parity is by far the easiest problem tested and therefore likely benefits
@@ -1247,18 +1248,18 @@ from higher exploration.
 On many of the problems, many of the configurations have little to no statistical
 difference from the control in their evaluations required to reach the global optimum.
 On Parity and Encode it is probably safe to conclude that \emph{Single} is worse than
-the control.  As these are the easiest problems tested that difference may have
+the control.  As these are the easiest problems tested, that difference may have
 little real world meaning.  \emph{DAG} is almost certainly worse than the control on
 Decode.  Its results are so much worse that we can also likely conclude that \emph{DAG}
 is worse than all non \emph{DAG} configuration on that problem, even though no statistical
 tests are presented here.  The control on multiply did by far the worst of all configurations,
 with only \emph{Accumulate Normal} likely failing statistical significance.
 
-By ordering the algorithm combinations by MES and examining that ordering across each
+By ordering the algorithm combinations by median evaluations to success (MES) and examining that ordering across each
 problem, we can look for general trends.  From the table, it appears that on easier problems
 the method of duplication used is the strongest predictor of rank, while
 the ordering methods are more predictive on harder problems.  This comes from the
-observation that in for Parity and Encode (Upper half of Table~\ref{tab:results})
+observation that in Parity and Encode (Upper half of Table~\ref{tab:results})
 the first column is effectively sorted, while for Decode and Multiply
 (Lower half of Table~\ref{tab:results})
 the second column is sorted.
@@ -1432,9 +1433,9 @@ answer this we must consider what can prevent a node from becoming active.  For
 a node to never be active, all tested offspring with mutations that result in that node being activated
 must have been less fit than their parent.  Even if those offspring are no more fit, the selection method
 used by CGP would have allowed that offspring to replace its parent, at least probabilistically.  This leads
-to two possible causes for a node never being active: bad genes or infrequently tried.
+to two possible causes for a node never being active: bad genes or infrequent node sampling.
 
-The bad genes cause for a node never being active suggests the behavior encoded
+The bad genes cause suggests the behavior encoded
 by a node is simply useless on the problem landscape.  If this was the root cause
 of never active nodes, we would expect \emph{Reorder} and \emph{DAG} to have
 similar problems, as neither technique explicitly changes the likelihood of node
@@ -1443,7 +1444,7 @@ uniform in the genome, which is obviously not the case.  Finally, even if bad
 genes were the problem, we would expect the mutational drift allowed by CGP's
 selection method to change their bad genes and eventually allow them to be active.
 
-The infrequently tried cause for a node never being active suggests that few
+The infrequent node sampling cause suggests that few
 individuals are ever produced which have that node active, limiting the likelihood
 of those individuals being selected regardless of potential fitness.  Under this
 cause and combined with Equation~\ref{eq:prob}, we
@@ -1471,10 +1472,11 @@ problems that require further exploration, \emph{Reorder} is able to do so, whil
 \emph{Normal} remains positionally limited.
 
 \subsection{Node Behaviors}
+\label{sec:behavior}
 
 In order to understand how each node is being used by CGP,
 we first determine the semantics of each node~\cite{mcphee:2008:treesemantics}.
-For each input that is given to an individual, all of its nodes
+By semantics we mean that for each input to an individual, each node
 will produce a single output.  These output values can be recorded and ordered.
 As the domain in use is binary, the outputs can be viewed as a bit string, where
 each bit indicates the value a node outputs when an individual is presented with a
@@ -1521,8 +1523,8 @@ can instead read the output of X, removing the need to include Y in the solution
 \end{figure}
 
 The \Call{Simplify}{} algorithm given in Figure~\ref{fig:simplify} is designed
-to efficiently reduce redundancy encoded in a genome.  Generally, this
-algorithm will move all connections to the first node that produces the desired
+to efficiently remove redundancy encoded in a genome.  This
+algorithm moves all connections to the first node that produces the desired
 semantic.  After application, and recalculation of which nodes are still
 active, each active node produces a unique semantic string.  Any node that is
 transitively dependent on its own semantic will always be removed from
@@ -1634,7 +1636,7 @@ used category will vary as these other features change.
 
 From Table~\ref{tab:encode_behavior} and Table~\ref{tab:multiply_behavior}, having
 the plurality of active nodes in the ``Used'' category appears to correlate with
-increase evaluations to success.  Notice that in all \emph{Single} plots the
+increase evaluations to success in Table~\ref{tab:results}.  Notice that in all \emph{Single} plots the
 tallest bar for active nodes is ``Used,'' and the only non \emph{Single} plots
 where this is true are \emph{Normal} on Multiply.  On Encode, \emph{Single}
 runs had the highest median evaluations to success, with \emph{Normal} runs
@@ -1744,7 +1746,7 @@ The \textbf{No Reactivation} column uses the word reactivation to refer to nodes
 that were active in some ancestor of the offspring, were inactive in the offspring's
 parent, but are now again active in the offspring.  Reactivation is a measure of how
 often CGP reuses previously useful active nodes.  Reported in the table is how
-frequently an offspring replaces its parent with no reactivated nodes.  Smaller
+frequently an offspring replaces its parent such that is has no reactivated nodes.  Smaller
 values indicate an algorithm combination that frequently reuses nodes, as opposed to
 including randomly generated nodes (never active nodes) or ignoring inactive nodes
 entirely.
@@ -1983,12 +1985,12 @@ Appendix one text goes here.
 \section{}
 Appendix two text goes here.
 
-\end{comment}
 % use section* for acknowledgement
 \section*{Acknowledgment}
 
 TODO
 The authors would like to thank...
+\end{comment}
 
 
 % Can use something like this to put references on a page
@@ -2055,9 +2057,9 @@ research interests include evolutionary computation and genetic programming.
 \end{IEEEbiography}
 
 % if you will not have a photo at all:
-\begin{IEEEbiographynophoto}{William F. Punch}
+\begin{IEEEbiography}{William F. Punch}
 TODO
-\end{IEEEbiographynophoto}
+\end{IEEEbiography}
 
 % insert where needed to balance the two columns on the last page with
 % biographies
