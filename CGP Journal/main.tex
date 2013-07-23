@@ -376,7 +376,7 @@
 \usepackage{url}
 
 \newcommand{\graphicthird}[1]
-{\includegraphics[width=.3\textwidth,height=.3\textheight,keepaspectratio]{#1}}
+{\includegraphics[width=.285\textwidth,height=.285\textheight,keepaspectratio]{#1}}
 
 \newcommand{\thirdlabel}[1]
 {\multicolumn{1}{|c|}{\raisebox{.15\textwidth}{\rotatebox[origin=c]{90}{\textbf{\em #1}}}}}
@@ -1915,12 +1915,14 @@ algorithm combinations that preferred more reasonable genome sizes were those us
 especially when paired with \emph{Reorder} or \emph{DAG}.  Yet we theorize this may
 have more to do with \emph{Single} scaling poorly with the number of active nodes
 than with it overcoming whatever causes traditional CGP to prefer enormous genomes.
+\begin{comment}
 While \emph{Reorder} and \emph{DAG} were able to use smaller genomes than \emph{Normal}
 when paired with \emph{Single}, this decrease in size was not observed in any other
 pairings.  As such, the suggestion in~\cite{goldman:2013:ordering} that these
 techniques generally reduce genome size should be discarded.  Instead it is likely
 more correct to say that \emph{Reorder} and \emph{DAG} are less detrimentally effected
 by reducing the genome size.
+\end{comment}
 
 Compared on median evaluations to success, \emph{Normal} and \emph{Reorder} are
 likely to be equally good for simple problems, with some suggestion that \emph{Reorder}
