@@ -1457,7 +1457,7 @@ using the same genome size, arity, number of inputs, and number of outputs as ou
 plots in Table~\ref{tab:never_active}.
 Finally, from~\cite{goldman:2013:ordering} we would expect \emph{Reorder} and \emph{DAG}
 to have less or no positional bias, which also matches the results given in Table~\ref{tab:never_active}.
-%\end{comment}
+\end{comment}
 
 %The above paragraphs were replaced by the below paragraph.
 In Section~\ref{sec:ordering} we used Equation~\ref{eq:prob} to suggest \emph{Normal}
@@ -1514,15 +1514,15 @@ can instead read the output of X, removing the need to include Y in the solution
   \Procedure{Simplify}{}
     \State $reconnect \leftarrow \emptyset$
     \ForAll{$node \in reversed(active)$}
-      \State $reconnect[footprint(node)] \leftarrow node$
+      \State $reconnect[semantics(node)] \leftarrow node$
     \EndFor
     \ForAll{$i \in input\_locations$}
-      \State $reconnect[footprint(i)] \leftarrow i$
+      \State $reconnect[semantics(i)] \leftarrow i$
     \EndFor
     \ForAll{$g \in genes$}
       \If{$g$ is a connection gene}
-        \If{$footprint(g) \in reconnect$}
-          \State $g \leftarrow reconnect[footprint(g)]$
+        \If{$semantics(g) \in reconnect$}
+          \State $g \leftarrow reconnect[semantics(g)]$
         \EndIf
       \EndIf
     \EndFor
