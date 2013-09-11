@@ -1066,3 +1066,136 @@
 		 annual genetic programming conference (GP-2012)",
   doi-url =	"http://dx.doi.org/10.1145/2330163.2330252",
 }
+
+@InProceedings{doerr:2013:lambdalambda,
+  author =	"Benjamin Doerr and Carola Doerr and Franziska Ebel",
+  title =	"Lessons from the black-box: fast crossover-based
+		 genetic algorithms",
+  booktitle =	"GECCO '13: Proceeding of the fifteenth annual
+		 conference on Genetic and evolutionary computation
+		 conference",
+  year = 	"2013",
+  ISBN = 	"978-1-4503-1963-8",
+  pages =	"781--788",
+  month =	"6-10 " # jul,
+  organisation = "SIGEVO",
+  address =	"Amsterdam, The Netherlands",
+  URL =  	"http://doi.acm.org/10.1145/2463372.2463480",
+  doi =  	"doi:10.1145/2463372.2463480",
+  publisher =	"ACM",
+  publisher_address = "New York, NY, USA",
+  abstract =	"The recently active research area of black-box
+		 complexity revealed that for many optimisation problems
+		 the best possible black-box optimisation algorithm is
+		 significantly faster than all known evolutionary
+		 approaches. While it is not to be expected that a
+		 general-purpose heuristic competes with a
+		 problem-tailored algorithm, it still makes sense to
+		 look for the reasons for this discrepancy. In this
+		 work, we exhibit one possible reason---most optimal
+		 black-box algorithms profit also from solutions that
+		 are inferior to the previous-best one, whereas
+		 evolutionary approaches guided by the 'survival of the
+		 fittest' paradigm often ignore such solutions. Trying
+		 to overcome this shortcoming, we design a simple
+		 genetic algorithm that first creates lambda offspring
+		 from a single parent by mutation with a mutation
+		 probability that is k times larger than the usual one.
+		 From the best of these offspring (which often is worse
+		 than the parent) and the parent itself, we generate
+		 further offspring via a uniform crossover operator that
+		 takes bits from the winner offspring with probability
+		 1/k only. A rigorous runtime analysis proves that our
+		 new algorithm for suitable parameter choices on the
+		 OneMax test function class is asymptotically faster (in
+		 terms of the number of fitness evaluations) than what
+		 has been shown for mu +, lambda EAs. This is the first
+		 time that crossover is shown to give an advantage for
+		 the OneMax class that is larger than a constant factor.
+		 Using a fitness-dependent choice of k and lambda, the
+		 optimisation time can be reduced further to linear in
+		 n. Our experimental analysis on several test function
+		 classes shows advantages already for small problem
+		 sizes and broad parameter ranges. Also, a simple
+		 self-adaptive choice of these parameters gives
+		 surprisingly good results.",
+  notes =	"Also known as \cite{2463480} GECCO-2013 A joint
+		 meeting of the twenty second international conference
+		 on genetic algorithms (ICGA-2013) and the eighteenth
+		 annual genetic programming conference (GP-2013)",
+  doi-url =	"http://dx.doi.org/10.1145/2463372.2463480",
+}
+
+@InProceedings{thierens:2013:ltgahiff,
+  author =	"Dirk Thierens and Peter A. N. Bosman",
+  title =	"Hierarchical problem solving with the linkage tree
+		 genetic algorithm",
+  booktitle =	"GECCO '13: Proceeding of the fifteenth annual
+		 conference on Genetic and evolutionary computation
+		 conference",
+  year = 	"2013",
+  ISBN = 	"978-1-4503-1963-8",
+  pages =	"877--884",
+  month =	"6-10 " # jul,
+  organisation = "SIGEVO",
+  address =	"Amsterdam, The Netherlands",
+  URL =  	"http://doi.acm.org/10.1145/2463372.2463477",
+  doi =  	"doi:10.1145/2463372.2463477",
+  publisher =	"ACM",
+  publisher_address = "New York, NY, USA",
+  abstract =	"Hierarchical problems represent an important class of
+		 nearly decomposable problems. The concept of near
+		 decomposability is central to the study of complex
+		 systems. When little a priori information is available,
+		 a black box problem solver is needed to optimise these
+		 hierarchical problems. The solver should be able to
+		 learn linkage information, and to preserve and test
+		 partial solutions at different levels in the hierarchy.
+		 Two well known benchmark functions, shuffled
+		 Hierarchical If-And-Only-If (HIFF) and shuffled
+		 Hierarchical Trap (HTRAP) functions, exemplify the
+		 challenges posed by hierarchical problems. Standard
+		 genetic algorithms are unable to solve these problems,
+		 and specific methods, like SEAM and hBOA, have been
+		 designed to address them. In this paper, we investigate
+		 how the recently developed Linkage Tree Genetic
+		 Algorithm (LTGA) performs on these hierarchical
+		 problems. We compare LTGA with SEAM and hBOA on HIFF
+		 and HTRAP functions. Results show that, although LTGA
+		 is a simple algorithm compared to SEAM and hBOA, it
+		 nevertheless is a very efficient, reliable, and
+		 scalable algorithm for solving the randomly shuffled
+		 versions of HIFF and HTRAP, two hard, hierarchical
+		 problems.",
+  notes =	"Also known as \cite{2463477} GECCO-2013 A joint
+		 meeting of the twenty second international conference
+		 on genetic algorithms (ICGA-2013) and the eighteenth
+		 annual genetic programming conference (GP-2013)",
+  doi-url =	"http://dx.doi.org/10.1145/2463372.2463477",
+}
+
+@Article{jovanovic:1997:ruleofthree,
+  author =	"B. D. Jovanovic and P. S. Levy",
+  title =	"A Look at the Rule of Three",
+  journal =	"The American Statistician",
+  volume =	"51",
+  number =	"2",
+  pages =	"137--139",
+  month =	may,
+  year = 	"1997",
+  CODEN =	"ASTAAJ",
+  ISSN = 	"0003-1305 (print), 1537-2731 (electronic)",
+  issn-l =	"0003-1305",
+  bibdate =	"Mon May 05 17:19:59 1997",
+  bibsource =	"http://www.amstat.org/publications/tas/toc.html;
+		 http://www.math.utah.edu/pub/tex/bib/amstat.bib",
+  URL =  	"http://www.amstat.org/publications/tas/abstracts/jovanovic.html",
+  acknowledgement = "Nelson H. F. Beebe, University of Utah, Department
+		 of Mathematics, 110 LCB, 155 S 1400 E RM 233, Salt Lake
+		 City, UT 84112-0090, USA, Tel: +1 801 581 5254, FAX: +1
+		 801 581 4148, e-mail: \path|beebe@math.utah.edu|,
+		 \path|beebe@acm.org|, \path|beebe@computer.org|
+		 (Internet), URL:
+		 \path|http://www.math.utah.edu/~beebe/|",
+  fjournal =	"The American Statistician",
+}

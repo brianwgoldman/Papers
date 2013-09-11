@@ -51,6 +51,8 @@
 \usepackage{verbatim}
 \newcommand{\includegraphicsfit}[1]
 {\includegraphics[width=\columnwidth,height=\textheight,keepaspectratio]{#1}}
+
+\usepackage{bm}
 \begin{document}
 %
 % --- Author Metadata here ---
@@ -126,7 +128,7 @@ Anonymous\\
 
 \maketitle
 \begin{abstract}
-
+TODO
 \end{abstract}
 
 % A category with the (minimum) three required fields
@@ -140,7 +142,78 @@ Anonymous\\
 \keywords{TODO}
 
 \section{Introduction}
-TODO~\cite{goldman:2012:ltga}.
+TODO Parameterless optimization, model building, etc.
+
+\section{The P3 Algorithm}
+TODO Overview.  Use graphic.
+
+\subsection{Hill Climber}
+TODO Describe First Improvement Hill Climber, including waste prevention, etc.
+
+\subsection{Pyramid}
+TODO Explain population levels, entropy tables $O(n^2)$, uniqueness
+
+\subsection{Crossover}
+TODO Explain how entropy becomes clusters efficiently $O(n^2)$, cluster ordering,
+keep changes that don't reduce fitness, removal of zero entropy sub-clusters,
+keep donating until a change is made.
+
+\subsection{All Together}
+TODO Pieces working together.  HC removes pairwise noise, which allows crossover to detect
+clusters.  Levels allow realization of linkage at high levels, reduction in noise.
+
+\section{Comparison Algorithms}
+
+\subsection{Random Restart First Improvement Hill Climber}
+TODO This is important to have as it shows how the pyramid is able to reach optima
+the hill climber cannot.  Need a citation.
+
+\subsection{Linkage Tree Genetic Algorithm}
+TODO Discuss LTGA~\cite{thierens:2013:ltgahiff}, how it differs from P3, its limitation based on
+initialization, requirement of population size.  Mention how some
+of the ideas in P3 were tried in LTGA and seemed to make improvements~\cite{goldman:2012:ltga}.
+Discuss bisection method and Rule of Three~\cite{jovanovic:1997:ruleofthree}.
+Remember to say that the paper argues for $\frac{3}{N+1}$, so 100 trails is strictly
+less than $3\%$ expected failure rate.
+
+\subsection{\bm{$(1+(\lambda,\lambda))$}}
+TODO Explain briefly how it works, that it is the best theory supported crossover method~\cite{doerr:2013:lambdalambda}.
+Explain changes including: Keep best mutant if no worse than crossover offspring,
+prevent evaluations if crossover offspring identical to either parent, if tied fitness
+in crossover offspring take maximum hamming distance to parent.  If $\lambda \ge N$
+restart with random individual.  Does not use ``mod'' version as restarting is preferable
+when stuck on plateaus.
+
+\section{Test Problems}
+
+\subsection{Single Instance Problems}
+TODO Deceptive Trap, Deceptive Step Trap~\cite{goldman:2012:ltga}, Hierarchical If
+and Only If, Discretized Rastrigin.
+
+\subsection{Randomly Generated Problem Classes}
+TODO Nearest Neighbor NK with wrapping neighborhoods, Ising Spin Glasses on toroidal
+grids with only -1, 1 spins, Maximum Satisfiability constructed with known global
+optimum.
+
+\section{Experimental Results}
+TODO Cover all 7 problems as a group, focusing on the two ``types'' of problems.
+Make it explicit that you outperform by a constant factor on the static problems
+and by an order of complexity on generated problems.
+
+TODO Include graphic for 7 problem results.
+
+TODO Include table comparing results on largest version of each problem.
+
+\section{Promising Theory}
+TODO Easy proof on unimodal (no plateaus) and all functions of unitation due to HC.
+Sketch of how to prove runtime on Deceptive Trap, HIFF, suggestions toward all
+possible non-overlapping functions.
+
+\section{Conclusions and Future Work}
+TODO No parameters required, beats tuned LTGA.  Good at solving hard classes
+of problems, not just single instances of a problem as it scales to problem difficulty.
+Future work in theory.  Also readily applicable to real world problems as no
+problem information is required.
 
 %
 % The following two commands are all you need in the
