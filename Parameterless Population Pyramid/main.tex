@@ -144,8 +144,17 @@ TODO
 \section{Introduction}
 TODO Parameterless optimization, model building, etc.
 
+TODO Talk about ALPS~\cite{hornby:2006:alps}.
+
 \section{The P3 Algorithm}
-TODO Overview.  Use graphic.
+TODO Overview.  Use Figure~\ref{fig-p3}.
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{P3_big_fail}
+  \caption{Example}
+  \label{fig-p3}
+\end{figure}
 
 \subsection{Hill Climber}
 TODO Describe First Improvement Hill Climber, including waste prevention, etc.
@@ -154,7 +163,7 @@ TODO Describe First Improvement Hill Climber, including waste prevention, etc.
 TODO Explain population levels, entropy tables $O(n^2)$, uniqueness
 
 \subsection{Crossover}
-TODO Explain how entropy becomes clusters efficiently $O(n^2)$, cluster ordering,
+TODO Explain how entropy becomes clusters efficiently $O(n^2)$~\cite{gronau:2007:upgma}, cluster ordering,
 keep changes that don't reduce fitness, removal of zero entropy sub-clusters,
 keep donating until a change is made.
 
@@ -192,13 +201,16 @@ and Only If, Discretized Rastrigin.
 
 \subsection{Randomly Generated Problem Classes}
 TODO Nearest Neighbor NK with wrapping neighborhoods, Ising Spin Glasses on toroidal
-grids with only -1, 1 spins, Maximum Satisfiability constructed with known global
+grids with only -1, 1 spins~\cite{saul:1994:spinglass}.
+Used\footnote{\url{http://www.informatik.uni-koeln.de/spinglass/}}, Maximum Satisfiability constructed with known global
 optimum.
 
 \section{Experimental Results}
 TODO Cover all 7 problems as a group, focusing on the two ``types'' of problems.
 Make it explicit that you outperform by a constant factor on the static problems
 and by an order of complexity on generated problems.
+
+TODO Mention 1.5 trillion evaluations and 150,000 runs (average 10 million evaluations per run).
 
 TODO Include graphic for 7 problem results.
 
