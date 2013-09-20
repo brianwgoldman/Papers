@@ -139,12 +139,15 @@ TODO
 
 \terms{Algorithms}
 
-\keywords{TODO}
+\keywords{Linkage Learning, Local Search, TODO}
 
 \section{Introduction}
 TODO Parameterless optimization, model building, etc.
 
 TODO Talk about ALPS~\cite{hornby:2006:alps}.
+
+TODO Talk about LO-LIMD~\cite{posik:2011:parameterless} and how it was parameter-less,
+but is incapable of handling overlapping linkages.
 
 \section{The P3 Algorithm}
 TODO Overview.  Use Figure~\ref{fig-p3}.
@@ -181,6 +184,7 @@ the hill climber cannot.  Need a citation.
 TODO Discuss LTGA~\cite{thierens:2013:ltgahiff}, how it differs from P3, its limitation based on
 initialization, requirement of population size.  Mention how some
 of the ideas in P3 were tried in LTGA and seemed to make improvements~\cite{goldman:2012:ltga}.
+Tests of adding hillclimber to LTGA argued no improvement~\cite{bosman:2011:lsbbo}.
 Discuss bisection method and Rule of Three~\cite{jovanovic:1997:ruleofthree}.
 Remember to say that the paper argues for $\frac{3}{N+1}$, so 100 trails is strictly
 less than $3\%$ expected failure rate.
@@ -200,7 +204,7 @@ TODO Deceptive Trap, Deceptive Step Trap~\cite{goldman:2012:ltga}, Hierarchical 
 and Only If, Discretized Rastrigin.
 
 \subsection{Randomly Generated Problem Classes}
-TODO Nearest Neighbor NK with wrapping neighborhoods, Ising Spin Glasses on toroidal
+TODO Nearest Neighbor NK with wrapping neighborhoods~\cite{wright:2000:solvingnk}, Ising Spin Glasses on toroidal
 grids with only -1, 1 spins~\cite{saul:1994:spinglass}.
 Used\footnote{\url{http://www.informatik.uni-koeln.de/spinglass/}}, Maximum Satisfiability constructed with known global
 optimum.
