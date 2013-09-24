@@ -150,52 +150,242 @@ TODO Talk about LO-LIMD~\cite{posik:2011:parameterless} and how it was parameter
 but is incapable of handling overlapping linkages.
 
 \section{The P3 Algorithm}
-TODO Overview.  Use Figure~\ref{fig-p3}.
+\label{sec-p3}
+Before going into detail about how each aspect of P3 works, consider the example
+evolution presented in Figure~\ref{fig-p3}.  At the start of optimization there
+is no known problem information, so solution \#1 is randomly generated.  This
+is then brought to a local optima using a hill climber (Section~\ref{sec-hillclimber})
+creating solution \#2, which is added to the pyramid (Section~\ref{sec-pyramid}) level
+$P_0$.  As there is no further exploitable information, \#3 is randomly generated
+and optimized to create \#4, which is added to $P_0$.  \#2 and \#4 are used to
+define a crossover (Section~\ref{sec-crossover}), which improves \#4 to create
+\#5. As \#5 used information from $P_0$ is it added to the next level of the pyramid, $P_1$.
+Again P3 lacks information to continue, so \#6 is randomly generated and improved into
+\#7.  Unlike \#2 and \#4, \#7 is not added in this example because it happens to be identical to
+a solution already in the pyramid.  Even though \#7 is not unique, it still crosses with
+$P_0$, which does make a unique improvement \#8 that is added to $P_1$ and mixed with that
+level to create \#9.  As before, the process creates \#10, \#11, and \#12 using
+random generation, hill climbing, and crossover, respectively.  In this example \#13
+is not added to $P_2$ because it not a strict improvement in fitness over \#12.  There
+is not enough information in $P_2$ to improve \#13 further, so the process would begin
+yet again with a random solution.
 
 \begin{figure}
   \centering
   \includegraphicsfit{P3_big_fail}
-  \caption{Example}
+  \caption{Example of the first steps of P3's optimization described in Section~\ref{sec-p3}.
+  \#7 is not added because it is a duplicate of a solution already in the pyramid.  \#13 is
+  not added because it is not a fitness improvement over \#12.}
   \label{fig-p3}
 \end{figure}
 
 \subsection{Hill Climber}
-TODO Describe First Improvement Hill Climber, including waste prevention, etc.
+\label{sec-hillclimber}
+The terminology used to describe different methods of making minor modifications
+to a solution, evaluating the quality of those changes, and iteratively constructing
+new solutions, is full of duplicated, ambiguously defined terms.  As such we shall
+describe what is likely an existing algorithm and give it a descriptive name that
+may not match all of its previous incarnations.
+
+For our purposes, we use the First Improvement Hill Climber (FIHC), a method of exploiting
+local information through a series of modify-evaluate-accept iterations, to start
+from randomly initialized solutions and end with single change local optimal results.
+FIHC uses the following algorithm.  Consider all gene loci $x_i$ in a random order.
+For a given $x_i$ try all possible alternative values for the gene $x_i$, evaluating
+solution quality with each.  If any alternative value is a strict fitness improvement
+over the current value for $x_i$, replace $x_i$ with the improved value.  If no
+change is made to the solution, stop, otherwise iterate.
+
+To avoid wasting evaluations, FIHC keeps track of all loci tested since the last
+change was made to the solution.  If the algorithm returns to the same loci without
+any changes, it moves on to the next loci without performing any evaluations.
+
+FIHC solves all functions of unitation in $O(N)$ time.  This is in contrast to
+methods like Steepest Ascent Hill Climber~\cite{bosman:2011:lsbbo, goldman:2012:ltga}
+which require $O(N^2)$ as changes are only accepted after all neighbor solutions
+are evaluated.  In general FIHC is designed to find optima using a minimum number
+of evaluations.  Furthermore, because FIHC tests loci in a random order it does
+not cause any positional bias to the search.
+
 
 \subsection{Pyramid}
-TODO Explain population levels, entropy tables $O(n^2)$, uniqueness
+\label{sec-pyramid}
+Unlike many EC techniques, P3 does not have a single population of solutions.
+Instead to maintains a pyramid like structure, such that each level of the pyramid
+has a population of solutions, with each level representing something akin to different
+generations of evolution.  The exact relationship between the levels is described
+in Section~\ref{sec-alltogether}.
+
+The levels represent independent sets of unique solutions, such that
+$\forall_{i, j \in P, i \neq j} P_i \cap P_j = \emptyset$.  This relationship
+is maintained constructively, such that new solutions can only be added to a level
+if they do not exist in any level of the pyramid.  This uniqueness check can be
+achieved in constant time by maintaining a hash of all solutions in the pyramid.
+
+Along with storing the solutions, each level also maintains a table of pairwise
+gene value frequencies.  This is also built constructively, such that initially
+all frequencies are set to 0.  Each time a solution is added to a level, all
+pairs of loci are queried for their gene values.  The table is then updated,
+incrementing the count for each observed pairing.  This requires $O(N^2)$ operations
+(no evaluations) each time a solution is added to a level of the pyramid, but is
+constant in the number of solutions currently in the level.
 
 \subsection{Crossover}
-TODO Explain how entropy becomes clusters efficiently $O(n^2)$~\cite{gronau:2007:upgma}, cluster ordering,
-keep changes that don't reduce fitness, removal of zero entropy sub-clusters,
-keep donating until a change is made.
+\label{sec-crossover}
+P3 uses a crossover method derived from that defined for LTGA~\cite{thierens:2013:ltgahiff}
+(Section~\ref{sec-ltga}),
+in that it uses gene value entropy to construct clusters of genes that should have their values
+conserved during crossover.  There are two primary steps in
+defining this type of crossover: cluster creation and cluster usage.
+
+During cluster creation, P3 attempts to create a binary tree of clusters such that the leaves
+represent individual gene loci and each internal node represent the subset of loci created
+by joining the subsets encoded in its children.  These clusters represent detected linked
+loci in the genome, and are used when performing crossover.
+Using the table of observed frequencies described in Section~\ref{sec-pyramid}, Equation~\ref{eq-distance}
+efficiently estimates the linkage between clusters of loci using the average pairwise
+entropy, as given in Equation~\ref{eq-entropy}.
+\begin{equation}
+  D(C_i,C_j) = \frac{1}{\left | C_i \right |\cdot \left |C_j \right|}\sum_{c_i \in C_i}\sum_{c_j \in C_j} 
+  2 - \frac{H(C_i) + H(C_j)}{H(C_i \cup C_j)}
+  \label{eq-distance}
+\end{equation}
+\begin{equation}
+  H(C) = -\sum_{s\in S} p_c(s)\log(p_c(s))
+  \label{eq-entropy}
+\end{equation}
+
+Starting from the leaves, such that each loci appears exactly once, the binary tree
+can be constructed using an agglomerative method.  Each iteration determine the
+pairwise linkage between each cluster of loci using Equation~\ref{eq-distance},
+and merge the two closest into a new cluster.  The process ends when there is only
+a single cluster containing all loci.  As our clustering algorithm provides the proper
+criteria this algorithm requires $O(N^2)$ total time to correctly construct the linkage tree
+from the frequency table~\cite{gronau:2007:upgma}.
+
+Not all of the clusters in the linkage tree are worth using during crossover.  The most
+obvious is a cluster containing all the loci.  If we performed a crossover such that all
+of the loci must remain together, no new individual would be created.  We further remove
+clusters that are completely contained within some other cluster, such that if
+$D(C_i,C_j) = 0$, $C_i$ and $C_j$ are not used when performing crossover.  $D(C_i,C_j)$ only
+returns $0$ when the loci in $C_i$ perfectly predict the bits in $C_j$ and vice versa,
+and from this we conclude that the settings for those two loci should never be disrupted.
+When used on particularly small populations this has the potential to greatly reduce the number
+of clusters used during crossover.  For instance, if $|P_i| = 1$ no clusters exist, and if $|P_i| = 2$
+exactly two clusters exist: one where the solutions agree and one where they disagree.
+
+Given the useful set of clusters, we can now define how they are used.  P3 uses
+crossover to recombine known information in a level of the pyramid with a candidate
+solution.  For each cluster, do the following.  Select a random donor from the population.
+Copy the donor's gene values for all loci in the cluster into the candidate solution.
+Evaluate the candidate.  If the fitness of the candidate has been reduced, revert the candidate's
+gene values.  When choosing the donor P3 ensures there is at least one gene value
+different between the donor and the candidate solution.  This can potentially require
+up to $O(|P_i|)$, but is on average more efficient than allowing donations that
+do not change any gene values.
+
+To complete a single crossover event, all of the useful clusters are tested, each
+requiring at most a single evaluation.  Clusters are tested in smallest first order,
+with clusters of equal size ordered randomly.  This ensures smaller building blocks
+are optimized before large changes are made to the genome, which helps preserve
+diversity.  As cluster building and application ordering are not dependent on
+the position of loci in the genome, there is no positional bias in the search points
+evaluated.
 
 \subsection{All Together}
+\label{sec-alltogether}
 TODO Pieces working together.  HC removes pairwise noise, which allows crossover to detect
 clusters.  Levels allow realization of linkage at high levels, reduction in noise.
 
 \section{Comparison Algorithms}
 
 \subsection{Random Restart First Improvement Hill Climber}
-TODO This is important to have as it shows how the pyramid is able to reach optima
-the hill climber cannot.  Need a citation.
+TODO Need a citation either here or Section~\ref{sec-hillclimber}.
+
+As P3 utilizes a hill climber to perform optimization, it is necessary to show P3's
+added complexity is able to outperform using the hill climber alone.  Therefore
+as the first comparison we define a complete optimization method based of off the
+First Improvement Hill Climber defined in Section~\ref{sec-hillclimber}.  This definition
+is extended to match P3's style of restarting. Whenever the hill climber
+obtains a solution that cannot be improved using a single bit flip, a new solution
+is randomly generated and optimized.
+
+If P3's quality relies solely on starting at random points and applying hill climber,
+this comparison algorithm should perform even better than P3.  Similar to P3 this
+algorithm is parameterless, makes no assumptions about gene ordering, and will
+find the global optima given a sufficient (potentially exponential) number of evaluations.
 
 \subsection{Linkage Tree Genetic Algorithm}
-TODO Discuss LTGA~\cite{thierens:2013:ltgahiff}, how it differs from P3, its limitation based on
-initialization, requirement of population size.  Mention how some
-of the ideas in P3 were tried in LTGA and seemed to make improvements~\cite{goldman:2012:ltga}.
-Tests of adding hillclimber to LTGA argued no improvement~\cite{bosman:2011:lsbbo}.
-Discuss bisection method and Rule of Three~\cite{jovanovic:1997:ruleofthree}.
-Remember to say that the paper argues for $\frac{3}{N+1}$, so 100 trails is strictly
-less than $3\%$ expected failure rate.
+\label{sec-ltga}
+The closest relative to P3 in existing literature is the Linkage Tree Genetic Algorithm
+(LTGA).  There have been a number of different variations proposed to LTGA since
+its original publication~\cite{thierens:2010:ltga}, so for comparison we have chosen
+to use the variant described in the most recent publication~\cite{thierens:2013:ltgahiff}.
+This algorithm is also the current state of the art, outperforming other algorithms
+in black box optimization across numerous benchmarks.
+
+LTGA works by iteratively improving a population of solutions in a generational manner.
+Each generation the half of the solutions (chosen using standard tournament selection)
+are used to construct a linkage tree just as described in Section~\ref{sec-crossover}.
+Each solution in the population is then crossed with the entire population using that
+linkage tree, with the results put into the next generation.  This process continues
+until the population fails to change between generations, signaling convergence.
+
+Unlike P3, LTGA does not make use of a hill climber, and there is evidence that
+doing so results in decreased efficiency~\cite{bosman:2011:lsbbo}.  LTGA applies
+clusters in least linked first order whereas P3 uses smallest first.  Also, LTGA
+does not search for donors until one containing different genes is found.  Instead
+if the donated genes are identical, it simply skips the evaluation.  LTGA
+requires a population size parameter, maintains a fixed population size across
+generations, and does not prevent duplicate individuals in a population.  LTGA
+does not add new genetic information after initialization, meaning that if
+required diversity is not contained in the original population or lost in future
+generations, LTGA will fail to find the global optimum.
+
+In order to set the population size parameter to solve a class of problems, we use
+the bisection method~\cite{goldman:2012:ltga}, which determines the minimum population
+size required to meet a specified success criteria.  As P3 will run until the global optima
+is found or the evaluation limit is reached, we want to ensure LTGA has a similar requirement
+on its success.  Therefore using the Rule of Three~\cite{jovanovic:1997:ruleofthree} we
+can provide a bound on the probability of failure $\frac{3}{k+1}$ with $95\%$ confidence,
+where $k$ is a number of runs without a failure.  Here we state that a population size
+is successful if it performs 100 runs without failing to find the global optimum, meaning
+the probability of that population failing to solve problems of the same class is bounded above by
+$3\%$.  Note that these 100 runs are considered training, and the results from the bisection
+runs are not included during the comparative testing.  Furthermore, when testing on problem
+classes, bisection is performed on a different set of instances than testing.
+
+Other variants of LTGA have more closely resembled P3~\cite{goldman:2012:ltga},
+but as those variants are not in active use, we did not use them for comparison.
+However, no LTGA variant has been able to remove the population size parameter
+or the problem of premature convergence.
 
 \subsection{\bm{$(1+(\lambda,\lambda))$}}
-TODO Explain briefly how it works, that it is the best theory supported crossover method~\cite{doerr:2013:lambdalambda}.
-Explain changes including: Keep best mutant if no worse than crossover offspring,
-prevent evaluations if crossover offspring identical to either parent, if tied fitness
-in crossover offspring take maximum hamming distance to parent.  If $\lambda \ge N$
-restart with random individual.  Does not use ``mod'' version as restarting is preferable
-when stuck on plateaus.
+As a final comparison we chose the $(1+(\lambda,\lambda))$ algorithm~\cite{doerr:2013:lambdalambda}
+which is currently the best theory supported crossover method.  Unlike P3 and LTGA,
+$(1+(\lambda,\lambda))$ does not use a population of solutions or any model building
+to determine problem variable linkage.  Instead it uses mutation to produce $\lambda$
+offspring, selecting the best to recombine with the original parent to produce $\lambda$
+more offspring using uniform crossover.  In the original work a method for controlling
+the value of $\lambda$ is provided based on offspring success, meaning there are no
+parameters to be set in this algorithm.
+
+In order to make $(1+(\lambda,\lambda))$ a viable method of optimizing problems
+with multiple local optima, we modified the original algorithm.  Primarily, if
+during search $\lambda \ge N$, search is restarted from a random individual with
+$\lambda=1$.  This is done because when $\lambda \ge N$ the mutation rate is greater
+than or equal to $100\%$, nullifying search.  Furthermore, this point is only reached
+when the algorithm has stalled for a significant number of generations.
+
+We also made minor modifications to selection and to prevent wasting evaluations.
+If the best offspring produced in a generation is a mutant offspring, select that
+over any of those produced using crossover.  If there is a fitness tie between the
+best offspring in a generation, select the one with the maximum hamming distance
+to the parent.  This encourages drift over plateaus.  While the original paper
+discusses a ``mod'' version of the $\lambda$ control strategy for how to handle
+when offspring of equal fitness are produced, we found this conflicted with our
+method of restarting.  As such we use the original control strategy, where $\lambda$
+is increased if the best offspring in a generation is not strictly better than its parent.
 
 \section{Test Problems}
 
