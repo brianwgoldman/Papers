@@ -272,7 +272,7 @@ returns $0$ when the loci in $C_i$ perfectly predict the bits in $C_j$ and vice 
 and from this we conclude that the settings for those two loci should never be disrupted.
 When used on particularly small populations this has the potential to greatly reduce the number
 of clusters used during crossover.  For instance, if $|P_i| = 1$ no clusters exist, and if $|P_i| = 2$
-exactly two clusters exist: one where the solutions agree and one where they disagree.
+at most two clusters exist: one where the solutions agree and one where they disagree.
 
 Given the useful set of clusters, we can now define how they are used.  P3 uses
 crossover to recombine known information in a level of the pyramid with a candidate
@@ -388,16 +388,109 @@ method of restarting.  As such we use the original control strategy, where $\lam
 is increased if the best offspring in a generation is not strictly better than its parent.
 
 \section{Test Problems}
+TODO Mention that since all of our algorithms are variable order insensitive
+and have no bias toward creating 1s over 0s, all will have identical results if
+problem variables are randomly reordered or XOR'd.
+
+TODO Chose only problems with known global optima to allow comparison on time to
+global optima.
 
 \subsection{Single Instance Problems}
-TODO Deceptive Trap, Deceptive Step Trap~\cite{goldman:2012:ltga}, Hierarchical If
-and Only If, Discretized Rastrigin.
+Well defined test problem landscapes can help when performing exact analysis of
+algorithms.  These problems can be thought of as testing the edge cases of optimizers,
+presenting them with unnatural but interesting problem features.
+
+The classic example for this kind of test problem is the Deceptive Trap problem.
+For this benchmark the genome is broken up into non-overlapping problems of $k$
+genes, with the fitness of a single ``trap'' given by Equation~\ref{eq-deceptivetrap}.
+\begin{equation}
+   trap(t) = \left\{
+     \begin{array}{rl}
+       k-1-t, &  t<k\\
+       k,   &  t = k
+     \end{array}
+   \right.
+  \label{eq-deceptivetrap}
+\end{equation}
+In this equation $t$ represents the number of bits set in the trap.  For each trap
+there is one local optima (all bits set to 0) and one global optima (all bits set to 1).
+This problem requires exponential time to solve unless there is some method to effectively
+move complete traps between solutions, making this an excellent crossover test problem.
+
+However, when using a hill climber and linkage learning, the Deceptive Trap problem
+may be trivially solved~\cite{goldman:2012:ltga}.  As such the Deceptive Step Trap
+problem was defined, given in Equation~\ref{eq-deceptivesteptrap}.
+\begin{equation}
+   step\_trap(t) = \left \lfloor \frac{(k-s)\pmod{s} + trap(t)}{s} \right \rfloor
+  \label{eq-deceptivesteptrap}
+\end{equation}
+This problem leverages the original Deceptive Trap problem definition, with the
+addition of fitness plateaus of configurable size $s$.  This creates an enormous
+number of local optima and makes detection of linkages much more challenging.
+
+While both of these problems have difficult to solve subproblems, there non-overlapping
+nature and single optimal setting may not capture aspects of real world problem solving.
+Therefore the Hierarchical If and only If (HIFF) problem is often used to test an
+algorithms ability to handle these characteristics~\cite{thierens:2013:ltgahiff}.
+In this problem the genome is broken up hierarchically into a complete binary tree,
+with each gene representing a single bit, and each internal node representing the union
+between all genes in that nodes subtree.  A node in the tree contributes to the fitness
+only if all of the genes in its subset have the same value (IE are all 0 or are all 1).
+The amount contributed is equal to the number of bits in the subset.  As a result
+this problem involves creating larger and larger blocks of single value runs which
+only score if the entire block is optimized.
+
+Our final single instance problem is borrowed from the real valued optimization domain.
+The Discretized Rastrigin used the standard Rastrigin evaluation function (Equation~\ref{eq-rast}).
+\begin{equation}
+  An + \sum_{i=1}^{n}\left [ x_i^2-A\cos (2\pi x_i) \right ] \forall x\in [-5.12,5.12]
+  \label{eq-rast}
+\end{equation}
+This function creates a highly multimodal landscape which is completely separable
+and has a single global optima.  In order to apply our algorithms to this complex problem,
+we discretized the representation using 10 bit gray coded numbers evenly distributed
+on the range $[-5.12,5.12)$.
 
 \subsection{Randomly Generated Problem Classes}
-TODO Nearest Neighbor NK with wrapping neighborhoods~\cite{wright:2000:solvingnk}, Ising Spin Glasses on toroidal
-grids with only -1, 1 spins~\cite{saul:1994:spinglass}.
-Used\footnote{\url{http://www.informatik.uni-koeln.de/spinglass/}}, Maximum Satisfiability constructed with known global
-optimum.
+By enforcing only certain characteristics of a search space while allowing others
+to be generated randomly, we can perform tests on classes of problems instead
+of specific instances.  This can improve the generality of results as experiments
+then predict the expected quality over the entire class even if only a subset
+of possible instances are actually used during experimentation.  Unlike single
+instance problems, the challenge with randomly generated problems is often how
+to know when the global optimum is reached.
+
+NK landscapes define a class of problems such that the fitness of a single gene's
+value is dependent on $k$ other genes in the genome.  Finding the solution which
+maximized fitness on an arbitrary NK landscape requires exponential time, and
+are therefore a good candidate for heuristic techniques.  Nearest Neighbor NK
+landscapes are a subset of NK landscapes such that each gene is dependent on the $k$
+genes following it in the genome.  The advantage of this subset is that they can be
+solved in polynomial time~\cite{wright:2000:solvingnk}.  For our experiments we
+used wrapping neighborhoods, such that genes near the end of the genome depend on
+genes at the start of the genome.
+
+Ising Spin Glasses are another large class of $NP-Hard$ problems.  These problems
+involve minimizing the interaction terms in a graph based on edge weights by changing
+the sign of graph nodes.  Similar to with NK landscapes, there is a subset of Ising problems
+known as $2D\pm J$ Ising Spin Glasses.  This subset restricts graph interactions to a
+toroidal two dimensional grid with edge weights of $\{-1, +1\}$.  This subset can
+be solved in polynomial time~\cite{saul:1994:spinglass}, and there are existing
+tools for solving arbitrary instances.\footnote{\url{http://www.informatik.uni-koeln.de/spinglass/}}
+
+Our final problem class is a subset of the Maximum Satisfiability (MAXSAT) problem.
+This problem consists of a series of disjunctive clauses, such that each clause contains
+three problem variables, some of which are negated. While
+MAXSAT requires exponential time to solve, we have devised a method of generating
+instances that ensures each has at least one solution that satisfies all clauses.
+First, a random target solution is generated.  For each clause, set the sign of each
+variable in the clause such that that clause will be satisfied by the target solution.
+To ensure there is no bias to variable signs in the generated problem there is a $\frac{1}{6}$ probability
+all clause signs match the target, a $\frac{1}{6}$ probability two of the three signs match,
+and a $\frac{4}{6}$ probability only one sign matches.  By setting the clause signs
+in this way we ensure the target solution is always able to satisfy all clauses,
+meaning all problems have a known best fitness.  Note that its possible there to be
+other solutions that satisfy all clauses.
 
 \section{Experimental Results}
 TODO Cover all 7 problems as a group, focusing on the two ``types'' of problems.
@@ -410,10 +503,65 @@ TODO Include graphic for 7 problem results.
 
 TODO Include table comparing results on largest version of each problem.
 
+TODO Mention source code is available\footnote{\url{https://name.of.site.removed/anonymous}}.
+
 \section{Promising Theory}
 TODO Easy proof on unimodal (no plateaus) and all functions of unitation due to HC.
 Sketch of how to prove runtime on Deceptive Trap, HIFF, suggestions toward all
 possible non-overlapping functions.
+
+Due to P3's persistent integration of random solutions, it always has a non zero
+probability of reaching the global optimum.  Because it meets this prerequisite
+(unlike LTGA), it is likely possible to derive expected running times for P3 on
+a number of problems.  While we do not present a rigorous solution to any particular
+problem here, we wish to illuminate potential avenues for future proofs.
+
+The traditional One Max class, as well as all functions of unitation, will be
+trivially solved by the hill climber in at most $N+1$ evaluations.  These come
+from the initial evaluation of the random solution, plus the $N$ evaluations required
+to test each gene for improvement.  While more difficult to bound, any unimodal
+search space without fitness plateaus will be solved by a single application
+of the hill climber.  Notably we expect a bound on Leading Ones of $O(N^2)$ time.
+
+Yet unlike many theory based algorithms, we believe P3 can achieve bounds on more
+complex and interesting landscapes.  Consider a sketch for a proof on the Deceptive
+Trap problem.  Each restart will require at most $2N$ evaluations to evaluate the
+random individual and optimize it to a local optima using the hill climber.  In
+$P_0$ all solutions will either have all 1s or all 0s.  As a result $D(C_i, C_j) = 0$
+if all $C_i$ and $C_j$ come from the same trap.  Therefore all crossover clusters
+will move only complete traps between solutions, and once there is sufficient
+diversity in the population there will be a crossover for each individual trap.
+When performing a crossover of a single trap there can only be a single alternative
+value, meaning if the candidate solution has all 0s the donor must have all 1s, or vice
+versa.  Therefore if $P_i$ contains the optimum solution for a trap in at least one
+individual and has a crossover that moves that trap, all solutions produced by crossing
+$P_i$ with a candidate solution will have the optimized value of that trap.  Extending to
+all traps we can say that once any $P_i$ has at least one solution with the optimized
+version of a trap for all traps the very next crossover with $P_i$ will produce the global optimum.
+The only remaining portion of the proof is to determine how many evaluations are required to reach this point,
+which is relatively trivial.
+
+Using loose requirements, this can likely be extended to any arbitrary fully decomposable
+problem. Assuming that for sufficiently large population sizes the entropy between
+bits in a single subproblem is lower than the entropy of bits between subproblems,
+P3 will construct a cluster capable of moving exactly one subproblem's gene values
+during crossover.  As crossover cannot decrease the fitness of a solution each
+crossover will have a non zero probability of improving subproblem solution quality.
+The probability of low fitness local optima for a subproblem reaching high levels
+is therefore low, which increases the probability of donors only having high quality
+solutions to subproblems.  Combined this is expected to create a runtime potentially
+exponential in subproblem size, but polynomial in problem size.
+
+This proof sketch can likely be extended to the HIFF problem, with minor modifications.
+Each application of the hill climber ensures all subproblems of size 2 will be solved.
+Once $P_0$ has a sufficient number of solutions it will correctly cross all subproblems
+independently, such that all future solutions crossed with $P_0$ will have all subproblems
+of size 4 solved.  While $P_1$ can contain solutions that do not correctly solve some 2 bit
+subproblems (added before $P_0$ reached critical mass), the probability of these solutions
+being selected as donors decreases rapidly (solutions added after $P_0$ reaches critical mass).
+As such each level effectively serves to optimize the next largest subproblem size, leading to
+convergence using a logarithmic number of levels.
+
 
 \section{Conclusions and Future Work}
 TODO No parameters required, beats tuned LTGA.  Good at solving hard classes
