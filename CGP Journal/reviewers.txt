@@ -17,22 +17,11 @@ Typographical corrections and other minor suggestions:
 
 Abstract:  To avoid confusion, it may be helpful to make it clear that Skip, Accumulate etc. are your invention , e.g. "which we name..."
 
-Page 2, column 1, line 9:  Actually, in many CGP implementations it is not common to exclude the gene's current value during mutation.
-
-Page 4, column 1, line 51: "Once all of a *node's* dependencies..."
-
 Page 7, column 1, lines 28-33:  References or at least a very brief description of the purpose of for Kruskal–Wallis (as for the Mann-Whitney U test) would aid those not familiar.
 
 ----------------------------------------------------
 Reviewer: 2
 Following are some comments to help improve the paper:
-Page 1, Line -5: Please provide the reasons why the interaction is important? Also, please explain (briefly) how your goals can be achieved.
-Page 3, Line 6: why only "one" active gene is mutated?
-Page 3, Line -1, Column 2: ", and defined Normal as CGP's historical ordering method", do you mean the ordering method of the original CGP? If possible, please give a short description of Normal.
-Page 4, Line -21, Column 2: " While this increase ... drawback.", this sentence is not entirely clear to me. Please elaborate more and provide reasons for this statement.
-Page 5, Line 1: "mutating node" or "mutated node"?
-Page 6: the Parameter setting section is clear and easy to understand. It would be nice to give some rationales why potential configurations run 5 times and later 4 times? Why are higher values used?
-Page 7, Line -11, "we would suggest Skip be used over accumulate for any real world application." is quite a strong claim. Only binary problems are examined in the experiments, is it enough to support your claim?
 Page 8, Table II: If possible, please provide the average, standard deviation of "Evaluations to success" and the average running time of each configuration.
 
 
@@ -42,125 +31,6 @@ to see more work done on harder problems. Here there was only one seriously hard
 
 The paper has focused on Boolean problems and it would be interesting to
 carry out similar analysis in other domains. Of course, this remains for the future.
-
-
-
-Specific suggestions for correction:
-
-
-II. CARTESIAN GENETIC PROGRAMMING
-
-"Mutation is commonly performed by mutating each gene of each node at a set probability, where
-mutation involves changing a gene randomly to some different valid value. For example, if a function gene
-is chosen for mutation, its new value is randomly chosen from all possible functions, excluding the gene’s
-current value."
-
-Mutation is generally carried out in two ways. One is as described in the paper. The other uses a "mutation rate" in which
-the user decides the number of genes that can be mutated (usually using a parameter indicating the percentage
-of genes that may be mutated). With this method there is a minimum number of genes that may be changed, namely a single
-
-gene. The two methods require markedly different amounts of computation. In the former, mutation by probability, one
-must travel along the genotype deciding to mutate a gene with a given probability, this operation is O(n) where n is the
-number of genes. However the "mutation rate" method is O(1) as it determines a fixed number of gene locations to
-mutate and it does not travel along the genotype looking at all the genes. It is this interpretation of mutation that is
-described on page 28 of the book non CGP edited by Miller.
-
-I think it would be good to at least mention this, it may or may not have implications for subsequent work reported in the
-
-paper. Also it would be very good to be clear about what type of mutation probability you have used. For instance in
-
-section III you use the term "mutation rate" and you presumably mean "mutation probability"?
-
-Another quite minor point is that as stated in Miller's book (page 28) when a function gene is selected for mutation, no
-
-check is made as to whether the mutated function is the same as that before mutation. Of course, it costs little to do
-the check...
-
-
-
-III. DUPLICATE EVALUATION AVOIDANCE
-
-
-A. Skip
-
-"Each gene in each active node is compared for
-equivalence with the corresponding gene in the offspring’s
-parent. If all active genes are found to be equal than the
-offspring is not evaluated and is instead given the same fitness
-as its parent."
-
-"than" should be "then".
-
-It is worth noting in the paper that this step does incur a computational cost. If the computational cost of fitness
-
-evaluation is large this "checking for equivalence" test may be negligible. Assuming that the average number of active
-
-genes is logarithmic in the number of genes, then this equivalence test incurs an extra cost of O(log n) for each
-
-offspring. I am not sure from your paper how you did implemented equivalence checking...
-
-
-
-B. Accumulate
-
-Following on from my remarks on section "A. Skip" about computational cost I think the paper would benefit from some
-remarks about the extra computational cost of carrying out the Accumulate strategy. Each genotype Fi has to have its
-active genes checked to see if there is at least one difference from the parent. How computationally expensive is this?
-
-
-C. Single
-
-"Instead of mutating each gene at a set probability, Single mutates genes at random until exactly one active gene
-is mutated."
-
-Since one knows what the parent's active genes are, one could change an active gene at random. It would be very
-
-interesting to see if this variant of single resulted in any change in performance. What I am getting at
-is that you made a choice in defining this strategy and clearly there are other choices, discussing those
-would add value to the paper...
-
-
-
-
-IV. GENOME ORDERING
-
-
-"As was discussed in Section II, CGP uses node ordering in
-the genome to prevent cycles, by ensuring nodes only receive
-input from sources that precede them in the genome. This
-restriction does not limit CGP’s ability to represent DAGs, as
-all DAGs can be serialized to fit this requirement. However,
-this representation likely has an impact on CGP’s ability to
-evolve specific DAGs [14]."
-
-"...this representation likely..." -> "...this representation is likely..."
-
-A. Reorder
-
-
-"The first step in performing Reorder on a genome is to
-create convenience data structures to store direct connection
-relationships."
-
-"convenience" -> "convenient"
-
-B. DAG
-
-
-V. QUALITATIVE COMPARISONS
-
-Table 1
-
-"Each generation the parent’s node ordering is shuffled
-without effecting node behavior."
-
-"effecting" -> "affecting"
-
-It is probably a Latex issue, but the caption TABLE 1 merges with the bottom line of the table. I am sure there is a latex
-
-trick to add some space?
-
-
 
 C. Results
 
@@ -172,30 +42,3 @@ efficient when the problems get harder (more inputs), so making comparisons
 with modular CGP on 3-bit parity is of little value actually. Perhaps you
 could add a qualifying remark about this?
 
-
-VI. ANALYSIS OF EVOLUTIONARY MECHANISMS
-
-
-
-B. Node Behaviors
-
-"Table IV and Table V help illustrate the behavioral breakdown
-of nodes for each algorithm combination on the Encode
-and Multiply problems, respectively. These two problems were
-chosen as they represent different ends of the quality spectrum
-for Skip-Normal and because together the are sufficiently
-representative of behaviors seen on the other problems."
-
-"the are" -> "they are"
-
-"If this is true, it may help to explain CGP uses such large genomes..."
-
--> "If this is true, it may help to explain why CGP uses such large genomes..."
-
-
-C. Parent Replacement
-
-"Normal appears to also reduce changes to active node behavior, causing the most effect
-after Single."
-
-"most effect" -> "Largest effect"?

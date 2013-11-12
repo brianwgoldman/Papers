@@ -546,6 +546,11 @@ Previous studies of CGP's evolutionary mechanisms have
 focused on bloat~\cite{miller:2001:bloat},
 neutrality~\cite{vassilev:2000:neutrality}, and structural bias~\cite{payne:2009:bias}.
 We shall focus on the interaction between mutation and genome ordering.
+%NEW
+While these features of CGP have trivial definitions, we will argue, using
+experimentation and analysis of alternatives, that they have a great deal
+of impact on search success.
+%/NEW
 
 In Section~\ref{sec:cgp} we provide
 an introduction to CGP, with sufficient background to put later sections into
@@ -586,7 +591,7 @@ As both output locations and information flow in the DAG are evolvable, often
 only a tiny fraction of the genome participates in creating the
 output values.  These nodes are referred to as ``active,'' with the nodes not
 being used to create output values referred to as ``inactive.''  Inactive nodes
-allow CGP individuals to drift genetically, as they can be mutated without affecting
+allow CGP individuals to drift genetically, as they can be mutated without effecting
 the fitness of the individual.  This genetic drift can then be incorporated, as
 mutation can change the DAG structure causing previously inactive nodes to become
 active.  Previous work suggests CGP is most efficient when up to 95\% of the genome
@@ -599,11 +604,19 @@ This means during each generation a single parent produces four offspring using
 mutation.  The best offspring then competes with the parent,\footnote{Ties are broken
 randomly.} with the offspring
 replacing the parent if it is no less fit.  This replacement strategy encourages
-neutral drift.  Mutation
-is commonly performed by mutating each gene of each node at a set probability, where mutation
+neutral drift.
+%NEW
+In CGP mutation is done in a myriad of nearly synonymous ways.  Here we mutate
+%/NEW
+each gene of each node at a set probability, where mutation
 involves changing a gene randomly to some different valid value.  For example,
 if a function gene is chosen for mutation, its new value is randomly chosen from
-all possible functions, excluding the gene's current value.  Combined,
+all possible functions, excluding the gene's current value.
+%NEW
+This version of mutation was chosen to allow precise prediction of changes
+in gene value necessarily in later sections.
+%/NEW
+Combined,
 this form of CGP can be viewed as a stochastic hill climber with neutrality.
 For a more in depth description of CGP, see~\cite{miller:2011:chapter2}.
 
@@ -624,13 +637,13 @@ effect this waste can have, and proposed \emph{Skip}, \emph{Accumulate}, and
 \emph{Single} as methods for avoiding or preventing these duplicate evaluations.
 
 The number of wasted evaluations is
-directly related to the mutation rate and the number of active genes.  With
-sufficiently high mutation rates and enough active genes, the probability of
+directly related to the mutation probability and the number of active genes.  With
+sufficiently high probabilities and enough active genes, the chance of
 creating an offspring which is actively identical to its parent is very low.
 Yet such a configuration may make it difficult for CGP to optimize, as mutation
 is likely to change many active genes in each application.  As was discussed
 in~\cite{goldman:2013:cgpwaste}, this can make normal CGP very sensitive to the
-mutation rate.
+mutation probability.
 
 \subsection{Skip}
 The \emph{Skip} method for avoiding duplicate evaluations involves the least
@@ -638,30 +651,38 @@ amount of modification from CGP's normal behavior.  After an offspring is produc
 and its set of active nodes is determined but before it is evaluated, it is compared
 with its parent.  Each gene in each active node is compared for equivalence with
 the corresponding gene in the offspring's parent.  If all active genes are found to be equal
-than the offspring is not evaluated and is instead given the same fitness
+then the offspring is not evaluated and is instead given the same fitness
 as its parent.
 Note that since inactive genes are not compared for equivalence it is still possible
 for offspring to genetically differ from their parents.
 
 Because \emph{Skip} does not modify any evolutionary mechanisms found in traditional CGP,
 it will produce identical individuals, with a potential reduction in evaluations.
-If the mutation rate is high enough relative
+If the mutation probability is high enough relative
 to the number of active genes, \emph{Skip} will require the same number of evaluations as traditional CGP, since
 the probability of an offspring being actively identical to its parent is effectively zero.
-When the mutation rate is low enough relative to the number of active genes, some number of
+When the mutation probability is low enough relative to the number of active genes, some number of
 offspring will be actively identical to their parents, resulting in a reduction in evaluations
 but no change in the evolutionary trajectory.
 
+%NEW
+This technique incurs a minor increase in runtime, as each active gene in the
+offspring must be compared against the parent's gene at the same locus.
+This operation is at most linear in genome size.  Yet
+on problems where evaluation is even somewhat expensive, the evaluations prevented
+by performing this check will result in a net reduction in runtime.
+%/NEW
+
 We would expect both intuitively and from our initial
 experimentation~\cite{goldman:2013:cgpwaste} that \emph{Skip} will be less sensitive
-to the mutation rate than normal CGP.  We would also expect \emph{Skip} to use a lower
-mutation rate than normal CGP when both are optimized to reduce evaluations.
-The former comes from the fact that in normal CGP any mutation rate that has a significant
-probability of creating offspring actively identical to their parents wastes
+to the mutation probability than normal CGP.  We would also expect \emph{Skip} to use a lower
+mutation probability than normal CGP when both are optimized to reduce evaluations.
+The former comes from the fact that in normal CGP any mutation probability that has a significant
+chance of creating offspring actively identical to their parents wastes
 evaluations.  In \emph{Skip} there are only two penalties for reducing the
-mutation rate.  From an evolutionary standpoint, if search becomes trapped in a local optima, low mutation
-rates may have increased difficulty escaping to find the global optimum.  From a performance standpoint,
-exceptionally low mutation rates may spend a prohibitive amount of time
+mutation probability.  From an evolutionary standpoint, if search becomes trapped in a local optima, low mutation
+probabilities may have increased difficulty escaping to find the global optimum.  From a performance standpoint,
+exceptionally low mutation probabilities may spend a prohibitive amount of time
 attempting to produce an evaluable offspring.
 Note that these penalties also exist in normal CGP.
 
@@ -686,7 +707,7 @@ before it is evaluated, with an emphasis on encouraging neutral drift.
 
 Previous experimentation has shown that \emph{Accumulate} acts very similarly to
 \emph{Skip}~\cite{goldman:2013:cgpwaste}, with the exception that \emph{Accumulate}
-favors lower mutation rates when tuned to reduce evaluations to success. While at first these algorithms may appear
+favors lower mutation probabilities when tuned to reduce evaluations to success. While at first these algorithms may appear
 quite different, further consideration shows how they are similar.  In \emph{Skip}
 any actively identical offspring that is produced is likely to be selected as we expect mutations to
 active genes to more often reduce fitness than improve it.  In the next generation
@@ -695,6 +716,20 @@ continuing until it finally does mutate one or more active genes.  At this point
 mutant is better it replaces the parent, otherwise the parent, which has been accumulating
 mutations to inactive genes, is kept.  In this way \emph{Skip} mirrors \emph{Accumulate},
 except \emph{Skip} acts over multiple generations instead of compressed into a single generation.
+
+%NEW
+Similar to \emph{Skip}, \emph{Accumulate} incurs a minor computation cost in
+order to prevent wasting evaluations.  Generating each $F_i$ requires at most
+$O(AN)$, where $A$ is the arity of the nodes and $N$ is the number of nodes.
+While \emph{Accumulate} may produce many $F_i$ in the process of creating
+a single offspring, conceptually \emph{Skip} using the same mutation rate
+will create a similar number of total individuals when performing the same
+number of evaluations.  As such, we suggest \emph{Accumulate}
+will take no more than a constant factor more runtime to produce the same number
+of evaluable individuals as \emph{Skip}.  As before, this increase is likely
+eclipsed when solving problems with sufficiently time consuming evaluation functions.
+%/NEW
+
 
 \subsection{Single}
 While \emph{Skip} and \emph{Accumulate} save evaluations by not evaluating offspring
@@ -710,7 +745,7 @@ mutated active gene must either be to an intron or represent another way to
 code a solution of equal quality.  Second, as a benefit of forced changes,
 \emph{Single} avoids the overhead of repeatedly generating individuals without
 creating an evaluable offspring.  Third, \emph{Single} does not require a mutation
-rate parameter, effectively setting the mutation rate to $\frac{1}{a}$ for active
+parameter, effectively setting the mutation probability to $\frac{1}{a}$ for active
 genes and $\frac{1}{a+1}$ for inactive genes, where $a$ is the number of active genes.
 
 In encodings without inactive genes, limiting mutation to changing exactly one gene
@@ -722,13 +757,22 @@ to drift due to lack of introns, it does have an increased potential to become s
 As will be discussed in Section~\ref{sec:ordering} and was shown in~\cite{goldman:2013:ordering}
 this problem of highly active genomes is very unlikely.
 
+%NEW
+Conceptually this method could be extended to mutate some number of active genes
+before terminating.  Doing so would reintroduce a parameter to govern how many
+active genes to mutate.  Our choice of a single mutation allows for the minimal
+amount of change to ensure the individual should be evaluated, while mutations
+made to inactive genes still give CGP sufficient power in each mutation to escape
+local optimums.
+%/NEW
+
 \section{Genome Ordering}
 \label{sec:ordering}
 As was discussed in Section~\ref{sec:cgp}, CGP uses node ordering in the genome
 to prevent cycles, by ensuring nodes only receive input from sources that
 precede them in the genome.  This restriction does not limit CGP's ability
 to represent DAGs, as all DAGs can be serialized to fit this requirement.
-However, this representation likely has an impact on CGP's ability to evolve specific
+However, this representation is likely having an impact on CGP's ability to evolve specific
 DAGs~\cite{goldman:2013:ordering}.
 
 Primarily, enforcing node ordering adds artificial limitations to CGP's ability to
@@ -781,8 +825,11 @@ are almost certainly going to be active, while nodes in the last three quarters
 of the genome are almost never going to be active.
 
 To rectify these issues and examine CGP without ordering bias, \cite{goldman:2013:ordering}
-created \emph{Reorder} and \emph{DAG} as methods for genome ordering, and defined
-\emph{Normal} as CGP's historical ordering method.
+created \emph{Reorder} and \emph{DAG} as methods for genome ordering.
+%NEW
+For clarity, we shall refer to CGP's historical ordering method of enforcing
+only forward connections as \emph{Normal}.
+%/NEW
 
 \subsection{Reorder}
 \label{sec:reorder}
@@ -794,7 +841,7 @@ output (directly or indirectly) to the node.  In general, this process works by 
 locations in the genome at random once all of the nodes they take input from have been assigned
 locations earlier in the genome.
 
-The first step in performing \emph{Reorder} on a genome is to create convenience
+The first step in performing \emph{Reorder} on a genome is to create
 data structures to store direct connection relationships.  These structures are used
 to determine in constant time all connections incident on a node, and 
 can be built in order $O(AN)$ time, where $A$ is the arity of the nodes
@@ -805,7 +852,7 @@ is used to assign each node a new location in the modified genome.
 It starts by constructing the \emph{addable} set, which contains all nodes who's direct
 dependencies have already been added.  Initially this contains only the input locations.
 Once a node is assigned a location, all of the nodes that depend on its output
-have that dependency marked as satisfied.  Once all of a nodes dependencies
+have that dependency marked as satisfied.  Once all of a node's dependencies
 are satisfied, it can be put into \emph{addable}.  In this way, nodes are
 randomly removed from \emph{addable}, assigned the next possible location
 in the genome, with new nodes added to \emph{addable} as they becomes semantically
@@ -874,11 +921,14 @@ to examine different orderings of the genome without such costs.
 The price \emph{Reorder} pays for this potential improvement is a larger mutational search
 space.  Though a shuffled individual is phenotypically unchanged,
 its mutational adjacency can be significantly different.  As such the variety of offspring
-an individual can create is increased when using \emph{Reorder}.  While this increase
-makes finding a specific offspring that improves upon the parent less likely, the
-general likelihood of producing an offspring that improves upon the parent may 
-more than offset this drawback.
-
+an individual can create is increased when using \emph{Reorder}.
+%/NEW
+Therefore creating a specific offspring that improves upon the parent is
+less likely, in that the number of alternatives is increased.  Yet many
+of these additional alternatives may also be improvements upon the parent.  This may
+increase the likelihood of producing an offspring that improves
+upon the parent, allowing \emph{Reorder} to overcome this drawback.
+%/NEW
 
 \subsection{DAG}
 \label{sec:dag}
@@ -892,6 +942,8 @@ As in \emph{Normal} and \emph{Reorder}, when a connection gene is chosen for mut
 However, the options to choose from are only limited to those connections which do not
 create cycles.
 To achieve this, we incrementally determine
+%NEW No change was made to mutating node as that is in fact what we wanted
+%/NEW
 which nodes transitively depend on the mutating node and which do not, with
 information stored in a $known$ map data structure.  This data structure is initialized with
 the information that the node is dependent on itself and that all input locations
@@ -932,7 +984,7 @@ mutating node, giving \Call{IsDependent}{} a complexity of $O(AN)$.  In the wors
 may be called on all possible nodes in the genome to check their dependence.
 Yet cumulatively those calls can only take $O(AN)$ time due to the non-repeating
 nature of the search.  As a result, the expected worst case run time for \emph{DAG}
-mutation is $O(mA^2N^2)$, where $m$ is the mutation rate.  We expect $mAN$
+mutation is $O(mA^2N^2)$, where $m$ is the mutation probability.  We expect $mAN$
 connection genes to be mutated, each requiring a worst case of $N$ dependency checks
 each taking $A$ time.
 This is in contrast to \emph{Normal} and \emph{Reorder} which require $O(mAN)$ to perform
@@ -998,6 +1050,7 @@ nodes, so each mutation has a higher chance of choosing $Y$.
 
 \begin{table}
 	\centering
+	\caption{Short descriptions of each of the algorithm variants.}
 	\begin{tabular}{|c|p{6cm}|}
 	\hline
   \multicolumn{2}{|c|}{\textbf{Duplication}} \\ \hline
@@ -1010,7 +1063,6 @@ nodes, so each mutation has a higher chance of choosing $Y$.
 	\textbf{\emph{DAG}} & Connection genes can mutate to make any connection as long as no cycle is formed. \\
 	  \hline
 	\end{tabular}
-	\caption{Short descriptions of each of the algorithm variants.}
 	\label{tab:glossary}
 \end{table}
 
@@ -1083,26 +1135,26 @@ a specific method.  While tuning can lead to the alternative issue
 of methods only being effective after extensive problem specific tuning, we set out to use
 rough-grained values and provide each technique with equal tuning time to alleviate that bias.
 
-We focus on two parameter values in our configuration: mutation rate and genome size.
+We focus on two parameter values in our configuration: mutation probability and genome size.
 While there are other potential configurable parameters (population size, offspring size, etc),
 we feel the CGP literature has converged on settings for those parameters (1, 4).
 Furthermore, as duplication detection explicitly deals with the relationship between
-mutation rate and number of active genes, and the number of active genes depends
-on the genome size and ordering method, mutation rate and genome size seem to be
+mutation probability and number of active genes, and the number of active genes depends
+on the genome size and ordering method, mutation probability and genome size seem to be
 the most likely to impact results.
 
 To set parameter values, we started by defining a grid of parameter values:
 50, 100, 200, 500, 1000, 2000, 5000, 10000 for genome size and 0.05, 0.02, 0.01,
-0.005, 0.002, 0.001, 0.0005, 0.0002 for mutation rate.  Note that here a genome
+0.005, 0.002, 0.001, 0.0005, 0.0002 for mutation probability.  Note that here a genome
 size of 50 means there are 50 nodes, each composed of multiple genes, plus the
-required genes to specify output locations.  Also note that a mutation rate of 0.05
+required genes to specify output locations.  Also note that a mutation probability of 0.05
 is used here to mean each gene has a 5\% probability of being mutated in a single
 application of mutation.  These ranges were chosen to completely cover the
 range of previously used parameter settings.
-The grid is formed by trying all possible mutation rates
+The grid is formed by trying all possible mutation probabilities
 with all possible genome sizes, resulting in 64 potential configurations for each
 of the algorithm combinations.  Finally note that as \emph{Single} does not
-use a mutation rate, only the eight configurations with different genome sizes were
+use a mutation probability, only the eight configurations with different genome sizes were
 used when \emph{Single} was employed.
 
 To choose which parameter configuration to use with each algorithm combination
@@ -1115,7 +1167,16 @@ are run 5 times, 16 are run 9 times, 8 are run 13 times, 4 are run 17 times, 2 a
 and 2 are run 25 times.  For algorithm combinations using \emph{Single}, all 8 parameter configurations were run 17 times
 before any were removed.  This iterative reduction allows us to focus tuning on
 those parameter configurations most likely to be effective, with more information
-gathered before choosing between high quality configurations.  In total this means
+gathered before choosing between high quality configurations.
+%NEW
+We chose to run each initially 5 times to reduce the chance of
+eliminating a configuration due to outliers.  We incrementally added 4
+to provide enough information to significantly update estimates,
+while keeping the number of runs odd, allowing the median to be a
+representative run and not an interpolation.  As a final consideration
+the number of experiments were set to make the total number of runs feasible.
+%/NEW
+In total this means
 15,696 complete runs are required to set the parameter configuration for all
 algorithm configurations for all problems.
 
@@ -1138,10 +1199,16 @@ used to produce our results is available from our website.\footnote{\url{https:/
 
 \begin{table*}
 	\centering
+	\caption{Results for algorithm configuration on each problem.  Highlighted row
+	is the control configuration \emph{Skip-Normal}.  MES=Median Evaluations to Success; MAD=Median
+	Absolute Deviation; Active=Median number of active nodes in evolved solution;
+	Used=Median number of nodes active in evolved solution after applying SIMPLIFY (See Section~\ref{sec:behavior});
+	p-value=Result from Mann-Whitney~U comparison with control.
+	}
 	\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
 	  \hline
 	  \multicolumn{9}{|c|}{\textbf{3-bit Parity}, Kruskal-Wallis=$5.99\cdot 10^{-14}$} \\ \hline
-\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
+\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Probability} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
 \emph{Accumulate} & \emph{Normal} & 10,000 & 0.02 & 682 & 348 & 122 & 20 & 0.5602 \\ \hline
 \emph{Accumulate} & \emph{Reorder}&  5,000 & 0.01 & 796 & 434 & 331 & 23 & 0.7174 \\ \hline
 \rowcolor{Gray}
@@ -1155,7 +1222,7 @@ used to produce our results is available from our website.\footnote{\url{https:/
 
 	  \multicolumn{9}{|c|}{\textbf{16-4-bit Encode}, Kruskal-Wallis=$1.19\cdot 10^{-6}$} \\ \hline
 
-\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
+\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Probability} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
 \rowcolor{Gray}
 \emph{Skip} & \emph{Normal}        & 10,000 & 0.005 & 16,226 & 7,455  &   283 & 49 & NA \\ \hline
 \emph{Skip} & \emph{Reorder}       & 10,000 & 0.005 & 17,883 & 8,378  & 2,070 & 62 & 0.6918 \\ \hline
@@ -1170,7 +1237,7 @@ used to produce our results is available from our website.\footnote{\url{https:/
 	  \multicolumn{9}{|c|}{\textbf{4-16-bit Decode}, Kruskal-Wallis=$1.02\cdot 10^{-36}$} \\ \hline
 
 
-\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
+\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Probability} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
 \emph{Skip} & \emph{Reorder}       &  2,000 & 0.002 &  62,853 & 20,023 &   757 & 114 & 0.5247 \\ \hline
 \emph{Single} & \emph{Reorder}     &    500 &    NA &  63,731 & 13,119 &   245 &  97 & 0.3610 \\ \hline
 \emph{Accumulate} & \emph{Normal}  &  1,000 & 0.002 &  67,390 & 11,991 &   211 &  87 & 0.8767 \\ \hline
@@ -1184,7 +1251,7 @@ used to produce our results is available from our website.\footnote{\url{https:/
 
 	  \multicolumn{9}{|c|}{\textbf{3-bit Multiply}, Kruskal-Wallis=$5.14\cdot 10^{-18}$} \\ \hline
 
-\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Rate} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
+\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Probability} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
 \emph{Skip} & \emph{Reorder}      & 10,000 & 0.0005  & 196,116  & 60,326  & 3,175 & 484 & 0  \\ \hline
 \emph{Accumulate} & \emph{Reorder}& 10,000 & 0.001 & 199,193 & 85,970 & 3,117 & 489 & 0  \\ \hline
 \emph{Single} & \emph{Dag} & 200  & NA & 239,844 & 78,739 & 114 & 74 & 0 \\ \hline
@@ -1197,12 +1264,6 @@ used to produce our results is available from our website.\footnote{\url{https:/
 \emph{Skip} & \emph{Normal} & 2,000 & 0.002 & 657,121 & 311,376 & 175 & 84 & NA \\ \hline
 
 	\end{tabular}
-	\caption{Results for algorithm configuration on each problem.  Highlighted row
-	is the control configuration \emph{Skip-Normal}.  MES=Median Evaluations to Success; MAD=Median
-	Absolute Deviation; Active=Median number of active nodes in evolved solution;
-	Used=Median number of nodes active in evolved solution after applying SIMPLIFY (See Section~\ref{sec:behavior});
-	p-value=Result from Mann-Whitney~U comparison with control.
-	}
 	\label{tab:results}
 \end{table*}
 
@@ -1218,7 +1279,7 @@ As such, each algorithm combination was then compared with the control
 to determine statistical significance using pairwise Mann-Whitney~U tests. The
 resulting p-value for each test is reported in the table.
 
-As discussed in Section~\ref{sec:parameter}, the genome size and mutation rate
+As discussed in Section~\ref{sec:parameter}, the genome size and mutation probability
 for each algorithm combination was extensively optimized.  In line with previous
 research~\cite{miller:2006:redundancy}, this led to massive genome sizes for
 almost all algorithm combinations on all problems.  With the exception of 
@@ -1238,10 +1299,10 @@ that \emph{Reorder} and \emph{DAG} are best able to cope with smaller genome siz
 Independent of duplication method, the ordering methods do not seem to create any
 pressure on which genome size is chosen.
 
-Unlike genome size, all configurations choose approximately the same mutation rate
+Unlike genome size, all configurations choose approximately the same mutation probability
 for each problem.  With the exception of Parity, there appears
 to be a general consensus that each gene should be mutated with probability 0.002,
-independent of genome size.  Parity used a higher mutation rate, but this is likely
+independent of genome size.  Parity used a higher mutation probability, but this is likely
 because 3-bit Parity is by far the easiest problem tested and therefore likely benefits
 from higher exploration.
 
@@ -1284,9 +1345,15 @@ problems.
 
 The difference between using \emph{Skip} and \emph{Accumulate} remains
 negligible~\cite{goldman:2013:cgpwaste}, even in combination with different ordering
-methods.  As \emph{Accumulate} is far more complex in terms of algorithm function
+methods.
+%NEW
+This supports the idea that the two are actually achieving synonymous behavior
+through different means.
+%/NEW
+As \emph{Accumulate} is far more complex in terms of algorithm function
 than \emph{Skip}, we would suggest \emph{Skip} be used over \emph{Accumulate} for
-any real world application.
+%NEW Slight change here, "real world" became "future"
+any future applications.
 
 As a final check that our results do not somehow unfairly handicap traditional CGP,
 we compared our median evaluations to success with previous publications.  The results
@@ -1382,6 +1449,7 @@ This is in contrast to marking locations as never active, which was not done in
 this study.
 
 \begin{table*}
+	\caption{Location of never active nodes across all 50 runs for all nine algorithm combinations on the Multiply problem.}
 	\centering
   \begin{tabular}{c|c|c|c|}
     \cline{2-4}
@@ -1396,7 +1464,6 @@ this study.
                           \graphicthird{multiply_single_reorder} &
                           \graphicthird{multiply_single_dag}\\ \hline
 	\end{tabular}
-	\caption{Location of never active nodes across all 50 runs for all nine algorithm combinations on the Multiply problem.}
 	\label{tab:never_active}
 \end{table*}
 
@@ -1548,6 +1615,8 @@ since the final \textbf{for all} loop is the most expensive step.  As before, th
 
 \begin{table*}
 	\centering
+	\caption{Average node behavior for all nine algorithm combinations on the Encode problem.
+	         Excludes never active nodes.}
   \begin{tabular}{c|c|c|c|}
     \cline{2-4}
     & \textbf{\em Normal} & \textbf{\em Reorder} & \textbf{\em DAG} \\ \hline
@@ -1561,13 +1630,13 @@ since the final \textbf{for all} loop is the most expensive step.  As before, th
                           \graphicthird{bar_encode_single_reorder} &
                           \graphicthird{bar_encode_single_dag}\\ \hline
 	\end{tabular}
-	\caption{Average node behavior for all nine algorithm combinations on the Encode problem.
-	         Excludes never active nodes.}
 	\label{tab:encode_behavior}
 \end{table*}
 
 \begin{table*}
 	\centering
+	\caption{Average node behavior for all nine algorithm combinations on the Multiply problem.
+	         Excludes never active nodes.}
   \begin{tabular}{c|c|c|c|}
     \cline{2-4}
     & \textbf{\em Normal} & \textbf{\em Reorder} & \textbf{\em DAG} \\ \hline
@@ -1581,8 +1650,6 @@ since the final \textbf{for all} loop is the most expensive step.  As before, th
                           \graphicthird{bar_multiply_single_reorder} &
                           \graphicthird{bar_multiply_single_dag}\\ \hline
 	\end{tabular}
-	\caption{Average node behavior for all nine algorithm combinations on the Multiply problem.
-	         Excludes never active nodes.}
 	\label{tab:multiply_behavior}
 \end{table*}
 
@@ -1606,7 +1673,7 @@ Table~\ref{tab:encode_behavior} and Table~\ref{tab:multiply_behavior} help illus
 the behavioral breakdown of nodes for each algorithm combination on the Encode
 and Multiply problems, respectively.  These two problems were chosen as they
 represent different ends of the quality spectrum for \emph{Skip-Normal} and
-because together the are sufficiently representative of behaviors seen on the other
+because together they are sufficiently representative of behaviors seen on the other
 problems.
 
 Each diagram describes node behavior as falling into eight distinct categories
@@ -1653,7 +1720,7 @@ where this is true are \emph{Normal} on Multiply.  On Encode, \emph{Single}
 runs had the highest median evaluations to success, with \emph{Normal} runs
 doing similarly on Multiply.  This appears to imply that having duplication
 of node behavior in the active nodes, and not just inactive nodes, is beneficial
-to search.  If this is true, it may help explain CGP uses such large genomes,
+to search.  If this is true, it may help explain why CGP uses such large genomes,
 as \emph{Normal} is only able to achieve enough active nodes to allow duplication
 when the genome size significantly exceeds the actual solution size.  Also
 the success of \emph{Reorder} and \emph{DAG} on Multiply may also be partially be attributable
@@ -1673,6 +1740,9 @@ evaluations to solve would lead to the discrepancy.
 
 \begin{table}
 	\centering
+	\caption{Behavior of offspring replacement for each algorithm combination
+	         on each problem.
+	         Act-Un=Active Unchanged; No React=No Reactivation; React Changed=Reactivation Changed}
 	\begin{tabular}{|c|c|c|c|c|}
 	  \hline
 	  \multicolumn{5}{|c|}{\textbf{3-bit Parity}} \\ \hline
@@ -1734,9 +1804,6 @@ evaluations to solve would lead to the discrepancy.
    \rowcolor{Gray}
        \emph{Skip} &  \emph{Normal} & 73.46\% & 92.04\% & 79.07\% \\ \hline
 	\end{tabular}
-	\caption{Behavior of offspring replacement for each algorithm combination
-	         on each problem.
-	         Act-Un=Active Unchanged; No React=No Reactivation; React Changed=Reactivation Changed}
 	\label{tab:reactivate}
 \end{table}
 
@@ -1781,7 +1848,7 @@ from their parents, produces offspring with no changes in active node behavior
 yet phenotypically identical individuals.  Even more surprising is that \emph{Single}
 appears to increase the chance of producing offspring without changing active behavior.
 Somewhat unexpectedly \emph{Normal} appears to also reduce changes to active node behavior,
-causing the most effect after \emph{Single}.
+causing the largest effect after \emph{Single}.
 
 The likely cause of both is the number
 of active nodes receiving mutations each generation.  Even though \emph{Single}
@@ -1939,7 +2006,7 @@ behavior continues to be enough different from \emph{Skip} to warrant further
 study, especially with problems requiring higher numbers of active genes.  In
 general though, if evaluation time is significantly impacted by the number of
 active nodes or the total size of the genome, we suggest \emph{Single}.  While
-mutation rate appears relatively independent of problem and algorithm combination (all of our tuning
+mutation probability appears relatively independent of problem and algorithm combination (all of our tuning
 resulted in 0.002 being optimal or close to it), \emph{Single} still has the
 advantage of not requiring this parameter at all.
 
