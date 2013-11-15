@@ -1,0 +1,57 @@
+
+In [8], the authors use AND, OR, NAND, NOR for all of the other boolean problems tested (Even Parity, Digital Adder, and Digital Comparitor),
+but use AND, AND with one input inverted, XOR and OR on digital multiplier.
+The two papers [8] cites that performed research on this problem used AND, XOR.  They claim this makes the problem easier as
+human designed solutions use only AND, XOR.  Therefore eliminating XOR as a choice likely makes this problem even harder.
+
+
+It is possible to achieve O(1) amortized cost when performing mutations using the probability method.
+This can be done leveraging the binomial distribution, which in many languages is implemented to give
+the random number of trials k of N total which are true given probability P.  k genes can then
+be selected from the genome at random just as when using a mutation rate.  This operator is
+advantageous in that allows for a flexible number of mutating genes, up to and including
+mutating all genes in a single step.  If I were to extend Single to use a configurable
+number of genes, this would be my choice of method.
+
+Over four thousand runs would be required to properly tune and evaluate any additional
+problem.
+A major focus of our work (ordering effect on the location and number of active genes)
+is grounded in theory which makes no assumptions on the type of problem being solved.
+As the experimental results matched the theory, we have no reason to suspect our
+conclusions on these topics to change when the operators or data type is changed.
+Some conclusions that could change depending on data type: The relative effectiveness
+of the proposed modifications (IE, skip vs single, reorder vs normal, etc), the
+evolved genome sizes, and the charts in Table IV and Table V.
+
+The reason we chose all of our original problems as binary was to allow for the
+detailed analysis of behavior in the latter half of Section VI.  If we had done
+four problems, but using diverse domains, it would have been much more challenging
+to determine why we observed changes in behavior between problems.  By using
+four problems with similar domains and the same operators, we are able to determine
+how our techniques scale with problem difficulty.
+
+While we agree it is desirable to have more problems, and more diverse problems,
+we were limited by how deep we wanted to go in analyzing our set of problems.
+As stated elsewhere, each problem required approximately four thousand runs to
+determine optimal genome size and mutation rate.  Similarly we wanted to delve
+deeply into behavior, which requires time to determine measures and discover patterns,
+not all of which are going to be domain independent.  As CGP's foundation is the
+binary domain, we felt this was the correct choice for such detail oriented work.
+
+Upon the suggestion of Reviewer 2, we further examined the statistical measures
+of evaluations to success which we report in Table II.  As it is not safe to assume the number
+of evaluations to success is normally distributed (in fact, they are most likely not normal),
+we chose to provide non-parametric (median) instead of parametric (mean) measures,
+as was done in [8].  Upon our review, we decided Median Absolute Deviation was not
+capturing useful information, and we now show bootstrap confidence intervals, which is a much
+more statistically sound and interesting value.
+
+As to the including the wall clock time for our experiments, we attempted to cover our
+reasoning for not doing this in the 4rd to last paragraph in the Results section.
+In order to provide a fair comparison of runtime, we would need to redo tuning
+with a focus on minimizing wall clock time instead of number of evaluations, which
+would require another four thousand runs to time just one problem.  An additional
+problem in reporting this value is hardware diversity.  To complete our experiments
+we utilized a computing cluster with diverse hardware quality.  To avoid this problem,
+we would need to recreate all experiments on homogeneous hardware, which is intractable
+for experiments of this size.

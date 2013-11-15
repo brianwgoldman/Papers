@@ -831,6 +831,16 @@ For clarity, we shall refer to CGP's historical ordering method of enforcing
 only forward connections as \emph{Normal}.
 %/NEW
 
+%NEW
+It is important to note that Equation~\ref{eq:prob} does not apply to all variants of CGP.
+For instance, the early versions of CGP~\cite{miller:2011:chapter2} which utilize a
+levels back parameter $L$ will have
+a flat active probability for all nodes at least $L$ nodes from the start and $L$ nodes from the end
+of the genome.  Yet this does not remove the issue of artificially limiting connections,
+and in fact adds many new limitations.  More recently,~\cite{cai:2005:ircgp} proposed
+a method which reassembled the genome using semantic cues, which circumvents the
+forward only limitation in \emph{Normal}.
+%/NEW
 \subsection{Reorder}
 \label{sec:reorder}
 The \emph{Reorder} method shuffles an existing genome's node ordering without
@@ -1200,68 +1210,68 @@ used to produce our results is available from our website.\footnote{\url{https:/
 \begin{table*}
 	\centering
 	\caption{Results for algorithm configuration on each problem.  Highlighted row
-	is the control configuration \emph{Skip-Normal}.  MES=Median Evaluations to Success; MAD=Median
-	Absolute Deviation; Active=Median number of active nodes in evolved solution;
+	is the control configuration \emph{Skip-Normal}.  MES=Median Evaluations to Success;
+	Confidence Interval=95\% bootstrapped confidence interval; Active=Median number of active nodes in evolved solution;
 	Used=Median number of nodes active in evolved solution after applying SIMPLIFY (See Section~\ref{sec:behavior});
 	p-value=Result from Mann-Whitney~U comparison with control.
 	}
 	\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
 	  \hline
 	  \multicolumn{9}{|c|}{\textbf{3-bit Parity}, Kruskal-Wallis=$5.99\cdot 10^{-14}$} \\ \hline
-\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Probability} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
-\emph{Accumulate} & \emph{Normal} & 10,000 & 0.02 & 682 & 348 & 122 & 20 & 0.5602 \\ \hline
-\emph{Accumulate} & \emph{Reorder}&  5,000 & 0.01 & 796 & 434 & 331 & 23 & 0.7174 \\ \hline
+\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Probability} & \textbf{MES} & \textbf{Confidence Interval} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
+\emph{Accumulate} & \emph{Normal} & 10,000 & 0.02 & 682 & 445 .. 869 & 122 & 20 & 0.5602 \\ \hline
+\emph{Accumulate} & \emph{Reorder}&  5,000 & 0.01 & 796 & 576 .. 1,019 & 331 & 23 & 0.7174 \\ \hline
 \rowcolor{Gray}
-\emph{Skip} & \emph{Normal}       & 10,000 & 0.02 & 823 & 363 & 119 & 20 & NA \\ \hline
-\emph{Skip} & \emph{Reorder}      &  2,000 & 0.01 & 870 & 362 & 198 & 20 & 0.3125 \\ \hline
-\emph{Accumulate} & \emph{Dag}    &  5,000 & 0.01 & 964 & 499 & 1,174 & 22 & 0.3310 \\ \hline
-\emph{Skip} & \emph{Dag}          & 10,000 & 0.02 & 1,042 & 620 & 2,083 & 24 & 0.0248 \\ \hline
-\emph{Single} & \emph{Normal}     & 500 & NA & 1,214 & 497 & 39 & 17 & 0.0046 \\ \hline
-\emph{Single} & \emph{Reorder}    & 200 & NA & 1,506 & 823 & 57 & 18 & 0 \\ \hline
-\emph{Single} & \emph{Dag}        & 100 & NA & 2,569 & 1,313 & 43 & 15 & 0 \\ \hline\hline
+\emph{Skip} & \emph{Normal}       & 10,000 & 0.02 & 823 & 662 .. 1,034 & 119 & 20 & NA \\ \hline
+\emph{Skip} & \emph{Reorder}      &  2,000 & 0.01 & 870 & 708 .. 1,070 & 198 & 20 & 0.3125 \\ \hline
+\emph{Accumulate} & \emph{Dag}    &  5,000 & 0.01 & 964 & 759 .. 1,250 & 1,174 & 22 & 0.3310 \\ \hline
+\emph{Skip} & \emph{Dag}          & 10,000 & 0.02 & 1,042 & 734 .. 1,339 & 2,083 & 24 & 0.0248 \\ \hline
+\emph{Single} & \emph{Normal}     & 500 & NA & 1,214 & 885 .. 1,487 & 39 & 17 & 0.0046 \\ \hline
+\emph{Single} & \emph{Reorder}    & 200 & NA & 1,506 & 552 .. 2,122 & 57 & 18 & 0 \\ \hline
+\emph{Single} & \emph{Dag}        & 100 & NA & 2,569 & 2,109 .. 3,358 & 43 & 15 & 0 \\ \hline\hline
 
 	  \multicolumn{9}{|c|}{\textbf{16-4-bit Encode}, Kruskal-Wallis=$1.19\cdot 10^{-6}$} \\ \hline
 
-\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Probability} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
+\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Probability} & \textbf{MES} & \textbf{Confidence Interval} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
 \rowcolor{Gray}
-\emph{Skip} & \emph{Normal}        & 10,000 & 0.005 & 16,226 & 7,455  &   283 & 49 & NA \\ \hline
-\emph{Skip} & \emph{Reorder}       & 10,000 & 0.005 & 17,883 & 8,378  & 2,070 & 62 & 0.6918 \\ \hline
-\emph{Accumulate} & \emph{Reorder} & 10,000 & 0.002 & 18,132 & 8,926  & 2,027 & 64 & 0.8822 \\ \hline
-\emph{Accumulate} & \emph{Normal}  & 10,000 & 0.005 & 21,428 & 6,379  &   279 & 49 & 0.2525 \\ \hline
-\emph{Accumulate} & \emph{Dag}     & 10,000 & 0.002 & 24,855 & 12,512 & 4,059 & 69 & 0.0736 \\ \hline
-\emph{Skip} & \emph{Dag}           & 10,000 & 0.002 & 25,678 & 12,034 & 4,178 & 62 & 0.0211 \\ \hline
-\emph{Single} & \emph{Reorder}     & 100    & NA    & 26,558 & 7,858  &    52 & 32 & 0.0076 \\ \hline
-\emph{Single} & \emph{Normal}      & 2,000  & NA    & 31,057 & 14,475 &   141 & 43 & 0.0085 \\ \hline
-\emph{Single} & \emph{Dag}         & 100    & NA    & 34,208 & 10,069 &    59 & 34 & 0 \\ \hline\hline
+\emph{Skip} & \emph{Normal}        & 10,000 & 0.005 & 16,226 & 9,315 .. 22,229  &   283 & 49 & NA \\ \hline
+\emph{Skip} & \emph{Reorder}       & 10,000 & 0.005 & 17,883 & 10,690 .. 23,999 & 2,070 & 62 & 0.6918 \\ \hline
+\emph{Accumulate} & \emph{Reorder} & 10,000 & 0.002 & 18,132 & 13,646 .. 22,983 & 2,027 & 64 & 0.8822 \\ \hline
+\emph{Accumulate} & \emph{Normal}  & 10,000 & 0.005 & 21,428 & 17,536 .. 25,948 &   279 & 49 & 0.2525 \\ \hline
+\emph{Accumulate} & \emph{Dag}     & 10,000 & 0.002 & 24,855 & 18,222 .. 33,069 & 4,059 & 69 & 0.0736 \\ \hline
+\emph{Skip} & \emph{Dag}           & 10,000 & 0.002 & 25,678 & 16,170 .. 33,422 & 4,178 & 62 & 0.0211 \\ \hline
+\emph{Single} & \emph{Reorder}     & 100    & NA    & 26,558 & 20,678 .. 31,613 &    52 & 32 & 0.0076 \\ \hline
+\emph{Single} & \emph{Normal}      & 2,000  & NA    & 31,057 & 24,145 .. 42,278 &   141 & 43 & 0.0085 \\ \hline
+\emph{Single} & \emph{Dag}         & 100    & NA    & 34,208 & 29,840 .. 38,035 &    59 & 34 & 0 \\ \hline\hline
 
 	  \multicolumn{9}{|c|}{\textbf{4-16-bit Decode}, Kruskal-Wallis=$1.02\cdot 10^{-36}$} \\ \hline
 
 
-\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Probability} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
-\emph{Skip} & \emph{Reorder}       &  2,000 & 0.002 &  62,853 & 20,023 &   757 & 114 & 0.5247 \\ \hline
-\emph{Single} & \emph{Reorder}     &    500 &    NA &  63,731 & 13,119 &   245 &  97 & 0.3610 \\ \hline
-\emph{Accumulate} & \emph{Normal}  &  1,000 & 0.002 &  67,390 & 11,991 &   211 &  87 & 0.8767 \\ \hline
+\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Probability} & \textbf{MES} & \textbf{Confidence Interval} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
+\emph{Skip} & \emph{Reorder}       &  2,000 & 0.002 &  62,853 & 50,033 .. 72,267 &   757 & 114 & 0.5247 \\ \hline
+\emph{Single} & \emph{Reorder}     &    500 &    NA &  63,731 & 56,070 .. 70,706 &   245 &  97 & 0.3610 \\ \hline
+\emph{Accumulate} & \emph{Normal}  &  1,000 & 0.002 &  67,390 & 60,738 .. 74,624 &   211 &  87 & 0.8767 \\ \hline
 \rowcolor{Gray}
-\emph{Skip} & \emph{Normal}        &  1,000 & 0.002 &  68,231 & 15,115 &   202 &  85 & NA \\ \hline
-\emph{Single} & \emph{Normal}      &  1,000 &    NA &  68,819 & 14,590 &   203 &  85 & 0.7695 \\ \hline
-\emph{Accumulate} & \emph{Reorder} &  2,000 & 0.002 &  72,991 & 18,650 &   760 & 115 & 0.1868 \\ \hline
-\emph{Skip} & \emph{Dag}           & 10,000 & 0.001 & 132,821 & 29,432 & 4,983 & 125 & 0 \\ \hline
-\emph{Accumulate} & \emph{Dag}     &  5,000 & 0.002 & 133,188 & 29,326 & 2,542 & 125 & 0 \\ \hline
-\emph{Single} & \emph{Dag}         &    500 &    NA & 160,696 & 39,242 &   299 &  97 & 0 \\ \hline\hline
+\emph{Skip} & \emph{Normal}        &  1,000 & 0.002 &  68,231 & 63,266 .. 74,463 &   202 &  85 & NA \\ \hline
+\emph{Single} & \emph{Normal}      &  1,000 &    NA &  68,819 & 62,940 .. 74,939 &   203 &  85 & 0.7695 \\ \hline
+\emph{Accumulate} & \emph{Reorder} &  2,000 & 0.002 &  72,991 & 67,163 .. 78,131 &   760 & 115 & 0.1868 \\ \hline
+\emph{Skip} & \emph{Dag}           & 10,000 & 0.001 & 132,821 & 117,034 .. 155,471 & 4,983 & 125 & 0 \\ \hline
+\emph{Accumulate} & \emph{Dag}     &  5,000 & 0.002 & 133,188 & 121,369 .. 147,073 & 2,542 & 125 & 0 \\ \hline
+\emph{Single} & \emph{Dag}         &    500 &    NA & 160,696 & 142,001 .. 160,696 &   299 &  97 & 0 \\ \hline\hline
 
 	  \multicolumn{9}{|c|}{\textbf{3-bit Multiply}, Kruskal-Wallis=$5.14\cdot 10^{-18}$} \\ \hline
 
-\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Probability} & \textbf{MES} & \textbf{MAD} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
-\emph{Skip} & \emph{Reorder}      & 10,000 & 0.0005  & 196,116  & 60,326  & 3,175 & 484 & 0  \\ \hline
-\emph{Accumulate} & \emph{Reorder}& 10,000 & 0.001 & 199,193 & 85,970 & 3,117 & 489 & 0  \\ \hline
-\emph{Single} & \emph{Dag} & 200  & NA & 239,844 & 78,739 & 114 & 74 & 0 \\ \hline
-\emph{Single} & \emph{Reorder}    & 500   & NA & 243,664 & 91,935 & 266 & 131 & 0 \\ \hline
-\emph{Skip} & \emph{Dag}          & 2,000 & 0.002 & 369,931 & 174,408 & 952 & 149 & 0.0100 \\ \hline
-\emph{Accumulate} & \emph{Dag}    & 2,000 & 0.002  & 379,202 & 147,289 & 973 & 158 & 0.0053  \\ \hline
-\emph{Single} & \emph{Normal}     & 5,000  & NA & 399,911 & 194,384 & 273 & 112 & 0.0047 \\ \hline
-\emph{Accumulate} & \emph{Normal} & 2,000 & 0.002 & 483,938 & 227,686 & 168 & 87 & 0.45 \\ \hline
+\textbf{Duplication} & \textbf{Ordering} & \textbf{Genome Size} & \textbf{Mutation Probability} & \textbf{MES} & \textbf{Confidence Interval} & \textbf{Active} & \textbf{Used} & \textbf{p-value} \\ \hline
+\emph{Skip} & \emph{Reorder}      & 10,000 & 0.0005& 196,116 & 160,073 .. 223,500  & 3,175 & 484 & 0  \\ \hline
+\emph{Accumulate} & \emph{Reorder}& 10,000 & 0.001 & 199,193 & 123,496 .. 275,013 & 3,117 & 489 & 0  \\ \hline
+\emph{Single} & \emph{Dag}        &   200  & NA    & 239,844 & 204,347 .. 286,418 & 114 & 74 & 0 \\ \hline
+\emph{Single} & \emph{Reorder}    & 500    & NA    & 243,664 & 178,566 .. 301,246 & 266 & 131 & 0 \\ \hline
+\emph{Skip} & \emph{Dag}          & 2,000  & 0.002 & 369,931 & 234,885 .. 483,753 & 952 & 149 & 0.0100 \\ \hline
+\emph{Accumulate} & \emph{Dag}    & 2,000  & 0.002 & 379,202 & 255,165 .. 460,783 & 973 & 158 & 0.0053  \\ \hline
+\emph{Single} & \emph{Normal}     & 5,000  & NA    & 399,911 & 280,070 .. 516,034 & 273 & 112 & 0.0047 \\ \hline
+\emph{Accumulate} & \emph{Normal} & 2,000  & 0.002 & 483,938 & 308,049 .. 611,034 & 168 & 87 & 0.45 \\ \hline
 \rowcolor{Gray}
-\emph{Skip} & \emph{Normal} & 2,000 & 0.002 & 657,121 & 311,376 & 175 & 84 & NA \\ \hline
+\emph{Skip} & \emph{Normal}       & 2,000  & 0.002 & 657,121 & 469,287 .. 864,073 & 175 & 84 & NA \\ \hline
 
 	\end{tabular}
 	\label{tab:results}
@@ -1273,10 +1283,22 @@ Rows for each problem are ordered by that algorithm combination's median evaluat
 success (MES), with the best algorithm combination appearing at the top of each section.
 The highlighted rows mark \emph{Skip-Normal}, the control algorithm combination
 representing traditional CGP performance.  All configurations for each problem
-were then tested using Kruskal-Wallis to determine if any configuration was
+were then tested using
+%NEW
+Kruskal-Wallis\footnote{Kruskal-Wallis, a non-parametric equivalent of ANOVA, determines
+if samples were drawn from the same distribution.  If this test is significant, at
+least one of the samples differs from the others.}
+%/NEW
+to determine if any configuration was
 statistically different from any other.  All problems were determined to be highly significant.
 As such, each algorithm combination was then compared with the control
-to determine statistical significance using pairwise Mann-Whitney~U tests. The
+to determine statistical significance using pairwise
+%NEW
+Mann-Whitney~U\footnote{Mann-Whitney~U, a non-parametric equivalent of Student's t-test,
+determines if two populations were drawn from the same distribution.  If this test is significant,
+the populations are not equal.}
+%/NEW
+tests. The
 resulting p-value for each test is reported in the table.
 
 As discussed in Section~\ref{sec:parameter}, the genome size and mutation probability
@@ -1357,16 +1379,24 @@ any future applications.
 
 As a final check that our results do not somehow unfairly handicap traditional CGP,
 we compared our median evaluations to success with previous publications.  The results
-reported for traditional CGP and CGP using modules in~\cite{walker:2008:cgpmodules}
+reported for traditional CGP in~\cite{walker:2008:cgpmodules}
 for 3-bit parity required 6 times as many evaluations as \emph{Skip-Normal}.
-The same source had traditional CGP requiring 4 million evaluations to success,
+On the 3-bit Multiplier problem using a slightly different operator set,
+the same source had traditional CGP requiring 4 million evaluations to success,
 as opposed to our \emph{Skip-Normal} requiring 600 thousand, also a factor of 6 improvement.
-CGP with modules required over 800 thousand evaluations, worse than our \emph{Skip-Normal},
-and approximately 4 times more than \emph{Skip-Reorder}.  We must be wary about comparisons
-to their 3-bit multiplier though, as their version used a different function set.
-That said the function set they used appears to have been chosen explicitly to improve
-CGP's performance on that problem, so we suggest that if we had used a the same function
-set our results would still be significantly better.
+%NEW
+To determine the effect the difference in function set had on results, we ran
+\emph{Skip-Normal} and \emph{Skip-Reorder} using their functions but our parameters.
+The former improved to 453,684 while the latter increased to 303,657, maintaining
+a statistically significant difference.  These
+results make sense as the operator set in~\cite{walker:2008:cgpmodules} is able
+to more compactly represent the solution than our set.  This puts less strain
+on \emph{Normal} to deal with complex solutions, while \emph{Reorder}'s extremely
+large genome size is likely made unnecessary.  Note that as we did not tune
+using their operator set, our results should be considered a lower bound on quality for
+using \emph{Skip-Normal} and \emph{Skip-Reorder} to solve 3-bit Multiplier
+with their operators.
+%/NEW
 
 Our parameter tuning focused on minimizing the number of evaluations each algorithm
 combination required to solve problems, as that is the primary measure of runtime
