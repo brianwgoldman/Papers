@@ -376,7 +376,7 @@
 \usepackage{url}
 
 \newcommand{\graphicthird}[1]
-{\includegraphics[width=.285\textwidth,height=.285\textheight,keepaspectratio]{#1}}
+{\includegraphics[width=.27\textwidth,height=.27\textheight,keepaspectratio]{#1}}
 
 \newcommand{\thirdlabel}[1]
 {\multicolumn{1}{|c|}{\raisebox{.15\textwidth}{\rotatebox[origin=c]{90}{\textbf{\em #1}}}}}
@@ -552,6 +552,7 @@ experimentation and analysis of alternatives, that they have a great deal
 of impact on search success.
 %/NEW
 
+\begin{comment}
 In Section~\ref{sec:cgp} we provide
 an introduction to CGP, with sufficient background to put later sections into
 context.  Section~\ref{sec:duplicate} describes previous work on preventing mutation
@@ -562,7 +563,7 @@ Each technique is then rigorously tuned and qualitatively compared on a collecti
 of benchmarks in Section~\ref{sec:quality}.  Section~\ref{sec:analysis} then
 provides a deep look into the details of CGP's search, and how each method impacts
 search, with final remarks given in Section~\ref{sec:conclusion}.
-
+\end{comment}
 
 \section{Cartesian Genetic Programming}
 \label{sec:cgp}
@@ -636,6 +637,7 @@ Our previous work~\cite{goldman:2013:cgpwaste} has taken an initial look at the
 effect this waste can have, and proposed \emph{Skip}, \emph{Accumulate}, and
 \emph{Single} as methods for avoiding or preventing these duplicate evaluations.
 
+\begin{comment}
 The number of wasted evaluations is
 directly related to the mutation probability and the number of active genes.  With
 sufficiently high probabilities and enough active genes, the chance of
@@ -644,6 +646,7 @@ Yet such a configuration may make it difficult for CGP to optimize, as mutation
 is likely to change many active genes in each application.  As was discussed
 in~\cite{goldman:2013:cgpwaste}, this can make normal CGP very sensitive to the
 mutation probability.
+\end{comment}
 
 \subsection{Skip}
 The \emph{Skip} method for avoiding duplicate evaluations involves the least
@@ -692,7 +695,7 @@ creation and offspring evaluation.  Instead of skipping evaluations when offspri
 are determined to be actively identical to their parents, \emph{Accumulate} enters
 into a cycle of repeated mutation until an individual worth evaluating is created.
 To understand this technique, consider an example where the parent $P$ produces
-the offspring $F_0$ using mutation. If $F_0$ is actively identical $P$, $F_0$
+the offspring $F_0$ using mutation. If $F_0$ is actively identical to $P$, $F_0$
 creates its own offspring $F_1$ using mutation.  This process of $F_i$ producing
 $F_{i+1}$ continues until $F_n$ is produced, where $F_n$ is not actively identical
 to $P$.  $F_n$ is then evaluated.  If $F_n$ is no worse than $P$, it replaces
@@ -792,7 +795,7 @@ connection.
 
 As an extension to the theory presented in~\cite{goldman:2013:ordering}, we have
 derived the formula which predicts the probability a node is active based on its
-index, given in Equation~\ref{eq:prob} and plotted in Figure~\ref{fig:prob}.
+index, given in Equation~\ref{eq:prob}.
 \begin{equation}
 p(i) \leftarrow 1 - (\frac{N+I-1}{N+I})^O \cdot \prod_{j=i+1}^{N} 1 - p(j) \cdot (1-(\frac{j+I-1}{j+I})^A)
 \label{eq:prob}
@@ -811,6 +814,7 @@ that all output locations connect to inputs or nodes not at index $i$.  This
 formula assumes only operator bias, not selective pressure, is acting on the
 genome.
 
+\begin{comment}
 \begin{figure}
 \includegraphics[width=\columnwidth,height=\textheight,keepaspectratio]{active_prob}
 \caption{Plot of Equation~\ref{eq:prob} describing the probability that a node
@@ -823,6 +827,12 @@ genome.
 From Figure~\ref{fig:prob} it is clear that nodes near the beginning of the genome
 are almost certainly going to be active, while nodes in the last three quarters
 of the genome are almost never going to be active.
+\end{comment}
+%NEW
+Substituting $N=2000$, $A=2$, $I=6$, $O=6$ into Equation~\ref{eq:prob}
+predicts only 160 active nodes, with 80\% of the first 100 nodes expected to be
+active while just 4\% of the remaining 1900 nodes are expected to be active.
+%/NEW
 
 To rectify these issues and examine CGP without ordering bias, \cite{goldman:2013:ordering}
 created \emph{Reorder} and \emph{DAG} as methods for genome ordering.
@@ -1560,10 +1570,12 @@ to have less or no positional bias, which also matches the results given in Tabl
 In Section~\ref{sec:ordering} we used Equation~\ref{eq:prob} to suggest \emph{Normal}
 as a strong bias on the location of active nodes regardless of fitness landscape, and that
 \emph{Reorder} and \emph{DAG} would likely have less or no bias.
-Figure~\ref{fig:prob} shows the expected probability given by Equation~\ref{eq:prob},
-using the same genome size, arity, number of inputs, and number of outputs as our
-3-bit multiply.  This curve bears a striking resemblance to all three \emph{Normal}
-plots in Table~\ref{tab:never_active}.
+%NEW
+The example inputs used in that section match those of \emph{Normal}'s tuned
+configuration on 3-bit multiply.  The predicted number of active nodes and their
+location in the genome match almost exactly
+the behavior displayed in all three \emph{Normal} plots in Table~\ref{tab:never_active}.
+%/NEW
 
 Examining the progression in fitness across the different ordering methods shows
 the effect of initialization on each.  All three order methods share the same initialization
@@ -1709,6 +1721,8 @@ problems.
 Each diagram describes node behavior as falling into eight distinct categories
 split between active and inactive nodes.  Nodes are put into the first category
 they satisfy.
+\\
+\\
 \begin{enumerate}
 \item ``Constant'' - Independent of problem input, constant nodes produce a fixed output.
 \item ``Used'' - Nodes still active after applying \Call{Simplify}{}.
@@ -1998,10 +2012,12 @@ for the first time.
 
 \section{Conclusion}
 \label{sec:conclusion}
+\begin{comment}
 Even with CGP's relatively simple evolutionary mechanisms, fully understanding
 the effects those mechanisms have on search takes concerted effort.  By examining
 the effectiveness as well as the actual behavior of traditional CGP and
 a handful of variants we have helped advance this understanding.
+\end{comment}
 
 Generally, CGP appears to require the least number of evaluations when the genome
 size far exceeds what is necessary for the problem at hand.  When properly tuned,
