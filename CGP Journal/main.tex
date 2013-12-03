@@ -546,7 +546,7 @@ Previous studies of CGP's evolutionary mechanisms have
 focused on bloat~\cite{miller:2001:bloat},
 neutrality~\cite{vassilev:2000:neutrality}, and structural bias~\cite{payne:2009:bias}.
 We shall focus on the interaction between mutation and genome ordering.
-%NEW
+%Done-NEW
 While these features of CGP have trivial definitions, we will argue, using
 experimentation and analysis of alternatives, that they have a great deal
 of impact on search success.
@@ -606,14 +606,14 @@ mutation.  The best offspring then competes with the parent,\footnote{Ties are b
 randomly.} with the offspring
 replacing the parent if it is no less fit.  This replacement strategy encourages
 neutral drift.
-%NEW
+%Done-NEW
 In CGP mutation is done in a myriad of nearly synonymous ways.  Here we mutate
 %/NEW
 each gene of each node at a set probability, where mutation
 involves changing a gene randomly to some different valid value.  For example,
 if a function gene is chosen for mutation, its new value is randomly chosen from
 all possible functions, excluding the gene's current value.
-%NEW
+%Done-NEW
 This version of mutation was chosen to allow precise prediction of changes
 in gene value necessarily in later sections.
 %/NEW
@@ -668,7 +668,7 @@ When the mutation probability is low enough relative to the number of active gen
 offspring will be actively identical to their parents, resulting in a reduction in evaluations
 but no change in the evolutionary trajectory.
 
-%NEW
+%Done-NEW
 This technique incurs a minor increase in runtime, as each active gene in the
 offspring must be compared against the parent's gene at the same locus.
 This operation is at most linear in genome size.  Yet
@@ -720,7 +720,7 @@ mutant is better it replaces the parent, otherwise the parent, which has been ac
 mutations to inactive genes, is kept.  In this way \emph{Skip} mirrors \emph{Accumulate},
 except \emph{Skip} acts over multiple generations instead of compressed into a single generation.
 
-%NEW
+%Done-NEW
 Similar to \emph{Skip}, \emph{Accumulate} incurs a minor computation cost in
 order to prevent wasting evaluations.  Generating each $F_i$ requires at most
 $O(AN)$, where $A$ is the arity of the nodes and $N$ is the number of nodes.
@@ -760,7 +760,7 @@ to drift due to lack of introns, it does have an increased potential to become s
 As will be discussed in Section~\ref{sec:ordering} and was shown in~\cite{goldman:2013:ordering}
 this problem of highly active genomes is very unlikely.
 
-%NEW
+%Done-NEW
 Conceptually this method could be extended to mutate some number of active genes
 before terminating.  Doing so would reintroduce a parameter to govern how many
 active genes to mutate.  Our choice of a single mutation allows for the minimal
@@ -837,12 +837,12 @@ active while just 4\% of the remaining 1900 nodes are expected to be active.
 
 To rectify these issues and examine CGP without ordering bias, \cite{goldman:2013:ordering}
 created \emph{Reorder} and \emph{DAG} as methods for genome ordering.
-%NEW
+%Done-NEW
 For clarity, we shall refer to CGP's historical ordering method of enforcing
 only forward connections as \emph{Normal}.
 %/NEW
 
-%NEW
+%DONE-NEW
 It is important to note that Equation~\ref{eq:prob} does not apply to all variants of CGP.
 For instance, the early versions of CGP~\cite{miller:2011:chapter2} which utilize a
 levels back parameter $L$ will have
@@ -943,7 +943,7 @@ The price \emph{Reorder} pays for this potential improvement is a larger mutatio
 space.  Though a shuffled individual is phenotypically unchanged,
 its mutational adjacency can be significantly different.  As such the variety of offspring
 an individual can create is increased when using \emph{Reorder}.
-%/NEW
+%Done-NEW
 Therefore creating a specific offspring that improves upon the parent is
 less likely, in that the number of alternatives is increased.  Yet many
 of these additional alternatives may also be improvements upon the parent.  This may
@@ -963,7 +963,7 @@ As in \emph{Normal} and \emph{Reorder}, when a connection gene is chosen for mut
 However, the options to choose from are only limited to those connections which do not
 create cycles.
 To achieve this, we incrementally determine
-%NEW No change was made to mutating node as that is in fact what we wanted
+%Done-NEW No change was made to mutating node as that is in fact what we wanted
 %/NEW
 which nodes transitively depend on the mutating node and which do not, with
 information stored in a $known$ map data structure.  This data structure is initialized with
@@ -1189,7 +1189,7 @@ and 2 are run 25 times.  For algorithm combinations using \emph{Single}, all 8 p
 before any were removed.  This iterative reduction allows us to focus tuning on
 those parameter configurations most likely to be effective, with more information
 gathered before choosing between high quality configurations.
-%NEW
+%Done-NEW
 We chose to run each initially 5 times to reduce the chance of
 eliminating a configuration due to outliers.  We incrementally added 4
 to provide enough information to significantly update estimates,
@@ -1295,7 +1295,7 @@ success (MES), with the best algorithm combination appearing at the top of each 
 The highlighted rows mark \emph{Skip-Normal}, the control algorithm combination
 representing traditional CGP performance.  All configurations for each problem
 were then tested using
-%NEW
+%Done-NEW
 Kruskal-Wallis\footnote{Kruskal-Wallis, a non-parametric equivalent of ANOVA, determines
 if samples were drawn from the same distribution.  If this test is significant, at
 least one of the samples differs from the others.}
@@ -1304,7 +1304,7 @@ to determine if any configuration was
 statistically different from any other.  All problems were determined to be highly significant.
 As such, each algorithm combination was then compared with the control
 to determine statistical significance using pairwise
-%NEW
+%Done-NEW
 Mann-Whitney~U\footnote{Mann-Whitney~U, a non-parametric equivalent of Student's t-test,
 determines if two populations were drawn from the same distribution.  If this test is significant,
 the populations are not equal.}
@@ -1379,13 +1379,13 @@ problems.
 The difference between using \emph{Skip} and \emph{Accumulate} remains
 negligible~\cite{goldman:2013:cgpwaste}, even in combination with different ordering
 methods.
-%NEW
+%Done-NEW
 This supports the idea that the two are actually achieving synonymous behavior
 through different means.
 %/NEW
 As \emph{Accumulate} is far more complex in terms of algorithm function
 than \emph{Skip}, we would suggest \emph{Skip} be used over \emph{Accumulate} for
-%NEW Slight change here, "real world" became "future"
+%Done-NEW Slight change here, "real world" became "future"
 any future applications.
 
 As a final check that our results do not somehow unfairly handicap traditional CGP,
@@ -1395,7 +1395,7 @@ for 3-bit Parity required 6 times as many evaluations as \emph{Skip-Normal}.
 On the 3-bit Multiplier problem using a slightly different operator set,
 the same source had traditional CGP requiring 4 million evaluations to success,
 as opposed to our \emph{Skip-Normal} requiring 600 thousand, also a factor of 6 improvement.
-%NEW
+%DONE-NEW
 To determine the effect the difference in function set had on results, we ran
 \emph{Skip-Normal} and \emph{Skip-Reorder} using their functions but our parameters.
 The former improved to 453,684 while the latter increased to 303,657, maintaining

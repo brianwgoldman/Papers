@@ -1,44 +1,111 @@
+First, we would like to thank both the reviewers and the editorial staff for their
+time in examining our work.  The comments we received were very helpful and
+have lead to significant improvements.
 
-In [8], the authors use AND, OR, NAND, NOR for all of the other boolean problems tested (Even Parity, Digital Adder, and Digital Comparitor),
-but use AND, AND with one input inverted, XOR and OR on digital multiplier.
-The two papers [8] cites that performed research on this problem used AND, XOR.  They claim this makes the problem easier as
-human designed solutions use only AND, XOR.  Therefore eliminating XOR as a choice likely makes this problem even harder.
-
-
-It is possible to achieve O(1) amortized cost when performing mutations using the probability method.
-This can be done leveraging the binomial distribution, which in many languages is implemented to give
-the random number of trials k of N total which are true given probability P.  k genes can then
-be selected from the genome at random just as when using a mutation rate.  This operator is
-advantageous in that allows for a flexible number of mutating genes, up to and including
-mutating all genes in a single step.  If I were to extend Single to use a configurable
-number of genes, this would be my choice of method.
-
-Over four thousand runs would be required to properly tune and evaluate any additional
-problem.
-A major focus of our work (ordering effect on the location and number of active genes)
-is grounded in theory which makes no assumptions on the type of problem being solved.
-As the experimental results matched the theory, we have no reason to suspect our
-conclusions on these topics to change when the operators or data type is changed.
-Some conclusions that could change depending on data type: The relative effectiveness
-of the proposed modifications (IE, skip vs single, reorder vs normal, etc), the
-evolved genome sizes, and the charts in Table IV and Table V.
+Before covering individual points, we would like to respond to the two
+reviewers who suggested we could improve the support of our conclusions by
+including problems outside the binary domain.  We completely agree, and as
+with Reviewer 3 we feel like this is an excellent avenue for future work.  However,
+the focus of this work was to delve deeply into a small set of problems with
+the hope of developing the hypotheses about CGP's inherent behavior.  To that
+end we felt attempting to increase the breadth would limit our depth.  As was
+pointed out by two reviewers, our work required extensive experimentation
+to achieve the conclusions on our small set of problems.  More directly, to
+include a single new problem (boolean or otherwise) with which we
+could perform comparable analysis would require over four thousand additional runs
+to perform proper parameter tuning and data collection.
 
 The reason we chose all of our original problems as binary was to allow for the
 detailed analysis of behavior in the latter half of Section VI.  If we had done
 four problems, but using diverse domains, it would have been much more challenging
 to determine why we observed changes in behavior between problems.  By using
 four problems with similar domains and the same operators, we are able to determine
-how our techniques scale with problem difficulty.
+how our techniques scale with problem difficulty.  Similarly, the analysis tools
+we developed to perform the comparison could rely on problem uniformity.
+Also, since the binary domain is
+the most studied and successful in CGP literature, detailed analysis and conclusions drawn about
+its behavior in this domain are likely to have the most impact on the field.
 
-While we agree it is desirable to have more problems, and more diverse problems,
-we were limited by how deep we wanted to go in analyzing our set of problems.
-As stated elsewhere, each problem required approximately four thousand runs to
-determine optimal genome size and mutation rate.  Similarly we wanted to delve
-deeply into behavior, which requires time to determine measures and discover patterns,
-not all of which are going to be domain independent.  As CGP's foundation is the
-binary domain, we felt this was the correct choice for such detail oriented work.
+A major focus of our work (ordering effect on the location and number of active genes)
+is grounded in theory which makes no assumptions on the type of problem being solved.
+Furthermore, the operators we investigate deal with domain independent problems.
+As the experimental results matched the theory, we have no reason to suspect our
+conclusions on these topics to change when the operators or data type is changed.
+However, we understand that the following could change depending on data type: The relative effectiveness
+of the proposed modifications (IE, skip vs single, reorder vs normal, etc), the
+evolved genome sizes, and the charts in Table IV and Table V.  Yet we do not feel
+these are the primary concern of the work, nor do we have any reason to believe
+the conclusions should only hold true for binary problems.
 
-Upon the suggestion of Reviewer 2, we further examined the statistical measures
+With that said, we would now like to provide point by point responses to the reviewer
+comments.
+
+Reviewer 1:
+"You may find it useful to at least mention other representations of CGP in
+which the dependency of node ordering has been reduced, or even, removed"
+Page 3, right column, last paragraph before Section Reorder: This paragraph was
+added with appropriate citations to a few versions of CGP which do not follow Equation 1.
+
+"When comparing your results with previous publications [8], why didn't you used the same function set?"
+In [8], the authors use AND, OR, NAND, NOR for all of the other boolean problems tested (Even Parity, Digital Adder, and Digital Comparitor),
+but use AND, AND with one input inverted, XOR and OR on digital multiplier.
+The two papers [8] cites that performed research on this problem used AND, XOR.  They claim this makes the problem easier as
+human designed solutions use only AND, XOR.  Therefore eliminating XOR as a choice likely makes this problem even harder.
+That said, our paper chose to keep the operators consistent across problems.  Converting our
+version to use their operators (either [8]s or the work cited by [8]) would require an infeasible
+amount of time to again perform tuning.  However, Page 8, left column we have added more
+information about this comparison.  Notably, we used our parameters with their operators
+and maintained Reorder as being statistically better.
+
+"It is unfortunate that all analysis was limited to boolean problems"
+Covered in general response.
+
+"[I]t may be helpful to make it clear that Skip, Accumulate etc. are your invention"
+For terseness we felt that as our abstract states our focus was on "creating methods"
+combined with fact that these methods both exist in previous published work, no modification
+was necessary.
+
+"[I]n many CGP implementations it is not common to exclude the gene's current value during mutation."
+Page 1, right column, last paragraph: We have correct this to point out both that it isn't
+so much common as unclearly defined and that our choice is in doing so is to allow
+for precise behavioral analysis.  While the distinction may result in minor differences in behavior,
+we see no reason for it to effect any conclusions drawn about CGP's aggregate behavior.
+
+"Once all of a *node's* dependencies..."
+Fixed.
+
+"References or at least a very brief description of the purpose of for
+Kruskal–Wallis (as for the Mann-Whitney U test) would aid those not familiar."
+Page 7, Footnote 3 and 4 have been added.
+
+
+Reviewer 2:
+"Please provide the reasons why the interaction is important? Also, please explain (briefly) how your goals can be achieved."
+Page 1, left column, last sentence as been added.
+
+"[W]hy only "one" active gene is mutated?"
+Page 3, left column, last paragraph before Section Genome Reordering: Added explanation that more than
+one could have been used, but one is sufficient and removes a parameter.
+
+"", and defined Normal as CGP's historical ordering method", do you mean the ordering method of the original CGP?"
+Yes.  Page 3, right column, paragraph starting with "To rectify these", last sentence clarifies our meaning.
+
+""While this increase ... drawback.", this sentence is not entirely clear to me. Please elaborate more and provide reasons for this statement."
+Page 4, right column, last paragraph before Section DAG.  Last few sentences expand on the idea.
+
+""mutating node" or "mutated node"?"
+Mutating is in fact intended here.  This section is discussing the process of performing
+a mutation on a node, so at this point in the description it is "mutating."
+
+"It would be nice to give some rationales why potential configurations run 5 times and later 4 times? Why are higher values used?"
+Page 6, right column, last full paragraph, starting from "We chose to run each initially 5 times"
+
+""we would suggest Skip be used over accumulate for any real world application." is quite a strong claim. Only binary problems are examined in the experiments, is it enough to support your claim?"
+Page 7, right column, last full paragraph: Added some language to clarify our reasoning.  From what we can tell
+the methods are different ways of doing the exact same thing.  Since Accumulate is more complicated, we suggest Skip.
+
+"If possible, please provide the average, standard deviation of "Evaluations to success" and the average running time of each configuration.
+We further examined the statistical measures
 of evaluations to success which we report in Table II.  As it is not safe to assume the number
 of evaluations to success is normally distributed (in fact, they are most likely not normal),
 we chose to provide non-parametric (median) instead of parametric (mean) measures,
@@ -47,7 +114,7 @@ capturing useful information, and we now show bootstrap confidence intervals, wh
 more statistically sound and interesting value.
 
 As to the including the wall clock time for our experiments, we attempted to cover our
-reasoning for not doing this in the 4rd to last paragraph in the Results section.
+reasoning for not doing this starting on Page 8, right column, continuing to the end of the section.
 In order to provide a fair comparison of runtime, we would need to redo tuning
 with a focus on minimizing wall clock time instead of number of evaluations, which
 would require another four thousand runs to time just one problem.  An additional
@@ -55,3 +122,68 @@ problem in reporting this value is hardware diversity.  To complete our experime
 we utilized a computing cluster with diverse hardware quality.  To avoid this problem,
 we would need to recreate all experiments on homogeneous hardware, which is intractable
 for experiments of this size.
+
+
+Reviewer 3:
+"Although I am not suggesting any more work be undertaken. It would have been nice
+to see more work done on harder problems. ... The paper has focused on Boolean problems and it would be interesting to
+carry out similar analysis in other domains. Of course, this remains for the future."
+Covered in general response.
+
+"Mutation is generally carried out in two ways [rate vs probability]...The two methods require markedly different amounts of computation"
+It is possible to achieve O(1) amortized cost when performing mutations using the probability method.
+This can be done leveraging the binomial distribution, which in many languages is implemented to give
+the random number of trials k of N total which are true given probability P.  k genes can then
+be selected from the genome at random just as when using a mutation rate.  This operator is
+advantageous in that allows for a flexible number of mutating genes, up to and including
+mutating all genes in a single step.  We alluded to this Page 9, left column, first full paragraph.
+Note, if we were to extend Single to use a configurable
+number of genes, this would be my choice of method.  As such we would disagree that the probability method
+by necessity requires more computation than rate.
+
+That said, for clarity we have corrected all references to mutation "rate" and replaced them with "probability."
+
+"Another quite minor point is that as stated in Miller's book (page 28) when a function gene is selected for mutation, no
+check is made as to whether the mutated function is the same as that before mutation"
+Page 1, right column, last paragraph: We have clarified this.  See response to similar comment by Reviewer 1.
+
+"than" should be "then"
+Fixed.
+
+"It is worth noting in the paper that this step does incur a computational cost."
+Page 2, left column, last full paragraph.
+
+"I think the paper would benefit from some
+remarks about the extra computational cost of carrying out the Accumulate strategy"
+Page 2, right column, last paragraph.
+
+"Since one knows what the parent's active genes are, one could change an active gene at random."
+Page 3, left column, last paragraph before Section Genome Ordering partially covers this.  In general
+we felt the existing arguments about the importance of neutral drift covered why inactive genes are
+also mutated.
+
+"...this representation likely..." -> "...this representation is likely..."
+Fixed.
+
+"convenience" -> "convenient"
+Page 4, left column, first paragraph: We decided the word convenient was not necessary and removed
+it entirely.
+
+"effecting" -> "affecting"
+Fixed.
+
+"It is probably a Latex issue, but the caption TABLE 1 merges with the bottom line of the table."
+The IEEE standard is to have captions above a table.  Our original submission had captions below
+the tables, which was why there was a problem.  Caption locations for all tables have been corrected.
+
+"making comparisons with modular CGP on 3-bit parity is of little value actually"
+That comparison has been removed as we felt it was not useful.
+
+"the are" -> "they are"
+Fixed.
+
+"If this is true, it may help to explain CGP uses such large genomes..."
+Fixed.
+
+"most effect" -> "Largest effect"?
+Fixed.
