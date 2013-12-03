@@ -829,8 +829,9 @@ are almost certainly going to be active, while nodes in the last three quarters
 of the genome are almost never going to be active.
 \end{comment}
 %NEW
-Substituting $N=2000$, $A=2$, $I=6$, $O=6$ into Equation~\ref{eq:prob}
-predicts only 160 active nodes, with 80\% of the first 100 nodes expected to be
+Substituting $N=2000$, $A=2$, $I=6$, $O=6$ into Equation~\ref{eq:prob} (chosen to match
+experimental values used in Section~\ref{sec:analysis})
+predicts only 160 active nodes, or 8\% of the total genome.  Positionally, 80\% of the first 100 nodes are expected to be
 active while just 4\% of the remaining 1900 nodes are expected to be active.
 %/NEW
 
@@ -1062,7 +1063,7 @@ The probability of connecting $X$ to $Y$ is also influenced by how many nodes tr
 For example, assume $X$ has more nodes transitively dependent on it than $Y$.
 In \emph{Reorder}, $X$ is again more likely to be placed before $Y$, this time because the number
 of possible nodes preceding it is reduced.  \emph{DAG} is biased in the reverse, such that $X$ will
-have a higher chance of connecting to $Y$ that $Y$ to $X$.  This is because $X$ can connect to fewer
+have a higher chance of connecting to $Y$ than $Y$ to $X$.  This is because $X$ can connect to fewer
 nodes, so each mutation has a higher chance of choosing $Y$.
 
 \section{Qualitative Comparisons}
@@ -1124,7 +1125,7 @@ To cover a range of different binary problems, each of the four chosen have
 different numbers of inputs, different number of outputs, and different levels
 of difficulty.
 
-The first problem, 3-bit parity, represents the most
+The first problem, 3-bit Parity, represents the most
 common application for
 CGP~\cite{yu:2001:neutrality,miller:2006:redundancy,walker:2008:cgpmodules}.
 We include this problem purely for backward comparison, as we agree that in general
@@ -1345,7 +1346,7 @@ the control.  As these are the easiest problems tested, that difference may have
 little real world meaning.  \emph{DAG} is almost certainly worse than the control on
 Decode.  Its results are so much worse that we can also likely conclude that \emph{DAG}
 is worse than all non \emph{DAG} configuration on that problem, even though no statistical
-tests are presented here.  The control on multiply did by far the worst of all configurations,
+tests are presented here.  The control on Multiply did by far the worst of all configurations,
 with only \emph{Accumulate Normal} likely failing statistical significance.
 
 By ordering the algorithm combinations by median evaluations to success (MES) and examining that ordering across each
@@ -1390,7 +1391,7 @@ any future applications.
 As a final check that our results do not somehow unfairly handicap traditional CGP,
 we compared our median evaluations to success with previous publications.  The results
 reported for traditional CGP in~\cite{walker:2008:cgpmodules}
-for 3-bit parity required 6 times as many evaluations as \emph{Skip-Normal}.
+for 3-bit Parity required 6 times as many evaluations as \emph{Skip-Normal}.
 On the 3-bit Multiplier problem using a slightly different operator set,
 the same source had traditional CGP requiring 4 million evaluations to success,
 as opposed to our \emph{Skip-Normal} requiring 600 thousand, also a factor of 6 improvement.
@@ -1568,11 +1569,11 @@ to have less or no positional bias, which also matches the results given in Tabl
 
 %The above paragraphs were replaced by the below paragraph.
 In Section~\ref{sec:ordering} we used Equation~\ref{eq:prob} to suggest \emph{Normal}
-as a strong bias on the location of active nodes regardless of fitness landscape, and that
+has a strong bias on the location of active nodes regardless of fitness landscape, and that
 \emph{Reorder} and \emph{DAG} would likely have less or no bias.
 %NEW
 The example inputs used in that section match those of \emph{Normal}'s tuned
-configuration on 3-bit multiply.  The predicted number of active nodes and their
+configuration on 3-bit Multiply.  The predicted number of active nodes and their
 location in the genome match almost exactly
 the behavior displayed in all three \emph{Normal} plots in Table~\ref{tab:never_active}.
 %/NEW
