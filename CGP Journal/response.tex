@@ -1,3 +1,13 @@
+\documentclass{letter}
+\usepackage{hyperref}
+\usepackage{verbatim}
+%\signature{Brian W. Goldman and William F. Punch}
+%\address{21 Bridge Street \\ Smallville \\ Dunwich DU3 4WE}
+\begin{document}
+
+\begin{letter}{}
+\opening{Greetings Editors and Reviewers:}
+
 First, we would like to thank both the reviewers and the editorial staff for their
 time in examining our work.  The comments we received were very helpful and
 have lead to significant improvements.
@@ -5,27 +15,34 @@ have lead to significant improvements.
 Before covering individual points, we would like to respond to the two
 reviewers who suggested we could improve the support of our conclusions by
 including problems outside the binary domain.  We completely agree, and as
-with Reviewer 3 we feel like this is an excellent avenue for future work.  However,
-the focus of this work was to delve deeply into a small set of problems with
-the hope of developing the hypotheses about CGP's inherent behavior.  To that
-end we felt attempting to increase the breadth would limit our depth.  As was
+noted by Reviewer 3 we feel like this is an excellent avenue for future work.  However,
+the focus of this work was to delve deeply into a small set of problems to
+develop hypotheses about CGP's inherent behavior.  To that
+end we felt that increasing the paper's breadth would limit our depth.  As was
 pointed out by two reviewers, our work required extensive experimentation
-to achieve the conclusions on our small set of problems.  More directly, to
-include a single new problem (boolean or otherwise) with which we
-could perform comparable analysis would require over four thousand additional runs
-to perform proper parameter tuning and data collection.
+to achieve our conclusions on a small set of problems.  More directly, to
+include a single new problem (boolean or otherwise) with
+comparable analysis would require over four thousand additional runs.
+%including proper parameter tuning and data collection.
 
-The reason we chose all of our original problems as binary was to allow for the
+The reason we chose binary problems was to allow for the
 detailed analysis of behavior in the latter half of Section VI.  If we had done
 four problems, but using diverse domains, it would have been much more challenging
 to determine why we observed changes in behavior between problems.  By using
-four problems with similar domains and the same operators, we are able to determine
+four problems with similar domains and the same operators, we were able to determine
 how our techniques scale with problem difficulty.  Similarly, the analysis tools
-we developed to perform the comparison could rely on problem uniformity.
-Also, since the binary domain is
-the most studied and successful in CGP literature, detailed analysis and conclusions drawn about
-its behavior in this domain are likely to have the most impact on the field.
+we developed to perform the comparison allowed us to rely on problem uniformity.
+Finally, since the binary domain is
+the most studied and successful in CGP literature, detailed analysis and conclusions drawn
+are likely to have the most impact on the field.
 
+We would like to reiterate that our thesis is understanding
+CGP's problem solving behaviors and not necessarily to suggest any of our modifications
+as universal improvements.  We agree that the inclusion of wall time comparisons on a diverse
+set of hard real world problems can be very informative when defending new methods
+for optimization, but we strive more for comprehension than improvement.
+
+\begin{comment}
 A major focus of our work (ordering effect on the location and number of active genes)
 is grounded in theory which makes no assumptions on the type of problem being solved.
 Furthermore, the operators we investigate deal with domain independent problems.
@@ -36,6 +53,7 @@ of the proposed modifications (IE, skip vs single, reorder vs normal, etc), the
 evolved genome sizes, and the charts in Table IV and Table V.  Yet we do not feel
 these are the primary concern of the work, nor do we have any reason to believe
 the conclusions should only hold true for binary problems.
+\end{comment}
 
 With that said, we would now like to provide point by point responses to the reviewer
 comments.
@@ -51,9 +69,8 @@ In [8], the authors use AND, OR, NAND, NOR for all of the other boolean problems
 but use AND, AND with one input inverted, XOR and OR on digital multiplier.
 The two papers [8] cites that performed research on this problem used AND, XOR.  They claim this makes the problem easier as
 human designed solutions use only AND, XOR.  Therefore eliminating XOR as a choice likely makes this problem even harder.
-That said, our paper chose to keep the operators consistent across problems.  Converting our
-version to use their operators (either [8]s or the work cited by [8]) would require an infeasible
-amount of time to again perform tuning.  However, Page 8, left column we have added more
+That said, our paper chose to keep the operators consistent across problems.
+However, Page 8, left column we have added more
 information about this comparison.  Notably, we used our parameters with their operators
 and maintained Reorder as being statistically better.
 
@@ -66,7 +83,7 @@ combined with fact that these methods both exist in previous published work, no 
 was necessary.
 
 "[I]n many CGP implementations it is not common to exclude the gene's current value during mutation."
-Page 1, right column, last paragraph: We have correct this to point out both that it isn't
+Page 1, right column, last paragraph: We have corrected this to point out both that it isn't
 so much common as unclearly defined and that our choice is in doing so is to allow
 for precise behavioral analysis.  While the distinction may result in minor differences in behavior,
 we see no reason for it to effect any conclusions drawn about CGP's aggregate behavior.
@@ -116,12 +133,10 @@ more statistically sound and interesting value.
 As to the including the wall clock time for our experiments, we attempted to cover our
 reasoning for not doing this starting on Page 8, right column, continuing to the end of the section.
 In order to provide a fair comparison of runtime, we would need to redo tuning
-with a focus on minimizing wall clock time instead of number of evaluations, which
-would require another four thousand runs to time just one problem.  An additional
+with a focus on minimizing wall clock time instead of number of evaluations.
+An additional
 problem in reporting this value is hardware diversity.  To complete our experiments
-we utilized a computing cluster with diverse hardware quality.  To avoid this problem,
-we would need to recreate all experiments on homogeneous hardware, which is intractable
-for experiments of this size.
+we utilized a computing cluster with diverse hardware quality.
 
 
 Reviewer 3:
@@ -177,7 +192,7 @@ The IEEE standard is to have captions above a table.  Our original submission ha
 the tables, which was why there was a problem.  Caption locations for all tables have been corrected.
 
 "making comparisons with modular CGP on 3-bit parity is of little value actually"
-That comparison has been removed as we felt it was not useful.
+That comparison has been removed as we agree it was not useful.
 
 "the are" -> "they are"
 Fixed.
@@ -187,3 +202,7 @@ Fixed.
 
 "most effect" -> "Largest effect"?
 Fixed.
+
+\end{letter}
+
+\end{document}
