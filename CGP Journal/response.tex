@@ -1,7 +1,9 @@
 \documentclass{letter}
 \usepackage{hyperref}
 \usepackage{verbatim}
-%\signature{Brian W. Goldman and William F. Punch}
+\usepackage[T1]{fontenc}
+\usepackage{fullpage}
+\signature{Brian W. Goldman and William F. Punch}
 %\address{21 Bridge Street \\ Smallville \\ Dunwich DU3 4WE}
 \begin{document}
 
@@ -33,7 +35,7 @@ four problems with similar domains and the same operators, we were able to deter
 how our techniques scale with problem difficulty.  Similarly, the analysis tools
 we developed to perform the comparison allowed us to rely on problem uniformity.
 Finally, since the binary domain is
-the most studied and successful in CGP literature, detailed analysis and conclusions drawn
+the most studied and successful in CGP literature, detailed analysis and conclusions drawn there
 are likely to have the most impact on the field.
 
 We would like to reiterate that our thesis is understanding
@@ -58,13 +60,18 @@ the conclusions should only hold true for binary problems.
 With that said, we would now like to provide point by point responses to the reviewer
 comments.
 
-Reviewer 1:
-"You may find it useful to at least mention other representations of CGP in
-which the dependency of node ordering has been reduced, or even, removed"
+\textbf{Reviewer 1:}
+
+\begin{quote}
+You may find it useful to at least mention other representations of CGP in
+which the dependency of node ordering has been reduced, or even, removed.
+\end{quote}
 Page 3, right column, last paragraph before Section Reorder: This paragraph was
 added with appropriate citations to a few versions of CGP which do not follow Equation 1.
 
-"When comparing your results with previous publications [8], why didn't you used the same function set?"
+\begin{quote}
+When comparing your results with previous publications [8], why didn't you used the same function set?
+\end{quote}
 In [8], the authors use AND, OR, NAND, NOR for all of the other boolean problems tested (Even Parity, Digital Adder, and Digital Comparitor),
 but use AND, AND with one input inverted, XOR and OR on digital multiplier.
 The two papers [8] cites that performed research on this problem used AND, XOR.  They claim this makes the problem easier as
@@ -74,54 +81,55 @@ However, Page 8, left column we have added more
 information about this comparison.  Notably, we used our parameters with their operators
 and maintained Reorder as being statistically better.
 
-"It is unfortunate that all analysis was limited to boolean problems"
+\begin{quote}It is unfortunate that all analysis was limited to boolean problems\end{quote}
 Covered in general response.
 
-"[I]t may be helpful to make it clear that Skip, Accumulate etc. are your invention"
-For terseness we felt that as our abstract states our focus was on "creating methods"
+\begin{quote}[I]t may be helpful to make it clear that Skip, Accumulate etc. are your invention\end{quote}
+For terseness we felt that as our abstract states our focus was on ``creating methods''
 combined with fact that these methods both exist in previous published work, no modification
 was necessary.
 
-"[I]n many CGP implementations it is not common to exclude the gene's current value during mutation."
+\begin{quote}[I]n many CGP implementations it is not common to exclude the gene's current value during mutation.\end{quote}
 Page 1, right column, last paragraph: We have corrected this to point out both that it isn't
-so much common as unclearly defined and that our choice is in doing so is to allow
+so much common as unclearly defined and that our choice was made to allow
 for precise behavioral analysis.  While the distinction may result in minor differences in behavior,
 we see no reason for it to effect any conclusions drawn about CGP's aggregate behavior.
 
-"Once all of a *node's* dependencies..."
+\begin{quote}Once all of a *node's* dependencies...\end{quote}
 Fixed.
 
-"References or at least a very brief description of the purpose of for
-Kruskal–Wallis (as for the Mann-Whitney U test) would aid those not familiar."
+\begin{quote}References or at least a very brief description of the purpose of for
+Kruskal-Wallis (as for the Mann-Whitney U test) would aid those not familiar.\end{quote}
 Page 7, Footnote 3 and 4 have been added.
 
 
-Reviewer 2:
-"Please provide the reasons why the interaction is important? Also, please explain (briefly) how your goals can be achieved."
+\textbf{Reviewer 2:}
+
+\begin{quote}Please provide the reasons why the interaction is important? Also, please explain (briefly) how your goals can be achieved.\end{quote}
 Page 1, left column, last sentence as been added.
 
-"[W]hy only "one" active gene is mutated?"
+\begin{quote}[W]hy only ``one'' active gene is mutated?\end{quote}
 Page 3, left column, last paragraph before Section Genome Reordering: Added explanation that more than
 one could have been used, but one is sufficient and removes a parameter.
 
-"", and defined Normal as CGP's historical ordering method", do you mean the ordering method of the original CGP?"
-Yes.  Page 3, right column, paragraph starting with "To rectify these", last sentence clarifies our meaning.
+\begin{quote}``and defined Normal as CGP's historical ordering method'', do you mean the ordering method of the original CGP?\end{quote}
+Yes.  Page 3, right column, paragraph starting with ``To rectify these'', last sentence clarifies our meaning.
 
-""While this increase ... drawback.", this sentence is not entirely clear to me. Please elaborate more and provide reasons for this statement."
+\begin{quote}``While this increase ... drawback.'', this sentence is not entirely clear to me. Please elaborate more and provide reasons for this statement.\end{quote}
 Page 4, right column, last paragraph before Section DAG.  Last few sentences expand on the idea.
 
-""mutating node" or "mutated node"?"
+\begin{quote}``mutating node'' or ``mutated node''?\end{quote}
 Mutating is in fact intended here.  This section is discussing the process of performing
-a mutation on a node, so at this point in the description it is "mutating."
+a mutation on a node, so at this point in the description it is ``mutating.''
 
-"It would be nice to give some rationales why potential configurations run 5 times and later 4 times? Why are higher values used?"
-Page 6, right column, last full paragraph, starting from "We chose to run each initially 5 times"
+\begin{quote}It would be nice to give some rationales why potential configurations run 5 times and later 4 times? Why are higher values used?\end{quote}
+Page 6, right column, last full paragraph, starting from ``We chose to run each initially 5 times.''
 
-""we would suggest Skip be used over accumulate for any real world application." is quite a strong claim. Only binary problems are examined in the experiments, is it enough to support your claim?"
+\begin{quote}``we would suggest Skip be used over accumulate for any real world application.'' is quite a strong claim. Only binary problems are examined in the experiments, is it enough to support your claim?\end{quote}
 Page 7, right column, last full paragraph: Added some language to clarify our reasoning.  From what we can tell
 the methods are different ways of doing the exact same thing.  Since Accumulate is more complicated, we suggest Skip.
 
-"If possible, please provide the average, standard deviation of "Evaluations to success" and the average running time of each configuration.
+\begin{quote}If possible, please provide the average, standard deviation of ``Evaluations to success'' and the average running time of each configuration.\end{quote}
 We further examined the statistical measures
 of evaluations to success which we report in Table II.  As it is not safe to assume the number
 of evaluations to success is normally distributed (in fact, they are most likely not normal),
@@ -130,22 +138,25 @@ as was done in [8].  Upon our review, we decided Median Absolute Deviation was n
 capturing useful information, and we now show bootstrap confidence intervals, which is a much
 more statistically sound and interesting value.
 
-As to the including the wall clock time for our experiments, we attempted to cover our
+As to including the wall clock time for our experiments, we attempted to cover our
 reasoning for not doing this starting on Page 8, right column, continuing to the end of the section.
 In order to provide a fair comparison of runtime, we would need to redo tuning
 with a focus on minimizing wall clock time instead of number of evaluations.
 An additional
 problem in reporting this value is hardware diversity.  To complete our experiments
-we utilized a computing cluster with diverse hardware quality.
+we utilized a computing cluster with diverse hardware quality, and running all experiments
+on uniform hardware is infeasible for us at this time.
 
 
-Reviewer 3:
-"Although I am not suggesting any more work be undertaken. It would have been nice
+\textbf{Reviewer 3:}
+
+\begin{quote}Although I am not suggesting any more work be undertaken. It would have been nice
 to see more work done on harder problems. ... The paper has focused on Boolean problems and it would be interesting to
-carry out similar analysis in other domains. Of course, this remains for the future."
+carry out similar analysis in other domains. Of course, this remains for the future.\end{quote}
 Covered in general response.
 
-"Mutation is generally carried out in two ways [rate vs probability]...The two methods require markedly different amounts of computation"
+\begin{quote}Mutation is generally carried out in two ways [rate vs probability]...The two methods require markedly
+different amounts of computation...\end{quote}
 It is possible to achieve O(1) amortized cost when performing mutations using the probability method.
 This can be done leveraging the binomial distribution, which in many languages is implemented to give
 the random number of trials k of N total which are true given probability P.  k genes can then
@@ -153,56 +164,57 @@ be selected from the genome at random just as when using a mutation rate.  This 
 advantageous in that allows for a flexible number of mutating genes, up to and including
 mutating all genes in a single step.  We alluded to this Page 9, left column, first full paragraph.
 Note, if we were to extend Single to use a configurable
-number of genes, this would be my choice of method.  As such we would disagree that the probability method
+number of genes, this would be our choice of method.  As such we would disagree that the probability method
 by necessity requires more computation than rate.
 
-That said, for clarity we have corrected all references to mutation "rate" and replaced them with "probability."
+That said, for clarity we have corrected all references to mutation ``rate'' and replaced them with ``probability.''
 
-"Another quite minor point is that as stated in Miller's book (page 28) when a function gene is selected for mutation, no
-check is made as to whether the mutated function is the same as that before mutation"
+\begin{quote}Another quite minor point is that as stated in Miller's book (page 28) when a function gene is selected for mutation, no
+check is made as to whether the mutated function is the same as that before mutation\end{quote}
 Page 1, right column, last paragraph: We have clarified this.  See response to similar comment by Reviewer 1.
 
-"than" should be "then"
+\begin{quote}``than'' should be ``then''\end{quote}
 Fixed.
 
-"It is worth noting in the paper that this step does incur a computational cost."
+\begin{quote}It is worth noting in the paper that [checking active genes are changed] does incur a computational cost.\end{quote}
 Page 2, left column, last full paragraph.
 
-"I think the paper would benefit from some
-remarks about the extra computational cost of carrying out the Accumulate strategy"
+\begin{quote}I think the paper would benefit from some
+remarks about the extra computational cost of carrying out the Accumulate strategy\end{quote}
 Page 2, right column, last paragraph.
 
-"Since one knows what the parent's active genes are, one could change an active gene at random."
+\begin{quote}Since one knows what the parent's active genes are, one could change an active gene at random.\end{quote}
 Page 3, left column, last paragraph before Section Genome Ordering partially covers this.  In general
 we felt the existing arguments about the importance of neutral drift covered why inactive genes are
 also mutated.
 
-"...this representation likely..." -> "...this representation is likely..."
+\begin{quote}``...this representation likely...'' -> ``...this representation is likely...''\end{quote}
 Fixed.
 
-"convenience" -> "convenient"
+\begin{quote}``convenience'' -> ``convenient''\end{quote}
 Page 4, left column, first paragraph: We decided the word convenient was not necessary and removed
 it entirely.
 
-"effecting" -> "affecting"
+\begin{quote}``effecting'' -> ``affecting''\end{quote}
 Fixed.
 
-"It is probably a Latex issue, but the caption TABLE 1 merges with the bottom line of the table."
+\begin{quote}It is probably a Latex issue, but the caption TABLE 1 merges with the bottom line of the table.\end{quote}
 The IEEE standard is to have captions above a table.  Our original submission had captions below
 the tables, which was why there was a problem.  Caption locations for all tables have been corrected.
 
-"making comparisons with modular CGP on 3-bit parity is of little value actually"
+\begin{quote}making comparisons with modular CGP on 3-bit parity is of little value actually\end{quote}
 That comparison has been removed as we agree it was not useful.
 
-"the are" -> "they are"
+\begin{quote}``the are'' -> ``they are''\end{quote}
 Fixed.
 
-"If this is true, it may help to explain CGP uses such large genomes..."
+\begin{quote}If this is true, it may help to explain CGP uses such large genomes...\end{quote}
 Fixed.
 
-"most effect" -> "Largest effect"?
+\begin{quote}``most effect'' -> ``Largest effect''?\end{quote}
 Fixed.
 
+\closing{Thank you again for your thoughtful consideration.}
 \end{letter}
 
 \end{document}
