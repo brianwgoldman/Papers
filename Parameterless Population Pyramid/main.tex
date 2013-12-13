@@ -52,6 +52,9 @@
 \newcommand{\includegraphicsfit}[1]
 {\includegraphics[width=\columnwidth,height=\textheight,keepaspectratio]{#1}}
 
+\newcommand{\includegraphicswide}[1]
+{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{#1}}
+
 \usepackage{bm}
 \begin{document}
 %
@@ -294,8 +297,25 @@ evaluated.
 
 \subsection{All Together}
 \label{sec-alltogether}
-TODO Pieces working together.  HC removes pairwise noise, which allows crossover to detect
-clusters.  Levels allow realization of linkage at high levels, reduction in noise.
+The pieces of P3 were specifically chosen to interact in desirable ways.  First,
+the hill climber provides an efficient tool for discovering pairwise linkage, as
+search only ends when no single bit change can be made which improves fitness.
+Therefore crossover, which relies on pairwise linkage, has high quality information
+to leverage when determining clusters.
+
+Similarly, by starting from a random position for each new solution, P3 progressively reduces
+the chance of spurious linkage formation due to initialization.  Furthermore, these random
+restarts provide exploration to balance out the hill climber and crossover's extreme
+exploitation.
+
+Finally, the use of levels allows P3 to perform solution filtering without throwing
+away information.  Once found, a local optima is stored indefinitely and its linkage
+and genes will have impact on future crossovers.  However, by splitting solutions
+into levels, the linkage information and the donated genes come from similar solution
+qualities.  This prevents noise in gene linkage which only exists in low quality
+solutions from effecting cluster formation for high quality solutions.  It also
+reduces the chance for high quality solutions to simply overwrite new, unoptimized
+solutions, preserving search diversity.
 
 \section{Comparison Algorithms}
 
@@ -325,13 +345,13 @@ This algorithm is also the current state of the art, outperforming other algorit
 in black box optimization across numerous benchmarks.
 
 LTGA works by iteratively improving a population of solutions in a generational manner.
-Each generation the half of the solutions (chosen using standard tournament selection)
+Each generation half of the solutions (chosen using binary tournament selection)
 are used to construct a linkage tree just as described in Section~\ref{sec-crossover}.
 Each solution in the population is then crossed with the entire population using that
 linkage tree, with the results put into the next generation.  This process continues
 until the population fails to change between generations, signaling convergence.
 
-Unlike P3, LTGA does not make use of a hill climber, and there is evidence that
+Unlike P3, this variant of LTGA does not make use of a hill climber, and there is evidence that
 doing so results in decreased efficiency~\cite{bosman:2011:lsbbo}.  LTGA applies
 clusters in least linked first order whereas P3 uses smallest first.  Also, LTGA
 does not search for donors until one containing different genes is found.  Instead
@@ -386,14 +406,45 @@ discusses a ``mod'' version of the $\lambda$ control strategy for how to handle
 when offspring of equal fitness are produced, we found this conflicted with our
 method of restarting.  As such we use the original control strategy, where $\lambda$
 is increased if the best offspring in a generation is not strictly better than its parent.
+If an offspring produced by crossover has identical genes to either of its parents,
+it is not evaluated.
 
 \section{Test Problems}
-TODO Mention that since all of our algorithms are variable order insensitive
-and have no bias toward creating 1s over 0s, all will have identical results if
-problem variables are randomly reordered or XOR'd.
+All four of our optimization techniques share some interesting properties for
+problem equivalence.  First, all are fitness scale invariant, in that changing
+the fitness values without changing the relation between solution fitnesses does
+not effect any of their search methods.  This is true because none of the methods
+uses the fitness values directly, only when comparing the relative fitness between
+two solutions using boolean operators.  This does not hold true for some optimization
+methods, for instance fitness proportional selection.
 
-TODO Chose only problems with known global optima to allow comparison on time to
-global optima.
+None of the methods have a bias toward creating specific gene values outside
+of the bias created by the problem itself.  This means all of the optimizers
+will have unchanged behavior if a problem's inputs are reflected or XOR'd with a fixed string.  As
+an example, the problem of maximize the number of ones in a solution will be treated identically
+to the problem of maximizing the number of zeros in a solution.  Both are also identical
+to the problem of minimizing the hamming distance to any arbitrary solution.
+
+All of the methods are gene order independent.  This means that the location
+of genes in the genome can be randomly shuffled without effecting search behavior.
+This is not true in many evolutionary systems due to crossover.  For example,
+when using one point crossover the distance between genes in the genome effects the
+probability they will be kept together through a crossover.
+
+Combined, these features mean that tests on apparently simple problems can be
+indicative of search behavior on a large class of actually complex problems.
+
+In choosing test problems, we decided to use only benchmarks with knowable global
+optima.  This allows us to measure how many evaulations each method requires to converge to the
+global optima, as opposed to just the highest fitness reached.  This is advantageous
+as three of the four algorithms have no hard termination condition.  The remaining
+algorithm, LTGA, uses a population parameter which can be increased to slow
+convergence with the potential increase in fitness reachable before convergence.
+Therefore it is difficult to say how and when to declare any of the techniques
+converged unless the global optimum is found.
+While in practice it is often more important to find a good solution quickly
+than to find the optimum after an exceedingly long time, using this as a measure
+for algorithm quality can lead to algorithms which prematurely converge.
 
 \subsection{Single Instance Problems}
 Well defined test problem landscapes can help when performing exact analysis of
@@ -433,15 +484,15 @@ nature and single optimal setting may not capture aspects of real world problem 
 Therefore the Hierarchical If and only If (HIFF) problem is often used to test an
 algorithms ability to handle these characteristics~\cite{thierens:2013:ltgahiff}.
 In this problem the genome is broken up hierarchically into a complete binary tree,
-with each gene representing a single bit, and each internal node representing the union
-between all genes in that nodes subtree.  A node in the tree contributes to the fitness
+with each gene representing a leaf, and each internal node representing the union
+between all genes in that node's subtree.  A node in the tree contributes to the fitness
 only if all of the genes in its subset have the same value (IE are all 0 or are all 1).
 The amount contributed is equal to the number of bits in the subset.  As a result
 this problem involves creating larger and larger blocks of single value runs which
 only score if the entire block is optimized.
 
 Our final single instance problem is borrowed from the real valued optimization domain.
-The Discretized Rastrigin used the standard Rastrigin evaluation function (Equation~\ref{eq-rast}).
+The Discretized Rastrigin problem uses the standard Rastrigin evaluation function (Equation~\ref{eq-rast}).
 \begin{equation}
   An + \sum_{i=1}^{n}\left [ x_i^2-A\cos (2\pi x_i) \right ] \forall x\in [-5.12,5.12]
   \label{eq-rast}
@@ -472,7 +523,7 @@ genes at the start of the genome.
 
 Ising Spin Glasses are another large class of $NP-Hard$ problems.  These problems
 involve minimizing the interaction terms in a graph based on edge weights by changing
-the sign of graph nodes.  Similar to with NK landscapes, there is a subset of Ising problems
+the sign of graph nodes.  Similar to with NK landscapes, there is a polynomially solvable subset of Ising problems
 known as $2D\pm J$ Ising Spin Glasses.  This subset restricts graph interactions to a
 toroidal two dimensional grid with edge weights of $\{-1, +1\}$.  This subset can
 be solved in polynomial time~\cite{saul:1994:spinglass}, and there are existing
@@ -490,18 +541,56 @@ all clause signs match the target, a $\frac{1}{6}$ probability two of the three 
 and a $\frac{4}{6}$ probability only one sign matches.  By setting the clause signs
 in this way we ensure the target solution is always able to satisfy all clauses,
 meaning all problems have a known best fitness.  Note that its possible there to be
-other solutions that satisfy all clauses.
+other solutions that also satisfy all clauses.
 
 \section{Experimental Results}
+\begin{figure*}
+  \centering
+  \includegraphicswide{WithRast}
+  \caption{Test problems}
+  \label{fig-results}
+\end{figure*}
+
+\begin{table}
+	\centering
+	\begin{tabular}{|c|r|c|}
+	  \hline
+	                & \textbf{Median} & \textbf{Confidence Interval} \\ \hline
+    \multicolumn{3}{|c|}{\textbf{Deceptive Trap}, N=805, Speedup=2.936} \\ \hline
+\textbf{LTGA} & 1,807,127 & 1,805,039 .. 1,808,718 \\ \hline
+\textbf{P3} & 615,503 & 577,000 .. 653,504 \\ \hline\hline
+    \multicolumn{3}{|c|}{\textbf{Deceptive Step Trap}, N=805, Speedup=1.107} \\ \hline
+\textbf{LTGA} & 14,106,751 & 14,102,987 .. 14,109,910 \\ \hline
+\textbf{P3} & 12,742,411 & 11,951,148 .. 13,777,090 \\ \hline\hline
+    \multicolumn{3}{|c|}{\textbf{HIFF}, N=2048, Speedup=3.1278} \\ \hline
+\textbf{LTGA} & 1,847,077 & 1,845,662 .. 1,848,951 \\ \hline
+\textbf{P3} & 590,519 & 570,739 .. 608,160 \\ \hline\hline
+    \multicolumn{3}{|c|}{\textbf{Discretized Rastrigin}, N=800, Speedup=1.1854} \\ \hline
+\textbf{LTGA} & 244,086 & 242,815 .. 245,189 \\ \hline
+\textbf{P3} & 205,908 & 201,012 .. 210,913 \\ \hline\hline
+    \multicolumn{3}{|c|}{\textbf{Nearest Neighbor NK}, N=600, Speedup=4.408} \\ \hline
+\textbf{LTGA} & 37,620,027 & 37,244,617 .. 37,990,772 \\ \hline
+\textbf{P3} & 8,533,322 & 7,315,275 .. 9,481,271 \\ \hline\hline
+    \multicolumn{3}{|c|}{\textbf{Ising Spin Glass}, N=784, Speedup=20.403} \\ \hline
+\textbf{LTGA} & 12,677,619 & 12,601,917 .. 12,761,798 \\ \hline
+\textbf{P3} & 621,347 & 568,100 .. 667,236 \\ \hline\hline
+    \multicolumn{3}{|c|}{\textbf{MAX-SAT}, N=60, Speedup=942.50} \\ \hline
+\textbf{LTGA} & 21,130,960 & 17,576,126 .. 28,314,680 \\ \hline
+\textbf{P3} & 22,420 & 14,363 .. 29,161 \\ \hline
+
+  \end{tabular}
+	\caption{Results}
+	\label{table-results}
+\end{table}
+
+
 TODO Cover all 7 problems as a group, focusing on the two ``types'' of problems.
 Make it explicit that you outperform by a constant factor on the static problems
 and by an order of complexity on generated problems.
 
 TODO Mention 1.5 trillion evaluations and 150,000 runs (average 10 million evaluations per run).
 
-TODO Include graphic for 7 problem results.
-
-TODO Include table comparing results on largest version of each problem.
+TODO Compare LTGA results with previously published results as best as possible.
 
 TODO Mention source code is available\footnote{\url{https://name.of.site.removed/anonymous}}.
 
