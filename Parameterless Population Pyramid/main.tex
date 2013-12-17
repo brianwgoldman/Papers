@@ -520,7 +520,7 @@ population size of one and a parameter free algorithm to perform optimization.
 It relies on the existence of completely separable subproblems and noise free evaluation in order to determine
 if two genes are linked through perturbation of their values.  While effective on
 this class of problems, most real world problems do not fall into this category.
-In general, LTGA is the most powerful general optimizer with few parameters.
+%In general, LTGA is the most powerful general optimizer with few parameters.
 
 \subsection{\bm{$(1+(\lambda,\lambda))$}}
 As a final comparison we chose the $(1+(\lambda,\lambda))$ algorithm~\cite{doerr:2013:lambdalambda}
@@ -705,6 +705,41 @@ of $r=4.27$.
   \label{fig-results}
 \end{figure*}
 
+In total, our experiments performed 100 runs of each optimization algorithm across
+7 benchmark problems, with each run limited to 100 million evaluations.
+In performing data collection, we performed over 150,000 runs, totaling approximately
+1.5 trillion evaluations.  Of these, approximately 100,000 runs were used to optimally
+set the population size of LTGA.  Note that these runs should be considered a training phase,
+and as such all reported results for LTGA use independent runs to create a testing phase.
+This was the only algorithm tested that received such tuning.  As such, LTGA should have a significant
+advantage over the others in that it has pre-learned the correct population size.
+All of the code used to perform our experiments
+as well as individual run results and analysis scripts are available from our
+website\footnote{\url{https://name.of.site.removed/anonymous}}.  The results
+are summarized in Figure~\ref{fig-results} and Table~\ref{table-results}.
+
+On all 7 problems, the First Improvement Hill Climber and the $(1+(\lambda,\lambda))$
+optimizers appear to have a higher growth complexity than P3.  On all of the problems
+except MAT-SAT they are also worse than LTGA.  This makes sense as all of the
+benchmarks are deceptive in some sense, and neither of these techniques is designed
+to handle deceptive landscapes.  The inability for the iterative hill climber to solve
+any of the problems indicates that P3 must be doing something more than just local search.
+
+Figure~\ref{fig-results} does provide one misleading
+exception for $(1+(\lambda,\lambda))$ on the deceptive trap problem, where it appears to
+level out at high genome sizes.  This is entirely an artifact of the extremely high
+variance of this algorithm on this problem.  Note that many of the large problem
+sizes failed to find the optimum for the majority of runs (no dot drawn for that size).
+
+The behavior of P3 and LTGA on the four single instance problems appears very similar,
+with P3 generally being lower by a constant factor.  This makes sense as LTGA's
+tuning allows it to determine a single population size sufficient to solve that
+instance.  However, because it uses a fixed population size, it must set the that
+size large enough to ensure all random initializations of that population are
+likely to contain enough diversity to reach the global optimum.  By comparison, P3 is able to
+iteratively increase the population size, stopping once enough diversity has been generated.
+As such we would expect P3 to do better, but not a lot better.
+
 \begin{table}
 	\centering
 	\begin{tabular}{|c|r|c|}
@@ -739,41 +774,6 @@ of $r=4.27$.
 	\label{table-results}
 \end{table}
 
-In total, our experiments performed 100 runs of each optimization algorithm across
-7 benchmark problems, with each run limited to 100 million evaluations.
-In performing data collection, we performed over 150,000 runs, totaling approximately
-1.5 trillion evaluations.  Of these, approximately 100,000 runs were used to optimally
-set the population size of LTGA.  Note that these runs should be considered a training phase,
-as such all reported results for LTGA use independent runs to create a testing phase.
-This was the only algorithm tested that received such tuning.  As such, LTGA should have a significant
-advantage over the others in that it has pre-learned the correct population size.
-All of the code used to perform our experiments
-as well as individual run results and analysis scripts are available from our
-website\footnote{\url{https://name.of.site.removed/anonymous}}.  The results
-are summarized in Figure~\ref{fig-results} and Table~\ref{table-results}.
-
-On all 7 problems, the First Improvement Hill Climber and the $(1+(\lambda,\lambda))$
-optimizers appear to have a higher growth complexity than P3.  On all of the problems
-except MAT-SAT they are also worse than LTGA.  This makes sense as all of the
-benchmarks are deceptive in some sense, and neither of these techniques is designed
-to handle deceptive landscapes.  The inability for the iterative hill climber to solve
-any of the problems indicates that P3 must be doing something more than just local search.
-
-Figure~\ref{fig-results} does provide one misleading
-exception for $(1+(\lambda,\lambda))$ on the deceptive trap problem, where it appears
-level out at high genome sizes.  This is entirely an artifact of the extremely high
-variance of this algorithm on this problem.  Note that many of the large problem
-sizes failed to find the optimum for the majority of runs (no dot drawn for that size).
-
-The behavior of P3 and LTGA on the four single instance problems appears very similar,
-with P3 generally being lower by a constant factor.  This makes sense as LTGA's
-tuning allows it to determine a single population size sufficient to solve that
-instance.  However, because it uses a fixed population size, it must set the that
-size large enough to ensure all random initializations of that population are
-likely to contain enough diversity to reach the global optimum.  By comparison, P3 is able to
-iteratively increase the population size, stopping once enough diversity has been generated.
-As such we would expect P3 to do better, but not a lot better.
-
 When applied to the randomly generated problem classes, P3 appears to outperform LTGA
 by an order of complexity.  We suspect some of the cause is LTGA's need to fix
 a single population size.  Specifically, during tuning LTGA must set its population
@@ -792,7 +792,7 @@ while LTGA was not.
 Table~\ref{table-results} provides a close up look at the largest problem sizes
 in which LTGA was able to find the global optimum reliably in less than 100 million
 evaluations.  For each, we performed a pairwise Mann-Whitney~U test, all resulting
-in p-values less than $10^-22$, with the exception of Deceptive Step Trap which
+in p-values less than $10^{-22}$, with the exception of Deceptive Step Trap which
 resulted in $0.00025$.  As such these results are highly significant.  The amount
 of speedup ranged from 1.1 on Deceptive Step Trap to 942 on MAX-SAT, but in all
 cases P3 outperformed LTGA and all other comparison techniques.
@@ -825,7 +825,7 @@ Yet unlike many theory based algorithms, we believe P3 can achieve bounds on mor
 complex and interesting landscapes.  Consider a sketch for a proof on the Deceptive
 Trap problem.  Each restart will require at most $2N$ evaluations to evaluate the
 random individual and optimize it to a local optima using the hill climber.  In
-$P_0$ all solutions will either have all 1s or all 0s.  As a result $D(C_i, C_j) = 0$
+$P_0$ each trap in all solutions will either have all 1s or all 0s.  As a result $D(C_i, C_j) = 0$
 if all $C_i$ and $C_j$ come from the same trap.  Therefore all crossover clusters
 will move only complete traps between solutions, and once there is sufficient
 diversity in the population there will be a crossover for each individual trap.
