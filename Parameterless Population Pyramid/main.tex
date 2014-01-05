@@ -167,7 +167,7 @@ Anonymous\\
 Providing a good solution in reasonable time to a broad class of real
 world black box problems is a fundamental goal of evolutionary
 computation.  Achieving this goal often requires an optimizer to make
-assumptions about the nature of the problem is is solving as no
+assumptions about the nature of the problem it is solving as no
 optimizer can solve all problems equally well~\cite{Wolpert:1997:nfl}.
 
 Often built into the design of a genetic algorithm (GA) are
@@ -291,7 +291,7 @@ initialized solution and ending with a optimum, either local or global.
 FIHC uses the following algorithm.  Consider all gene loci
 $x_i$ in a random order.  For a given $x_i$ try all possible
 alternative values for the gene $x_i$, evaluating solution quality
-with change.  If any alternative value is a strict fitness improvement
+with each change.  If any alternative value is a strict fitness improvement
 over the current value for $x_i$, replace $x_i$ with the improved
 value.  Iteration of the process continues until no such change results in
 a strict fitness improvement.
@@ -358,7 +358,7 @@ entropy, as given in Equation~\ref{eq-entropy}.
 Starting from the leaves, the binary tree can be constructed using an
 agglomerative method.  Each
 iteration determines the pairwise linkage between each cluster of loci
-using Equation~\ref{eq-distance}, and merge the two closest into a new
+using Equation~\ref{eq-distance}, and merges the two closest into a new
 cluster.  The process ends when there is only a single cluster
 containing all loci.  As our clustering algorithm is both convex and
 satisfies the swapping lemma~\cite{gronau:2007:upgma}, this algorithm
@@ -465,7 +465,7 @@ either case, unless the population size is correctly set, the
 generational model will likely result in waste.
 
 As P3 has exploited all known information each time the top of the pyramid is reached,
-there no wasted evaluations on unused diversity.  Similarly, because P3
+no evaluations are wasted  on unused diversity.  Similarly, because P3
 does not throw away previously optimized solutions while adding diversity, it avoids
 waste caused by premature convergence. It is this essential balance of
 evaluation to diverstiy that P3 focuses on.
@@ -509,7 +509,7 @@ Section~\ref{sec-crossover} discussed how P3 will ignore some clusters
 and will also skip an evaluation if no change to the solution was made
 by a crossover.  As such we currently are unable to state conclusively
 that updating $P_i$ will require $O(N)$ evaluations.  That said,
-empirically it to be true.  Furthermore, it seems counterintuitive
+empirically it appears to be true.  Furthermore, it seems counterintuitive
 that intentionally wasting evaluations would be considered beneficial
 to runtime.
 
@@ -893,7 +893,7 @@ Due to P3's persistent integration of random solutions, it always has
 a non zero probability of reaching the global optimum.  Because of
 this (and unlike LTGA), it is possible to derive expected
 running times for P3 on a number of problems.  While we do not present
-a rigorous solution to any particular problem here, though we do wish to
+a rigorous solution to any particular problem here, we wish to
 illuminate potential avenues for future proofs.
 
 The traditional One Max class, as well as all functions of unitation, will be
