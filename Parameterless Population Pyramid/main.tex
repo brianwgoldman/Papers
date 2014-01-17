@@ -332,7 +332,7 @@ if they do not exist in any level of the pyramid.  This uniqueness check can be
 achieved in constant time by maintaining a hash of all solutions in the pyramid.
 
 Along with storing the solutions, each level also maintains a table of pairwise
-gene value frequencies.  This is also built constructively, such that initially
+gene value frequencies for use by crossover.  This is also built constructively, such that initially
 all frequencies are set to 0.  Each time a solution is added to a level, all
 pairs of loci are queried for their gene values.  The table is then updated,
 incrementing the count for each observed pairing.  This requires $O(N^2)$ operations
