@@ -309,7 +309,7 @@ change was made to the solution.  If the algorithm returns to the same loci with
 any changes, it moves on to the next loci without performing any evaluations.
 
 %TODO Consider removing lsbbo citation
-FIHC solves all functions of unitation in $O(N)$ time, where $N$ is the number of
+FIHC solves all linear functions in $O(N)$ time, where $N$ is the number of
 genes.  This is in contrast to
 methods like Steepest Ascent Hill Climber~\cite{bosman:2011:lsbbo, goldman:2012:ltga}
 which require $O(N^2)$ as changes are only accepted after all neighbor solutions
@@ -928,7 +928,7 @@ running times for P3 on a number of problems.  While we do not present
 a rigorous solution to any particular problem here, we wish to
 illuminate potential avenues for future proofs.
 
-The traditional One Max class, as well as all functions of unitation, will be
+The traditional One Max class, as well as all linear functions, will be
 trivially solved by the hill climber in at most $N+1$ evaluations.  These come
 from the initial evaluation of the random solution, plus the $N$ evaluations required
 to test each gene for improvement.  While more difficult to bound, any unimodal
