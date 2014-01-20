@@ -309,7 +309,8 @@ change was made to the solution.  If the algorithm returns to the same loci with
 any changes, it moves on to the next loci without performing any evaluations.
 
 %TODO Consider removing lsbbo citation
-FIHC solves all functions of unitation in $O(N)$ time.  This is in contrast to
+FIHC solves all functions of unitation in $O(N)$ time, where $N$ is the number of
+genes.  This is in contrast to
 methods like Steepest Ascent Hill Climber~\cite{bosman:2011:lsbbo, goldman:2012:ltga}
 which require $O(N^2)$ as changes are only accepted after all neighbor solutions
 are evaluated.  In general, FIHC is designed to find optima using a minimum number
@@ -389,6 +390,8 @@ $|P_i| =  2$ at most two clusters  exist: one for all  genes where the
 solutions agree and one for where they disagree.
 This means that Figure~\ref{fig-p3} is infeasible as crossover
 cannot make \#5 and \#9 unique from \{\#2, \#4\} and \{\#5, \#8\}, respectively.
+This inaccuracy was kept to make Figure~\ref{fig-p3} better express
+higher level concepts.
 
 P3 uses crossover to recombine known information in a level of the
 pyramid with a candidate solution.  For
