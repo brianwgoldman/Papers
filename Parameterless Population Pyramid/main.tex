@@ -227,8 +227,8 @@ system, such as Hierarchical Bayesian
 Optimization~\cite{pelikan:2004:parameterlesshboa}.
 Without the need to set a population size, racing ensures the GA will take no more than
 a logarithmic factor increase in evaluations beyond optimal.
-Some experimental evidence suggests the bound is closer to a constant
-factor worse than optimal.
+While experimental evidence suggests racing is only a constant
+factor loss, this method explicitly trades efficiency for applicability.
 
 In this work we shall introduce the Parameter-less Population Pyramid
 (P3).  P3 is an iterative method for constructing a collection of
@@ -252,7 +252,7 @@ has no information about the landscape so solution \#1 is randomly generated.  S
 is brought to a local optima using a hill climber
 (Section~\ref{sec-hillclimber}) creating solution \#2, which is added
 to the population pyramid (Section~\ref{sec-pyramid}) at population
-level $P_0$.  With a population of 1 at $P_0$, there is insufficient information to continue,
+level $P_0$.  With a population of 1 at $P_0$, there is insufficient information to perform crossover,
 so solution \#3 is randomly generated and optimized via hill climbing
 to create solution \#4, which is likewise added to the population
 pyramid at population level $P_0$.
@@ -321,8 +321,7 @@ not cause any positional bias to the search.
 \subsection{Pyramid}
 \label{sec-pyramid}
 As mentioned, P3 maintains a pyramid like structure of populations
-with each level representing something akin to different generations
-of evolution. More specifically, a solution's level is one higher than
+with more optimized solutions in higher levels. More specifically, a solution's level is one higher than
 its highest parent, similar to the layering done
 in~\cite{hornby:2006:alps}.
 
@@ -345,7 +344,7 @@ constant in the number of solutions currently in the level.
 P3 uses a crossover method derived from that defined for LTGA~\cite{thierens:2013:ltgahiff}
 (Section~\ref{sec-ltga});
 P3 uses gene value entropy to construct clusters of genes that should have their values
-conserved during crossover.  There are two primary steps in
+conserved during crossover.  There are two steps in
 defining this type of crossover: \emph{cluster creation} and \emph{cluster usage}.
 
 During cluster creation, P3 creates a binary tree of clusters such that the leaves
@@ -394,7 +393,7 @@ This inaccuracy was kept to make Figure~\ref{fig-p3} better express
 higher level concepts.
 
 P3 uses crossover to recombine known information in a level of the
-pyramid with a candidate solution.  For
+pyramid with a candidate solution as follows.  For
 each cluster select a random donor from the population.  Copy the
 donor's gene values for all loci in that cluster into the candidate
 solution.  Evaluate the candidate.  If the fitness of the candidate
@@ -415,8 +414,7 @@ with clusters of equal size ordered randomly.  This ensures smaller building blo
 are optimized before large changes are made to the genome, thus helping preserve
 diversity.  This also helps prevent genetic hitchhikers, which may interfere with
 entropy calculations.  As cluster building and application ordering are not dependent on
-the position of loci in the genome, this operator introduces no positional bias in the search points
-evaluated.
+the position of loci in the genome, this operator introduces no positional bias on search.
 
 \subsection{All Together}
 \label{sec-alltogether}
@@ -449,8 +447,8 @@ systems the crossover operator assumes linked genes
 are collocated in the genome.  This requires the user
 to configure genome structure based on gene linkage information they
 are unlikely to have. All of
-P3's operations ignore gene ordering, removing that level of
-configuration from the user.
+P3's operations ignore gene ordering, allowing the user to ignore
+that aspect of configuration.
 
 In general, P3 makes two assumptions about the search landscape:
 local structure and non uniform gene interdependence.
@@ -506,7 +504,7 @@ However, multiple evaluations can occur for each time a single individual is add
 to a population.
 
 Each time a random restart occurs, at minimum $N+1$ evaluations are performed.
-This means each time a solution is added to $P_0$, at least $O(N)$ evaluations
+This means each time a solution is added to $P_0$, at least $\Omega(N)$ evaluations
 must be performed.  This implies that the $O(N^2)$ cost of the update to $P_0$ can
 be amortized over these evaluations, making this update $O(N)$ per evaluation.
 %Note
@@ -517,7 +515,7 @@ be amortized over these evaluations, making this update $O(N)$ per evaluation.
 To cause an update to $P_i$, all of the crossovers discovered for
 $P_{i-1}$ must first be applied, each causing their own evaluation.
 If P3 were to na\"ively use all crossovers and perform an evaluation
-each time, this would cause $O(N)$ evaluations.  Again, this would
+each time, this would cause $\Omega(N)$ evaluations.  Again, this would
 result in $O(N)$ amortized cost to update $P_i$.  However,
 Section~\ref{sec-crossover} discussed how P3 will ignore some clusters
 and will also skip an evaluation if no change to the solution was made
@@ -530,7 +528,7 @@ to runtime.
 There is one more operation in P3 that may not scale linearly with
 genome size per evaluation: finding a non-identical donor.  When
 performing crossover P3 iteratively searches a population for a random
-donor which contains genes which differ from the current solution for
+donor with genes that differ from the current solution for
 the current crossover cluster.  In the worst case, this operation
 could require $|C_j||P_i|$, where $|C_j|$ is the number of genes in
 the crossover and $|P_i|$ is the number of solutions in the
@@ -563,7 +561,7 @@ a sufficient (potentially exponential) number of evaluations.
 
 \subsection{Linkage Tree Genetic Algorithm}
 \label{sec-ltga}
-The closest relative to P3 in existing literature is the Linkage Tree Genetic Algorithm
+The closest relative to P3 in the existing literature is the Linkage Tree Genetic Algorithm
 (LTGA).  There have been a number of different variations proposed to LTGA since
 its original publication~\cite{thierens:2010:ltga}, so for comparison we have chosen
 to use the variant described in the most recent publication~\cite{thierens:2013:ltgahiff}.
@@ -590,8 +588,8 @@ information after initialization, meaning that if required diversity
 is not contained in the original population or lost in future
 generations, LTGA will fail to find the global optimum.
 
-To ensure maximal LTGA quality, we use the bisection method~\cite{goldman:2012:ltga}
-to minimally set LTGA's population size.  To be considered successful, a
+To ensure LTGA is able to find the global optimum quickly, we use the bisection method~\cite{goldman:2012:ltga}
+to minimally set LTGA's population size parameter.  To be considered successful, a
 population size must result in 100 runs without premature convergence.
 According to the Rule of Three~\cite{jovanovic:1997:ruleofthree}, this bounds
 LTGA's failure rate to less than $\frac{3}{100+1} \approx 3\%$ with 95\% confidence.
@@ -617,12 +615,11 @@ classes, bisection is performed on a different set of instances than testing.
 \end{comment}
 
 Other variants of LTGA have more closely resembled P3~\cite{goldman:2012:ltga},
-but as those variants are not in active use, we did not use them for comparison.
+but as those variants do not appear to be in active use, we did not use them for comparison.
 However, no LTGA variant has removed the population size parameter
 or fully addressed the problem of premature convergence.
-
 %TODO Consider removing this
-There have been other model based optimization techniques that use little to
+There have also been other model based optimization techniques that use few to
 no parameters.  Specifically LO-LIMD~\cite{posik:2011:parameterless} uses a
 population size of one and a parameter free algorithm to perform optimization.
 It relies on the existence of completely separable subproblems and noise free evaluation in order to determine
@@ -647,7 +644,7 @@ $\lambda=1$.  This is done because when $\lambda \ge N$ the mutation rate is gre
 than or equal to $100\%$, nullifying search.  Furthermore, this point is only reached
 when the algorithm has stalled for a significant number of generations.
 
-We also made minor modifications to selection and to prevent wasting evaluations.
+We also made minor modifications to improve selection and to prevent wasting evaluations, as follows.
 If the best offspring produced in a generation is a mutant offspring, select that
 over any of those produced using crossover.  If there is a fitness tie between the
 best offspring in a generation, select the one with the maximum hamming distance
@@ -656,7 +653,7 @@ discusses a ``mod'' version of the $\lambda$ control strategy for how to handle
 when offspring of equal fitness are produced, we found this conflicted with our
 method of restarting.  As such we use the original control strategy. %, where $\lambda$
 %is increased if the best offspring in a generation is not strictly better than its parent.
-If an offspring produced by crossover has identical genes to either of its parents,
+Finally, if an offspring produced by crossover has identical genes to either of its parents,
 it is not evaluated.
 
 \section{Test Problems}
@@ -771,7 +768,7 @@ on the range $[-5.12,5.12)$.
 
 \subsection{Randomly Generated Problem Classes}
 By enforcing only certain characteristics of a search space while allowing others
-to be generated randomly, we can perform tests on classes of problems instead
+to be generated randomly, we can perform tests on \emph{classes} of problems instead
 of specific instances.  This can improve the generality of results as experiments
 then predict the expected quality over the entire class.  Unlike single
 instance problems, the challenge with randomly generated problems is often how
@@ -803,10 +800,10 @@ MAX-SAT requires exponential time to solve, we have devised a method of generati
 only satisfiable instances.
 First, a random target solution is generated.  For each clause, set the signs of each
 term ensuring the target solution satisfies that clause.
-To ensure there is no bias to term signs in the generated problem there is a $\frac{1}{6}$ probability
+To ensure there is no bias to term signs in the generated problem, there is a $\frac{1}{6}$ probability
 all clause signs match the target, a $\frac{1}{6}$ probability two of the three signs match,
-and a $\frac{4}{6}$ probability only one sign matches.  Note that its possible for there to be
-other solutions that also satisfy all clauses.  We chose a clause to variable ratio
+and a $\frac{4}{6}$ probability only one sign matches.  Note that it's possible for there to be
+other solutions that also satisfy all clauses.  We chose the standard clause to variable ratio
 of $r=4.27$.
 
 \section{Experimental Results}
@@ -815,8 +812,8 @@ of $r=4.27$.
   \includegraphicswide{WithRast}
   \caption{Comparison of the median number of evaluations to reach the global optimum for
            the four different optimization methods with respect
-           to problem size.  If the median run did not reach the global optimum no point
-           is drawn.  Results given on a log-log scale.}
+           to problem size.  If the median run did not reach the global optimum no data element
+           is shown.  Results given on a log-log scale.}
   \label{fig-results}
 \end{figure*}
 
@@ -837,14 +834,14 @@ On all 7 problems, the First Improvement Hill Climber and the $(1+(\lambda,\lamb
 optimizers appear to have a higher growth complexity than P3.  On all of the problems
 except MAX-SAT they are also worse than LTGA.  This makes sense as all of the
 benchmarks are deceptive in some sense, and neither of these techniques is designed
-to handle deceptive landscapes.  The inability for the iterative hill climber to solve
-any of the problems indicates that P3's success is more than just performing local search.
+to handle deceptive landscapes.  The inability for the iterative hill climber to quickly solve
+the problems indicates that P3's success is more than just performing local search.
 
 Figure~\ref{fig-results} does provide one misleading
 exception for $(1+(\lambda,\lambda))$ on the Deceptive Trap problem, where it appears to
 level out at high genome sizes.  This is entirely an artifact of the extremely high
 variance of this algorithm on this problem.  Note that many of the large problem
-sizes failed to find the optimum for the majority of runs (no dot drawn for that size).
+sizes failed to find the optimum for the majority of runs (no data element shown for that size).
 
 The behavior of P3 and LTGA on the four single instance problems appears very similar,
 with P3 generally being lower by a constant factor.  This makes sense as LTGA's
@@ -853,7 +850,7 @@ instance.  However, because it uses a fixed population size, it must set the tha
 size large enough to ensure all random initializations of its population
 contain enough diversity to reach the global optimum.  By comparison, P3 is able to
 iteratively increase the population size, stopping once enough diversity has been generated.
-As such we would expect P3 to do better, but not a lot better.
+As such we would expect P3 to do better, but not a lot better than tuned LTGA.
 
 \begin{table}
 	\centering
@@ -909,7 +906,7 @@ in which LTGA was able to find the global optimum reliably in less than 100 mill
 evaluations.  For each, we performed a pairwise Mann-Whitney~U test, all resulting
 in p-values less than $10^{-22}$, with the exception of Deceptive Step Trap which
 resulted in $0.00025$.  As such these results are highly significant.  The amount
-of speedup ranged from 1.1 on Deceptive Step Trap to 942 on MAX-SAT, but in all
+of speedup as compared to optimally tuned LTGA ranged from 1.1 on Deceptive Step Trap to 942 on MAX-SAT, but in all
 cases P3 outperformed LTGA and all other comparison techniques.
 
 As verification that our tuning for LTGA is valid, we refer
@@ -918,7 +915,7 @@ used.  In the section on Child Node filtering, they reported approximately 200,0
 mean evaluations to success on the HIFF problem using $N=512$.  Our result of
 239,365 is of comparable quality, with P3 solving the same problem using an average
 of 92,129 evaluations.  The discrepancy is likely due to the cited work using
-their tuning runs in their average, unrealistically allowing each run to use a different tuned population size.
+their tuning runs in their average.
 
 \section{Promising Theory}
 Due to P3's persistent integration of random solutions, it always has
@@ -954,7 +951,7 @@ all traps we can say that once any $P_i$ has at least one solution with the opti
 version of a trap for all traps the very next crossover with $P_i$ will produce the global optimum.
 The only remaining portion of the proof is to determine how many evaluations are required to reach this point.
 
-Using relaxed requirements, this can likely be extended to any arbitrary fully decomposable
+Using relaxed requirements, this can likely be extended to any arbitrary, fully decomposable,
 problem. Assuming that for sufficiently large population sizes the entropy between
 bits in a single subproblem is lower than the entropy of bits between subproblems,
 P3 will construct a cluster capable of moving exactly one subproblem's gene values
@@ -962,10 +959,10 @@ during crossover.  As crossover cannot decrease the fitness of a solution each
 crossover will have a greater than zero probability of improving subproblem solution quality.
 The probability of low fitness local optima for a subproblem reaching high pyramid levels
 is therefore low, which increases the probability of donors only having high quality
-solutions to subproblems.  Combined this is expected to create a runtime potentially
+solutions to subproblems.  Combined, this is expected to create a runtime potentially
 exponential in subproblem size, but polynomial in problem size.
 
-This proof sketch can also be extended to the HIFF problem, with minor modifications.
+This proof sketch can also be extended to the HIFF problem with minor modifications.
 Each application of the hill climber ensures all subproblems of size 2 will be solved.
 Once $P_0$ has a sufficient number of solutions it will correctly cross all subproblems of size 2
 independently, such that all future solutions crossed with $P_0$ will have all subproblems
@@ -978,17 +975,17 @@ convergence using a logarithmic number of levels.
 
 \section{Conclusions and Future Work}
 While many parameter-less techniques trade the potential quality of optimal tuning
-for general effectiveness, P3 appears to robustly outperform all of the comparison
-state of the art techniques across a diverse set of benchmark problems.  This is
-because unlike other parameter-less techniques, P3 does not duplicate effort running
+for general effectiveness, P3 appears to robustly outperform all of the comparison,
+state of the art, techniques across a diverse set of benchmark problems.  This is
+because, unlike other parameter-less techniques, P3 does not duplicate effort running
 multiple populations, nor does it throw away learned information like many evolutionary
 techniques.  By striking
 a balance between continuously adding diversity and the extreme exploitation provided
 by the multiple evaluation crossover, P3 is able to solve easy problems quickly
 and hard problems eventually without any problem specific tuning.
 
-Even when compared against LTGA, the closest relative to P3 in current literature
-and current state of the art linkage learning algorithm, P3 surpasses expectation.
+Even when compared against LTGA, the closest relative to P3 in current literature,
+P3 performs better.
 This is even after LTGA was extensively tuned to each problem class, an unrealistic
 proposition on any real world problem.
 %A likely advantage is that P3 is able to
@@ -997,8 +994,8 @@ proposition on any real world problem.
 %TODO Consider reiterating stuff about gene location invariant, scaling invariant.
 
 P3's ability to efficiently optimize not just single problem instance classes,
-but randomly generated problem classes without parameter setting makes it an
-ideal candidate for real world application.  Its focus on exploiting all known
+but randomly generated problem classes, without parameter tuning makes it an
+ideal candidate for real world applications.  Its focus on exploiting all known
 information before spending time increasing diversity makes it a great ``stop anytime''
 algorithm.
 %In future work, we plan to investigate in more detail P3's time to
@@ -1014,7 +1011,7 @@ of random information that allows for this analysis which cannot be done for man
 other state of the art techniques, such as LTGA.
 \end{comment}
 
-Currently, P3 is limited to single objective, noiseless, discrete valued problems.
+Currently, our results are limited to single objective, noiseless, discrete valued problems.
 In future work we plan to extend (or show no modification is necessary for) P3 to handle
 problems from these classes.  Doing so will help make P3 more applicable to a wider
 range of real world problems.
