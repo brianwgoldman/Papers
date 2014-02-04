@@ -1,0 +1,165 @@
+
+% LaTeX Article Template - using defaults
+\documentclass{article}
+%\setlength{\topmargin}{-0.75in}         % move margin up 0.75in
+%\setlength{\textwidth}{6.5in}      % text width 6.5in
+%\setlength{\textheight}{9.25in}         % textlength 9.25in
+%\setlength{\oddsidemargin}{0in}    % have left margin 1in over
+%\setlength{\baselineskip}{0.1in}
+
+\usepackage{graphicx} %images
+\usepackage{listings} %code
+\usepackage{amsmath} %pmatrix
+\usepackage{comment} %multiline comments
+\usepackage{algpseudocode} % creating proceedures
+\usepackage{verbatim}
+\usepackage{url}
+\usepackage{fullpage}
+\usepackage{epigraph}
+
+\newcommand{\includegraphicsfit}[1]
+{\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{#1}}
+
+\newcommand{\includegraphicssmall}[1]
+{\includegraphics[width=.25\textwidth,height=.25\textheight,keepaspectratio]{#1}}
+
+\def\signed#1{{\leavevmode\unskip\nobreak\hfil\penalty50\hskip2em
+  \hbox{}\nobreak\hfil\raise-3pt\hbox{(#1)}%
+  \parfillskip=0pt \finalhyphendemerits=0 \endgraf}}
+
+\begin{document}
+\begin{center}
+\textbf{Real World Application of the Parameter-less Population Pyramid}
+\end{center}
+
+Real world applications of evolutionary optimization are often
+hindered by the need to determine problem specific parameter
+settings.  
+Parameters can have a significant impact on search efficiency~\cite{goldberg:1991:gasize}
+and finding good settings can be very time consuming~\cite{grefenstette:1986:optimalga}.
+While some previous methods have reduced~\cite{Back:1992:selfadapt}
+or removed~\cite{pelikan:2004:parameterlesshboa} the
+need for parameter tuning, many do so by trading efficiency for
+general applicability.  The Parameter-less Population Pyramid (P3)
+is an evolutionary technique that requires \textbf{no parameters}
+and is still broadly effective. P3 strikes a balance between
+continuous integration of diversity and exploitative elitist
+operators, allowing it to solve easy problems quickly and hard
+problems eventually.  Work currently under review for publication
+compared P3 with three optimally tuned state-of-the-art algorithms~\cite{thierens:2013:ltgahiff,doerr:2013:lambdalambda}.
+Across seven problem classes P3 always found the
+optimum at least a constant factor \emph{\textbf{faster}} than all comparisons.
+More importantly, on the three most challenging problem classes,
+P3 had a lower order of computational complexity as measured by
+evaluations.  Based on over one trillion evaluations, these results
+suggest P3 has wide applicability to a broad class of
+problems.  The next step for P3 is to determine if those results carry over into real world
+applications.  \textbf{Therefore, the primary focus of this project is to integrate
+P3 into X-TOOLSS in order to (1) allow non-experts easy access to P3 and
+(2) gather evidence of P3's ability to optimize real world problems.}
+
+P3' driving principle is to make
+minimal assumptions about the search landscape while maximally
+exploiting gathered information.  As such, P3 does not use a fixed
+population size.  Unlike most evolutionary optimization systems, P3 uses multiple
+populations, with each population akin to a generation. 
+The optimization process begins with a single randomly generated solution.
+Having no other knowledge of the search landscape, P3 uses local search
+to bring that solution to an optima.  This solution is then stored in $F_0$
+(the first population).  Without making further assumptions
+about the search landscape, P3 chooses another random solution to optimize using
+local search, which is again stored in $F_0$.  Given two solutions in $F_0$, P3 can then
+perform an entropy based optimal mixing crossover~\cite{bosman:2011:lsbbo}.  The
+result of this mixing is then put into $F_1$.  As this new solution has nothing
+to cross with, the process begins again at a random solution.  In this way new
+solutions are added and crossed with existing levels of the population pyramid,
+with new levels being created as needed.  This allows P3 to simultaneously exploit
+all of its evaluations to produce a single high quality solution while avoiding convergence through
+constant addition of new genetic material.
+
+A challenge for all theory based optimization techniques is to make the transition
+to solving meaningful problems.  While the field has progressed significantly beyond
+its origins, many practitioners use outdated evolutionary systems~\cite{bechmann:2013:hummies}
+or rely on methods tailored to their specific problem~\cite{izzo:2013:hummies}.
+The fact that these suboptimal optimizers can already outperform human designers
+suggests that bridging the gap between academia and industry may yield spectacular results.
+
+There are two primary steps to making P3 an effective optimizer in practice: accessibility and adoption.
+To achieve these goals we plan to integrate P3 into X-TOOLSS.\footnote{\url{http://nxt.ncat.edu/}}
+X-TOOLSS is an open source optimization framework developed by Dr. Dozier's lab at North Carolina A\&T.
+This framework consists of a number of canonical evolutionary optimization techniques, and is under
+active use by engineers at NASA.  X-TOOLSS provides an easy to use interface which allows non-computer
+scientists to apply evolutionary optimization to their domain specific problem.  Bundled with the
+software are data collection and visualization tools which facilitate deeper understanding of
+the optimization process and comparisons between optimization techniques.
+
+To gauge the interest of X-TOOLSS users, with the help of Dr. Dozier, we asked Adam Burt, a NASA
+Aerospace Engineer, to try out P3.  Here is his unedited response comparing P3 to his past work
+using X-TOOLSS's basic evolutionary optimizers:
+
+\begin{quote}
+So I wanted to let you know that P3 appears to be doing incredibly well on the topology optimization problem.  Typically for 200ish elements it takes around 8-9000 function evaluations to find a good solution. P3 does it in roughly 600!!  I have already shared my enthusiasm with a co-worker of mine who has also done GA based topology optimization and he seemed fairly impressed as well.  I think you might really have something here.  I am going to do a few paper searches to see if I can find other authors who have done similar problems to see how many function evaluations they have on average, but I feel like 600 ish is very small for a GA.  My co-worker was also pretty excited about the prospect of a tuneless GA, I believe that will have a lot of benefit in the engineering application world. \signed{Adam Burt, NASA Aerospace Engineer}
+\end{quote}
+
+Adam has graciously worked with us to perform these preliminary experiments, but more general
+release is currently hindered by the expert centric design of P3's software.  Even now that Adam
+knows how to use our software, it requires him to have two separate tool sets for optimization.
+Therefore we feel it is imperative to integrate P3 into X-TOOLSS to make it more user friendly,
+allowing more engineers to benefit from P3's quality.
+
+Beyond accessibility, X-TOOLSS provides an invaluable potential to P3 for academic data collection.
+The framework's optimization analysis tools have been refined through continuous multi-user use, and
+will likely lead to further insights into P3's optimization.  Furthermore, as X-TOOLSS has a number
+of built in evolutionary optimizers, it provides a perfect device for gathering comparative results
+as P3 is applied to new and challenging problems.  Once integrated, non-computer scientists can utilize
+X-TOOLSS to compare P3 directly with existing evolutionary techniques.  This can provide the foundation
+for collaborative research between industry and academia, with industry gaining high quality solutions
+to challenging problems and academia gathering data on optimization techniques.
+
+%\includegraphicsfit{WithRast}
+
+
+
+\subsubsection*{Intellectual Merit}
+%Proposed work is highly innovative and has potential for having a ground-breaking impact in its field
+%Project aligns with BEACON mission and shows promise of opening new areas for multidisciplinary investigation
+%Project appears very likely to generate successful (funded) proposals
+%Degree of Multidisciplinarity of Project - No chance
+
+All previous parameter-less methods in evolutionary computing perform at least a constant factor
+worse than when using methods with optimal problem specific parameter tuning~\cite{pelikan:2004:parameterlesshboa}.
+What makes P3 so interesting as that in all of our preliminary data it has performed at
+least a constant factor \textbf{better} than optimally tuned state-of-the-art algorithms.
+However, these results are limited to artificial problems.  In order to perform a complete analysis,
+P3 needs to be applied to real world optimization problems.  Through X-TOOLSS and 
+with the help of engineers at NASA, this
+analysis can be performed with relative ease.
+
+Once collected, P3's ability to tackle real problems will provide either further evidence for its usefulness
+to people outside of the evolutionary optimization community or as a means for further improving P3.
+In either case it will help drive the direction of future research in parameter-less evolutionary optimization.
+
+
+\subsubsection*{Broader Impacts}
+%Education - Not likely
+%Project is organized around solution of a problem identified by a particular company/group of companies as important to them
+%Some diversity reflected among project participants (current or named for future appointment under project)
+%Project participants are from two or more BEACON institutions
+Once P3 has been integrated into X-TOOLSS, its parameter-less nature will allow
+end users (specifically NASA engineers) to try P3 on their optimization problems with ease.
+Our preliminary results suggest P3 will produce better quality solutions in less time
+than existing X-TOOLSS optimizers.
+
+Beyond the direct benefits gained by NASA and X-TOOLSS users, better understanding of P3
+can improve evolutionary optimization in general.  As mentioned previously, evolutionary
+methods are already able to produce human competitive designs, with enough successes each
+year to hold an annual competition.\footnote{\url{http://www.genetic-programming.org/combined.php}}
+These results impact everything from space exploration to cancer screenings, software error correction
+to protein structure prediction.
+
+
+\newpage
+\bibliographystyle{abbrv}
+\bibliography{../main}
+\end{document}
+
