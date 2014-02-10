@@ -48,15 +48,18 @@ operators, allowing it to solve easy problems quickly and hard
 problems eventually.  Work currently under review for publication
 compared P3 with three optimally tuned state-of-the-art algorithms~\cite{thierens:2013:ltgahiff,doerr:2013:lambdalambda}.
 Across seven problem classes P3 always found the
-optimum at least a constant factor \emph{\textbf{faster}} than all comparisons.
+optimum at least a constant factor \emph{\textbf{faster}} than the
+comparison algorithms.
 More importantly, on the three most challenging problem classes,
 P3 had a lower order of computational complexity as measured by
 evaluations.  Based on over one trillion evaluations, these results
 suggest P3 has wide applicability to a broad class of
-problems.  \textbf{Therefore, the primary focus of this project is to integrate
-P3 into X-TOOLSS in order to (1) allow non-experts easy access to P3,
-(2) improve P3's ability to optimize real world problems and (3) expand
-P3 to new evolutionary domains utilizing Genetic Programming.}
+problems.  \textbf{Therefore, the primary focus of this project is to:
+(1) integrate P3 into X-TOOLSS so it may be applied to
+new, practical problems, (2) use feedback from P3 X-TOOLSS applications
+to improve P3 and (3) expand
+P3's representation to Genetic Programming and explore its
+applicability to different kinds of problems.}
 
 P3' driving principle is to make
 minimal assumptions about the search landscape while maximally
@@ -77,7 +80,7 @@ with new levels being created as needed.  This allows P3 to simultaneously explo
 all of its evaluations to produce a single high quality solution while avoiding convergence through
 constant addition of new genetic material.
 
-A challenge for all theory based optimization techniques is to make the transition
+A challenge for many optimization techniques is to make the transition
 to solving meaningful problems.  While the field has progressed significantly beyond
 its origins, many practitioners use outdated evolutionary systems~\cite{bechmann:2013:hummies}
 or rely on methods tailored to their specific problem~\cite{izzo:2013:hummies}.
@@ -101,33 +104,40 @@ using X-TOOLSS's basic evolutionary optimizers:
 So I wanted to let you know that P3 appears to be doing incredibly well on the topology optimization problem.  Typically for 200ish elements it takes around 8-9000 function evaluations to find a good solution. P3 does it in roughly 600!!  I have already shared my enthusiasm with a co-worker of mine who has also done GA based topology optimization and he seemed fairly impressed as well.  I think you might really have something here.  I am going to do a few paper searches to see if I can find other authors who have done similar problems to see how many function evaluations they have on average, but I feel like 600 ish is very small for a GA.  My co-worker was also pretty excited about the prospect of a tuneless GA, I believe that will have a lot of benefit in the engineering application world. \signed{Adam Burt, NASA Aerospace Engineer}
 \end{quote}
 
-Adam has graciously worked with us to perform these preliminary experiments, but more general
-release is currently hindered by the expert centric design of P3's software.  Even now that Adam
-knows how to use our software, it requires him to have two separate tool sets for optimization.
+Adam has graciously worked with us to perform these preliminary
+experiments, but P3's present form requires more work to setup a
+problem than is likely tolerable by a typical domain user. 
+%more general
+%release is currently hindered by the expert centric design of P3's software.  Even now that Adam
+%knows how to use our software, it requires him to have two separate tool sets for optimization.
 Therefore we feel it is imperative to integrate P3 into X-TOOLSS to make it more user friendly,
-allowing more engineers to benefit from P3's quality.
+allowing more engineers to benefit from P3's capabilities.
 
-Beyond accessibility, X-TOOLSS provides an invaluable potential to P3 for academic data collection.
+Beyond accessibility, X-TOOLSS provides an invaluable potential for data collection.
 The framework's optimization analysis tools have been refined through continuous multi-user use, and
-will likely lead to further insights into P3's optimization.  Furthermore, as X-TOOLSS has a number
+will likely lead to further insights into P3's performance and applicability.  Furthermore, as X-TOOLSS has a number
 of built in evolutionary optimizers, it provides a perfect device for gathering comparative results
-as P3 is applied to new and challenging problems.  Once integrated, non-computer scientists can utilize
-X-TOOLSS to compare P3 directly with existing evolutionary techniques.  This can provide the foundation
+as P3 is applied to new problems.  Once integrated, domain experts can utilize
+X-TOOLSS to compare P3 directly with existing evolutionary techniques.
+This will provide a foundation
 for collaborative research between industry and academia, with industry gaining high quality solutions
 to challenging problems and academia gathering data on how to improve optimization techniques.
 
 %\includegraphicsfit{WithRast}
 
-P3 is currently limited to evolving discrete value encoded linear genomes. 
-Therefore we propose to leverage Grammatical Evolution~\cite{oneill:2001:grammatical}
-to give P3 the ability to evolve entire programs.  Grammatical Evolution (GE) is a subset
+P3 is currently limited to evolving discrete value encoded linear
+genomes which also limits the range of problems the approach can address.
+We therefore also propose to examine ways to expand P3 into the
+Genetic Programming area. We plan to leverage Grammatical Evolution~\cite{oneill:2001:grammatical}
+to give P3 the ability to evolve programs.  Grammatical Evolution (GE) is a subset
 of Genetic Programming which utilizes a non-trivial genotype to phenotype mapping, converting
 binary strings into full fledged programs.  To apply GE, a domain expert first creates a
 grammar which defines the structure of all possible useful programs.  When evaluating a
 solution, bits are read from the individual to determine which grammar expansion rules to perform,
-deterministically creating a program.  This is an ideal transition for P3 as from an
-evolutionary standpoint GE applications will be no different than binary string applications as
-only the evaluation step will have to change.
+deterministically creating a program.  This is an ideal transition for
+P3 since GE applications will be appear as binary string
+applications requiring 
+only modificiation to the evaluation step.
 
 \subsubsection*{Intellectual Merit}
 %Proposed work is highly innovative and has potential for having a ground-breaking impact in its field
