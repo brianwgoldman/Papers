@@ -97,7 +97,7 @@
 % the body of your article BEFORE References or any Appendices.
 
 \numberofauthors{2} %
-\begin{comment}
+%\begin{comment}
 \author{
 % 1st. author
 \alignauthor
@@ -113,7 +113,7 @@ William F. Punch\\
        \email{punch@msu.edu}
 }
 %\end{comment}
-%\begin{comment}
+\begin{comment}
 \author{
 % 1st. author
 \alignauthor
@@ -371,6 +371,30 @@ P3 uses a crossover method derived from that defined for LTGA~\cite{thierens:201
 P3 uses gene value entropy to construct clusters of genes that should have their values
 conserved during crossover.  There are two steps in
 defining this type of crossover: \emph{cluster creation} and \emph{cluster usage}.
+
+\begin{figure}
+  \begin{algorithmic}
+  \Procedure{Cluster-Creation}{}
+    \State $unmerged \leftarrow \{\{i\} | 0 \le i < N\}$
+    \State $useful \leftarrow unmerged$
+    \While{$|unmerged|>0$}
+      \State $C_i, C_j \leftarrow \min_{C_i,C_j \in unmerged} D(C_i, C_j)$
+      \State $unmerged \leftarrow unmerged - \{C_i, C_j\} + \{C_i \cup C_j\}$
+      \State $useful \leftarrow \{C_i \cup C_j\}$
+      \If{$D(C_i, C_j) == 0$}
+        \State $useful \leftarrow useful - \{C_i, C_j\}$
+      \EndIf
+    \EndWhile
+    \State Order $useful$ based on cluster size, smallest first.
+    \State Remove largest cluster from $useful$.
+
+    \Return $useful$
+  \EndProcedure
+\end{algorithmic}
+  \caption{Algorithm describing how clusters are created using Equation~\ref{eq-distance}.}
+  \label{fig:cluster-creation}
+\end{figure}
+
 
 During cluster creation, P3 creates a binary tree of clusters such that the leaves
 represent individual gene loci and each internal node represent the subset of loci created
@@ -852,7 +876,7 @@ This was the only algorithm that received tuning.  As such, LTGA should have a s
 advantage over the others in that it has pre-learned the correct population size.
 All of the code used to perform our experiments
 as well as individual run results and analysis scripts are available from our
-website.\footnote{\url{https://name.of.site.removed/anonymous}}  The results
+website.\footnote{\url{https://github.com/brianwgoldman/Parameter-less_Population_Pyramid}}  The results
 are summarized in Figure~\ref{fig-results} and Table~\ref{table-results}.
 
 On all 7 problems, the First Improvement Hill Climber and the $(1+(\lambda,\lambda))$
