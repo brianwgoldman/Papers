@@ -247,7 +247,14 @@ Unlike many GA techniques, P3
 does not have a single population of solutions.  Instead P3 maintains
 a pyramid-like structure, such that each level of the pyramid has a
 population of solutions, with each level representing something akin
-to different generations of evolution. Consider the example evolution
+to different generations of evolution.  Figure~\ref{fig-p3} provides
+a high level summary of how P3 iteratively constructs these populations
+and utilizes them to improve randomly generated solutions through
+hill climbing and crossover.  While P3 can be applied to any discrete value
+representation, we will focus on the binary domain here for simplicity.
+\\
+\begin{comment}
+Consider the example evolution
 presented in Figure~\ref{fig-p3}.  At the start of optimization P3
 has no information about the landscape so solution \#1 is randomly generated.  Solution \#1
 is brought to a local optimum using a hill climber
@@ -273,31 +280,33 @@ climbing, and crossover, respectively.  In this example \#13 is not
 added to $P_2$ because it is not a strict fitness improvement over
 \#12.  There is not enough information in $P_2$ to improve \#13
 further, so the process would begin yet again with a random solution.
+\end{comment}
 
 \begin{figure}
   \begin{algorithmic}
   \Procedure{Iterate-P3}{}
     \State Create random solution
     \State Apply hill climber (Section~\ref{sec-hillclimber})
-    \If{solution $\notin$ pyramid}
+    \If{$\forall_{P_i\in pyramid}$ solution $\notin P_i$}
       \State Add solution to $P_0$ (Section~\ref{sec-pyramid})
     \EndIf
 
     \ForAll{$P_i \in pyramid$}
       \State Mix solution with $P_i$ (Section~\ref{sec-crossover})
-      \If{solution fitness has improved}
-        \If{solution $\notin$ pyramid}
+      \If{solution's fitness has improved}
+        \If{$\forall_{P_i\in pyramid}$ solution $\notin P_i$}
           \State Add solution to $P_{i+1}$
         \EndIf
       \EndIf
     \EndFor
   \EndProcedure
 \end{algorithmic}
-  \caption{One iteration of P3 optimization.}
-  \label{fig:psuedo}
+  \caption{One iteration of P3 optimization. $pyramid$ is an
+           ordered set of populations.}
+  \label{fig-p3}
 \end{figure}
 
-
+\begin{comment}
 \begin{figure}
   \centering
   \includegraphicsfit{P3_big_fail}
@@ -306,6 +315,7 @@ further, so the process would begin yet again with a random solution.
   not added because it is not a fitness improvement over \#12.}
   \label{fig-p3}
 \end{figure}
+\end{comment}
 
 \subsection{Hill Climber}
 \label{sec-hillclimber}
@@ -363,6 +373,7 @@ pairs of loci are queried for their gene values.  The table is then updated,
 incrementing the count for each observed pairing.  This requires $O(N^2)$ operations
 (no evaluations) each time a solution is added to a level of the pyramid, but is
 constant in the number of solutions currently in the level.
+\\
 
 \subsection{Crossover}
 \label{sec-crossover}
@@ -375,13 +386,13 @@ defining this type of crossover: \emph{cluster creation} and \emph{cluster usage
 \begin{figure}
   \begin{algorithmic}
   \Procedure{Cluster-Creation}{}
-    \State $unmerged \leftarrow \{\{i\} | 0 \le i < N\}$
+    \State $unmerged \leftarrow \{\{0\}, \{1\}, \{2\}, \dots, \{N-1\}\}$
     \State $useful \leftarrow unmerged$
-    \While{$|unmerged|>0$}
+    \While{$|unmerged|>1$}
       \State $C_i, C_j \leftarrow \min_{C_i,C_j \in unmerged} D(C_i, C_j)$
       \State $unmerged \leftarrow unmerged - \{C_i, C_j\} + \{C_i \cup C_j\}$
-      \State $useful \leftarrow \{C_i \cup C_j\}$
-      \If{$D(C_i, C_j) == 0$}
+      \State $useful \leftarrow useful + \{C_i \cup C_j\}$
+      \If{$D(C_i, C_j) = 0$}
         \State $useful \leftarrow useful - \{C_i, C_j\}$
       \EndIf
     \EndWhile
@@ -391,8 +402,9 @@ defining this type of crossover: \emph{cluster creation} and \emph{cluster usage
     \Return $useful$
   \EndProcedure
 \end{algorithmic}
-  \caption{Algorithm describing how clusters are created using Equation~\ref{eq-distance}.}
-  \label{fig:cluster-creation}
+  \caption{Algorithm describing how clusters are created using Equation~\ref{eq-distance}
+           for each $P_i$. $unmerged$ and $useful$ are ordered sets of sets of gene loci.}
+  \label{fig-cluster-creation}
 \end{figure}
 
 
@@ -414,6 +426,16 @@ entropy, as given in Equation~\ref{eq-entropy}.
   \label{eq-entropy}
 \end{equation}
 
+Figure~\ref{fig-cluster-creation} depicts the process of agglomeratively constructing
+the linkage tree.  Starting with each gene location in separate clusters, Equation~\ref{eq-entropy}
+is used to find which $C_i$ and $C_j$ in $unmerged$, the set of gene clusters, have the tightest
+linkage (minimum distance).  These are merged to form a new cluster $C_i \cup C_j$, and
+the separate pieces are removed from $unmerged$ while $useful$ tracks all clusters ever
+created in the hierarchy.  This process iterates until all locations have been merged
+into a single cluster.  With proper bookkeeping this algorithm will construct
+the linkage tree from the frequency table in $O(N^2)$~\cite{gronau:2007:upgma}.
+
+\begin{comment}
 Starting from the leaves, the binary tree is constructed agglomeratively. Each
 iteration the clusters $C_i$ and $C_j$ which minimize $D(C_i, C_j)$ are
 merged to form a new cluster $C_i \cup C_j$.
@@ -421,6 +443,7 @@ The process ends when there is only a single cluster
 containing all loci.  This clustering algorithm
 requires $O(N^2)$ operations to construct the linkage tree
 from the frequency table~\cite{gronau:2007:upgma}.
+\end{comment}
 
 Not all of  the resulting clusters in the linkage  tree are useful for
 crossover.  The most obvious useless  cluster is one that contains all
@@ -436,13 +459,47 @@ potential  to  greatly  reduce  the  number of  clusters  used  during
 crossover.  For  instance, if  $|P_i| = 1$,  no clusters exist. If
 $|P_i| =  2$ at most two clusters  exist: one for all  genes where the
 solutions agree and one for where they disagree.
+\begin{comment}
 This means that Figure~\ref{fig-p3} is infeasible as crossover
 cannot make \#5 and \#9 unique from \{\#2, \#4\} and \{\#5, \#8\}, respectively.
 This inaccuracy was kept to make Figure~\ref{fig-p3} better express
 higher level concepts.
+\end{comment}
+
+\begin{figure}
+  \begin{algorithmic}
+  \Procedure{Cluster-Usage}{}
+    \ForAll{$C_i \in useful$}
+      \ForAll{$d \in shuffled(P_i)$}
+        \State Copy $d$'s gene values for $C_i$ into solution
+        \If{solution was changed}
+          \If{solution's fitness decreased}
+            \State Revert changes
+          \EndIf
+          \State \textbf{break}
+        \EndIf
+      \EndFor
+    \EndFor
+  \EndProcedure
+\end{algorithmic}
+  \caption{Algorithm describing how clusters are used to perform crossover.}
+  \label{fig-cluster-usage}
+\end{figure}
 
 P3 uses crossover to recombine known information in a level of the
-pyramid with a candidate solution as follows.  For
+pyramid with a candidate solution as depicted in Figure~\ref{fig-cluster-usage}.
+For each cluster $C_i$ found by \Call{Cluster-Creation}{}, choose a random
+donor $d$ from the current level such that $d$'s gene values for at
+least one gene in $C_i$ differs from the candidate solution.
+Copy all of $d$'s gene values into the solution and evaluate the new
+solution.  If the fitness of the candidate
+has been reduced, revert the candidate's gene values.  It is important
+to note that candidate changes are kept in the case when the fitness
+is \emph{unaffected}.  This allows crossover to drift, potentially
+moving through fitness plateaus.
+
+\begin{comment}
+For
 each cluster select a random donor from the population.  Copy the
 donor's gene values for all loci in that cluster into the candidate
 solution.  Evaluate the candidate.  If the fitness of the candidate
@@ -450,6 +507,7 @@ has been reduced, revert the candidate's gene values.  It is important
 to note that candidate changes are kept in the case when the fitness
 is \emph{unaffected}.  This allows crossover to drift, potentially
 moving through fitness plateaus.
+\end{comment}
 
 When choosing a donor, P3 ensures there is at least one gene value
 different between the donor and the candidate solution.  This can
