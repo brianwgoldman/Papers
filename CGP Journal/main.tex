@@ -595,9 +595,10 @@ As both output locations and information flow in the DAG are evolvable, often
 only a tiny fraction of the genome participates in creating the
 output values.  These nodes are referred to as ``active,'' with the nodes not
 being used to create output values referred to as ``inactive.''  Inactive nodes
-allow CGP individuals to drift genetically, as they can be mutated without effecting
-the fitness of the individual.  This genetic drift can then be incorporated, as
-mutation can change the DAG structure causing previously inactive nodes to become
+%TODO Changed here
+allow for genetic drift, as individuals can be mutated without effecting
+their fitness.  These mutations can then be incorporated, as future
+mutations can change the DAG structure causing previously inactive nodes to become
 active.  Previous work suggests CGP is most efficient when up to 95\% of the genome
 is inactive~\cite{miller:2006:redundancy}, while more recent work suggests this may
 be a result of hidden parsimony pressure in CGP~\cite{goldman:2013:ordering}.
