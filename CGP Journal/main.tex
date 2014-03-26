@@ -878,7 +878,8 @@ dependencies have already been added.  Initially this contains only the input lo
 Once a node is assigned a location, all of the nodes that depend on its output
 have that dependency marked as satisfied.  Once all of a node's dependencies
 are satisfied, it can be put into \emph{addable}.  In this way, nodes are
-randomly removed from \emph{addable}, assigned the next possible location
+%TODO Change here
+randomly removed from \emph{addable}, assigned the next location
 in the genome, with new nodes added to \emph{addable} as they becomes semantically
 viable.  Iteration ends when all nodes have been assigned new locations.
 \Call{RandomSerialization}{} requires $O(AN)$, as there can be only $N$ iterations,
