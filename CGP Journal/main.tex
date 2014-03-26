@@ -1111,7 +1111,8 @@ as \emph{Skip} has no impact on evolutionary search, and is strictly an improvem
 to using no duplication detection at all.
 
 In total this creates 9 algorithm combinations.  Of these, our previous work
-has been reported showing the effectiveness of the duplication methods with \emph{Normal} ordering~\cite{goldman:2013:cgpwaste}
+%TODO Changed here
+has shown the effectiveness of the duplication methods with \emph{Normal} ordering~\cite{goldman:2013:cgpwaste}
 as well as analysis of all three ordering methods with \emph{Single}~\cite{goldman:2013:ordering}.
 This means there remain 4 novel combinations to be tested.
 This is also the first time the ordering methods
@@ -1908,8 +1909,9 @@ active nodes means more chances for mutation to change the behavior of at least 
 
 Somewhat unintuitively, node reactivation and active node semantic changes appear
 to be highly correlated.  This is apparent in the fact that the \textbf{No Reactivation}
-column in each table is almost perfectly sorted, even though rows were sorted using the
-\textbf{Active Unchanged} column.  Again the number of active nodes seems the likely
+%TODO Changed here
+column in each table is almost perfectly sorted, even though rows were sorted by the
+\textbf{Active Unchanged} column.  Again the number of active nodes is the likely
 cause.  Having fewer active nodes reduces the number of introns, making it more
 difficult for inactive nodes to become active.  Fewer active nodes also decreases
 how many inactive nodes could have ever been active.
@@ -1917,15 +1919,15 @@ how many inactive nodes could have ever been active.
 Potentially the most interesting results come from the control combination of
 \emph{Skip-Normal}.  As problem difficulty increases, \emph{Skip-Normal} produces
 an increasingly large number of offspring with no change in active node behavior,
-with little to no node reactivation, and a high chance of changing nodes before
+with little node reactivation, and a high chance of changing nodes before
 they are reactivated.  This suggests two important features: \emph{Skip} is likely
 saving a significant number of evaluations, and \emph{Normal} CGP is likely using
 inactive nodes primarily to inject random behavior.  The former comes from the
-argument that a large part of the active unchanged individuals are also likely
+%TODO Changed here
+argument that most of the active unchanged individuals are also likely
 actively identical to their parents.  The latter is supported by the fact that
-\emph{Skip-Normal} so infrequently reactivates a node with tested behavior.  More
-often than not offspring connecting in inactive nodes are testing that node's behavior
-for the first time.
+\emph{Skip-Normal} infrequently reactivates a node with tested behavior with
+offspring frequently connecting in untested inactive nodes.
 
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
