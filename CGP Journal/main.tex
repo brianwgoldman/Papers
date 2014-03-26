@@ -470,7 +470,8 @@ creating methods to prevent wasted CGP evaluations (\emph{Skip}, \emph{Accumulat
 and \emph{Single}) and creating methods to overcome CGP's search limitations imposed by
 genome ordering (\emph{Reorder} and \emph{DAG}).
 
-Our results show that most CGP techniques evolve genomes that
+%TODO mention this
+Our results on boolean problems show CGP evolves genomes that
 are highly inactive, very redundant, and full of seemingly useless constants.
 On some tested problems we found less than 1\% of the genome was actually required to
 encode the evolved solution.
@@ -545,7 +546,9 @@ Genetic Programming (CGP) an effective evolutionary optimizer.
 Previous studies of CGP's evolutionary mechanisms have
 focused on bloat~\cite{miller:2001:bloat},
 neutrality~\cite{vassilev:2000:neutrality}, and structural bias~\cite{payne:2009:bias}.
-We shall focus on the interaction between mutation and genome ordering.
+We shall focus on the interaction between mutation and genome ordering, both
+%TODO final change
+generally and how they specifically apply to the boolean problem domain.
 %Done-NEW
 While these features of CGP have trivial definitions, we will argue, using
 experimentation and analysis of alternatives, that they have a great deal
