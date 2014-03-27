@@ -45,7 +45,7 @@
 %
 % For tracking purposes - this is V2.0 - May 2012
 
-\documentclass{sig-alternate}
+\documentclass{sig-alternate-2013}
 %\linespread{2.5}
 \usepackage{url}
 \usepackage{verbatim}
@@ -57,18 +57,25 @@
 {\includegraphics[width=.9\textwidth,height=\textheight,keepaspectratio]{#1}}
 
 \usepackage{bm}
-\begin{document}
-%
-% --- Author Metadata here ---
-\conferenceinfo{GECCO'14,} {July 12--16, 2014, Vancouver, BC, Canada.}
-\CopyrightYear{2014}
-\crdata{978-1-4503-2662-9/14/07}
+
+\newfont{\mycrnotice}{ptmr8t at 7pt}
+\newfont{\myconfname}{ptmri8t at 7pt}
+\let\crnotice\mycrnotice%
+\let\confname\myconfname%
+
+\permission{Permission to make digital or hard copies of part or all of this work
+for personal or classroom use is granted without fee provided that copies are not
+made or distributed for profit or commercial advantage, and that copies bear this
+notice and the full citation on the first page. Copyrights for third-party
+components of this work must be honored. For all other uses, contact the
+owner/author(s). Copyright is held by the author/owner(s).}
+\conferenceinfo{GECCO'14,}{July 12--16, 2014, Vancouver, BC, Canada.}
+\copyrightetc{ACM \the\acmcopyr}
+\crdata{978-1-4503-1964-5/14/07. \\ http://dx.doi.org/10.1145/2576768.2598350}
+
 \clubpenalty=10000
 \widowpenalty = 10000
-%\CopyrightYear{2007} % Allows default copyright year (20XX) to be over-ridden - IF NEED BE.
-%\crdata{0-12345-67-8/90/01}  % Allows default copyright data (0-89791-88-6/97/05) to be over-ridden - IF NEED BE.
-% --- End of Author Metadata ---
-
+\begin{document}
 \title{Parameter-less Population Pyramid}
 %\subtitle{[Genetic Algorithms Track]}
 %
@@ -165,7 +172,7 @@ Anonymous\\
 
 \terms{Algorithms, Performance, Experimentation}
 
-\keywords{Linkage Learning, Local Search, Parameter-less}
+\keywords{Linkage Learning; Local Search; Parameter-less}
 
 \section{Introduction}
 Providing a good solution in reasonable time to a broad class of real
