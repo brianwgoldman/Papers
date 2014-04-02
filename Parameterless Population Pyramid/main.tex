@@ -295,22 +295,25 @@ further, so the process would begin yet again with a random solution.
   \Procedure{Iterate-P3}{}
     \State Create random solution
     \State Apply hill climber (Section~\ref{sec-hillclimber})
-    \If{$\forall_{P_i\in pyramid}$ solution $\notin P_i$}
+    \If{solution $\notin hashset$}
       \State Add solution to $P_0$ (Section~\ref{sec-pyramid})
+      \State Add solution to $hashset$
     \EndIf
 
     \ForAll{$P_i \in pyramid$}
       \State Mix solution with $P_i$ (Section~\ref{sec-crossover})
       \If{solution's fitness has improved}
-        \If{$\forall_{P_i\in pyramid}$ solution $\notin P_i$}
+        \If{solution $\notin hashset$}
           \State Add solution to $P_{i+1}$
+          \State Add solution to $hashset$
         \EndIf
       \EndIf
     \EndFor
   \EndProcedure
 \end{algorithmic}
   \caption{One iteration of P3 optimization. $pyramid$ is an
-           ordered set of populations.}
+           ordered set of populations and $hashset$ is a set
+           of all solutions in $pyramid$.}
   \label{fig-p3}
 \end{figure}
 
@@ -381,7 +384,6 @@ pairs of loci are queried for their gene values.  The table is then updated,
 incrementing the count for each observed pairing.  This requires $O(N^2)$ operations
 (no evaluations) each time a solution is added to a level of the pyramid, but is
 constant in the number of solutions currently in the level.
-\\
 
 \subsection{Crossover}
 \label{sec-crossover}
