@@ -1,6 +1,9 @@
 \documentclass[twoside]{article}
 \usepackage{ecj,palatino,epsfig,latexsym,natbib}
 \usepackage{url}
+\usepackage{verbatim}
+\usepackage{subcaption}
+\usepackage[noend]{algpseudocode}
 
 \newcommand{\includegraphicswide}[1]
 {\includegraphics[width=.9\textwidth,height=\textheight,keepaspectratio]{#1}}
@@ -44,36 +47,156 @@ parameter-less.
 \end{keywords}
 
 \section{Introduction}
-~\cite{Wolpert:1997:nfl}
+A primary purpose of evolutionary optimization is to efficiently find good solutions
+to challenging real world problems with minimal prior knowledge about the problem itself.
+This driving goal has created search algorithms which can escape user bias to create
+truly novel results, sometimes publishable or patentable in their own right~\citep{kannappan:2014:humies}.
+While it is not possible for any algorithm to do better than random across all possible
+problems~\citep{Wolpert:1997:nfl}, effectiveness can be achieved by assuming the search
+landscape has structure and then biasing the algorithm toward exploiting those features.
 
-~\cite{goldberg:1991:gasize} % Search efficiency
+In evolutionary optimization, and genetic algorithms~(GAs) in particular, search is often
+biased through parameters. This is beneficial as it allows practitioners to inject their
+knowledge about the shape of the search landscape into the algorithm. However, it can require
+expert knowledge to leverage this feature to its fullest potential or require exceedingly expensive
+parameter tuning~\citep{grefenstette:1986:optimalga}. Furthermore, the quality of solutions found,
+and the speed at which they are found, in GAs is strongly tied to setting these parameters
+correctly~\citep{goldberg:1991:gasize}. Parameters such as population size, mutation rate, crossover
+rate, tournament size, etc can have no clear relationship to the problem being solved, meaning even
+domain experts may not understand how they will interact with the problem or each other.
 
-~\cite{grefenstette:1986:optimalga} % Expensive to tune
+As such there has been periodic efforts to reduce or remove the need for parameter tuning.
+\cite{Back:1992:selfadapt} introduced self-adaptive parameters, where parameter values
+were included in each solution's genome and underwent evolution. This allowed search
+to optimize some of its own parameters and therefore reduced the need for expert tuning.
+\cite{harik:1999:parameterlessga} was able to design an entirely parameter-less GA by
+designing control strategies which made on line modifications to each parameter based
+on how well search was progressing. Unfortunately these methods were provably less efficient
+than correctly setting the parameters by up to a logarithmic
+factor~\citep{pelikan:1999:worstparameter-less}.
 
-~\cite{harik:1999:parameterlessga}
+One area that has been very effective at reducing the number of algorithm parameters has been
+model based search. \cite{pelikan:2006:hboa}'s Hierarchical Bayesian Optimization
+Algorithm~(hBOA) and \cite{thierens:2010:ltga}'s Linkage Tree Genetic Algorithm~(LTGA)
+both only require a single parameter: population size. \cite{posik:2011:parameterless}
+leveraged these methods to create a fully parameter-less algorithm which was restricted
+only to order-k fully decomposable noiseless problems.
 
-~\cite{posik:2011:parameterless} % Model based parameter-less, only noiseless non-overlapping
-
-~\cite{goldman:2014:p3}
+Most recently \cite{goldman:2014:p3} introduced the Parameter-less Population Pyramid~(P3).
+This method combines model based search with a local search operator using a pyramid structure
+of populations to achieve parameter-less optimization. Initial results suggest that unlike
+previous parameter-less methods, P3 is actually more efficient than current state-of-the-art
+parameterized search algorithms. In this work we shall extend these results to cover more
+comparison algorithms, results on both efficiency in reaching the global optimum and intermediate
+fitnesses, algorithm complexity analysis, and provide more in depth analysis of P3 itself.
+\begin{comment}
+Section~\ref{sec-optimizers}
+explains how each of these algorithms, including P3, perform search. Section~\ref{sec-problems}
+provides a description of each test problem. As hBOA and LTGA require a population size parameter
+Section~\ref{sec-tuning} provides our methodology to ensure each is optimally tuned to each problem.
+\end{comment}
 
 \section{Optimizers}
-
-\subsection{P3}
-~\cite{goldman:2014:p3}
-
-~\cite{hornby:2006:alps}
-
-~\cite{gronau:2007:upgma} % Efficient clustering
+\label{sec-optimizers}
 
 \subsection{Hill Climber}
 ~\cite{goldman:2014:p3}
 
 \subsection{LTGA}
-~\cite{thierens:2010:ltga}
+Figure~\ref{fig-cluster-creation}. Figure~\ref{fig-cluster-usage}.
+\begin{figure}
+  \begin{algorithmic}
+  \Procedure{Cluster-Creation}{}
+    \State $unmerged \leftarrow \{\{0\}, \{1\}, \{2\}, \dots, \{N-1\}\}$
+    \State $useful \leftarrow unmerged$
+    \While{$|unmerged|>1$}
+      \State $C_i, C_j \leftarrow \min_{C_i,C_j \in unmerged} D(C_i, C_j)$
+      \State $unmerged \leftarrow unmerged - \{C_i, C_j\} + \{C_i \cup C_j\}$
+      \State $useful \leftarrow useful + \{C_i \cup C_j\}$
+      \If{$D(C_i, C_j) = 0$}
+        \State $useful \leftarrow useful - \{C_i, C_j\}$
+      \EndIf
+    \EndWhile
+    \State Order $useful$ based on cluster size, smallest first.
+    \State Remove largest cluster from $useful$.
 
+    \Return $useful$
+  \EndProcedure
+\end{algorithmic}
+  \caption{Algorithm describing how clusters are created using Equation~\ref{eq-distance}
+           for each $P_i$. $unmerged$ and $useful$ are ordered sets of sets of gene loci.}
+  \label{fig-cluster-creation}
+\end{figure}
+
+\begin{figure}
+  \begin{algorithmic}
+  \Procedure{Cluster-Usage}{}
+    \ForAll{$C_i \in useful$}
+      \ForAll{$d \in shuffled(P_i)$}
+        \State Copy $d$'s gene values for $C_i$ into solution
+        \If{solution was changed}
+          \If{solution's fitness decreased}
+            \State Revert changes
+          \EndIf
+          \State \textbf{break}
+        \EndIf
+      \EndFor
+    \EndFor
+  \EndProcedure
+\end{algorithmic}
+  \caption{Algorithm describing how clusters are used to perform crossover.}
+  \label{fig-cluster-usage}
+\end{figure}
+
+~\cite{thierens:2010:ltga}
 ~\cite{thierens:2013:ltgahiff}
 
+\begin{equation}
+  D(C_i,C_j) = \frac{1}{\left | C_i \right |\cdot \left |C_j \right|}\sum_{c_i \in C_i}\sum_{c_j \in C_j}
+  2 - \frac{H(C_i) + H(C_j)}{H(C_i \cup C_j)}
+  \label{eq-distance}
+\end{equation}
+\begin{equation}
+  H(C) = -\sum_{s\in S} p_c(s)\log(p_c(s))
+  \label{eq-entropy}
+\end{equation}
+
 ~\cite{bosman:2011:lsbbo} % LTGA with hill climbing
+
+\subsection{P3}
+Figure~\ref{fig-p3}.
+\begin{figure}
+  \begin{algorithmic}
+  \Procedure{Iterate-P3}{}
+    \State Create random solution
+    \State Apply hill climber (Section~\ref{sec-hillclimber})
+    \If{solution $\notin hashset$}
+      \State Add solution to $P_0$ (Section~\ref{sec-pyramid})
+      \State Add solution to $hashset$
+    \EndIf
+
+    \ForAll{$P_i \in pyramid$}
+      \State Mix solution with $P_i$ (Section~\ref{sec-crossover})
+      \If{solution's fitness has improved}
+        \If{solution $\notin hashset$}
+          \State Add solution to $P_{i+1}$
+          \State Add solution to $hashset$
+        \EndIf
+      \EndIf
+    \EndFor
+  \EndProcedure
+\end{algorithmic}
+  \caption{One iteration of P3 optimization. $pyramid$ is an
+           ordered set of populations and $hashset$ is a set
+           of all solutions in $pyramid$.}
+  \label{fig-p3}
+\end{figure}
+
+~\cite{goldman:2014:p3}
+
+~\cite{hornby:2006:alps}
+
+~\cite{gronau:2007:upgma} % Efficient clustering
 
 \subsection{hBOA}
 
@@ -88,6 +211,8 @@ parameter-less.
 ~\cite{goldman:2014:p3}
 
 \section{Problem Descriptions}
+\label{sec-problems}
+
 \subsection{Single Instance Problems}
 ~\cite{goldberg:1991:gasize} % Deceptive Trap
 
@@ -107,6 +232,8 @@ parameter-less.
 ~\cite{goldman:2014:p3} % MAXSAT
 
 \section{Comparison Algorithm Parameter Tuning}
+\label{sec-tuning}
+
 ~\cite{goldman:2012:ltga} % Bisection with no parameters
 
 ~\cite{goldman:2014:p3}
@@ -114,77 +241,131 @@ parameter-less.
 ~\cite{jovanovic:1997:ruleofthree}
 
 \section{Global Optimum}
+\label{sec-optimum}
 
-\begin{figure*}
-  \centering
+\begin{figure}[t]
+  \begin{center}
   \includegraphicsfit{evals-to-success}
+  \end{center}
   \caption{Comparison of the median number of evaluations to reach the global optimum for
            the six different optimization methods with respect
            to problem size.  If the median run did not reach the global optimum no data element
            is shown.  Results given on a log-log scale.}
   \label{fig-evals-to-success}
-\end{figure*}
+\end{figure}
 
 TODO Compare all 6 optimization techniques on time to reach global optimum.  Figure~\ref{fig-evals-to-success}.
 
 TODO Table listing empirical $O(N)$ times for each technique on each problem. Include
 statistical comparison of log-log regression lines.
 
-\begin{figure*}
-  \centering
+\begin{figure}[t]
+  \begin{center}
   \includegraphicsfit{evals-to-success-range}
-  \caption{Comparison of the upper and lower quartiles of evaluations required to reach the global optimum for
-           three different optimization methods with respect
-           to problem size.}
+  \end{center}
+  \caption{Comparison of the upper and lower quartiles of evaluations required
+           to reach the global optimum for P3 and LTGA with respect to problem size.}
   \label{fig-evals-to-success-range}
-\end{figure*}
+\end{figure}
 
-TODO Graphic showing quartiles to illustrate P3's scaling on problems
+TODO Graphic showing quartiles to illustrate P3's scaling on problems. Figure~\ref{fig-evals-to-success-range}.
 
 \section{Stop Anytime}
+\begin{figure}[t]
+  \begin{center}
+  \includegraphicsfit{fitness-over-time}
+  \end{center}
+  \caption{Compares the median best fitness reached during search for each of the six optimization methods.}
+  \label{fig-fitness-over-time}
+\end{figure}
+
 TODO Compare all 6 optimization techniques on fitnesses reached at different times
-during the run on problem sizes near 100 or 150
+during the run on problem sizes. Explain results same for different sizes. Figure~\ref{fig-fitness-over-time}.
 
-TODO Compare all 4 optimization techniques on fitnesses reached at different times
-during the run on problem sizes near 500 or 750
+TODO Include graphic for one problem where LTGA was tuned using a significantly higher failure rate.
 
+\begin{figure}[t]
+  \begin{centering}
+    \begin{subfigure}{.5\textwidth}
+      \begin{centering}
+        \includegraphicsfit{rebuilds}
+      \end{centering}
+      \caption{Rebuilds}
+      \label{fig-rebuilds}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+      \begin{centering}
+        \includegraphicsfit{donations}
+      \end{centering}
+      \caption{Donations}
+      \label{fig-donations}
+    \end{subfigure}
+  \end{centering}
+  \caption{Computation costs incurred by model rebuilding (Figure~\ref{fig-rebuilds}) and
+           repeated donations (Figure~\ref{fig-donations}) per evaluation as problem size increases.}
+\end{figure}
 
-\section{Complexity Per Evaluation}
-TODO Include graphic of rebuilds per evaluation (decreasing with length)
+TODO Include graphic of rebuilds per evaluation. Figure~\ref{fig-rebuilds}.
 
-TODO Include graphic of donations per evaluation (sub-linear growth)
+TODO Include graphic of donations per evaluation. Figure~\ref{fig-donations}.
 
-TODO Include graphic comparing seconds per evaluation up to small problems (hboa super-linear)
-
-TODO Include graphic comparing seconds per evaluation for large problems (perhaps just 1 graph of P3 across all problems)
+TODO Include a table of $O(N)$ seconds per evaluation for all 4 model building techniques on all 7 problems.
 
 \section{Inner Workings}
-TODO Include graphic of proportion of evaluations spend on hill climber (constant with length)
 
-TODO Include graphic of crossover success (constant with length)
+\begin{figure}[t]
+  \begin{centering}
+    \begin{subfigure}{.5\textwidth}
+      \begin{centering}
+        \includegraphicsfit{cross}
+      \end{centering}
+      \caption{Crossover Proportion}
+      \label{fig-cross}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+      \begin{centering}
+        \includegraphicsfit{cross-success}
+      \end{centering}
+      \caption{Crossover Success}
+      \label{fig-cross-success}
+    \end{subfigure}
+  \end{centering}
+  \caption{For each problem Figure~\ref{fig-cross} shows the proportion of P3 evaluations spend on crossovers
+           and Figure~\ref{fig-cross-success} shows the percentage of fitness improving crossover evaluations.}
+\end{figure}
 
-TODO Include graphic of Ising Spin Glass, NK, and DeceptiveStepTrap's pyramid shape and crossover success rates at each level
+TODO Include graphic of proportion of evaluations spent on crossover. Figure~\ref{fig-cross}.
+
+TODO Include graphic of crossover success Figure~\ref{fig-cross-success}.
+
+\begin{figure}[t]
+  \begin{centering}
+    \begin{subfigure}{.5\textwidth}
+      \begin{centering}
+        \includegraphicsfit{level-size}
+      \end{centering}
+      \caption{Population Size}
+      \label{fig-level-size}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+      \begin{centering}
+        \includegraphicsfit{level-success}
+      \end{centering}
+      \caption{Crossover Success}
+      \label{fig-level-success}
+    \end{subfigure}
+  \end{centering}
+  \caption{For each problem Figure~\ref{fig-level-size} shows the number of solutions stored in each level of the pyramid
+           and Figure~\ref{fig-level-success} shows the percentage of fitness improving crossover evaluations at each level.}
+\end{figure}
+
+TODO Include graphic of pyramid shape (Figure~\ref{fig-level-size}) and crossover success rates (Figure~\ref{fig-level-success}) at each level.
 
 ~\cite{lobo:2011:dynamicpop}
 
+~\cite{goldman:2011:dynamic-parameters}
+
 \section{Conclusions and Future Work}
-
-\section{About Figures}
-
-\begin{figure}[t]
-\begin{center}
-\centerline{ 
-% \psfig{file=yourfigure.eps,width=3.0truein}
-%  UNCOMMENT the above line and add yourfigure.eps
-%  AND delete or comment-out the framebox
-\framebox(375,50)
-}
-\end{center}
-\caption{This is a caption below a framebox where a
-figure might appear.  Use epsfig in the {\tt $\backslash$usepackage\{epsfig,ecj...\}} 
-command to help to insure that we can process your figure.}
-\label{graph1}
-\end{figure}
 
 \small
 
