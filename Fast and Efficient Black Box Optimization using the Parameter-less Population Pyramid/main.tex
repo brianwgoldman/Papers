@@ -100,7 +100,57 @@ Section~\ref{sec-tuning} provides our methodology to ensure each is optimally tu
 \label{sec-optimizers}
 
 \subsection{Hill Climber}
-~\cite{goldman:2014:p3}
+Perhaps the simplest black box search heuristic is stochastic local search, or hill climbing.
+This optimization technique focuses on improving a single solution until it reaches a local
+optimum. Here we use the first improvement hill climber defined by \cite{goldman:2014:p3}
+and given in Figure~\ref{fig-hc}. This algorithm works by flipping each bit in a random
+order, keeping modifications when fitness is improved, until doing so cannot result in
+further fitness improvements.
+
+The hill climber requires $O(1)$ operations per evaluation amortized cost. In order to
+terminate, it must perform at least $N$ evaluations, where $N$ is the number of bits
+in the solution, in order to ensure no single bit flip can result in a fitness improvement.
+As such any operation that happens only once per search can be amortized over at least $N$
+evaluations, covering the initialization of $options$.
+
+Assuming proper hashing data structures, determining if $index \notin tried$ should require only $O(1)$
+time. While this operation may be called without a directly related evaluation, amortized cost
+provides an upper bound. Consider that in order to add an $index$ into $tried$ an evaluation must
+be performed. Lets say this evaluation pays for two checks of that $index$, one of which was used
+during this loop. If no fitness improving move is found, the next time through the loop the second check
+is used. A third check is only necessary if no fitness improving move was found for any index.
+This is a contradiction as the loop terminates when no improving move was found. Therefore this check
+can only be called twice per evaluation.
+
+
+
+\begin{figure}
+  \begin{algorithmic}
+  \Procedure{Hill-Climber}{}
+    \State $options \leftarrow [0 \dots N-1]$
+    \State $tried \leftarrow \emptyset$
+    \While{$|tried| < |options|$}
+      \State $shuffle(options)$
+      \ForAll{$index \in options$}
+        \If{$index \notin tried$}
+          \State Flip bit $index$ in solution
+          \If{solution's fitness increased}
+            \State $tried \leftarrow \emptyset$
+          \Else
+            \State Revert change
+          \EndIf
+          \State $tried \leftarrow tried \cup \{index\}$
+        \EndIf
+      \EndFor
+    \EndWhile
+  \EndProcedure
+\end{algorithmic}
+  \caption{Hill climbing algorithm used to improve randomly generated solutions until no single
+           bit change results in a fitness improvement.}
+  \label{fig-hc}
+\end{figure}
+
+
 
 \subsection{LTGA}
 Figure~\ref{fig-cluster-creation}. Figure~\ref{fig-cluster-usage}.
@@ -254,7 +304,7 @@ Figure~\ref{fig-p3}.
   \label{fig-evals-to-success}
 \end{figure}
 
-TODO Compare all 6 optimization techniques on time to reach global optimum.  Figure~\ref{fig-evals-to-success}.
+TODO Compare all 6 optimization techniques on evaluations to reach global optimum.  Figure~\ref{fig-evals-to-success}.
 
 TODO Table listing empirical $O(N)$ times for each technique on each problem. Include
 statistical comparison of log-log regression lines.
@@ -309,7 +359,7 @@ TODO Include graphic of rebuilds per evaluation. Figure~\ref{fig-rebuilds}.
 
 TODO Include graphic of donations per evaluation. Figure~\ref{fig-donations}.
 
-TODO Include a table of $O(N)$ seconds per evaluation for all 4 model building techniques on all 7 problems.
+TODO Include a table of $O(N)$ seconds per evaluation and total seconds for all 4 model building techniques on all 7 problems.
 
 \section{Inner Workings}
 
