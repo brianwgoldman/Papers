@@ -125,13 +125,12 @@ can only be called twice per evaluation.
 
 
 \begin{figure}
-  \begin{algorithmic}
+  \begin{algorithmic}[1]
   \Procedure{Hill-Climber}{}
     \State $options \leftarrow [0 \dots N-1]$
     \State $tried \leftarrow \emptyset$
     \While{$|tried| < |options|$}
-      \State $shuffle(options)$
-      \ForAll{$index \in options$}
+      \ForAll{$index \in shuffled(options)$}
         \If{$index \notin tried$}
           \State Flip bit $index$ in solution
           \If{solution's fitness increased}
@@ -153,10 +152,22 @@ can only be called twice per evaluation.
 
 
 \subsection{Linkage Tree Genetic Algorithm}
+~\cite{thierens:2010:ltga} introduced the Linkage Tree Genetic Algorithm (LTGA) which automatically
+detects and exploits problem epistasis by examining pairwise gene entropy. Due to its enhanced
+ability to preserve high fitness gene subsets, LTGA was able to outperform state of the art
+GAs across many benchmarks. Since its first proposal, many variants of LTGA have been
+proposed~\citep{goldman:2012:ltga}. Therefore for clarity we have chosen the version
+presented by \cite{thierens:2013:ltgahiff} as our model for comparison as it is both
+modern and appears to approach the consensus in the literature.
 
-Figure~\ref{fig-cluster-creation}. Figure~\ref{fig-cluster-usage}.
+LTGA's effectiveness comes from its method of performing crossover. Instead of blindly
+mixing genes between parents, LTGA attempts to preserve important interrelationships
+between genes. Before performing any crossovers in a generation, LTGA first builds
+a set of hierarchical gene clusters which are then used to dictate how genes are mixed
+during crossover.
+
 \begin{figure}
-  \begin{algorithmic}
+  \begin{algorithmic}[1]
   \Procedure{Cluster-Creation}{}
     \State $unmerged \leftarrow \{\{0\}, \{1\}, \{2\}, \dots, \{N-1\}\}$
     \State $useful \leftarrow unmerged$
@@ -168,30 +179,72 @@ Figure~\ref{fig-cluster-creation}. Figure~\ref{fig-cluster-usage}.
         \State $useful \leftarrow useful - \{C_i, C_j\}$
       \EndIf
     \EndWhile
-    \State Order $useful$ based on cluster size, smallest first.
-    \State Remove largest cluster from $useful$.
+    \State Order $useful$ based based on last merged first\label{fig-cluster-creation-ordering}
+    \State Remove largest cluster from $useful$
 
     \Return $useful$
   \EndProcedure
 \end{algorithmic}
-  \caption{Algorithm describing how clusters are created using Equation~\ref{eq-distance}
-           for each $P_i$. $unmerged$ and $useful$ are ordered sets of sets of gene loci.}
+  \caption{Algorithm describing how LTGA creates clusters using Equation~\ref{eq-distance}
+           for a population. $unmerged$ and $useful$ are ordered sets of sets of gene loci.}
   \label{fig-cluster-creation}
 \end{figure}
 
+Figure~\ref{fig-cluster-creation} provides the agglomerative method LTGA uses to create gene clusters.
+This algorithm will create a tree of sets, such that the leaves of the tree contain a single gene and
+nodes are the union of their children's sets. These sets are then used by crossover to specify epistatic
+relationships which should be preserved.
+The process begins by creating the set of sets $unmerged$ which tracks all top level clusters. Initially
+$unmerged$ contains single member sets for each gene. Each iteration the two sets with the minimum pairwise
+distance (given in Equation~\ref{eq-distance}) are merged to create a single cluster. This process is repeated
+until only a single set remains in $unmerged$ which contains all of the genes in the genome.
+
+\begin{equation}
+  D(C_i,C_j) = \frac{1}{\left | C_i \right |\cdot \left |C_j \right|}\sum_{c_i \in C_i}\sum_{c_j \in C_j}
+  2 - \frac{H(c_i) + H(c_j)}{H(c_i \cup c_j)}
+  \label{eq-distance}
+\end{equation}
+\begin{equation}
+  H(c) = -\sum_{s\in S} p_c(s)\log(p_c(s))
+  \label{eq-entropy}
+\end{equation}
+
+Throughout this process $useful$ tracks the set of all gene clusters which should be preserved for use by crossover.
+This set begins with all genes in separate clusters, and each time a new cluster is created it is added to $useful$.
+However, not all clusters are necessarily worth keeping. For instance, in all versions of LTGA the cluster
+containing all genes is removed from $useful$ as preserving all genes during crossover can only create clones.
+\cite{thierens:2013:ltgahiff} extended this removal to include any unsupported subsets. If the pairwise distance
+between two clusters is 0, this means there are no individuals in the population which disrupt the values stored in
+each cluster. Therefore when performing crossover there is no reason to believe a fitness improvement can be achieved
+by breaking the stored pattern. As such only clusters who's direct superset has non-zero distance are kept.
+
+\cite{thierens:2013:ltgahiff}'s version of LTGA does not use the entire population when determining pairwise entropy.
+Instead, binary tournament use used to select half of the population. This is done to ensure the model is built
+using only high quality solutions, even during the first generation.
+
+In order to efficiently perform clustering, a pairwise gene frequency table is constructed.
+Equation~\ref{eq-entropy} uses how frequently each of the four possible string values for each
+pair of genes occurs in the selected solutions. Extracting this information requires $O(\mu N^2)$
+time, where $\mu$ is the population size and $N$ is the genome size. The process of converting
+this pairwise frequency information into clusters can be achieved in $O(N^2)$ using the bookkeeping
+methods presented by \cite{gronau:2007:upgma}. This cost is performed only once per generation,
+and is then used to perform approximately $O(\mu N)$ crossover evaluations. As a result, the amortized cost of
+LTGA's model building is $O(N)$.
+
 \begin{figure}
-  \begin{algorithmic}
+  \begin{algorithmic}[1]
   \Procedure{Cluster-Usage}{}
     \ForAll{$C_i \in useful$}
-      \ForAll{$d \in shuffled(P_i)$}
+      %\ForAll{$d \in shuffled(P_i)$}
+        \State $d \leftarrow rand\_choice(P)$\label{fig-cluster-usage-donate}
         \State Copy $d$'s gene values for $C_i$ into solution
         \If{solution was changed}
           \If{solution's fitness decreased}
             \State Revert changes
           \EndIf
-          \State \textbf{break}
+          %\State \textbf{break}
         \EndIf
-      \EndFor
+      %\EndFor
     \EndFor
   \EndProcedure
 \end{algorithmic}
@@ -199,35 +252,42 @@ Figure~\ref{fig-cluster-creation}. Figure~\ref{fig-cluster-usage}.
   \label{fig-cluster-usage}
 \end{figure}
 
-~\cite{thierens:2010:ltga}
-~\cite{thierens:2013:ltgahiff}
+Figure~\ref{fig-cluster-usage} describes how the identified clusters are used by crossover to preserve
+gene linkage while still exploring the search space. Unlike more traditional crossover methods, LTGA
+crosses each individual with the entire population. Also, to produce a single offspring, multiple evaluations
+of the fitness function are performed.
 
-\begin{equation}
-  D(C_i,C_j) = \frac{1}{\left | C_i \right |\cdot \left |C_j \right|}\sum_{c_i \in C_i}\sum_{c_j \in C_j}
-  2 - \frac{H(C_i) + H(C_j)}{H(C_i \cup C_j)}
-  \label{eq-distance}
-\end{equation}
-\begin{equation}
-  H(C) = -\sum_{s\in S} p_c(s)\log(p_c(s))
-  \label{eq-entropy}
-\end{equation}
+Each generation, each individual in the population undergoes crossover. In a single crossover event, each
+cluster of genes $C_i$ in $useful$ is applied in last merged first order as a crossover mask. A random donor $d$
+is chosen from the entire population (not just the model selected population), and $d$'s gene's for $C_i$ are copied
+into the working solution. If a modification is made, an evaluation is then performed. If the crossover
+resulted in no worse fitness than the changes are kept. This allows for neutral drift across plateaus.
+The resulting solution, which must be at least as fit as its parent, is then
+copied into the next generation.
+
+
+In total each individual can cause up to $|useful|$ evaluations. If all clusters were kept, even those deemed
+unhelpful, and all donations were evaluated, even those which did not change any genes, then \Call{Cluster-Usage}{}
+would perform exactly $2N-2$ evaluations for each of the $\mu$ in the population. This provides the amortizing evaluations
+required to make clustering only $O(N)$ operations per evaluation. However, but skipping some evaluations, its
+possible that clustering may be super-linear.
 
 ~\cite{bosman:2011:lsbbo} % LTGA with hill climbing
 
 \subsection{P3}
 Figure~\ref{fig-p3}.
 \begin{figure}
-  \begin{algorithmic}
+  \begin{algorithmic}[1]
   \Procedure{Iterate-P3}{}
     \State Create random solution
-    \State Apply hill climber (Section~\ref{sec-hillclimber})
+    \State Apply hill climber
     \If{solution $\notin hashset$}
-      \State Add solution to $P_0$ (Section~\ref{sec-pyramid})
+      \State Add solution to $P_0$
       \State Add solution to $hashset$
     \EndIf
 
     \ForAll{$P_i \in pyramid$}
-      \State Mix solution with $P_i$ (Section~\ref{sec-crossover})
+      \State Mix solution with $P_i$
       \If{solution's fitness has improved}
         \If{solution $\notin hashset$}
           \State Add solution to $P_{i+1}$
@@ -245,9 +305,11 @@ Figure~\ref{fig-p3}.
 
 ~\cite{goldman:2014:p3}
 
-~\cite{hornby:2006:alps}
+Figure~\ref{fig-cluster-creation} Line~\ref{fig-cluster-creation-ordering}.
 
-~\cite{gronau:2007:upgma} % Efficient clustering
+Figure~\ref{fig-cluster-usage} Line~\ref{fig-cluster-usage-donate}.
+
+~\cite{hornby:2006:alps}
 
 \subsection{hBOA}
 
@@ -257,9 +319,32 @@ Figure~\ref{fig-p3}.
 ~\cite{pelikan:2004:parameterlesshboa}
 
 \subsection{$1+(\lambda, \lambda)$}
-~\cite{doerr:2013:lambdalambda}
+\cite{doerr:2013:lambdalambda} was the first genetic algorithm to provably show
+the advantages of performing crossover on simple landscapes. This comparatively simple
+algorithm maintains only a single individual and a self-controlled parameter $\lambda$.
 
-~\cite{goldman:2014:p3}
+Each iteration, a number of bits to flip is chosen from the binomial distribution $b\sim B(N, \frac{\lambda}{N})$.
+Next, $\lfloor\lambda\rfloor$ offspring are produced by flipping $b$ bits. The
+best mutant then produces $\lambda$ offspring via uniform crossover with the original parent, such that each gene comes from the
+mutant with probability $\frac{1}{\lambda}$. In the original algorithm the best
+offspring produced by crossover then replaces the original parent if its fitness is no worse.
+The $\lambda$ parameter, which is initialized to 1, is decreased if the offspring replaced
+its parent and decreased otherwise.
+
+The original formulation was designed specifically for unimodal landscapes and as such were
+not directly suitable for multimodal problems. \cite{goldman:2014:p3} extended the $1+(\lambda, \lambda)$
+to include random restarts. As search stagnates, the $\lambda$ parameter increases in value. Eventually
+this results in $\lambda \ge N$. This results in mutation flipping all bits of the individual, preventing
+useful exploration. Therefore whenever $\lambda \ge N$, search is restarted from a random solution with $\lambda$
+reset to 1.
+
+A few other efficiency modifications were also made. If there is a tie in crossover offspring fitness,
+whichever has a larger hamming distance from the parent is retained. This encourages drifting across plateaus.
+The ``mod'' control strategy proposed by \cite{doerr:2013:lambdalambda} was not used as it conflicted with
+the random restart strategy.
+If a crossover individual is identical to either of its parents, it is not evaluated.
+If mutation produces an offspring which is better than the best crossover offspring, it is used to compare
+against the original parent.
 
 \section{Problem Descriptions}
 \label{sec-problems}
