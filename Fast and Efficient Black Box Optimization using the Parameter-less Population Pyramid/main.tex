@@ -79,8 +79,8 @@ One area that has been very effective at reducing the number of algorithm parame
 model based search. \cite{pelikan:2006:hboa}'s Hierarchical Bayesian Optimization
 Algorithm~(hBOA) and \cite{thierens:2010:ltga}'s Linkage Tree Genetic Algorithm~(LTGA)
 both only require a single parameter: population size. \cite{posik:2011:parameterless}
-leveraged these methods to create a fully parameter-less algorithm which was restricted
-only to order-k fully decomposable noiseless problems.
+leveraged model building to create a fully parameter-less algorithm, but it is restricted to
+only order-k fully decomposable noiseless problems.
 
 Most recently \cite{goldman:2014:p3} introduced the Parameter-less Population Pyramid~(P3).
 This method combines model based search with a local search operator using a pyramid structure
@@ -272,10 +272,33 @@ would perform exactly $2N-2$ evaluations for each of the $\mu$ in the population
 required to make clustering only $O(N)$ operations per evaluation. However, but skipping some evaluations, its
 possible that clustering may be super-linear.
 
-~\cite{bosman:2011:lsbbo} % LTGA with hill climbing
+By design, LTGA only has a single parameter: population size. LTGA uses no mutation, and crossover is defined
+in terms of the clustering algorithm. Selection between generations is fully elitist and embedded in the crossover,
+with selection of model building solutions fixed to a binary tournament. Neither \Call{Cluster-Creation}{} nor
+\Call{Cluster-Usage}{} rely on parameter values. LTGA does not provide any method for controlling or setting
+the population size, and uses a fixed user specified size for each generation.
 
-\subsection{P3}
-Figure~\ref{fig-p3}.
+\subsection{Parameter-less Population Pyramid}
+\cite{goldman:2014:p3} introduced the Parameter-less Population Pyramid (P3) as a method for
+performing optimization which did not require the user to provide any parameters. This is
+achieved by combining efficient local search with the model building methods of LTGA using
+an iteratively constructed hierarchy of populations.
+
+The high level algorithm of P3 is presented in Figure~\ref{fig-p3}. Unlike more traditional
+genetic algorithms, P3 does not follow a generational model. Instead, it maintains an iteratively
+expanding pyramid of expanding populations. Each iteration, a new random solution is generated.
+This solution is brought to a local optimum using the algorithm in Figure~\ref{fig-hc}. If that
+local optimum has not been added to the pyramid yet, the solution is added to the lowest
+population $P_0$.
+
+Next, the solution is iteratively improved by applying LTGA's crossover algorithm (Figure~\ref{fig-cluster-usage})
+with each population $P_i$ in the pyramid. If this process results in a strict fitness improvement and has
+created a solution not yet stored in the pyramid, it is added to the next highest pyramid level $P_{i+1}$.
+If $P_{i+1}$ does not yet exist, it is created. In this way populations in the pyramid expand over time,
+and the number of populations stored increases over time. Initially the pyramid contains no solutions
+or populations, meaning the user does not need to specify a population size.
+
+
 \begin{figure}
   \begin{algorithmic}[1]
   \Procedure{Iterate-P3}{}
@@ -303,13 +326,41 @@ Figure~\ref{fig-p3}.
   \label{fig-p3}
 \end{figure}
 
-~\cite{goldman:2014:p3}
+To accommodate P3's unique population structure, some of LTGA's clustering procedures needed
+to be adapted. In LTGA
+clusters are identified at the start of each generation, with those clusters used
+to create all solutions produced in that generation. As P3 does not perform serial
+generations, this process had to be modified. Instead, P3 updates the model each
+time a solution is added to a population, the model is rebuilt. Furthermore, unlike
+LTGA all solutions in the population are used to generate the model, not just the
+winners of a binary tournament. This selection process is not necessary as the
+worst solutions in the pyramid are already high quality due to local search.
+Using local search in LTGA was examined by \cite{bosman:2011:lsbbo} and found
+to provide no significant improvement.
 
-Figure~\ref{fig-cluster-creation} Line~\ref{fig-cluster-creation-ordering}.
+Beyond the changes in population structuring, P3 also has slight modifications to
+LTGA's version of \Call{Cluster-Creation}{} and \Call{Cluster-Usage}{}.
+P3 changes Line~\ref{fig-cluster-creation-ordering} in Figure~\ref{fig-cluster-creation}
+from \emph{last merged first} ordering to \emph{smallest first} ordering.
+This method applies gene clusters during crossover based on how many genes
+are in each cluster\footnote{Ties are broken randomly.}, and not on how tightly linked those genes are.
+\cite{goldman:2012:ltga} found that this alternative was better at preserving
+diversity, and therefore required smaller populations, but was not integrated into
+our chosen canonical LTGA variant.
 
-Figure~\ref{fig-cluster-usage} Line~\ref{fig-cluster-usage-donate}.
+P3 also modified Line~\ref{fig-cluster-usage-donate} in Figure~\ref{fig-cluster-usage}.
+Instead of choosing a single genetic donor for each cluster, P3 iterates over the
+population in a random order until a solution in the population is found which
+has a least one gene different for that cluster of genes than the improving solution.
+This process increases the likelihood of an evaluation being performed for every cluster,
+and helps test rare gene patterns in the population.
+
+TODO Explain higher computational costs
 
 ~\cite{hornby:2006:alps}
+
+
+TODO Explain more than the sum of its parts
 
 \subsection{hBOA}
 
