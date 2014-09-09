@@ -355,22 +355,117 @@ has a least one gene different for that cluster of genes than the improving solu
 This process increases the likelihood of an evaluation being performed for every cluster,
 and helps test rare gene patterns in the population.
 
-TODO Explain higher computational costs
+In LTGA the cost of rebuilding the model is $O(\mu N^2)$ as it must collect pairwise
+gene frequency information for all $\mu$ solutions in the population. P3 does not store
+a single population, and it does not have a fixed $\mu$ size for any population. However,
+each time a solution is added to the population, it requires $O(N^2)$ time to update
+the table of pairwise frequencies and another $O(N^2)$ time to rebuild the linkage model.
+The model is then used immediately to perform up to one evaluation for each of the up
+to $2N-2$ clusters. Therefore similar to LTGA if no evaluation shortcuts were made P3
+will have an amortized cost of $O(N)$ modeling cost per evaluation. While P3 does
+rebuild the model more frequently per solution in the population, it also performs
+a number of local search evaluations which are quite efficient, meaning theoretical
+comparisons of their speed are difficult to perform. As a final note, P3's repeated
+attempts to find a useful donation make it less likely than LTGA to skip evaluations,
+but has an added cost to find these donations. Repeated donations could require as much
+as $O(\mu)$ donations per evaluation, but experimental evidence suggest that this
+operation actually saves more time than it costs by increasing the number of evaluations
+per model rebuild.
 
-~\cite{hornby:2006:alps}
+Each of the pieces of the P3 algorithm were selected not just for their stand alone efficacy,
+but for the ways in which they interact. By using the hill climber to ensure each solution
+is at a local optima, the underlying pairwise relationships in the problem are exposed. As
+a result detecting clusters for use by crossover is much more effective. The crossover operator
+is extremely elitist, as each gene donation must result in no fitness loss, and a solution must
+strictly improve to be added to the next level of the pyramid. This is balanced by continual
+integration of new random solutions. Furthermore, each random restart decreases the probability
+of spurious linkages caused by shared ancestry. This diversity is further preserved by applying
+gene clusters in smallest first order during crossover as this reduces the probability of genetic
+hitchhikers.
 
+Other algorithms have proposed using multiple concurrent populations.
+\cite{hornby:2006:alps} had a hierarchy of populations with solutions periodically advancing
+upward. This allowed for continuous integration of diversity as the lowest population is reseeded
+with random solutions. However, this method resulted in increased parameterization as not only was
+a population size required, parameters for how frequently generations advanced between levels and
+how many total levels to have were added. \cite{harik:1999:parameterlessga} used multiple independent
+populations of different sizes as a method for removing the population size parameter, but
+doing was provably less efficient than using an optimal population size.
 
-TODO Explain more than the sum of its parts
+\subsection{Hierarchical Bayesian Optimization Algorithm}
 
-\subsection{hBOA}
+\cite{pelikan:2006:hboa} used statistical principles in combination with a decision tree structure
+to create the Hierarchical Bayesian Optimization Algorithm (hBOA). This method creates a model of
+epistatic relationships between genes which is then used to stochastically generate new solutions.
+Each generation a binary tournament with replacement is used to selection $\mu$ solutions from
+the population. These solutions are then used to build the model used to generate $\mu$ new
+solutions. The new solutions are then integrated into the population using restricted tournament
+replacement.
 
-~\cite{pelikan:2006:hboa}
+Conceptually, the model built by hBOA is trying to infer rules of the form ``Given that this
+subset of genes are set to these values, how frequently is gene x set to value v?'' This can
+be represented using a decision forest, with each tree in the forest representing one gene
+in the solution. In the decision tree $T_i$, which is used to set the value of gene $x_i$,
+Each internal node represents previous decisions on how to set
+some other gene $x_j$, with the children of that node representing how the decision was made. The
+leaves of each tree give the probability that $x_i$ should be set to each possible value.
+Therefore in binary alphabets binary trees with a single probability $p$ stored at each leaf
+can be used, where $p$ is the probability $x_i$ should be set to one.
+
+The forest is constructed iteratively, with each tree initially containing a single leaf
+with each leaf storing a pointer to all selected solutions. Each iteration the algorithm considers
+all possible ways of splitting an existing leaf using another gene $x_j$, such that solutions in the
+leaf are moved to the newly created leaves based on their value for $x_j$. The general goal is to
+separate the solutions such that all solutions with $x_i = 0$ move to one leaf while solutions with
+$x_j = 1$ move to the other. Each possible split is scored using Equation~\ref{eq-hboa} with the best
+split kept. This process continues until none of the splits result in a higher quality. To favor compact
+models, Equation~\ref{eq-hboa} is scaled by Equation~\ref{eq-hboa-stop}, which provides increased cost
+for more total leaves.
+
+\begin{equation}
+  BDe(B) = p(B)\prod_{i=0}^{N}\prod_{l\in L_i} \frac{\Gamma(m'_i(l))}{\Gamma(m_i(l) + m'_i(l))}
+  \prod_{x_i}\frac{\Gamma(m_i(x_i, l) + m'_i(x_i,l))}{\Gamma(m'_i(x_i,l))}
+  \label{eq-hboa}
+\end{equation}
+
+\begin{equation}
+  p(B) = c2^{-0.5(\sum_i|L_i|)log_2\mu}
+  \label{eq-hboa-stop}
+\end{equation}
+
+While Equation~\ref{eq-hboa} is very complex and almost always results in near infinitesimal results, many
+of the terms can be canceled out as it is only important to know the relative quality between two models:
+$BDe(B) < BDe(B')$.
+The outermost product of Equation~\ref{eq-hboa} iterates over all trees in the forest. However, each split
+can modify only one of the trees and therefore the contribution of all others can be canceled. The middle
+product is across all leaves in the tree. Again since only one leaf can be changed, all other terms can
+be canceled. By convention hBOA uses uninformed Bayesian priors of $m'_i(l)= 2$ and $m'_i(x_i, l)=1$ for
+binary alphabets. As the $\Gamma(n) = (n-1)!$ this means the top term in the middle product and the bottom
+term in the third product reduce to 1. The only remaining terms are then $m_i(l)$ and $m_i(x_i, l)$ which
+represent the number of solutions which reached leaf $l$ and the number of solutions which reached leaf $l$
+with a specific value, respectively.
+
+Equation~\ref{eq-hboa-stop} can also be simplified when doing comparisons. The only difference for $p(B)$ and $p(B')$ is the total
+number of leaves ($\sum_i|L_i|$) has increased by 1. Therefore the ratio simplifies to $2^{0.5 log_2\mu}$ regardless of
+actual model size.
+
+All combined, this means the expression $BDe(B) < BDe(B')$ can be calculated using Equation~\ref{eq-hboa-final},
+where B' is different from B by exactly 1 split, such that $l$ was split to create $l'$ and $l''$. Only splits that
+satisfy this inequality are considered enough to keep. Furthermore, whichever split maximizes the right side of the
+Equation~\ref{eq-hboa-final} is chosen each iteration. Note that these factorials can be exceedingly large and
+therefore its imperative that implementations avoid rounding errors and overflows.
+
+\begin{equation}
+  2^{0.5 log_2\mu} < \frac{(m_i(l) + 1)!}{m_i(0, l)!m_i(1,l)!} \cdot
+  \frac{m_i(0, l')!m_i(1,l')!m_i(0, l'')!m_i(1,l'')!}{(m_i(l') + 1)!(m_i(l'') + 1)!}
+  \label{eq-hboa-final}
+\end{equation}
 
 \subsection{Parameter-less hBOA}
 ~\cite{pelikan:2004:parameterlesshboa}
 
 \subsection{$1+(\lambda, \lambda)$}
-\cite{doerr:2013:lambdalambda} was the first genetic algorithm to provably show
+\cite{doerr:2013:lambdalambda} presented the first genetic algorithm to provably show
 the advantages of performing crossover on simple landscapes. This comparatively simple
 algorithm maintains only a single individual and a self-controlled parameter $\lambda$.
 
