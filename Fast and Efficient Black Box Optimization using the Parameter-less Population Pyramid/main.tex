@@ -56,24 +56,23 @@ problems~\citep{Wolpert:1997:nfl}, effectiveness can be achieved by assuming the
 landscape has structure and then biasing the algorithm toward exploiting those features.
 
 In evolutionary optimization, and genetic algorithms~(GAs) in particular, search is often
-biased through parameters. This is beneficial as it allows practitioners to inject their
-knowledge about the shape of the search landscape into the algorithm. However, it can require
-expert knowledge to leverage this feature to its fullest potential or require exceedingly expensive
-parameter tuning~\citep{grefenstette:1986:optimalga}. Furthermore, the quality of solutions found,
-and the speed at which they are found, in GAs is strongly tied to setting these parameters
-correctly~\citep{goldberg:1991:gasize}. Parameters such as population size, mutation rate, crossover
+biased through parameters. This can be beneficial as it allows practitioners to inject their
+knowledge about the shape of the search landscape into the algorithm.
+However, the quality of solutions found, and the speed at which they are found, is strongly tied to setting these parameters
+correctly~\citep{goldberg:1991:gasize}. As such expert knowledge or exceedingly
+expensive parameter tuning~\citep{grefenstette:1986:optimalga} may be required to leverage
+this feature to its fullest potential. Furthermore,  Parameters such as population size, mutation rate, crossover
 rate, tournament size, etc can have no clear relationship to the problem being solved, meaning even
-domain experts may not understand how they will interact with the problem or each other.
+domain experts may not understand how they will interact with the problem or with each other.
 
 As such there has been periodic efforts to reduce or remove the need for parameter tuning.
-\cite{Back:1992:selfadapt} introduced self-adaptive parameters, where parameter values
+\cite{Back:1992:selfadapt} introduced self-adaptive parameters, in which parameter values
 were included in each solution's genome and underwent evolution. This allowed search
-to optimize some of its own parameters and therefore reduced the need for expert tuning.
+to optimize some of its own parameters resulting in a reduced the need for expert tuning.
 \cite{harik:1999:parameterlessga} was able to design an entirely parameter-less GA by
 designing control strategies which made on line modifications to each parameter based
 on how well search was progressing. Unfortunately these methods were provably less efficient
-than correctly setting the parameters by up to a logarithmic
-factor~\citep{pelikan:1999:worstparameter-less}.
+than directly setting the parameters to optimal values~\citep{pelikan:1999:worstparameter-less}.
 
 One area that has been very effective at reducing the number of algorithm parameters has been
 model based search. \cite{pelikan:2006:hboa}'s Hierarchical Bayesian Optimization
@@ -83,11 +82,11 @@ leveraged model building to create a fully parameter-less algorithm, but it is r
 only order-k fully decomposable noiseless problems.
 
 Most recently \cite{goldman:2014:p3} introduced the Parameter-less Population Pyramid~(P3).
-This method combines model based search with a local search operator using a pyramid structure
-of populations to achieve parameter-less optimization. Initial results suggest that unlike
+This method uses a pyramid structure of populations to combine model based search with local search
+to achieve parameter-less optimization. Initial results suggest that unlike
 previous parameter-less methods, P3 is actually more efficient than current state-of-the-art
 parameterized search algorithms. In this work we shall extend these results to cover more
-comparison algorithms, results on both efficiency in reaching the global optimum and intermediate
+comparison algorithms, compare both efficiency in reaching the global optimum and intermediate
 fitnesses, algorithm complexity analysis, and provide more in depth analysis of P3 itself.
 \begin{comment}
 Section~\ref{sec-optimizers}
@@ -107,13 +106,12 @@ and given in Figure~\ref{fig-hc}. This algorithm works by flipping each bit in a
 order, keeping modifications when fitness is improved, until doing so cannot result in
 further fitness improvements.
 
-The hill climber requires $O(1)$ operations per evaluation amortized cost. In order to
-terminate, it must perform at least $N$ evaluations, where $N$ is the number of bits
-in the solution, in order to ensure no single bit flip can result in a fitness improvement.
+The hill climber requires an amortized cost of $O(1)$ operations per evaluation. In order to
+terminate, at least one evaluation must be performed for each of the $N$ bits in the solution.
 As such any operation that happens only once per search can be amortized over at least $N$
 evaluations, covering the initialization of $options$.
 
-Assuming proper hashing data structures, determining if $index \notin tried$ should require only $O(1)$
+Using proper hashing data structures, determining if $index \notin tried$ requires $O(1)$
 time. While this operation may be called without a directly related evaluation, amortized cost
 provides an upper bound. Consider that in order to add an $index$ into $tried$ an evaluation must
 be performed. Lets say this evaluation pays for two checks of that $index$, one of which was used
@@ -156,8 +154,8 @@ can only be called twice per evaluation.
 detects and exploits problem epistasis by examining pairwise gene entropy. Due to its enhanced
 ability to preserve high fitness gene subsets, LTGA was able to outperform state of the art
 GAs across many benchmarks. Since its first proposal, many variants of LTGA have been
-proposed~\citep{goldman:2012:ltga}. Therefore for clarity we have chosen the version
-presented by \cite{thierens:2013:ltgahiff} as our model for comparison as it is both
+proposed~\citep{goldman:2012:ltga} so for clarity we have chosen the version
+presented by \cite{thierens:2013:ltgahiff} as our model. This variant was chosen as it is
 modern and appears to approach the consensus in the literature.
 
 LTGA's effectiveness comes from its method of performing crossover. Instead of blindly
@@ -195,7 +193,7 @@ This algorithm will create a tree of sets, such that the leaves of the tree cont
 nodes are the union of their children's sets. These sets are then used by crossover to specify epistatic
 relationships which should be preserved.
 The process begins by creating the set of sets $unmerged$ which tracks all top level clusters. Initially
-$unmerged$ contains single member sets for each gene. Each iteration the two sets with the minimum pairwise
+$unmerged$ contains single member sets for each gene. Each iteration the two sets with the minimum average pairwise
 distance (given in Equation~\ref{eq-distance}) are merged to create a single cluster. This process is repeated
 until only a single set remains in $unmerged$ which contains all of the genes in the genome.
 
@@ -214,9 +212,9 @@ This set begins with all genes in separate clusters, and each time a new cluster
 However, not all clusters are necessarily worth keeping. For instance, in all versions of LTGA the cluster
 containing all genes is removed from $useful$ as preserving all genes during crossover can only create clones.
 \cite{thierens:2013:ltgahiff} extended this removal to include any unsupported subsets. If the pairwise distance
-between two clusters is 0, this means there are no individuals in the population which disrupt the values stored in
-each cluster. Therefore when performing crossover there is no reason to believe a fitness improvement can be achieved
-by breaking the stored pattern. As such only clusters who's direct superset has non-zero distance are kept.
+between two clusters is 0, this means there are no individuals in the population which disrupt the relationships between the two
+clusters. Therefore when performing crossover there is no reason to believe a fitness improvement can be achieved
+by breaking the stored pattern. As such a cluster is only kept if its direct superset has a non-zero distance.
 
 \cite{thierens:2013:ltgahiff}'s version of LTGA does not use the entire population when determining pairwise entropy.
 Instead, binary tournament use used to select half of the population. This is done to ensure the model is built
@@ -261,16 +259,20 @@ Each generation, each individual in the population undergoes crossover. In a sin
 cluster of genes $C_i$ in $useful$ is applied in last merged first order as a crossover mask. A random donor $d$
 is chosen from the entire population (not just the model selected population), and $d$'s gene's for $C_i$ are copied
 into the working solution. If a modification is made, an evaluation is then performed. If the crossover
-resulted in no worse fitness than the changes are kept. This allows for neutral drift across plateaus.
+resulted in no worse fitness then the changes are kept. This allows for neutral drift across plateaus.
 The resulting solution, which must be at least as fit as its parent, is then
 copied into the next generation.
 
 
 In total each individual can cause up to $|useful|$ evaluations. If all clusters were kept, even those deemed
 unhelpful, and all donations were evaluated, even those which did not change any genes, then \Call{Cluster-Usage}{}
-would perform exactly $2N-2$ evaluations for each of the $\mu$ in the population. This provides the amortizing evaluations
-required to make clustering only $O(N)$ operations per evaluation. However, but skipping some evaluations, its
+would perform exactly $2N-2$ evaluations for each of the $\mu$ solutions in the population. This provides the amortizing evaluations
+required to make clustering only $O(N)$ operations per evaluation. However, by skipping some evaluations, its
 possible that clustering may be super-linear.
+
+LTGA has no explicit form of diversity control and has no method for introducing new genetic information once
+the population has converged. Therefore an LTGA run is considered converged once two consecutive populations
+contain the same unique solutions.
 
 By design, LTGA only has a single parameter: population size. LTGA uses no mutation, and crossover is defined
 in terms of the clustering algorithm. Selection between generations is fully elitist and embedded in the crossover,
@@ -280,15 +282,15 @@ the population size, and uses a fixed user specified size for each generation.
 
 \subsection{Parameter-less Population Pyramid}
 \cite{goldman:2014:p3} introduced the Parameter-less Population Pyramid (P3) as a method for
-performing optimization which did not require the user to provide any parameters. This is
+performing optimization which does not require the user to provide any parameters. This is
 achieved by combining efficient local search with the model building methods of LTGA using
 an iteratively constructed hierarchy of populations.
 
 The high level algorithm of P3 is presented in Figure~\ref{fig-p3}. Unlike more traditional
-genetic algorithms, P3 does not follow a generational model. Instead, it maintains an iteratively
+GAs, P3 does not follow a generational model. Instead, it maintains an iteratively
 expanding pyramid of expanding populations. Each iteration, a new random solution is generated.
 This solution is brought to a local optimum using the algorithm in Figure~\ref{fig-hc}. If that
-local optimum has not been added to the pyramid yet, the solution is added to the lowest
+local optimum has not yet been added to the pyramid, the solution is added to the lowest
 population $P_0$.
 
 Next, the solution is iteratively improved by applying LTGA's crossover algorithm (Figure~\ref{fig-cluster-usage})
@@ -331,7 +333,7 @@ to be adapted. In LTGA
 clusters are identified at the start of each generation, with those clusters used
 to create all solutions produced in that generation. As P3 does not perform serial
 generations, this process had to be modified. Instead, P3 updates the model each
-time a solution is added to a population, the model is rebuilt. Furthermore, unlike
+time a solution is added to a population. Furthermore, unlike
 LTGA all solutions in the population are used to generate the model, not just the
 winners of a binary tournament. This selection process is not necessary as the
 worst solutions in the pyramid are already high quality due to local search.
@@ -345,13 +347,13 @@ from \emph{last merged first} ordering to \emph{smallest first} ordering.
 This method applies gene clusters during crossover based on how many genes
 are in each cluster\footnote{Ties are broken randomly.}, and not on how tightly linked those genes are.
 \cite{goldman:2012:ltga} found that this alternative was better at preserving
-diversity, and therefore required smaller populations, but was not integrated into
+diversity, and therefore required smaller populations, but has  not been integrated into
 our chosen canonical LTGA variant.
 
 P3 also modified Line~\ref{fig-cluster-usage-donate} in Figure~\ref{fig-cluster-usage}.
 Instead of choosing a single genetic donor for each cluster, P3 iterates over the
 population in a random order until a solution in the population is found which
-has a least one gene different for that cluster of genes than the improving solution.
+has a least one gene different for that cluster of genes from the improving solution.
 This process increases the likelihood of an evaluation being performed for every cluster,
 and helps test rare gene patterns in the population.
 
@@ -368,8 +370,8 @@ a number of local search evaluations which are quite efficient, meaning theoreti
 comparisons of their speed are difficult to perform. As a final note, P3's repeated
 attempts to find a useful donation make it less likely than LTGA to skip evaluations,
 but has an added cost to find these donations. Repeated donations could require as much
-as $O(\mu)$ donations per evaluation, but experimental evidence suggest that this
-operation actually saves more time than it costs by increasing the number of evaluations
+as $O(\mu)$ attempts per evaluation, but experimental evidence suggest that this
+operation actually saves more overhead than it costs by increasing the number of evaluations
 per model rebuild.
 
 Each of the pieces of the P3 algorithm were selected not just for their stand alone efficacy,
@@ -385,12 +387,13 @@ hitchhikers.
 
 Other algorithms have proposed using multiple concurrent populations.
 \cite{hornby:2006:alps} had a hierarchy of populations with solutions periodically advancing
-upward. This allowed for continuous integration of diversity as the lowest population is reseeded
+upward. This allows for continuous integration of diversity as the lowest population is reseeded
 with random solutions. However, this method resulted in increased parameterization as not only was
 a population size required, parameters for how frequently generations advanced between levels and
 how many total levels to have were added. \cite{harik:1999:parameterlessga} used multiple independent
 populations of different sizes as a method for removing the population size parameter, but
-doing was provably less efficient than using an optimal population size.
+doing was provably less efficient than using an optimal population size as no information is shared
+between the populations.
 
 \subsection{Hierarchical Bayesian Optimization Algorithm}
 
@@ -398,32 +401,32 @@ doing was provably less efficient than using an optimal population size.
 to create the Hierarchical Bayesian Optimization Algorithm (hBOA). This method creates a model of
 epistatic relationships between genes which is then used to stochastically generate new solutions.
 Each generation a binary tournament with replacement is used to selection $\mu$ solutions from
-the population. These solutions are then used to build the model used to generate $\mu$ new
+the population. These solutions are then used to build the model, which in turn is used to generate $\mu$ new
 solutions. The new solutions are then integrated into the population using restricted tournament
 replacement.
 
 Conceptually, the model built by hBOA is trying to infer rules of the form ``Given that this
-subset of genes are set to these values, how frequently is gene x set to value v?'' This can
-be represented using a decision forest, with each tree in the forest representing one gene
+subset of genes are set to these values, how frequently is gene $x_i$ set to value v?'' This can
+be represented using a directed acyclic decision forest, with each tree in the forest representing one gene
 in the solution. In the decision tree $T_i$, which is used to set the value of gene $x_i$,
-Each internal node represents previous decisions on how to set
+each internal node represents previous decisions on how to set
 some other gene $x_j$, with the children of that node representing how the decision was made. The
 leaves of each tree give the probability that $x_i$ should be set to each possible value.
 Therefore in binary alphabets binary trees with a single probability $p$ stored at each leaf
 can be used, where $p$ is the probability $x_i$ should be set to one.
 
 The forest is constructed iteratively, with each tree initially containing a single leaf
-with each leaf storing a pointer to all selected solutions. Each iteration the algorithm considers
+and with each leaf storing a pointer for each selected solution. Each iteration the algorithm considers
 all possible ways of splitting an existing leaf using another gene $x_j$, such that solutions in the
 leaf are moved to the newly created leaves based on their value for $x_j$. The general goal is to
 separate the solutions such that all solutions with $x_i = 0$ move to one leaf while solutions with
-$x_j = 1$ move to the other. Each possible split is scored using Equation~\ref{eq-hboa} with the best
-split kept. This process continues until none of the splits result in a higher quality. To favor compact
+$x_j = 1$ move to the other. Whichever split maximizes Equation~\ref{eq-hboa} is then kept.
+This process continues until none of the splits result in a higher quality model than the current one. To favor compact
 models, Equation~\ref{eq-hboa} is scaled by Equation~\ref{eq-hboa-stop}, which provides increased cost
 for more total leaves.
 
 \begin{equation}
-  BDe(B) = p(B)\prod_{i=0}^{N}\prod_{l\in L_i} \frac{\Gamma(m'_i(l))}{\Gamma(m_i(l) + m'_i(l))}
+  BDe(B) = \prod_{i=0}^{N}\prod_{l\in L_i} \frac{\Gamma(m'_i(l))}{\Gamma(m_i(l) + m'_i(l))}
   \prod_{x_i}\frac{\Gamma(m_i(x_i, l) + m'_i(x_i,l))}{\Gamma(m'_i(x_i,l))}
   \label{eq-hboa}
 \end{equation}
@@ -435,23 +438,23 @@ for more total leaves.
 
 While Equation~\ref{eq-hboa} is very complex and almost always results in near infinitesimal results, many
 of the terms can be canceled out as it is only important to know the relative quality between two models:
-$BDe(B) < BDe(B')$.
+$p(B)BDe(B) < p(B')BDe(B')$.
 The outermost product of Equation~\ref{eq-hboa} iterates over all trees in the forest. However, each split
 can modify only one of the trees and therefore the contribution of all others can be canceled. The middle
 product is across all leaves in the tree. Again since only one leaf can be changed, all other terms can
 be canceled. By convention hBOA uses uninformed Bayesian priors of $m'_i(l)= 2$ and $m'_i(x_i, l)=1$ for
-binary alphabets. As the $\Gamma(n) = (n-1)!$ this means the top term in the middle product and the bottom
+binary alphabets. As $\Gamma(n) = (n-1)!$ this means the top term in the middle product and the bottom
 term in the third product reduce to 1. The only remaining terms are then $m_i(l)$ and $m_i(x_i, l)$ which
 represent the number of solutions which reached leaf $l$ and the number of solutions which reached leaf $l$
 with a specific value, respectively.
 
 Equation~\ref{eq-hboa-stop} can also be simplified when doing comparisons. The only difference for $p(B)$ and $p(B')$ is the total
 number of leaves ($\sum_i|L_i|$) has increased by 1. Therefore the ratio simplifies to $2^{0.5 log_2\mu}$ regardless of
-actual model size.
+total model size.
 
 All combined, this means the expression $BDe(B) < BDe(B')$ can be calculated using Equation~\ref{eq-hboa-final},
 where B' is different from B by exactly 1 split, such that $l$ was split to create $l'$ and $l''$. Only splits that
-satisfy this inequality are considered enough to keep. Furthermore, whichever split maximizes the right side of the
+satisfy this inequality are considered good enough to keep. Furthermore, whichever split maximizes the right side of the
 Equation~\ref{eq-hboa-final} is chosen each iteration. Note that these factorials can be exceedingly large and
 therefore its imperative that implementations avoid rounding errors and overflows.
 
@@ -461,27 +464,76 @@ therefore its imperative that implementations avoid rounding errors and overflow
   \label{eq-hboa-final}
 \end{equation}
 
+Initially there are $\Theta(N^2)$ possible ways to split existing leaves, as each of the $N$ single node
+trees can be split by any of the other $N-1$ genes. Each iteration a new edge is added to the decision
+forest, meaning some of the previously tested splits cannot be used. For instance, if $T_i$, which is used
+to decide the value of $x_i$, is split using the value of $x_j$, $T_j$ can no longer be split using $x_i$.
+As a split creates two new leaves, $O(N)$ new potential splits must also be tested. Equation~\ref{eq-hboa-final}
+parses all solutions which reach a leaf to count gene frequencies, requiring $\mu$ time.
+The number of total leaves created depends heavily on the problem and $\mu$.
+However, assuming no splits are accepted or that the cost of testing all future splits is less than
+the initial $\Theta(N^2)$, constructing the model requires $\Omega(\mu N^2)$ time. Each
+model is used to generate $\mu$ solutions, leading to a cost per evaluation of $\Omega(N^2)$.
+
+To generate a solution, the value of each gene $x_i$ is set using its corresponding decision tree $T_i$. Because
+the forest is directed acyclic, there must be an ordering of $T_i$ such that before $T_i$ is executed all
+$x_j$ it uses to make decisions have already been set. As such, previous decisions made by other trees
+are used to follow each $T_i$ until a leaf is reached. The value of $x_i$ is then set based on the
+probably that other solutions reached that leaf with each value of $x_i$.
+
+To perform replacement, hBOA uses restricted tournament replacement. After each new solution is generated
+and evaluated, $w$ solutions are chosen at random from the population, where $w=\min\{N, \frac{\mu}{20}\}$.
+Whichever of the $w$ solutions is the most genetically similar to the offspring is compared with the offspring.
+If the fitness of the offspring is no worse, it replaces the genetically similar member of $w$, otherwise the
+offspring is discarded. This method is designed to preserve genetic diversity as only genetically similar
+solutions must compete on fitness.
+
+To model properly, hBOA is designed to work with large population sizes, resulting in a large number of
+evaluations per generation. As hBOA utilizes explicit diversity maintenance, standard methods for determining
+convergence are not considered very accurate. Therefore the authors suggest that an hBOA run should be
+terminated after performing generations equal to $N$.
+
+Like other model based techniques, hBOA has very few parameters. There is no mutation or crossover,
+and modeling does not rely on any explicit parameters. Solution selection, generation, and replacement
+are all derived from the population size, which must be set by the user.
+
 \subsection{Parameter-less hBOA}
-~\cite{pelikan:2004:parameterlesshboa}
+Using the methods first introduced by \cite{harik:1999:parameterlessga} for the Parameter-less GA,
+\cite{pelikan:2004:parameterlesshboa} created Parameter-less hBOA which automatically scales its
+population size to fit the problem. This is done by maintaining a list of concurrent populations
+using exponentially scaled population sizes.
+
+A run of Parameter-less hBOA starts with a single population of size $\mu_0$, conventionally set
+to $\mu_0=10$. After two generations are performed, a new population of size $\mu_1 = 2\mu_0$ is created
+and performs a generation. Evolution then continues with the $\mu_0$ population performing two generations
+for each one performed by $\mu_1$. Each time population $\mu_i$ performs its second generation a new population
+$\mu_{i+1}=2\mu_i$ is created, which performs generations half as often as $\mu_i$. In this way an infinite number of
+parallel population can be simulated, with each population receiving the same number of total evaluations.
+
+In all other aspects each population is identical to an hBOA population using a fixed $\mu$. No search information
+is shared among populations, and each search is independently terminated. As such Parameter-less hBOA cannot
+perform better than hBOA using the optimal population size for a given instance, as it must also spend evaluations
+on populations of different sizes. This inefficiency is bounded by a log multiple of the total number of
+evaluations~\citep{pelikan:1999:worstparameter-less}.
 
 \subsection{$1+(\lambda, \lambda)$}
 \cite{doerr:2013:lambdalambda} presented the first genetic algorithm to provably show
 the advantages of performing crossover on simple landscapes. This comparatively simple
 algorithm maintains only a single individual and a self-controlled parameter $\lambda$.
 
-Each iteration, a number of bits to flip is chosen from the binomial distribution $b\sim B(N, \frac{\lambda}{N})$.
+Each iteration, the number of bits to flip is chosen from the binomial distribution $b\sim B(N, \frac{\lambda}{N})$.
 Next, $\lfloor\lambda\rfloor$ offspring are produced by flipping $b$ bits. The
 best mutant then produces $\lambda$ offspring via uniform crossover with the original parent, such that each gene comes from the
 mutant with probability $\frac{1}{\lambda}$. In the original algorithm the best
 offspring produced by crossover then replaces the original parent if its fitness is no worse.
 The $\lambda$ parameter, which is initialized to 1, is decreased if the offspring replaced
-its parent and decreased otherwise.
+its parent and increased otherwise.
 
 The original formulation was designed specifically for unimodal landscapes and as such were
-not directly suitable for multimodal problems. \cite{goldman:2014:p3} extended the $1+(\lambda, \lambda)$
+not directly suitable for multimodal problems. \cite{goldman:2014:p3} extended $1+(\lambda, \lambda)$
 to include random restarts. As search stagnates, the $\lambda$ parameter increases in value. Eventually
-this results in $\lambda \ge N$. This results in mutation flipping all bits of the individual, preventing
-useful exploration. Therefore whenever $\lambda \ge N$, search is restarted from a random solution with $\lambda$
+this results in $\lambda \ge N$ causing mutation to always flip all bits of the individual.
+As this prevents any future improvement whenever $\lambda \ge N$ search is restarted from a random solution with $\lambda$
 reset to 1.
 
 A few other efficiency modifications were also made. If there is a tie in crossover offspring fitness,
