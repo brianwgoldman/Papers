@@ -546,15 +546,70 @@ against the original parent.
 
 \section{Problem Descriptions}
 \label{sec-problems}
+TODO Consider adding paragraph about problem equivalence.
 
 \subsection{Single Instance Problems}
-~\cite{goldberg:1991:gasize} % Deceptive Trap
+Understanding how a stochastic search algorithm will behave on arbitrary and complex
+search landscapes can be exceedingly difficult. Therefore a common practice for
+algorithm understanding is to perform search on well defined, well understood
+landscapes. To be of interest these landscapes need to represent interesting
+and important challenges aspects of real world problems.
 
-~\cite{goldman:2012:ltga} % Deceptive Step Trap
+Perhaps the most common such landscape is the Deceptive Trap problem \citep{goldberg:1991:gasize}.
+In this landscape the genome is broken up into $k$ sized fully decomposable subproblems referred
+to as traps.
+Each subproblem is scored using Equation~\ref{eq-deceptive-trap}, where $t$ is the number of
+bits in the trap set to 1. To global optimum in each trap is a string of all 1s, while all
+other solutions lead to a local optima of all 0s. As a result this problem tests an algorithms
+ability to overcome $k$ sized deception and is commonly used to determine how effective crossover
+is at preserving building blocks. Any crossover event that mixes bits from different parents in
+the same trap will likely result in that trap being optimized to the local optima. For our experiments
+we chose $k=7$ to ensure highly deceptive traps.
 
-~\cite{thierens:2013:ltgahiff} % HIFF
+\begin{equation}
+   trap(t) = \left\{
+     \begin{array}{rl}
+       k-1-t, &  t<k\\
+       k,   &  t = k
+     \end{array}
+   \right.
+  \label{eq-deceptive-trap}
+\end{equation}
 
-~\cite{goldman:2014:p3} % Rastrigin
+\cite{goldman:2012:ltga} found that mixing local search with linkage learning rendered the Deceptive
+Trap problem trivial. This is because local search is able to optimize each trap to one of the two
+optima (all 1s or all 0s), and then linkage learning can have perfect knowledge of gene interactions.
+In order to make the problem more difficult yet still deceptive, the authors proposed the Deceptive
+Step Trap problem, given in Equation~\ref{eq-deceptive-step-trap}. This function modifies the results
+of Equation~\ref{eq-deceptive-trap} to include plateaus of size $s$, introducing an exponential number
+of local optima in each trap. As a result the Deceptive Step Trap is much more challenging for linkage
+learning techniques, while still being highly deceptive. We chose to use $s=2$ to create the maximum
+number of local optima.
+\begin{equation}
+   step\_trap(t) = \left \lfloor \frac{(k-s)\pmod{s} + trap(t)}{s} \right \rfloor
+  \label{eq-deceptive-step-trap}
+\end{equation}
+
+Another challenging aspect of landscapes can be higher order relationships. For these problems
+the are easily detected main effects as well as larger interrelationships. The Hierarchical If
+and only If (HIFF) problem is designed to capture the difficulties of this class of problem.
+In HIFF the genome is broken up into a complete binary tree, such that each gene appears in exactly one
+leaf and each internal node is the subset of genes contained in its children. If all genes represented
+in a node of the tree are set to the same value, they score equal to the size of the set. In this way
+small subsets lead toward solutions to larger subsets. However a node can score if all genes are either
+all 1s or all 0s, meaning that to solve higher order subproblems it is necessary to perform crossovers
+that preserve lower order solutions. This problem is a natural fit for LTGA as the linkage tree can
+perfectly duplicate the problem's true relationships \citep{thierens:2013:ltgahiff}.
+
+As a final class of well known problems, we have chosen to borrow the Rastrigin problem from real valued
+optization. This problem's landscape, determined by Equation~\ref{eq-rast}, is highly multimodal caused by
+the oscillating cosine function. \cite{goldman:2014:p3} proposed the Discretized Rastrigin problem, such
+that each floating point $x_i$ in Equation~\ref{eq-rast} is encoded using a 10 bit gray code.
+\begin{equation}
+  An + \sum_{i=1}^{n}\left [ x_i^2-A\cos (2\pi x_i) \right ] \forall x\in [-5.12,5.12]
+  \label{eq-rast}
+\end{equation}
+
 
 \subsection{Randomly Generated Problem Classes}
 
