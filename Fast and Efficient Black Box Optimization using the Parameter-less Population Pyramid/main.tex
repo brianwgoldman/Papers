@@ -61,16 +61,16 @@ knowledge about the shape of the search landscape into the algorithm.
 However, the quality of solutions found, and the speed at which they are found, is strongly tied to setting these parameters
 correctly~\citep{goldberg:1991:gasize}. As such expert knowledge or exceedingly
 expensive parameter tuning~\citep{grefenstette:1986:optimalga} may be required to leverage
-this feature to its fullest potential. Furthermore,  Parameters such as population size, mutation rate, crossover
+this feature to its fullest potential. Furthermore,  parameters such as population size, mutation rate, crossover
 rate, tournament size, etc can have no clear relationship to the problem being solved, meaning even
 domain experts may not understand how they will interact with the problem or with each other.
 
-As such there has been periodic efforts to reduce or remove the need for parameter tuning.
+As such there have been periodic efforts to reduce or remove the need for parameter tuning.
 \cite{Back:1992:selfadapt} introduced self-adaptive parameters, in which parameter values
 were included in each solution's genome and underwent evolution. This allowed search
 to optimize some of its own parameters resulting in a reduced the need for expert tuning.
-\cite{harik:1999:parameterlessga} was able to design an entirely parameter-less GA by
-designing control strategies which made on line modifications to each parameter based
+\cite{harik:1999:parameterlessga} were able to design an entirely parameter-less GA by
+designing control strategies which made on-line modifications to each parameter based
 on how well search was progressing. Unfortunately these methods were provably less efficient
 than directly setting the parameters to optimal values~\citep{pelikan:1999:worstparameter-less}.
 
@@ -79,7 +79,7 @@ model based search. \cite{pelikan:2006:hboa}'s Hierarchical Bayesian Optimizatio
 Algorithm~(hBOA) and \cite{thierens:2010:ltga}'s Linkage Tree Genetic Algorithm~(LTGA)
 both only require a single parameter: population size. \cite{posik:2011:parameterless}
 leveraged model building to create a fully parameter-less algorithm, but it is restricted to
-only order-k fully decomposable noiseless problems.
+only order-k, fully decomposable, noiseless problems.
 
 Most recently \cite{goldman:2014:p3} introduced the Parameter-less Population Pyramid~(P3).
 This method uses a pyramid structure of populations to combine model based search with local search
@@ -111,7 +111,7 @@ terminate, at least one evaluation must be performed for each of the $N$ bits in
 As such any operation that happens only once per search can be amortized over at least $N$
 evaluations, covering the initialization of $options$.
 
-Using proper hashing data structures, determining if $index \notin tried$ requires $O(1)$
+With the use of proper hashing data structures, determining if $index \notin tried$ requires $O(1)$
 time. While this operation may be called without a directly related evaluation, amortized cost
 provides an upper bound. Consider that in order to add an $index$ into $tried$ an evaluation must
 be performed. Lets say this evaluation pays for two checks of that $index$, one of which was used
@@ -193,7 +193,7 @@ This algorithm will create a tree of sets, such that the leaves of the tree cont
 nodes are the union of their children's sets. These sets are then used by crossover to specify epistatic
 relationships which should be preserved.
 The process begins by creating the set of sets $unmerged$ which tracks all top level clusters. Initially
-$unmerged$ contains single member sets for each gene. Each iteration the two sets with the minimum average pairwise
+$unmerged$ contains single member sets for each gene. After each iteration the two sets with the minimum average pairwise
 distance (given in Equation~\ref{eq-distance}) are merged to create a single cluster. This process is repeated
 until only a single set remains in $unmerged$ which contains all of the genes in the genome.
 
@@ -289,7 +289,7 @@ an iteratively constructed hierarchy of populations.
 The high level algorithm of P3 is presented in Figure~\ref{fig-p3}. Unlike more traditional
 GAs, P3 does not follow a generational model. Instead, it maintains an iteratively
 expanding pyramid of expanding populations. Each iteration, a new random solution is generated.
-This solution is brought to a local optimum using the algorithm in Figure~\ref{fig-hc}. If that
+This solution is brought to a local optimum using the hill climbing algorithm in Figure~\ref{fig-hc}. If that
 local optimum has not yet been added to the pyramid, the solution is added to the lowest
 population $P_0$.
 
@@ -328,8 +328,7 @@ or populations, meaning the user does not need to specify a population size.
   \label{fig-p3}
 \end{figure}
 
-To accommodate P3's unique population structure, some of LTGA's clustering procedures needed
-to be adapted. In LTGA
+To accommodate P3's unique population structure, some of LTGA's clustering procedures were adapted. In LTGA,
 clusters are identified at the start of each generation, with those clusters used
 to create all solutions produced in that generation. As P3 does not perform serial
 generations, this process had to be modified. Instead, P3 updates the model each
@@ -363,8 +362,8 @@ a single population, and it does not have a fixed $\mu$ size for any population.
 each time a solution is added to the population, it requires $O(N^2)$ time to update
 the table of pairwise frequencies and another $O(N^2)$ time to rebuild the linkage model.
 The model is then used immediately to perform up to one evaluation for each of the up
-to $2N-2$ clusters. Therefore similar to LTGA if no evaluation shortcuts were made P3
-will have an amortized cost of $O(N)$ modeling cost per evaluation. While P3 does
+to $2N-2$ clusters. Just as in LTGA, if no evaluation shortcuts were made, P3
+has an amortized cost of $O(N)$ modeling cost per evaluation. While P3 does
 rebuild the model more frequently per solution in the population, it also performs
 a number of local search evaluations which are quite efficient, meaning theoretical
 comparisons of their speed are difficult to perform. As a final note, P3's repeated
@@ -377,7 +376,7 @@ per model rebuild.
 Each of the pieces of the P3 algorithm were selected not just for their stand alone efficacy,
 but for the ways in which they interact. By using the hill climber to ensure each solution
 is at a local optima, the underlying pairwise relationships in the problem are exposed. As
-a result detecting clusters for use by crossover is much more effective. The crossover operator
+a result, detecting clusters for use by crossover is much more effective. The crossover operator
 is extremely elitist, as each gene donation must result in no fitness loss, and a solution must
 strictly improve to be added to the next level of the pyramid. This is balanced by continual
 integration of new random solutions. Furthermore, each random restart decreases the probability
