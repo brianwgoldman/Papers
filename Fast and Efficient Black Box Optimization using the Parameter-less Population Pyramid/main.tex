@@ -98,7 +98,22 @@ Section~\ref{sec-tuning} provides our methodology to ensure each is optimally tu
 \section{Comparison Optimizers}
 \label{sec-optimizers}
 
-\subsection{Hill Climber}
+In order to fully understand the effectiveness of a black box search algorithm, it is useful
+to compare it with other similar algorithms. Therefore here we preset five advanced algorithms with
+related features to P3. The Random Restart Hill Climber was chosen as an efficient form of repeated
+local search, and because it shows the advantages of performing the more complex portions of P3.
+The $1+(\lambda, \lambda)$ algorithm is the current best theory supported simple genetic algorithm
+and its method of crossover is in some sense a macro-mutation just as in P3. hBOA and Parameter-less
+hBOA are advanced model building search techniques which are very effective at learning complex
+problem structure, designed to achieve similar goals as P3's linkage learning but using very different
+methods. Finally LTGA represents the current state-of-the-art in black box search and is the origin
+of P3's linkage learning and crossover methods.
+
+Finally, only hBOA and LTGA require any parameters, with each of these only requiring a population
+size. This makes knowing the optimal behavior of these algorithms much more tractable.
+
+\subsection{Random Restart Hill Climber}
+\label{sec-hill-climber}
 Perhaps the simplest black box search heuristic is stochastic local search, or hill climbing.
 This optimization technique focuses on improving a single solution until it reaches a local
 optimum. Here we use the first improvement hill climber defined by \cite{goldman:2014:p3}
@@ -144,6 +159,12 @@ during this loop. If no fitness improving move is found, the next time through t
 is used. A third check is only necessary if no fitness improving move was found for any index.
 This is a contradiction as the loop terminates when no improving move was found. Therefore this check
 can only be called twice per evaluation.
+
+Due to its nature, this hill climber cannot escape basins of attraction. Once a solution is reached
+such that none of the single bit neighbors are fitness improvements, search stops. As a result to
+have any hope of solving multimodal problems this algorithm requires a restart mechanism. We have
+chosen here to naively restart search from a random solution whenever a local optima is found. This
+ensures that on all landscapes there is always a non-zero probability of search finding the global optimum.
 
 \subsection{$1+(\lambda, \lambda)$}
 \cite{doerr:2013:lambdalambda} presented the first genetic algorithm to provably show
