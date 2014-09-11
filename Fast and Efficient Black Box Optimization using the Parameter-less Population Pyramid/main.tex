@@ -669,12 +669,17 @@ problem is challenging chose a clause to variable ratio of $4.27$.
 
 \section{Comparison Algorithm Parameter Tuning}
 \label{sec-tuning}
-
-~\cite{goldman:2012:ltga} % Bisection with no parameters
-
-~\cite{goldman:2014:p3}
-
-~\cite{jovanovic:1997:ruleofthree}
+While four of the six algorithms in our experiments do not require any user specified parameters,
+hBOA and LTGA both use a population size parameter. To ensure these techniques are not unfairly
+handicapped, we have extensively tuned each algorithm to each problem size for each problem to
+determine the optimal population size using the bisection method \citep{sastry:2001:bisection}.
+Extended by \cite{goldman:2012:ltga} the bisection sets the population size by iteratively
+doubling the population size until some success criteria is met and then performing bisection
+between the lowest successful and highest unsuccessful sizes. Thus the minimum population size
+which meets the success criteria is found. \cite{goldman:2014:p3} proposed a success criteria
+of performing $r$ successful runs in a row, such that the expected failure rate can be bounded
+above by $\frac{3}{r+1}$~\cite{jovanovic:1997:ruleofthree}. As P3 and the other three algorithms
+do not prematurely converge, we chose $r=100$ to similarly ensure hBOA and LTGA almost never do.
 
 \section{Global Optimum}
 \label{sec-optimum}
