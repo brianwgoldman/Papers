@@ -54,9 +54,9 @@ A primary purpose of evolutionary optimization is to efficiently find good solut
 to challenging real world problems with minimal prior knowledge about the problem itself.
 This driving goal has created search algorithms which can escape user bias to create
 truly novel results, sometimes publishable or patentable in their own right~\citep{kannappan:2014:humies}.
-While it is not possible for any algorithm to do better than random across all possible
+While it is not possible for any algorithm to do better than random search across all possible
 problems~\citep{Wolpert:1997:nfl}, effectiveness can be achieved by assuming the search
-landscape has structure and then biasing the algorithm toward exploiting those features.
+landscape has structure and then biasing the algorithm toward exploiting that structure.
 
 In evolutionary optimization, and genetic algorithms~(GAs) in particular, search is often
 biased through parameters. This can be beneficial as it allows practitioners to inject their
@@ -73,11 +73,10 @@ As such there have been periodic efforts to reduce or remove the need for parame
 were included in each solution's genome and underwent evolution. This allowed search
 to optimize some of its own parameters resulting in a reduced the need for expert tuning.
 \cite{harik:1999:parameterlessga} were able to design an entirely parameter-less GA by
-designing control strategies which made on-line modifications to each parameter based
-on how well search was progressing. Unfortunately these methods were provably less efficient
+leveraging schema theory and parallel populations. Unfortunately these methods were provably less efficient
 than directly setting the parameters to optimal values~\citep{pelikan:1999:worstparameter-less}.
 
-One area that has been very effective at reducing the number of algorithm parameters has been
+One area that has been very effective at reducing the number of algorithm parameters is
 model based search. \cite{pelikan:2006:hboa}'s Hierarchical Bayesian Optimization
 Algorithm~(hBOA) and \cite{thierens:2010:ltga}'s Linkage Tree Genetic Algorithm~(LTGA)
 both only require a single parameter: population size. \cite{posik:2011:parameterless}
@@ -117,7 +116,7 @@ size. This makes knowing the optimal behavior of these algorithms much more trac
 algorithms are also gene order independent, fitness scale invariant, and unbiased. This means
 for any problem the order in which problem variables appear in the genome can be changed
 without changing the behavior of the search. The fitness can also be manipulated in any fashion
-as long as the rank ordering of solutions is unchanged. They are also unaffected by the meaning
+as long as the rank ordering of solutions is unchanged. These algorithms are also unaffected by the meaning
 assigned to each bit, such that inverting a predetermined random subset of genes before evaluation
 will not impact search efficiency.
 
@@ -180,9 +179,10 @@ ensures that on all landscapes there is always a non-zero probability of search 
 the advantages of performing crossover on simple landscapes. This comparatively simple
 algorithm maintains only a single individual and a self-controlled parameter $\lambda$.
 
-Each iteration, the number of bits to flip is chosen from the binomial distribution $b\sim B(N, \frac{\lambda}{N})$.
+Each iteration, the number of bits to flip is chosen from the binomial distribution $b\sim B(N, \frac{\lambda}{N})$,
+where $N$ is the number of bits in the genome.
 Next, $\lfloor\lambda\rfloor$ offspring are produced by flipping $b$ bits. The
-best mutant then produces $\lambda$ offspring via uniform crossover with the original parent, such that each gene comes from the
+best mutant then produces $\lfloor\lambda\rfloor$ offspring via uniform crossover with the original parent, such that each gene comes from the
 mutant with probability $\frac{1}{\lambda}$. In the original algorithm the best
 offspring produced by crossover then replaces the original parent if its fitness is no worse.
 The $\lambda$ parameter, which is initialized to 1, is decreased if the offspring replaced
@@ -192,7 +192,7 @@ The original formulation was designed specifically for unimodal landscapes and a
 not directly suitable for multimodal problems. \cite{goldman:2014:p3} extended $1+(\lambda, \lambda)$
 to include random restarts. As search stagnates, the $\lambda$ parameter increases in value. Eventually
 this results in $\lambda \ge N$ causing mutation to always flip all bits of the individual.
-As this prevents any future improvement whenever $\lambda \ge N$ search is restarted from a random solution with $\lambda$
+As this prevents any future improvement, whenever $\lambda \ge N$ search is restarted from a random solution with $\lambda$
 reset to 1.
 
 A few other efficiency modifications were also made. If there is a tie in crossover offspring fitness,
@@ -252,20 +252,20 @@ The outermost product of Equation~\ref{eq-hboa} iterates over all trees in the f
 can modify only one of the trees and therefore the contribution of all others can be canceled. The middle
 product is across all leaves in the tree. Again since only one leaf can be changed, all other terms can
 be canceled. By convention hBOA uses uninformed Bayesian priors of $m'_i(l)= 2$ and $m'_i(x_i, l)=1$ for
-binary alphabets. As $\Gamma(n) = (n-1)!$ this means the top term in the middle product and the bottom
+binary alphabets. As $\Gamma(a) = (a-1)!$ this means the top term in the middle product and the bottom
 term in the third product reduce to 1. The only remaining terms are then $m_i(l)$ and $m_i(x_i, l)$ which
 represent the number of solutions which reached leaf $l$ and the number of solutions which reached leaf $l$
-with a specific value, respectively.
+with a specific value for $x_i$, respectively.
 
-Equation~\ref{eq-hboa-stop} can also be simplified when doing comparisons. The only difference for $p(B)$ and $p(B')$ is the total
-number of leaves ($\sum_i|L_i|$) has increased by 1. Therefore the ratio simplifies to $2^{0.5 log_2\mu}$ regardless of
+Equation~\ref{eq-hboa-stop} can also be simplified when doing comparisons. If model $B'$ has exactly one more
+leaf than model $B$ than $p(B)$ and $p(B')$ the ratio $\frac{p(B)}{p(B')}$ simplifies to $2^{0.5 log_2\mu}$ regardless of
 total model size.
 
-All combined, this means the expression $BDe(B) < BDe(B')$ can be calculated using Equation~\ref{eq-hboa-final},
-where B' is different from B by exactly 1 split, such that $l$ was split to create $l'$ and $l''$. Only splits that
+All combined, this means the expression $p(B)BDe(B) < p(B')BDe(B')$ can be calculated using Equation~\ref{eq-hboa-final},
+where $B'$ is different from $B$ by exactly 1 split, such that $l$ was split to create $l'$ and $l''$. Only splits that
 satisfy this inequality are considered good enough to keep. Furthermore, whichever split maximizes the right side of the
 Equation~\ref{eq-hboa-final} is chosen each iteration. Note that these factorials can be exceedingly large and
-therefore its imperative that implementations avoid rounding errors and overflows.
+therefore it is imperative that implementations avoid rounding errors and overflows.
 
 \begin{equation}
   2^{0.5 log_2\mu} < \frac{(m_i(l) + 1)!}{m_i(0, l)!m_i(1,l)!} \cdot
@@ -393,7 +393,7 @@ clusters. Therefore when performing crossover there is no reason to believe a fi
 by breaking the stored pattern. As such a cluster is only kept if its direct superset has a non-zero distance.
 
 \cite{thierens:2013:ltgahiff}'s version of LTGA does not use the entire population when determining pairwise entropy.
-Instead, binary tournament use used to select half of the population. This is done to ensure the model is built
+Instead, binary tournament is used to select half of the population. This is done to ensure the model is built
 using only high quality solutions, even during the first generation.
 
 In order to efficiently perform clustering, a pairwise gene frequency table is constructed.
@@ -579,14 +579,14 @@ Understanding how a stochastic search algorithm will behave on arbitrary and com
 search landscapes can be exceedingly difficult. Therefore a common practice for
 algorithm understanding is to perform search on well defined, well understood
 landscapes. To be of interest these landscapes need to represent interesting
-and important challenges aspects of real world problems.
+and important aspects of real world problems.
 
 Perhaps the most common such landscape is the Deceptive Trap problem \citep{goldberg:1991:gasize}.
-In this landscape the genome is broken up into $k$ sized fully decomposable subproblems referred
+In this landscape the genome is broken up into $k$ bit non-overlapping subproblems referred
 to as traps.
 Each subproblem is scored using Equation~\ref{eq-deceptive-trap}, where $t$ is the number of
 bits in the trap set to 1. To global optimum in each trap is a string of all 1s, while all
-other solutions lead to a local optima of all 0s. As a result this problem tests an algorithms
+other solutions lead to a local optima of all 0s. As a result this problem tests an algorithm's
 ability to overcome $k$ sized deception and is commonly used to determine how effective crossover
 is at preserving building blocks. Any crossover event that mixes bits from different parents in
 the same trap will likely result in that trap being optimized to the local optima. For our experiments
@@ -616,8 +616,7 @@ number of local optima.
   \label{eq-deceptive-step-trap}
 \end{equation}
 
-Another challenging aspect of landscapes can be higher order relationships. For these problems
-the are easily detected main effects as well as larger interrelationships. The Hierarchical If
+Another challenging aspect of landscapes can be higher order relationships. The Hierarchical If
 and only If (HIFF) problem is designed to capture the difficulties of this class of problem.
 In HIFF the genome is broken up into a complete binary tree, such that each gene appears in exactly one
 leaf and each internal node is the subset of genes contained in its children. If all genes represented
@@ -638,8 +637,8 @@ that each floating point $x_i$ in Equation~\ref{eq-rast} is encoded using a 10 b
 
 \subsection{Randomly Generated Problem Classes}
 While well defined landscapes can provide specific insights into how an algorithm works,
-their static nature can lead to misleading results. Specifically algorithm quality might
-be very fragile, only effective at searching well behaved landscapes. A more realistic
+their static nature can create misleading results. Specifically algorithm quality might
+be very fragile such that it is only effective at searching well behaved landscapes. A more realistic
 test of an algorithm's black box effectiveness is to work with randomly generated instances
 drawn from a problem class. When tested over a sufficiently large sample it is then possible
 to draw more general conclusions about the algorithms effectiveness. The challenge with these
@@ -650,7 +649,7 @@ NK Landscape determines the fitness of each gene based on epistatic relationship
 other genes in the genome. This fitness is specified using a randomly generated table of
 fitness values, were each possible combination of the $K+1$ genes is mapped to some floating
 point value $[0-1]$. In unrestricted NK landscapes the relationships between genes are also
-randomly chosen and as a result finding the global optimum is $NP$-Hard for $k>1$. However,
+randomly chosen and as a result finding the global optimum is $NP$-Hard for $K>1$. However,
 if epistasis is instead set such that each gene depends on the $K$ directly following it
 in the genome the solution can be found in polynomial time~\citep{wright:2000:solvingnk}.
 These Nearest Neighbor NK landscapes are therefore ideal for search algorithm testing.
@@ -660,10 +659,10 @@ For all of our experiments we fixed $K=5$ to ensure highly rugged landscapes.
 Ising Spin Glasses. A spin glass is defined by interaction terms between variables with
 the genome encoding the sign for each variable and a goal to minimize the total interaction value.
 Similar to NK Landscapes the general class is $NP$-Hard to optimize, but the $2D\pm J$ subset of
-Ising Spin Glasses can be polynomially solved\footnote{\url{http://www.informatik.uni-koeln.de/spinglass/}}.
+Ising Spin Glasses can be polynomially solved.\footnote{\url{http://www.informatik.uni-koeln.de/spinglass/}}
 
 As our final class of randomly generated problems we chose the Maximum Satisfiability (MAX-SAT) problem.
-Related to the more common 3-SAT problem, a MAX-SAT is defined by a set of three term clauses.
+Related to the more common 3-SAT problem, a MAX-SAT instance is defined by a set of three term clauses.
 Each term is a randomly chosen variable, which may also be negated. A clause scores if an and only if
 at least one term in the clause evaluates to true. In order to make MAX-SAT instances with a known global
 optimum \cite{goldman:2014:p3} proposed constructing clauses around a fixed solution. In this way the
@@ -674,14 +673,14 @@ problem is challenging chose a clause to variable ratio of $4.27$.
 \label{sec-tuning}
 While four of the six algorithms in our experiments do not require any user specified parameters,
 hBOA and LTGA both use a population size parameter. To ensure these techniques are not unfairly
-handicapped, we have extensively tuned each algorithm to each problem size for each problem to
-determine the optimal population size using the bisection method \citep{sastry:2001:bisection}.
-Extended by \cite{goldman:2012:ltga} the bisection sets the population size by iteratively
-doubling the population size until some success criteria is met and then performing bisection
+handicapped, we have extensively tuned each using the bisection method \citep{sastry:2001:bisection}
+to determine the optimal population size for each size of each problem.
+Extended by \cite{goldman:2012:ltga} this method iteratively
+doubles the population size until some success criteria is met and then performs bisection
 between the lowest successful and highest unsuccessful sizes. Thus the minimum population size
 which meets the success criteria is found. \cite{goldman:2014:p3} proposed a success criteria
 of performing $r$ successful runs in a row, such that the expected failure rate can be bounded
-above by $\frac{3}{r+1}$~\cite{jovanovic:1997:ruleofthree}. As P3 and the other three algorithms
+above by $\frac{3}{r+1}$~\citep{jovanovic:1997:ruleofthree}. As P3 and the other three algorithms
 do not prematurely converge, we chose $r=100$ to similarly ensure hBOA and LTGA almost never do.
 
 \section{Global Optimum}
