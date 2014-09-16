@@ -11,6 +11,9 @@
 \newcommand{\includegraphicsfit}[1]
 {\includegraphics[width=\columnwidth,height=\textheight,keepaspectratio]{#1}}
 
+\usepackage{array}
+\newcolumntype{L}{>{\centering\arraybackslash}m{1.9cm}}
+
 %% do not add any other page- or text-size instruction here
 
 \parskip=0.00in
@@ -696,6 +699,30 @@ do not prematurely converge, we chose $r=100$ to similarly ensure hBOA and LTGA 
 \end{figure}
 
 TODO Compare all 6 optimization techniques on evaluations to reach global optimum.  Figure~\ref{fig-evals-to-success}.
+
+
+\begin{table}
+	\centering
+	\begin{tabular}{|c|r|r|r|r|r|r|r|r|}
+	  \cline{2-9}
+	  \multicolumn{1}{c|}{} & \multicolumn{2}{L|}{Deceptive Trap} & \multicolumn{2}{L|}{Deceptive Step Trap}
+	                        & \multicolumn{2}{L|}{HIFF} & \multicolumn{2}{L|}{Rastrigin} \\ \cline{2-9}
+	  \multicolumn{1}{c|}{} & \multicolumn{1}{c|}{a} & \multicolumn{1}{c|}{b}
+	                        & \multicolumn{1}{c|}{a} & \multicolumn{1}{c|}{b}
+	                        & \multicolumn{1}{c|}{a} & \multicolumn{1}{c|}{b}
+	                        & \multicolumn{1}{c|}{a} & \multicolumn{1}{c|}{b} \\ \hline
+	                          % DT                    % DST                    % HIFF                  % Rast
+	  {Hill Climber}          &$<$0.00 &        11.10 &$<$0.00 &        10.60 &$<$0.00 &         9.45 &$<$0.00 &         5.50 \\ \hline
+	  {$1+(\lambda,\lambda)$} &   0.02 &         3.66 &$<$0.00 &         6.69 &$<$0.00 &         6.55 &$<$0.00 &         4.50 \\ \hline
+	  {hBOA}                  &  18.16 &         2.28 &  40.38 &         2.07 &   4.60 &         1.82 &   3.50 &         2.29 \\ \hline
+	  {Parameter-less hBOA}   &  16.92 &         2.72 &  28.71 &         2.59 &   4.94 &         2.25 &   3.55 &         2.61 \\ \hline
+	  {LTGA}                  & 324.88 & \textbf{1.28}& 165.27 &         1.72 &   7.02 &         1.66 &  21.05 & \textbf{1.43}\\ \hline
+	  {P3}                    &  68.80 &         1.38 & 354.69 & \textbf{1.56}&   4.06 & \textbf{1.59}&   5.29 &         1.59 \\ \hline
+  \end{tabular}
+	\caption{Results of fitting $y=ax^b$ model where $y$ is evaluations to success
+	         and $x$ is problem size. Bold entries are the statistically lowest growth rates.}
+	\label{table-bigo}
+\end{table}
 
 TODO Table listing empirical $O(N)$ times for each technique on each problem. Include
 statistical comparison of log-log regression lines.
