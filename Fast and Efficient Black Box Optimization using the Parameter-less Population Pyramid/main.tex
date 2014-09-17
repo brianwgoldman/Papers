@@ -686,6 +686,81 @@ do not prematurely converge, we chose $r=100$ to similarly ensure hBOA and LTGA 
 \section{Global Optimum}
 \label{sec-optimum}
 
+The goal of black box optimization is to quickly and reliably obtain high quality solutions. In this
+section we will compare how many evaluations each algorithm requires to find the global optimum on
+each problem.
+
+Figure~\ref{fig-evals-to-success} shows the median number of evaluations required by each of the six
+algorithms to find the global optimum for multiple sizes of each problem.  Each data point in
+Figure~\ref{fig-evals-to-success} represents the median of 100 runs, where unsuccessful runs
+are treated as requiring more evaluations than any successful run. If the median run was not successful
+no point is shown.
+
+The Random Restart Hill Climber and $1+(\lambda, \lambda)$ are both relatively effective on small problem
+sizes, but have difficulty scaling to larger problems.  Only on MAX-SAT are these optimizers competitive
+at larger tested problem sizes. However this may just be an artifact of that the largest tested MAX-SAT
+was an order of magnitude smaller than the largest size tested for most other problems. On the Deceptive
+Trap and Deceptive Step Trap problem $1+(\lambda, \lambda)$ has some other interesting results. For
+problems with 4 or less traps it performs significantly better than any other algorithm. This is likely
+due to an artifact of the landscape as $1+(\lambda, \lambda)$ is able to overcome deception by probabilistically
+flipping entire traps. For larger problems it becomes increasingly unlikely that mutation and crossover can
+create enough changes to an individual trap to overcome deception without negatively changing others. This
+behavior also causes high variance in success rate, as evident by the occasional successes on large problems.
+This ability to successfully integrate modifications of more than a single bit generally appears to lead $1+(\lambda, \lambda)$
+outperform the Hill Climber on all problems except Nearest Neighbor NK.
+
+As expected, Parameter-less hBOA was generally efficient than hBOA using an optimal population size. The slopes
+of the two lines are relatively similar across all problems, meeting with the theoretical expectation that
+Parameter-less hBOA is no more than a logarithmic factor worse than hBOA.  The only problem which reversed
+this trend was MAX-SAT, where Parameter-less hBOA actually outperformed hBOA. A potential explanation for
+this upset is that hBOA is using the optimal population size for the problem class, not for each instance.
+Therefore hBOA must use a population size sufficiently large to solve the hardest instances in the class.
+Parameter-less hBOA on the other hand is able to solve easy instances using much smaller population sizes.
+The net effect is therefore that by being more adaptable Parameter-less hBOA is able to achieve better median
+results.
+
+Considering how different hBOA and LTGA are in performing optimization, it is somewhat surprising how similar
+their results are on HIFF. hBOA utilizes Bayesian decision trees to stochastically generate solutions while
+LTGA uses a linkage tree to iteratively modify subsets of genes in an existing solution. On this problem both
+methods likely have the same two limiting factors: initial diversity and generational turnover. In order to
+ensure convergence to the global optima, both methods rely on initial populations which are sufficiently large.
+Both need to preserve enough diversity to ensure higher order building blocks can be created later. Both methods
+also build models once per generation. On HIFF detecting higher order relationships is very unlikely until lower
+order subproblems have been optimized. As a result both LTGA and hBOA are unlikely to solve more than one order
+of subproblem per generation. Therefore both require a number of generations based on the number of subproblem sizes
+in the problem.
+
+LTGA, as the current state-of-the-art, was generally the fastest to find the global optimum of all comparison
+algorithms. This is especially true on the four single instance problems where it often found the global
+optimum in a lower order of complexity.  However on Nearest Neighbor NK and Ising Spin Glasses LTGA appears
+to perform worse than hBOA.  This may be due to LTGA's inability to represent the overlapping nature of these problems.
+On MAX-SAT LTGA only outperforms hBOA. Again, the likely cause to this is LTGA's requirement to have a
+population size sufficiently large to solve the hardest problem in each class, reducing its effectiveness
+on instances of median difficulty.
+
+Across all problem and problem sizes P3 generally finds the global optimum using less evaluations than
+all of the comparison algorithms.  On Deceptive Trap P3 significantly outperforms both hill climbing
+and LTGA by combining the best features of each, using hill climbing to optimize each trap and crossover
+to perfectly mix traps. Deceptive Step Trap less amenable to local search with P3's quality effectively
+tied with both LTGA and hBOA. The slight improvement here may be due to P3's ability to solve some runs
+using smaller population sizes than LTGA and hBOA due to lucky initialization. Using local search on HIFF
+likely saves P3 a generation over LTGA and hBOA as all pairwise subproblems will already be solved. Combined
+with P3's ability to add diversity only as needed this likely explains why P3 is able to solve HIFF a constant
+multiple faster than either population based technique. P3 likely solves its median run of Nearest Neighbor
+NK and Ising Spin Glasses faster than both hBOA and LTGA again by using population sizes fit to each instance
+and not fit to the entire problem class. On MAX-SAT, where the most effective solvers are Hill Climber and
+$1+(\lambda, \lambda)$, P3 outperforms both likely due to its use of local search with a better ability to
+overcome deception.
+
+To more fully examine the hypothesis that its P3's ability to scale to differences in problem difficulty,
+Figure~\ref{fig-evals-to-success-range} shows the upper and lower quartiles for P3 and LTGA. On each problem
+LTGA has a much smaller difference between its best and worst runs. This makes sense as LTGA uses the same
+population size regardless of instance and progresses search generationally. In contrast P3 has a much
+higher split, with some runs finishing very quickly. This added variability is generally on only the lower
+end as P3's upper quartile is only worse than LTGA's upper quartile on Deceptive Step Trap and Nearest
+Neighbor NK. A possible explanation for this is that as P3 has not pre-learned the amount of diversity required
+to solve all instances does not take as risky behavior as LTGA.
+
 \begin{figure}[t]
   \begin{center}
   \includegraphicsfit{evals-to-success}
@@ -696,8 +771,6 @@ do not prematurely converge, we chose $r=100$ to similarly ensure hBOA and LTGA 
            is shown.  Results given on a log-log scale.}
   \label{fig-evals-to-success}
 \end{figure}
-
-TODO Compare all 6 optimization techniques on evaluations to reach global optimum.  Figure~\ref{fig-evals-to-success}.
 
 
 \begin{table}
@@ -734,8 +807,6 @@ statistical comparison of log-log regression lines.
            to reach the global optimum for P3 and LTGA with respect to problem size.}
   \label{fig-evals-to-success-range}
 \end{figure}
-
-TODO Graphic showing quartiles to illustrate P3's scaling on problems. Figure~\ref{fig-evals-to-success-range}.
 
 \section{Stop Anytime}
 \begin{figure}[t]
