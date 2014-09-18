@@ -772,7 +772,7 @@ to solve all instances does not take as risky behavior as LTGA.
   \label{fig-evals-to-success}
 \end{figure}
 
-
+\begin{comment}
 \begin{table}
 	\centering
 	\begin{tabular}{|c|r|r|r|r|r|r|r|r|}
@@ -799,6 +799,8 @@ to solve all instances does not take as risky behavior as LTGA.
 TODO Table listing empirical $O(N)$ times for each technique on each problem. Include
 statistical comparison of log-log regression lines.
 
+\end{comment}
+
 \begin{figure}[t]
   \begin{center}
   \includegraphicsfit{evals-to-success-range}
@@ -817,11 +819,73 @@ statistical comparison of log-log regression lines.
   \label{fig-fitness-over-time}
 \end{figure}
 
+For some applications, finding the global optimum is less important than finding good solutions quickly. Therefore
+we examine this behavior in Figure~\ref{fig-fitness-over-time}. At regular intervals during optimization
+Figure~\ref{fig-fitness-over-time} shows the median of the best fitnesses found by that point of search across
+100 runs. For each problem we show the largest problem size for which we were able to successfully set a population
+size for hBOA, but the trends shown are representative of all larger problem sizes. The maximum reporting interval
+is set to include the slowest P3 run to reach the global optimum.
+
+At almost every recording interval for every problem hBOA has the worst fitness. The only exceptions come when
+the total number of evaluations performed is significantly less than the genome size hBOA reaches better fitness
+than the Hill Climber, $1+(\lambda, \lambda)$, and P3. This early in search hBOA and LTGA are both still evaluating
+individuals in their randomly generated initial populations, while the three techniques worse than hBOA have started
+from a single solution and are attempting to optimize. Of the methods, hBOA uses by far the largest population sizes,
+about 55 times larger than LTGA. As such it makes sense that hBOA would take a long time to being to reach high
+quality solutions.
+
+Parameter-less hBOA generally reports higher fitness than hBOA when using the same number of total evaluations. This makes
+sense as Parameter-less hBOA's use of small populations allows it to begin to optimize long before hBOA has even evaluated
+its entire initial population. However, this trend is reversed after a sufficient number of evaluations, as is apparent
+on Deceptive Step Trap and Ising Spin Glasses. This makes sense as hBOA's population is set to quickly find the global
+optimum.
+
+Early in optimization P3 and the Random Restart Hill Climber have effectively identical quality. This makes sense
+as until P3 performs two restarts it is performing the same evaluations as the Hill Climber. Once P3 begins
+performing crossover it immediately improves over the Hill Climber. As such P3 is likely better than a simple
+hill climber regardless of how long each technique is run and irrespective of how high quality the solution
+found has to be.
+
+Perhaps the most striking result is the quality of $1+(\lambda, \lambda)$. Until quite far into search this
+method performs better than both LTGA and hBOA. Given sufficient evaluations $1+(\lambda, \lambda)$ outperforms
+Random Restart Hill Climbing on all 7 problems. For brief periods in the middle of search it performs the
+best of all techniques on the Deceptive Step Trap, HIFF, Ising Spin Glass, and MAX-SAT problems. A likely
+explanation is $1+(\lambda, \lambda)$'s ability to efficiently incorporate gene modifications of larger
+than one bit. This allows it to overcome the plateaus in Deceptive Step Trap, solve medium sized subproblems
+in HIFF, flip the signs on multiple adjacent bits in Ising Spin Glass, and cross plateaus in MAX-SAT. However,
+this method is not enough to quickly reach the global optima in many of these problems which causes it to eventually
+be overtaken by the model building techniques.
+
+TODO Talk about the shape of P3 and LTGA, specifically the jumps.
+
+\begin{figure}[t]
+  \begin{centering}
+    \begin{subfigure}{.5\textwidth}
+      \begin{centering}
+        \includegraphicsfit{small-pop-dst}
+      \end{centering}
+      \caption{Deceptive Step Trap 203}
+      \label{fig-small-pop-dst}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+      \begin{centering}
+        \includegraphicsfit{small-pop-nk}
+      \end{centering}
+      \caption{Nearest Neighbor NK 200}
+      \label{fig-small-pop-nk}
+    \end{subfigure}
+  \end{centering}
+  \caption{Comparison of how reducing LTGA's population size effects
+           the median best fitness reached during search.}
+\end{figure}
+
+
 TODO Compare all 6 optimization techniques on fitnesses reached at different times
-during the run on problem sizes. Explain results same for different sizes. Figure~\ref{fig-fitness-over-time}.
+during the run on problem sizes. Explain results same for different sizes.
 
 TODO Include graphic for one problem where LTGA was tuned using a significantly higher failure rate.
 
+\section{Computational Expenses}
 \begin{figure}[t]
   \begin{centering}
     \begin{subfigure}{.5\textwidth}
