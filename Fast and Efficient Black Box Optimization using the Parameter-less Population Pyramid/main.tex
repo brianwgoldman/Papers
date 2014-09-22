@@ -457,6 +457,7 @@ with selection of model building solutions fixed to a binary tournament. Neither
 the population size, and uses a fixed user specified size for each generation.
 
 \section{Parameter-less Population Pyramid}
+\label{sec-p3}
 \cite{goldman:2014:p3} introduced the Parameter-less Population Pyramid (P3) as a method for
 performing optimization which does not require the user to provide any parameters. This is
 achieved by combining efficient local search with the model building methods of LTGA using
@@ -940,11 +941,33 @@ which balances high quality intermediate fitness without trading away eventual o
   \end{centering}
   \caption{Computation costs incurred by model rebuilding (Figure~\ref{fig-rebuilds}) and
            repeated donations (Figure~\ref{fig-donations}) per evaluation as problem size increases.}
+  \label{fig-costs}
 \end{figure}
 
-TODO Include graphic of rebuilds per evaluation. Figure~\ref{fig-rebuilds}.
+When discussing the asymptotic complexity of P3 in Section~\ref{sec-p3}, two aspects eluded precise
+analysis: how expensive is model rebuilding and how many gene donations are made. Figure~\ref{fig-costs}
+provides some insight into how often these two aspects of the algorithm are utilized.
 
-TODO Include graphic of donations per evaluation. Figure~\ref{fig-donations}.
+Figure~\ref{fig-rebuilds} reports in an algorithmic sense how expensive model rebuilding for search.
+In order to calculate this value we recorded how many times search rebuilt the model during each run.
+Under the minimal assumption that an evaluation costs $O(N)$ time and that model rebuilds cost $O(N^2)$,
+Figure~\ref{fig-rebuilds} shows the ratio cost of model rebuilding per evaluation. If the cost of model building
+scaled linearly with evaluations, the relationship plotted for each problem should be asymptotically linear.
+For Nearest Neighbor NK, Ising Spin Glasses, and Rastrigin this appears to be the case. For both Trap problems
+and HIFF there appears to be slow growth in the ratio. The problem sizes used for MAX-SAT were not sufficient
+to accurately gauge the asymptotic behavior. Together this suggests that while the cost of building the model
+is almost linear per evaluation, it can grow slowly. However, even in the worst case (HIFF) this growth was
+bounded to no more than twice the algorithmic cost of an evaluation.
+
+When applying a crossover subset, P3 tries random donors from the population until one is found with at least
+one bit different from the improving solution. In theory this can result in up to $O(\mu)$ operations.
+Figure~\ref{fig-donations} examines the observed average number of donations per evaluation performed.
+Ising Spin Glass, HIFF, and Rastrigin all achieve effectively constant behavior here, implying repeated
+donation does not impact the asymptotic runtime of P3. Both Trap functions and Nearest Neighbor NK all
+increase in number of donations as problem size increases, potentially increasing algorithmic costs. An
+important note again is that each donation may range in size from a single bit up to $N-1$, with smaller
+donations far more likely to result in repeated attempts. As such this may cause some super-linear growth
+in P3, but its unlikely to be very high.
 
 \begin{figure}
   \begin{center}
@@ -958,7 +981,28 @@ TODO Include graphic of donations per evaluation. Figure~\ref{fig-donations}.
 \end{figure}
 
 
-TODO Include a table of $O(N)$ seconds per evaluation and total seconds for all 4 model building techniques on all 7 problems.
+To assess wall clock performance we provide Figure~\ref{fig-seconds-to-success}. Due to the scale
+of our experiments, diverse hardware potentially running multiple processes in parallel were used
+in order to collect all runs. As such these timings should be considered very skeptically as a number
+of sources may contribute to biased error in the results. Under those caveats, the results do suggest
+that any increase in P3's algorithmic complexity is offset by its efficient use of evaluations. On
+Deceptive Trap, Nearest Neighbor NK, Ising Spin Glasses, and MAX-SAT it still appears to find the global
+optimum faster than all comparison techniques. On HIFF LTGA is able to match P3's performance almost exactly,
+and on Rastrigin P3 falls behind only on moderate sized problems. Deceptive Step Trap yields the worst performance,
+with LTGA using optimal population sizes having a significantly lower growth curve than P3. This mirrors
+the results from Figure~\ref{fig-evals-to-success} under the assumption that P3's computational time per evaluation is higher
+than LTGA but by no more than a constant factor.
+
+When considering wall clock time hBOA and Parameter-less hBOA perform significantly worse than when using
+evaluations. This makes sense as hBOA's model building requires $\Omega(N^2)$ time per evaluation while under reasonable
+assumptions P3 and LTGA require $O(N)$ time per evaluation. This penalty is most clear on Ising Spin Glass where
+hBOA goes from being slightly more efficient than LTGA in terms of evaluations to significantly worse in terms of seconds.
+As P3 and LTGA require a similar asymptotic complexity per
+evaluation as the Hill Climber and $1+(\lambda, \lambda)$, no similar change in ordering occurs.
+
+These results suggest that even for minimally expensive fitness functions P3 can find the global optimum
+at least as quickly in seconds as its optimally tuned competitors. However, due to the potential noise in our data collection
+we are hesitant to draw too strong a conclusion.
 
 \section{Inner Workings}
 
