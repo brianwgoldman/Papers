@@ -856,7 +856,47 @@ in HIFF, flip the signs on multiple adjacent bits in Ising Spin Glass, and cross
 this method is not enough to quickly reach the global optima in many of these problems which causes it to eventually
 be overtaken by the model building techniques.
 
-TODO Talk about the shape of P3 and LTGA, specifically the jumps.
+For all problems, LTGA lags behind P3 in fitness improvement, but has a similar overall shape. On every problem except
+Rastrigin, LTGA has a significant early delay in fitness improvement, followed by near instantaneous improvement, plateau,
+and followed by a final period of improvement which results in the global optimum. This early period corresponds with
+initialization of the population, with the first fitness gain achieved immediately upon completing the first generation.
+This makes sense as LTGA's mixing strategy performs a sort of local search when the model has not yet detected gene epistasis.
+This brings LTGA's fitness to almost the same level as the techniques explicitly performing local search, but is not quite
+as effective at reaching local optima. Subsequent generations then make minor fitness improvements, but generally stagnate
+while the model remains uninformed and high quality building blocks in the population are still relatively rare. Once the model
+becomes accurate enough and the probability of a crossover using high quality genetic material increases sufficiently, LTGA
+enters a second period of rapid improvement.
+
+This behavior is easiest to understand on the two Trap problems. LTGA's first generation will push individual traps toward a
+local optima, but it requires more than a single generation to do so completely. Until that occurs, the model is likely behaving
+no better than random as there is little apparent linkage between bits. Once the model begins to identify individual traps crossover
+can begin to increase the frequency of higher fitness local optima. This process begins slowly as low fitness local optima are more
+likely to be chosen for donation than high fitness local optima due to their frequency in the population. The process becomes self
+catalysing as increased frequency of the global optimum trap genes means increased likelihood of the global optimum being spread by crossover.
+
+An almost identical behavior exists in P3, most strikingly in the Deceptive Trap. When solving
+Deceptive Trap, P3 immediately achieves a high fitness, equaled only by the Random Restart Hill Climber in quality. This rise is
+nothing more than bringing every trap to one of the two local optima, with the majority of traps set suboptimally. $1+(\lambda, \lambda)$
+is slightly less efficient about performing single bit improvements, but is the next quickest to reach this plateau. While the hill climber
+remains stuck, P3's use of crossover slowly begins to combine optimal trap values found by multiple independent restarts. Unlike LTGA which
+performs this improvement all at once, P3 integrates all optimal trap values immediately, waiting only on random restarts to find
+the optimal trap setting.
+
+It is important to note that while P3 generally achieved the best fitness across all time points, hBOA and LTGA were tuned specifically
+to find the global optimum and are not necessarily using the optimal population size for finding intermediate fitnesses. Consider
+that for both reducing the population size would almost certainly improve their fitness for evaluation steps less than their population
+size. To examine the effect of population size we tested LTGA using one tenth of the population size required for reliably finding the
+global optimum, with the results given in Figure~\ref{fig-small-pop}. The two problems shown are representative of the behavior of using
+a smaller population size on the other five problems. Reducing the population size resulted in LTGA's initial fitness improvement
+occurring earlier, which makes sense as the first generation is completed much more quickly. On Deceptive Step Trap this means that
+LTGA leaps ahead of P3 due to its ability to overcome the two bit fitness plateaus. Across all tested problems using the smaller
+population size reduced the quality of LTGA's first fitness plateau, likely due to missing required diversity to reach higher quality.
+The second period of improvement also comes earlier and reaches a lower quality fitness. On Deceptive Step Trap this prevents all 100
+runs from reaching the global optimum, down from 100 successful for the full population size. On Nearest Neighbor NK this drops the number
+of successful runs from 98 to 68. As a result we conclude that while reducing the population size of LTGA may improve its quality
+at early points during optimization, doing so reduces the robustness of the final solution found. This is in contrast to P3
+which balances high quality intermediate fitness without trading away eventual optimality.
+
 
 \begin{figure}[t]
   \begin{centering}
@@ -877,13 +917,8 @@ TODO Talk about the shape of P3 and LTGA, specifically the jumps.
   \end{centering}
   \caption{Comparison of how reducing LTGA's population size effects
            the median best fitness reached during search.}
+  \label{fig-small-pop}
 \end{figure}
-
-
-TODO Compare all 6 optimization techniques on fitnesses reached at different times
-during the run on problem sizes. Explain results same for different sizes.
-
-TODO Include graphic for one problem where LTGA was tuned using a significantly higher failure rate.
 
 \section{Computational Expenses}
 \begin{figure}[t]
