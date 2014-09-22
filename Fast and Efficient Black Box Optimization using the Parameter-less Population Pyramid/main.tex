@@ -686,6 +686,17 @@ do not prematurely converge, we chose $r=100$ to similarly ensure hBOA and LTGA 
 \section{Finding the Global Optimum}
 \label{sec-optimum}
 
+\begin{figure}
+  \begin{center}
+  \includegraphicsfit{evals-to-success}
+  \end{center}
+  \caption{Comparison of the median number of evaluations to reach the global optimum for
+           the six different optimization methods with respect
+           to problem size.  If the median run did not reach the global optimum no data element
+           is shown.  Results given on a log-log scale.}
+  \label{fig-evals-to-success}
+\end{figure}
+
 The goal of black box optimization is to quickly and reliably obtain high quality solutions. In this
 section we will compare how many evaluations each algorithm requires to find the global optimum on
 each problem.
@@ -738,6 +749,15 @@ On MAX-SAT LTGA only outperforms hBOA. Again, the likely cause to this is LTGA's
 population size sufficiently large to solve the hardest problem in each class, reducing its effectiveness
 on instances of median difficulty.
 
+\begin{figure}
+  \begin{center}
+  \includegraphicsfit{evals-to-success-range}
+  \end{center}
+  \caption{Comparison of the upper and lower quartiles of evaluations required
+           to reach the global optimum for P3 and LTGA with respect to problem size.}
+  \label{fig-evals-to-success-range}
+\end{figure}
+
 Across all problem and problem sizes P3 generally finds the global optimum using less evaluations than
 all of the comparison algorithms.  On Deceptive Trap P3 significantly outperforms both hill climbing
 and LTGA by combining the best features of each, using hill climbing to optimize each trap and crossover
@@ -760,17 +780,6 @@ higher split, with some runs finishing very quickly. This added variability is g
 end as P3's upper quartile is only worse than LTGA's upper quartile on Deceptive Step Trap and Nearest
 Neighbor NK. A possible explanation for this is that as P3 has not pre-learned the amount of diversity required
 to solve all instances does not take as risky behavior as LTGA.
-
-\begin{figure}[t]
-  \begin{center}
-  \includegraphicsfit{evals-to-success}
-  \end{center}
-  \caption{Comparison of the median number of evaluations to reach the global optimum for
-           the six different optimization methods with respect
-           to problem size.  If the median run did not reach the global optimum no data element
-           is shown.  Results given on a log-log scale.}
-  \label{fig-evals-to-success}
-\end{figure}
 
 \begin{comment}
 \begin{table}
@@ -801,17 +810,8 @@ statistical comparison of log-log regression lines.
 
 \end{comment}
 
-\begin{figure}[t]
-  \begin{center}
-  \includegraphicsfit{evals-to-success-range}
-  \end{center}
-  \caption{Comparison of the upper and lower quartiles of evaluations required
-           to reach the global optimum for P3 and LTGA with respect to problem size.}
-  \label{fig-evals-to-success-range}
-\end{figure}
-
 \section{Fitness Over Time}
-\begin{figure}[t]
+\begin{figure}
   \begin{center}
   \includegraphicsfit{fitness-over-time}
   \end{center}
@@ -946,7 +946,7 @@ TODO Include graphic of rebuilds per evaluation. Figure~\ref{fig-rebuilds}.
 
 TODO Include graphic of donations per evaluation. Figure~\ref{fig-donations}.
 
-\begin{figure}[t]
+\begin{figure}
   \begin{center}
   \includegraphicsfit{seconds-to-success}
   \end{center}
