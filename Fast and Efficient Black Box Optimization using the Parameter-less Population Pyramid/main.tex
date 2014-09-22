@@ -882,22 +882,6 @@ remains stuck, P3's use of crossover slowly begins to combine optimal trap value
 performs this improvement all at once, P3 integrates all optimal trap values immediately, waiting only on random restarts to find
 the optimal trap setting.
 
-It is important to note that while P3 generally achieved the best fitness across all time points, hBOA and LTGA were tuned specifically
-to find the global optimum and are not necessarily using the optimal population size for finding intermediate fitnesses. Consider
-that for both reducing the population size would almost certainly improve their fitness for evaluation steps less than their population
-size. To examine the effect of population size we tested LTGA using one tenth of the population size required for reliably finding the
-global optimum, with the results given in Figure~\ref{fig-small-pop}. The two problems shown are representative of the behavior of using
-a smaller population size on the other five problems. Reducing the population size resulted in LTGA's initial fitness improvement
-occurring earlier, which makes sense as the first generation is completed much more quickly. On Deceptive Step Trap this means that
-LTGA leaps ahead of P3 due to its ability to overcome the two bit fitness plateaus. Across all tested problems using the smaller
-population size reduced the quality of LTGA's first fitness plateau, likely due to missing required diversity to reach higher quality.
-The second period of improvement also comes earlier and reaches a lower quality fitness. On Deceptive Step Trap this prevents all 100
-runs from reaching the global optimum, down from 100 successful for the full population size. On Nearest Neighbor NK this drops the number
-of successful runs from 98 to 68. As a result we conclude that while reducing the population size of LTGA may improve its quality
-at early points during optimization, doing so reduces the robustness of the final solution found. This is in contrast to P3
-which balances high quality intermediate fitness without trading away eventual optimality.
-
-
 \begin{figure}[t]
   \begin{centering}
     \begin{subfigure}{.5\textwidth}
@@ -919,6 +903,22 @@ which balances high quality intermediate fitness without trading away eventual o
            the median best fitness reached during search.}
   \label{fig-small-pop}
 \end{figure}
+
+
+It is important to note that while P3 generally achieved the best fitness across all time points, hBOA and LTGA were tuned specifically
+to find the global optimum and are not necessarily using the optimal population size for finding intermediate fitnesses. Consider
+that for both reducing the population size would almost certainly improve their fitness for evaluation steps less than their population
+size. To examine the effect of population size we tested LTGA using one tenth of the population size required for reliably finding the
+global optimum, with the results given in Figure~\ref{fig-small-pop}. The two problems shown are representative of the behavior of using
+a smaller population size on the other five problems. Reducing the population size resulted in LTGA's initial fitness improvement
+occurring earlier, which makes sense as the first generation is completed much more quickly. On Deceptive Step Trap this means that
+LTGA leaps ahead of P3 due to its ability to overcome the two bit fitness plateaus. Across all tested problems using the smaller
+population size reduced the quality of LTGA's first fitness plateau, likely due to missing required diversity to reach higher quality.
+The second period of improvement also comes earlier and reaches a lower quality fitness. On Deceptive Step Trap this prevents all 100
+runs from reaching the global optimum, down from 100 successful for the full population size. On Nearest Neighbor NK this drops the number
+of successful runs from 98 to 68. As a result we conclude that while reducing the population size of LTGA may improve its quality
+at early points during optimization, doing so reduces the robustness of the final solution found. This is in contrast to P3
+which balances high quality intermediate fitness without trading away eventual optimality.
 
 \section{Computational Expenses}
 \begin{figure}[t]
