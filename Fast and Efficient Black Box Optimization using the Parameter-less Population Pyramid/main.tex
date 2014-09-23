@@ -1099,11 +1099,59 @@ may improve P3's crossover success.
            and Figure~\ref{fig-level-success} shows the percentage of fitness improving crossover evaluations at each level.}
 \end{figure}
 
-TODO Include graphic of pyramid shape (Figure~\ref{fig-level-size}) and crossover success rates (Figure~\ref{fig-level-success}) at each level.
+Another feature unique to P3 worth investigating is the shape and size of the population pyramid
+constructed for each problem. Figure~\ref{fig-level-size} shows the number of solutions stored at
+each level of the pyramid for the largest tested problem size for each problem. Each point is the
+median size across 100 runs. If a run did not store any solutions at a level it is treated as 0,
+and no point is drawn if the median run had 0 solutions stored at that level. This behavior is
+representative pyramid shape across all problem sizes tested.
 
-~\cite{lobo:2011:dynamicpop}
+With the exception of the dip in Deceptive Step Trap, all of the pyramids show a monotonic reduction
+in size as the level increases. This makes sense from an algorithmic standpoint as solutions are
+added to the first level as long as they are unique local optima. For each subsequent level a
+solution must be unique and a strict fitness improvement over its previously added version.
+As a result it makes sense that it is generally less likely for a solution to be added to
+higher levels than lower ones. This shape is also in many ways desirable from a population
+genetics standpoint. When using a generational model \cite{lobo:2011:dynamicpop} found theoretical
+evidence that the optimal population size reduces each generation with \cite{goldman:2011:dynamic-parameters}
+providing supporting empirical data. In P3, levels of the pyramid are akin to generations as solutions
+stored in each level have undergone the same number of variation and selection events,
+with higher levels representing more of each. Therefore it is possible that P3's
+pyramid shape is related to its ability to outperform competitors using an optimal
+fixed population size. Subsequently smaller levels are able to focus search,
+preserving only the diversity required by that stage of search. In comparison,
+LTGA and hBOA set the population size at each generation equal to that required
+to ensure sufficient initial diversity.
 
-~\cite{goldman:2011:dynamic-parameters}
+The number of solutions stored at the fourth level of Deceptive Step Trap is
+significantly lower than that of the third or fifth levels, breaking the decreasing
+trend of the other six problems. This behavior is rooted in the peculiar nature
+of this landscape, and is also present in all other problem sizes tested.
+After local search, all traps in all solutions have a total
+number of 1 bits equal to \{0, 1, 3, 5, 7\} as these correspond to the local
+optima when using $k=7$ and $s=2$. Crossover is very likely to overcome the
+two bit plateaus, and as a result solutions in the second level are unlikely
+to contain the lowest fitness local optima of 5 set bits. Similarly the third
+level has very few traps set to the next worst local optima of 3 bits. As a result,
+most solutions which reach the third level can only be improved by overcoming deception
+and replacing the second best local optima of zero or one bits set to having all seven bits set.
+At this point in search the population has not significantly increased the frequency of optimal
+trap settings and with 8 ways to represent suboptimal local optima linkage is also likely to be
+inaccurate. As a result our expectation is that when performing crossover with the third level
+of the pyramid very few fitness improvements will actually be made, meaning
+few solutions will be added to the fourth level. Those solutions that are added must, by definition,
+contain a higher frequency of optimal trap settings to have achieved a fitness improvement. As
+a result the crossover success rate and modeling quality at level four is likely to be much better
+than at level three, increasing the likelihood of solutions being improved by crossover.
+
+When examining the crossover success rate shown in Figure~\ref{fig-level-success} these suppositions are
+supported. The success rate for Deceptive Step Trap decreases for the first three levels, with the third level
+successful only 0.0004\% of the time. This quickly rebounds at higher levels. On all other problems, the
+crossover success rate follows a trajectory closer expectation. Low levels are more successful than medium
+levels as it is easier to make improvements to less optimized solutions. This trend reverses somewhat at
+higher levels as solution filtering allows for highly accurate models and high frequencies of high quality
+building blocks. The highest level on most problems has a very low crossover success rate, likely because
+so few solutions other than the global optimum every cross with that level.
 
 \section{Conclusions and Future Work}
 
