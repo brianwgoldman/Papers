@@ -35,8 +35,25 @@
 \maketitle
 
 \begin{abstract}
+%Should be about 200 words
+The Parameter-less Population Pyramid (P3) is a recently introduced method for performing
+evolutionary optimization without requiring problem specific user specified parameters.
+This is achieved by combining local search with advanced crossover to iteratively construct
+and exploit multiple populations simultaneously, with each population akin to a generation
+in traditional search.
 
-TODO About 200 words.
+When compared with five advanced search algorithms across dozens of problem sizes for
+seven different benchmarks P3 reliably required at least a constant factor less evaluations to find the global optimum
+than all tested competitors. P3 also in general maintains the highest fitness reached when comparing
+algorithms based on different number of evaluations performed. Some evidence suggests this performance
+also extends to considering total number seconds to find the global optimum.
+We investigate the causes of this efficiency and provide some evidence that P3's ability to
+add diversity only as needed may be contributing to its success.
+
+This quality is made even more striking in that unlike P3, the best comparison algorithms received extensive
+problem specific tuning to achieve their performance. As a result we conclude that in contrast to
+previous parameter-less techniques P3 is more efficient than existing parameterized methods for
+black box optimization.
 
 \end{abstract}
 
@@ -120,6 +137,8 @@ as long as the rank ordering of solutions is unchanged. These algorithms are als
 assigned to each bit, such that inverting a predetermined random subset of genes before evaluation
 will not impact search efficiency.
 
+Our implementations of all of these algorithms as well as all of the raw results and processing scripts
+are available from our website.\footnote{\url{https://github.com/brianwgoldman/FastEfficientP3}}
 \subsection{Random Restart Hill Climber}
 \label{sec-hill-climber}
 Perhaps the simplest black box search heuristic is stochastic local search, or hill climbing.
