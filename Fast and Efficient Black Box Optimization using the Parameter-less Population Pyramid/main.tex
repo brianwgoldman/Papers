@@ -812,6 +812,7 @@ statistical comparison of log-log regression lines.
 \end{comment}
 
 \section{Fitness Over Time}
+\label{sec-overtime}
 \begin{figure}
   \begin{center}
   \includegraphicsfit{fitness-over-time}
@@ -1002,7 +1003,7 @@ evaluation as the Hill Climber and $1+(\lambda, \lambda)$, no similar change in 
 
 These results suggest that even for minimally expensive fitness functions P3 can find the global optimum
 at least as quickly in seconds as its optimally tuned competitors. However, due to the potential noise in our data collection
-we are hesitant to draw too strong a conclusion.
+we are hesitant to draw too strong of a conclusion.
 
 \section{Inner Workings}
 
@@ -1027,9 +1028,55 @@ we are hesitant to draw too strong a conclusion.
            and Figure~\ref{fig-cross-success} shows the percentage of fitness improving crossover evaluations.}
 \end{figure}
 
-TODO Include graphic of proportion of evaluations spent on crossover. Figure~\ref{fig-cross}.
+While analysis of optimization speed is useful from a practitioner standpoint, doing so provides very
+little insight into algorithm behavior. To better understand how P3 works in detail we present here
+a look at some internal features specific to P3.
 
-TODO Include graphic of crossover success Figure~\ref{fig-cross-success}.
+P3 performs optimization using a mixture of hill climbing and crossover. Exactly how much time the algorithm
+dedicates to each is not clear from the algorithm description alone. As such, Figure~\ref{fig-cross} shows
+that the relationship between the two is strongly problem dependent but relatively independent of problem size.
+In general the trend appears to suggest that problems which can be more tightly represented by crossover tend
+to require less crossover evaluations. Deceptive Trap and Rastrigin spent the least evaluations on crossover, using
+15\% and 20\% respectively on the largest problem sizes. Both of these problems are perfectly separable and have relatively
+few local optima in each subproblem. HIFF and Ising Spin Glasses use crossover about 60\%. The HIFF structure can
+be perfectly learned by the linkage tree, but the higher order relationships require multiple stages of crossover to optimize.
+Ising Spin Glasses have an overlapping structure, making them impossible to perfectly represent in a single linkage tree, but
+that overlap is relatively minor in comparison with Nearest Neighbor NK, which uses 81\%. Deceptive Step Trap spends the highest
+percentage of evaluations on crossover, 92\%. Unlike all of the other problems, the value taken by an individual bit in Deceptive
+Step Trap has very little meaning. This is because any trap value is either a local optima or 1 bit flip away from being a local optima.
+This has a combined result of meaning it takes very few local search evaluations to find a local optima but very many crossover operations
+to proliferate the global optima. Epistatic relationships are also going to be very weak and even small population sizes are likely
+to mark all clusters as $useful$.
+
+Solutions are only added to the next highest pyramid level if at least one crossover donation resulted in a fitness
+improvement. Figure~\ref{fig-cross-success} examines the percentage of crossover donations that resulted in a fitness
+improvement. The ordering in Figure~\ref{fig-cross-success} is an almost perfect inversion of Figure~\ref{fig-cross},
+implying that the more successful crossover is at achieving fitness improving donations the lower the proportion of evaluations P3 will
+spend performing crossover. P3 achieves an impressive 30\% success rate for crossover donations on the largest Deceptive Trap
+problem sizes. This makes sense as crossover is able to immediately and perfectly identify entire traps such that all donations
+always contain only complete traps. Furthermore, by forcing crossover to attempt donations of genes different from the current solution,
+donations containing a single trap will have a very high success rate, always improving suboptimal traps which are far more frequently
+created by local search that optimal traps. Rastrigin and HIFF have relatively high success rates of 11\% and 7\%, respectively. Again
+this is likely due to accurate modeling and relatively low diversity of building block alternatives.
+Ising Spin Glasses and Deceptive Step Trap both have low success rates near 0.01\%. This follows as both are difficult to model with
+a linkage tree. In comparison to Figure~\ref{fig-cross-success} Deceptive Step Trap performs better than expected for crossover.
+However, the reason for this is likely that even exceedingly uninformed crossover can make improvements to Deceptive Step Trap as
+flipping two bits in the same trap will move between two local optima. Nearest Neighbor NK had the least successful crossovers,
+with only 0.007\% successful on the largest tested problems. In comparison to Ising Spin Glass, NK's overlap is far more extensive.
+As a result it makes sense that individual crossovers are going to be very unlikely to be fitness improvements.
+
+In comparison with LTGA, the crossover success rates of P3 are lower but similar in problem ordering. This is almost certainly
+a consequence of P3's use of local search. Counter intuitively the use of hill climbing on the initial population is likely reducing
+P3's crossover success not because it reduces model quality or the donation pool, but because it is much more challenging to improve
+locally optimal solutions than randomly generated ones. LTGA's crossover benefits from application to unoptimized solutions, which
+makes its aggregate crossover success incomparable to P3's.
+
+While the frequency of crossover changes per problem, and the likelihood of an individual crossover making a fitness improvement can be
+quite low, the results from Section~\ref{sec-optimum} and Section~\ref{sec-overtime} suggest its still critical to optimization. Without
+crossover P3's performance would be identical to the Random Restart Hill Climber, which was unable to solve even moderately sized problems
+and quickly fell behind P3 in intermediate fitness quality. Therefore even the infrequently successful crossover donation are
+critical to success. This does however suggest a potential avenue for future improvement as different modeling and donation algorithms
+may improve P3's crossover success.
 
 \begin{figure}[t]
   \begin{centering}
