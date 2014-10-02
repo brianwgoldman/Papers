@@ -38,23 +38,23 @@
 \begin{abstract}
 %Should be about 200 words
 The Parameter-less Population Pyramid (P3) is a recently introduced method for performing
-evolutionary optimization without requiring problem specific parameters.
+evolutionary optimization without requiring any user specified parameters.
 This is achieved by combining local search with advanced crossover to iteratively construct
 and exploit multiple populations simultaneously, with each population akin to a generation
-in traditional search.
+in traditional evolutionary computation.
 
 When compared with five advanced search algorithms across dozens of problem sizes for
-seven different benchmarks P3 reliably required at least a constant factor less evaluations to find the global optimum
-than all tested competitors. When compared using fixed numbers of evaluations P3
-generally finds the highest quality solutions. Some evidence also suggests this performance
-extends to considering total number seconds to find the global optimum even when using efficient fitness functions.
+seven different benchmarks, P3 reliably required at least a constant factor less evaluations to find the global optimum
+than all tested competitors. When compared using fixed numbers of evaluations, P3
+generally finds the highest quality solutions. Some evidence also suggests that P3
+is better when compared using the number seconds to find the global optimum even when using efficient fitness functions.
 We investigate the causes of this efficiency and provide some evidence that P3's ability to
 add diversity only as needed may be contributing to its success.
 
 This quality is made even more striking in that unlike P3, the best comparison algorithms received extensive
-problem specific tuning to achieve their performance. As a result we conclude that in contrast to
-previous parameter-less techniques P3 is more efficient than existing parameterized methods for
-black box optimization.
+problem specific tuning to achieve their performance. As a result we conclude that, in contrast to
+previous parameter-less techniques, P3 is an efficient, general, parameter-less approach to black box
+optimization which is more effective than existing state-of-the-art techniques.
 
 \end{abstract}
 
@@ -80,15 +80,15 @@ In evolutionary optimization, and genetic algorithms~(GAs) in particular, search
 biased through parameters. This can be beneficial as it allows practitioners to inject their
 knowledge about the shape of the search landscape into the algorithm.
 However, the quality of solutions found, and the speed at which they are found, is strongly tied to setting these parameters
-correctly~\citep{goldberg:1991:gasize}. As such expert knowledge or exceedingly
+correctly~\citep{goldberg:1991:gasize}. As such, expert knowledge or exceedingly
 expensive parameter tuning~\citep{grefenstette:1986:optimalga} may be required to leverage
 this feature to its fullest potential. Furthermore,  parameters such as population size, mutation rate, crossover
-rate, tournament size, etc can have no clear relationship to the problem being solved, meaning even
+rate, tournament size, etc. may have no clear relationship to the problem being solved, meaning even
 domain experts may not understand how they will interact with the problem or with each other.
 
-As such there have been periodic efforts to reduce or remove the need for parameter tuning.
+There have been periodic efforts to reduce or remove the need for parameter tuning.
 \cite{Back:1992:selfadapt} introduced self-adaptive parameters, in which parameter values
-were included in each solution's genome and underwent evolution. This allowed search
+were included in each solution's genome and themselves underwent evolution. This allowed search
 to optimize some of its own parameters resulting in a reduced the need for expert tuning.
 \cite{harik:1999:parameterlessga} were able to design an entirely parameter-less GA by
 leveraging schema theory and parallel populations. Unfortunately these methods were provably less efficient
@@ -97,7 +97,7 @@ than directly setting the parameters to optimal values~\citep{pelikan:1999:worst
 One area that has been very effective at reducing the number of algorithm parameters is
 model based search. \cite{pelikan:2006:hboa}'s Hierarchical Bayesian Optimization
 Algorithm~(hBOA) and \cite{thierens:2010:ltga}'s Linkage Tree Genetic Algorithm~(LTGA)
-both only require a single parameter: population size. \cite{posik:2011:parameterless}
+both require only a single parameter: population size. \cite{posik:2011:parameterless}
 leveraged model building to create a fully parameter-less algorithm, but it is restricted to
 only order-k, fully decomposable, noiseless problems.
 
@@ -118,10 +118,10 @@ Section~\ref{sec-tuning} provides our methodology to ensure each is optimally tu
 \section{Comparison Optimizers}
 \label{sec-optimizers}
 
-In order to fully understand the effectiveness of a black box search algorithm, it is useful
-to compare it with other similar algorithms. Therefore here we preset five advanced algorithms with
-related features to P3. The Random Restart Hill Climber was chosen as an efficient form of repeated
-local search, and because it shows the advantages of performing the more complex portions of P3.
+In order to fully understand the effectiveness of P3, we compare it with five advanced algorithms which
+have related features to P3. The Random Restart Hill Climber~\citep{goldman:2014:p3} was chosen as an efficient form of repeated
+local search. As P3 combines this hill climber with crossover,
+comparing with local search alone shows the advantages of performing the other portions of P3.
 The $1+(\lambda, \lambda)$ algorithm is the current best theory supported simple genetic algorithm
 and its method of crossover is in some sense a macro-mutation just as in P3. hBOA and Parameter-less
 hBOA are advanced model building search techniques which are very effective at learning complex
@@ -131,8 +131,8 @@ of P3's linkage learning and crossover methods.
 
 Finally, only hBOA and LTGA require any parameters, with each of these only requiring a population
 size. This makes knowing the optimal behavior of these algorithms much more tractable. All of the
-algorithms are also gene order independent, fitness scale invariant, and unbiased. This means
-for any problem the order in which problem variables appear in the genome can be changed
+algorithms are also gene order independent, fitness scale invariant, and unbiased. This means,
+for any problem, the order in which problem variables appear in the genome can be changed
 without changing the behavior of the search. The fitness can also be manipulated in any fashion
 as long as the rank ordering of solutions is unchanged. These algorithms are also unaffected by the meaning
 assigned to each bit, such that inverting a predetermined random subset of genes before evaluation
@@ -152,7 +152,7 @@ further fitness improvements.
 \begin{figure}
   \begin{algorithmic}[1]
   \Procedure{Hill-Climber}{}
-    \State $options \leftarrow [0 \dots N-1]$
+    \State $options \leftarrow [0 \dots N-1]$\label{fig-hc-options}
     \State $tried \leftarrow \emptyset$
     \While{$|tried| < |options|$}
       \ForAll{$index \in shuffled(options)$}
@@ -177,7 +177,7 @@ further fitness improvements.
 The hill climber requires an amortized cost of $O(1)$ operations per evaluation. In order to
 terminate, at least one evaluation must be performed for each of the $N$ bits in the solution.
 As such any operation that happens only once per search can be amortized over at least $N$
-evaluations, covering the initialization of $options$.
+evaluations, covering the initialization of $options$ on Line~\ref{fig-hc-options}.
 
 With the use of proper hashing data structures, determining if $index \notin tried$ requires $O(1)$
 time. While this operation may be called without a directly related evaluation, amortized cost
@@ -186,11 +186,11 @@ be performed. Lets say this evaluation pays for two checks of that $index$, one 
 during this loop. If no fitness improving move is found, the next time through the loop the second check
 is used. A third check is only necessary if no fitness improving move was found for any index.
 This is a contradiction as the loop terminates when no improving move was found. Therefore this check
-can only be called twice per evaluation.
+is called at most twice per evaluation.
 
 Due to its nature, this hill climber cannot escape basins of attraction. Once a solution is reached
-such that none of the single bit neighbors are fitness improvements, search stops. As a result to
-have any hope of solving multimodal problems this algorithm requires a restart mechanism. We have
+such that none of the single bit neighbors are fitness improvements, search stops. Thus
+this algorithm requires a restart mechanism to solve multimodal problems. We have
 chosen here to naively restart search from a random solution whenever a local optima is found. This
 ensures that on all landscapes there is always a non-zero probability of search finding the global optimum.
 
@@ -312,7 +312,7 @@ probably that other solutions reached that leaf with each value of $x_i$.
 
 To perform replacement, hBOA uses restricted tournament replacement. After each new solution is generated
 and evaluated, $w$ solutions are chosen at random from the population, where $w=\min\{N, \frac{\mu}{20}\}$.
-Whichever of the $w$ solutions is the most genetically similar to the offspring is compared with the offspring.
+Whichever of the $w$ solutions is the most genetically similar to the offspring compares its fitness with the offspring.
 If the fitness of the offspring is no worse, it replaces the genetically similar member of $w$, otherwise the
 offspring is discarded. This method is designed to preserve genetic diversity as only genetically similar
 solutions must compete on fitness.
@@ -349,7 +349,7 @@ evaluations~\citep{pelikan:1999:worstparameter-less}.
 ~\cite{thierens:2010:ltga} introduced the Linkage Tree Genetic Algorithm (LTGA) which automatically
 detects and exploits problem epistasis by examining pairwise gene entropy. Due to its enhanced
 ability to preserve high fitness gene subsets, LTGA was able to outperform state of the art
-GAs across many benchmarks. Since its first proposal, many variants of LTGA have been
+GAs across many benchmarks. Since its introduction, many variants of LTGA have been
 proposed~\citep{goldman:2012:ltga} so for clarity we have chosen the version
 presented by \cite{thierens:2013:ltgahiff} as our model. This variant was chosen as it is
 modern and appears to approach the consensus in the literature.
@@ -385,8 +385,8 @@ during crossover.
 \end{figure}
 
 Figure~\ref{fig-cluster-creation} provides the agglomerative method LTGA uses to create gene clusters.
-This algorithm will create a tree of sets, such that the leaves of the tree contain a single gene and
-nodes are the union of their children's sets. These sets are then used by crossover to specify epistatic
+This algorithm creates a tree of sets using pairwise gene entropy, such that the leaves of the tree contain a single gene and
+internal nodes are the union of their children's sets. These sets are then used by crossover to specify epistatic
 relationships which should be preserved.
 The process begins by creating the set of sets $unmerged$ which tracks all top level clusters. Initially
 $unmerged$ contains single member sets for each gene. After each iteration the two sets with the minimum average pairwise
@@ -411,14 +411,17 @@ containing all genes is removed from $useful$ as preserving all genes during cro
 between two clusters is 0, this means there are no individuals in the population which disrupt the relationships between the two
 clusters. Therefore when performing crossover there is no reason to believe a fitness improvement can be achieved
 by breaking the stored pattern. As such a cluster is only kept if its direct superset has a non-zero distance.
+As a final step Line~\ref{fig-cluster-creation-ordering} reorders $useful$ such that clusters appear in reversed
+order from which they were added to $useful$. Thus the most linked clusters and those containing single genes
+appear at the end of the returned list.
 
 \cite{thierens:2013:ltgahiff}'s version of LTGA does not use the entire population when determining pairwise entropy.
 Instead, binary tournament is used to select half of the population. This is done to ensure the model is built
 using only high quality solutions, even during the first generation.
 
-In order to efficiently perform clustering, a pairwise gene frequency table is constructed.
-Equation~\ref{eq-entropy} uses how frequently each of the four possible string values for each
-pair of genes occurs in the selected solutions. Extracting this information requires $O(\mu N^2)$
+In order to efficiently perform clustering, a pairwise gene frequency table is constructed from the selected solutions.
+To calculate Equation~\ref{eq-distance}, Equation~\ref{eq-entropy} is called for each
+gene ($H(c_i)$) and pair of genes ($H(c_i \cup c_j)$). Extracting this information requires $O(\mu N^2)$
 time, where $\mu$ is the population size and $N$ is the genome size. The process of converting
 this pairwise frequency information into clusters can be achieved in $O(N^2)$ using the bookkeeping
 methods presented by \cite{gronau:2007:upgma}. This cost is performed only once per generation,
@@ -452,7 +455,7 @@ crosses each individual with the entire population. Also, to produce a single of
 of the fitness function are performed.
 
 Each generation, each individual in the population undergoes crossover. In a single crossover event, each
-cluster of genes $C_i$ in $useful$ is applied in last merged first order as a crossover mask. A random donor $d$
+cluster of genes $C_i$ in $useful$ is applied as a crossover mask. A random donor $d$
 is chosen from the entire population (not just the model selected population), and $d$'s gene's for $C_i$ are copied
 into the working solution. If a modification is made, an evaluation is then performed. If the crossover
 resulted in no worse fitness then the changes are kept. This allows for neutral drift across plateaus.
@@ -531,7 +534,7 @@ to create all solutions produced in that generation. As P3 does not perform seri
 generations, this process had to be modified. Instead, P3 updates the model each
 time a solution is added to a population. Furthermore, unlike
 LTGA all solutions in the population are used to generate the model, not just the
-winners of a binary tournament. This selection process is not necessary as the
+winners of a binary tournament. We can do this because even the
 worst solutions in the pyramid are already high quality due to local search.
 Using local search in LTGA was examined by \cite{bosman:2011:lsbbo} and found
 to provide no significant improvement. A likely cause was that that study applied
@@ -545,7 +548,7 @@ This method applies gene clusters during crossover based on how many genes
 are in each cluster\footnote{Ties are broken randomly.}, and not on how tightly linked those genes are.
 \cite{goldman:2012:ltga} found that this alternative was better at preserving
 diversity, and therefore required smaller populations, but has  not been integrated into
-our chosen canonical LTGA variant.
+the canonical LTGA variant we used.
 
 P3 also modified Line~\ref{fig-cluster-usage-donate} in Figure~\ref{fig-cluster-usage}.
 Instead of choosing a single genetic donor for each cluster, P3 iterates over the
@@ -642,7 +645,7 @@ and only If (HIFF) problem is designed to capture the difficulties of this class
 In HIFF the genome is broken up into a complete binary tree, such that each gene appears in exactly one
 leaf and each internal node is the subset of genes contained in its children. If all genes represented
 in a node of the tree are set to the same value, they score equal to the size of the set. In this way
-small subsets lead toward solutions to larger subsets. However a node can score if all genes are either
+small subsets lead toward solutions to larger subsets. However, a node can score if all genes are either
 all 1s or all 0s, meaning that to solve higher order subproblems it is necessary to perform crossovers
 that preserve lower order solutions. This problem is a natural fit for LTGA as the linkage tree can
 perfectly duplicate the problem's true relationships \citep{thierens:2013:ltgahiff}.
@@ -658,12 +661,12 @@ that each floating point $x_i$ in Equation~\ref{eq-rast} is encoded using a 10 b
 
 \subsection{Randomly Generated Problem Classes}
 While well defined landscapes can provide specific insights into how an algorithm works,
-their static nature can create misleading results. Specifically algorithm quality might
+their static nature can be misleading. Specifically, algorithm quality might
 be very fragile such that it is only effective at searching well behaved landscapes. A more realistic
 test of an algorithm's black box effectiveness is to work with randomly generated instances
 drawn from a problem class. When tested over a sufficiently large sample it is then possible
 to draw more general conclusions about the algorithms effectiveness. The challenge with these
-landscapes is determining the global optimum to know if an algorithm was successful.
+landscapes is determining the global optimum to gauge if an algorithm was successful.
 
 Perhaps the most common model for generating random rugged landscapes is the NK model. An
 NK Landscape determines the fitness of each gene based on epistatic relationships with $K$
@@ -671,22 +674,30 @@ other genes in the genome. This fitness is specified using a randomly generated 
 fitness values, were each possible combination of the $K+1$ genes is mapped to some floating
 point value $[0-1]$. In unrestricted NK landscapes the relationships between genes are also
 randomly chosen and as a result finding the global optimum is $NP$-Hard for $K>1$. However,
-if epistasis is instead set such that each gene depends on the $K$ directly following it
+if epistasis is set such that each gene depends on the $K$ directly following it
 in the genome the solution can be found in polynomial time~\citep{wright:2000:solvingnk}.
 These Nearest Neighbor NK landscapes are therefore ideal for search algorithm testing.
 For all of our experiments we fixed $K=5$ to ensure highly rugged landscapes.
 
 \cite{saul:1994:spinglass} presents a combinatorial benchmark problem derived from physics:
-Ising Spin Glasses. A spin glass is defined by interaction terms between variables with
-the genome encoding the sign for each variable and a goal to minimize the total interaction value.
-Similar to NK Landscapes the general class is $NP$-Hard to optimize, but the $2D\pm J$ subset of
+Ising Spin Glasses. A spin glass is defined by a weighted graph of interaction terms between vertices.
+Each gene assigns a value to each vertex, with the fitness calculated by Equation~\ref{eq-ising}.
+In this equation, $E$ is the set of all edges, $e_{ij}$ is the edge weight connecting vertex $i$ to vertex $j$, and
+$x_i$ and $x_j$ are the gene values for vertex $i$ and $j$. Optimal fitness is when this sum is minimized.
+\begin{equation}
+\sum_{e_{ij} \in E} x_ie_{ij}x_j
+  \label{eq-ising}
+\end{equation}
+Similar to NK Landscapes, the general class is $NP$-Hard to optimize, but the $2D\pm J$ subset of
 Ising Spin Glasses can be polynomially solved.\footnote{\url{http://www.informatik.uni-koeln.de/spinglass/}}
+In this subset the graph is restricted to be a two dimensional torus, edge weights are randomly set
+to either -1 or 1, and vertex values must be -1 or 1.
 
 As our final class of randomly generated problems we chose the Maximum Satisfiability (MAX-SAT) problem.
 Related to the more common 3-SAT problem, a MAX-SAT instance is defined by a set of three term clauses.
 Each term is a randomly chosen variable, which may also be negated. A clause scores if an and only if
 at least one term in the clause evaluates to true. In order to make MAX-SAT instances with a known global
-optimum \cite{goldman:2014:p3} proposed constructing clauses around a fixed solution. In this way the
+optimum, \cite{goldman:2014:p3} proposed constructing clauses around a fixed solution. In this way the
 signs of the terms are set to ensure the target solution satisfies the clause. To ensure each
 problem is challenging chose a clause to variable ratio of $4.27$.
 
@@ -696,7 +707,7 @@ While four of the six algorithms in our experiments do not require any user spec
 hBOA and LTGA both use a population size parameter. To ensure these techniques are not unfairly
 handicapped, we have extensively tuned each using the bisection method \citep{sastry:2001:bisection}
 to determine the optimal population size for each size of each problem.
-Extended by \cite{goldman:2012:ltga} this method iteratively
+Extended by \cite{goldman:2012:ltga}, this method iteratively
 doubles the population size until some success criteria is met and then performs bisection
 between the lowest successful and highest unsuccessful sizes. Thus the minimum population size
 which meets the success criteria is found. \cite{goldman:2014:p3} proposed a success criteria
@@ -749,7 +760,7 @@ As expected, Parameter-less hBOA was generally less efficient than hBOA using an
 of the two lines are relatively similar across all problems, meeting with the theoretical expectation that
 Parameter-less hBOA is no more than a logarithmic factor worse than hBOA.  The only problem which reversed
 this trend was MAX-SAT, where Parameter-less hBOA actually outperformed hBOA. A potential explanation for
-this upset is that hBOA is using the optimal population size for the problem class, not for each instance.
+this is that hBOA is using the optimal population size for the problem class, not for each instance.
 Therefore hBOA must use a population size sufficiently large to solve the hardest instances in the class.
 Parameter-less hBOA on the other hand is able to solve easy instances using much smaller population sizes.
 The net effect is therefore that by being more adaptable Parameter-less hBOA is able to achieve better median
@@ -785,10 +796,10 @@ on instances of median difficulty.
 
 Of the 130 tested configurations, P3 found the global optimum using the least median evaluations on 114.
 The largest of these used 49 bits, with P3 achieving the best results on all 92 larger
-configurations. hBOA, LTGA, and Parameter-less hBOA only outperform P3 on the 5, 4, and 1 smallest Deceptive
-Step Trap instances, respectively. Random Restart Hill Climbing outperforms P3 on the 3 smallest Nearest Neighbor NK instances
+configurations. hBOA, LTGA, and Parameter-less hBOA only outperform P3 on the smallest 5, 4, and 1 Deceptive
+Step Trap instances, respectively. Random Restart Hill Climbing outperforms P3 on the smallest 3 Nearest Neighbor NK instances
 and the smallest Ising Spin Glass. $1+(\lambda, \lambda)$ has the most success outperforming P3, doing so
-on 5 smallest Deceptive Traps, 3 smallest Deceptive Step Traps, and 2 smallest Rastrigin.
+on the smallest 5 Deceptive Traps, 3 smallest Deceptive Step Traps, and 2 smallest Rastrigin.
 
 On Deceptive Trap P3 significantly outperforms both hill climbing
 and LTGA by combining the best features of each, using hill climbing to optimize each trap and crossover
@@ -853,7 +864,7 @@ statistical comparison of log-log regression lines.
 
 For some applications, finding the global optimum is less important than finding good solutions quickly. Therefore
 we examine this behavior in Figure~\ref{fig-fitness-over-time}. At regular intervals during optimization
-Figure~\ref{fig-fitness-over-time} shows the median of the best fitnesses found by that point of search across
+Figure~\ref{fig-fitness-over-time} shows the median of the best fitnesses found at that point of search across
 100 runs. For each problem we show the largest problem size for which we were able to successfully set a population
 size for hBOA, but the trends shown are representative of all larger problem sizes. The maximum reporting interval
 is set to include the slowest P3 run to reach the global optimum.
@@ -866,9 +877,9 @@ is set to include the slowest P3 run to reach the global optimum.
 % hc 9
 % phboa 18
 
-At 63\% of recording intervals hBOA has the worst fitness of any solver. Many of the exception occur when
-the total number of evaluations performed is significantly less than the genome size and hBOA reaches better fitness
-than the Hill Climber, $1+(\lambda, \lambda)$, and P3. This early in search hBOA and LTGA are both still evaluating
+At 63\% of the recording intervals hBOA has the worst fitness of any solver. Many of the exceptions occur when
+the total number of evaluations performed is significantly less than the genome size. Under these circumstances hBOA reaches better fitness
+than the Hill Climber, $1+(\lambda, \lambda)$, and P3. Early in search hBOA and LTGA are both still evaluating
 individuals in their randomly generated initial populations, while the three techniques worse than hBOA have started
 from a single solution and are attempting to optimize. Of the methods, hBOA uses by far the largest population sizes,
 about 55 times larger than LTGA on average for problems shown. As such it makes sense that hBOA would take a long time to reach high
@@ -910,7 +921,7 @@ enters a second period of rapid improvement.
 
 This behavior is easiest to understand on the two Trap problems. LTGA's first generation will push individual traps toward a
 local optima, but it requires more than a single generation to do so completely. Until that occurs, the model is likely behaving
-no better than random as there is little apparent linkage between bits. Once the model begins to identify individual traps crossover
+no better than random as there is little apparent linkage between bits. Once the model begins to identify individual traps, crossover
 can begin to increase the frequency of higher fitness local optima. This process begins slowly as low fitness local optima are more
 likely to be chosen for donation than high fitness local optima due to their frequency in the population. The process becomes
 self-catalysing as increased frequency of the global optimum trap genes means increased likelihood of the global optimum being spread by crossover.
@@ -1083,7 +1094,7 @@ to require less crossover evaluations. Deceptive Trap and Rastrigin spent the le
 few local optima in each subproblem. HIFF and Ising Spin Glasses use crossover for about 60\% of evaluations. The HIFF structure can
 be perfectly learned by the linkage tree, but the higher order relationships require multiple stages of crossover to optimize.
 Ising Spin Glasses have an overlapping structure, making them impossible to perfectly represent in a single linkage tree, but
-that overlap is relatively minor in comparison with Nearest Neighbor NK, which uses 81\%. Deceptive Step Trap spends the highest
+that overlap is relatively minor in comparison with Nearest Neighbor NK, which uses 81\% of evaluations on crossover. Deceptive Step Trap spends the highest
 percentage of evaluations on crossover, 92\%. Unlike all of the other problems, the value taken by an individual bit in Deceptive
 Step Trap has very little meaning. This is because any trap value is either a local optima or 1 bit flip away from being a local optima.
 This has a combined result of meaning it takes very few local search evaluations to find a local optima but very many crossover operations
@@ -1105,7 +1116,7 @@ a linkage tree. In comparison to Figure~\ref{fig-cross-success} Deceptive Step T
 However, the reason for this is likely that even exceedingly uninformed crossover can make improvements to Deceptive Step Trap as
 flipping two bits in the same trap will move between two local optima. Nearest Neighbor NK had the least successful crossovers,
 with only 0.007\% successful on the largest tested problems. In comparison to Ising Spin Glass, NK's overlap is far more extensive.
-As a result it makes sense that individual crossovers are going to be very unlikely to be fitness improvements.
+As a result it makes sense that individual crossovers are very unlikely to be fitness improvements.
 
 In comparison with LTGA, the crossover success rates of P3 are lower but similar in problem ordering. This is almost certainly
 a consequence of P3's use of local search. Counterintuitively the use of hill climbing on the initial population is likely reducing
@@ -1114,7 +1125,7 @@ locally optimal solutions than randomly generated ones. LTGA's crossover benefit
 makes its aggregate crossover success incomparable to P3's.
 
 While the frequency of crossover changes per problem, and the likelihood of an individual crossover making a fitness improvement can be
-quite low, the results from Section~\ref{sec-optimum} and Section~\ref{sec-overtime} suggest its still critical to optimization. Without
+quite low, the results from Section~\ref{sec-optimum} and Section~\ref{sec-overtime} suggest it's still critical to optimization. Without
 crossover P3's performance would be identical to the Random Restart Hill Climber, which was unable to solve even moderately sized problems
 and quickly fell behind P3 in intermediate fitness quality. Therefore even the infrequently successful crossover donation are
 critical to success. This does however suggest a potential avenue for future improvement as different modeling and donation algorithms
