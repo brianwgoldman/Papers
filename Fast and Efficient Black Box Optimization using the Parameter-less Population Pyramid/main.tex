@@ -138,7 +138,8 @@ as long as the rank ordering of solutions is unchanged. These algorithms are als
 assigned to each bit, such that inverting a predetermined random subset of genes before evaluation
 will not impact search efficiency.
 
-Our implementations of all of these algorithms as well as all of the raw results and processing scripts
+Our implementations of all of these algorithms as well as all of the population size information, raw results,
+and processing scripts
 are available from our website.\footnote{\url{https://github.com/brianwgoldman/FastEfficientP3}}
 \subsection{Random Restart Hill Climber}
 \label{sec-hill-climber}
@@ -703,6 +704,30 @@ problem is challenging chose a clause to variable ratio of $4.27$.
 
 \section{Comparison Algorithm Parameter Tuning}
 \label{sec-tuning}
+
+\begin{figure}[t]
+  \begin{centering}
+    \begin{subfigure}{.5\textwidth}
+      \begin{centering}
+        \includegraphicsfit{pop-hboa}
+      \end{centering}
+      \caption{Tuned Population Sizes for hBOA}
+      \label{fig-small-pop-dst}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+      \begin{centering}
+        \includegraphicsfit{pop-ltga}
+      \end{centering}
+      \caption{Tuned Population Sizes for LTGA}
+      \label{fig-small-pop-nk}
+    \end{subfigure}
+  \end{centering}
+  \caption{Optimal population sizes found using bisection on each size
+           for each problem.}
+  \label{fig-pop-sizes}
+\end{figure}
+
+
 While four of the six algorithms in our experiments do not require any user specified parameters,
 hBOA and LTGA both use a population size parameter. To ensure these techniques are not unfairly
 handicapped, we have extensively tuned each using the bisection method \citep{sastry:2001:bisection}
@@ -717,6 +742,14 @@ do not prematurely converge, we chose $r=100$ to similarly ensure hBOA and LTGA 
 As bisection can make infinitely large population sizes, any run which had not found the global
 optimum after 100 million evaluations or 128 computing hours was considered unsuccessful.
 
+Figure~\ref{fig-pop-sizes} shows the results from performing bisection. In general hBOA
+required population sizes which were at least an order of magnitude larger than LTGA. Due to
+runtime and memory usage finding the optimal value for hBOA was much less tractable than LTGA
+for moderate to large problem sizes. LTGA's population size also grew significantly slower
+than hBOA's as problem size increased, especially on the two Trap problems and Rastrigin.
+Both algorithms were very ineffective on MAX-SAT, neither able to tune to problems sizes over 60 bits.
+This is likely due to the fact that some randomly generated MAX-SAT landscapes are very flat
+and highly deceptive.
 \section{Finding the Global Optimum}
 \label{sec-optimum}
 
