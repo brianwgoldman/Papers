@@ -776,28 +776,53 @@ no point is shown. The maximum problem size used for each problem was set to be 
 feasibly determine an optimal population size for LTGA. For many larger problems results are not shown
 for hBOA due to the extreme computational cost required to optimally set the population size.
 
+\subsection{Quantitative Comparison}
+Of the 130 tested configurations, P3 found the global optimum using the least median evaluations on 114.
+The largest of these used 49 bits, with P3 achieving the best results on all 92 larger
+configurations. hBOA, LTGA, and Parameter-less hBOA only outperform P3 on the smallest 5, 4, and 1 Deceptive
+Step Trap instances, respectively. Random Restart Hill Climbing outperforms P3 on the smallest 3 Nearest Neighbor NK instances
+and the smallest Ising Spin Glass. $1+(\lambda, \lambda)$ has the most success outperforming P3, doing so
+on the smallest 5 Deceptive Traps, 3 smallest Deceptive Step Traps, and 2 smallest Rastrigin.
+
+\subsection{Local Search}
 The Random Restart Hill Climber and $1+(\lambda, \lambda)$ are both relatively effective on small problem
-sizes, but have difficulty scaling to larger problems.  Only on MAX-SAT are these optimizers competitive
-at larger tested problem sizes. However, this may just be an artifact as the largest tested MAX-SAT
-was an order of magnitude smaller than the largest size tested for most other problems. On the Deceptive
-Trap and Deceptive Step Trap problem $1+(\lambda, \lambda)$ has some other interesting results. For
-problems with 4 or less traps it performs significantly better than any other algorithm. This is likely
+sizes. This is especially true for the three randomly generated problem problem classes. These problems
+may contain relatively few local optima or just be exceptionally difficult for the model based algorithms.
+For Deceptive Trap and Deceptive Step Trap using 4 or less traps, $1+(\lambda, \lambda)$ performs significantly
+better than any other algorithm. This is likely
 because $1+(\lambda, \lambda)$ is able to overcome deception by probabilistically
-flipping entire traps. For larger problems it becomes increasingly unlikely that mutation and crossover can
-create enough changes to an individual trap to overcome deception without negatively changing others. This
-behavior also causes high variance in success rate, as evident by the occasional successes on large problems.
+flipping entire traps.
 This ability to successfully integrate modifications of more than a single bit generally appears to lead $1+(\lambda, \lambda)$
 to outperform the Hill Climber on all problems except Nearest Neighbor NK.
 
-As expected, Parameter-less hBOA was generally less efficient than hBOA using an optimal population size. The slopes
-of the two lines are relatively similar across all problems, meeting with the theoretical expectation that
-Parameter-less hBOA is no more than a logarithmic factor worse than hBOA.  The only problem which reversed
-this trend was MAX-SAT, where Parameter-less hBOA actually outperformed hBOA. A potential explanation for
-this is that hBOA is using the optimal population size for the problem class, not for each instance.
-Therefore hBOA must use a population size sufficiently large to solve the hardest instances in the class.
-Parameter-less hBOA on the other hand is able to solve easy instances using much smaller population sizes.
-The net effect is therefore that by being more adaptable Parameter-less hBOA is able to achieve better median
-results.
+On larger problem sizes, the ability for local search to reach the global optimum quickly diminishes.
+Only on MAX-SAT are these optimizers competitive
+at larger tested problem sizes. However, this may just be an artifact as the largest tested MAX-SAT
+was an order of magnitude smaller than the largest size tested for most other problems. As the problem
+size increases the number of local optima increases exponentially, which explains why Random Restart Hill
+Climbing was unable to scale.
+For larger problems it becomes increasingly unlikely that $1+(\lambda, \lambda)$'s mutation and crossover can
+create enough changes to the correct parts of an individual required to overcome deception without negatively changing others. This
+behavior also causes high variance in success rate, as evident by the occasional successes on large Deceptive Trap problems.
+
+By integrating local search, P3 gains most of the benefits. Unlike the other model based methods, P3 generally outperforms
+both Random Restart Hill Climber and $1+(\lambda, \lambda)$ on small problem sizes. On larger problem sizes
+P3's ability to perform targeted crossover quickly allows it to surpass $1+(\lambda, \lambda)$'s uninformed
+crossover. This targeted crossover may also explain why P3 is able to outperform $1+(\lambda, \lambda)$ on MAX-SAT.
+
+Local search may also account for some of P3's ability to surpass LTGA and hBOA on larger problem sizes.
+On Deceptive Trap P3's use of hill climbing ensures all traps are immediately optimized, allowing for perfect
+linkage detection and high quality donation. Deceptive Step Trap, which is less amenable to local search, does
+not show a similar improvement over the other model building techniques and performs only slightly better.
+Using local search on HIFF likely saves P3 a generation over LTGA and hBOA as all pairwise subproblems will already be solved,
+accounting for some of its improvement.
+
+\subsection{Model Building}
+Only techniques which explicitly built models of the search landscape were able to solve the largest problem
+instances. On single instance problems LTGA was generally more effective than hBOA, with hBOA outperforming
+LTGA on Nearest Neighbor NK and Ising Spin Glasses. This may be caused by the differences in modeling method:
+the single instance problems can all be perfectly represented with a linkage tree while none of the randomly generated
+problem classes can.
 
 Considering how different hBOA and LTGA are in performing optimization, it is somewhat surprising how similar
 their results are on HIFF. hBOA utilizes Bayesian decision trees to stochastically generate solutions while
@@ -810,14 +835,12 @@ order subproblems have been optimized. As a result both LTGA and hBOA are unlike
 of subproblem per generation. Therefore both require a number of generations based on the number of subproblem sizes
 in the problem.
 
-LTGA, as the current state-of-the-art, was generally at least as fast to find the global optimum as hBOA.
-However on Nearest Neighbor NK and Ising Spin Glasses LTGA appears
-to perform worse than hBOA.  This may be due to LTGA's inability to represent the overlapping nature of these problems.
-On MAX-SAT LTGA only outperforms hBOA and performs worse than the other 4 techniques.
-Again, the likely cause to this is LTGA's requirement to have a
-population size sufficiently large to solve the hardest problem in each class, reducing its effectiveness
-on instances of median difficulty.
+Similar to hBOA and LTGA, P3's model building allows it to scale to large problem sizes. As P3 utilizes the same
+model building method as LTGA, we should expect the effects of model building to be similar between those two algorithms.
+Indeed on the four problems where a linkage tree can perfectly represent gene epistasis, P3 has very similar
+scalability (slope) as LTGA, in most cases performing better only by a constant factor.
 
+\subsection{Population Sizing}
 \begin{figure}
   \begin{center}
   \includegraphicsfit{evals-to-success-range}
@@ -827,25 +850,19 @@ on instances of median difficulty.
   \label{fig-evals-to-success-range}
 \end{figure}
 
-Of the 130 tested configurations, P3 found the global optimum using the least median evaluations on 114.
-The largest of these used 49 bits, with P3 achieving the best results on all 92 larger
-configurations. hBOA, LTGA, and Parameter-less hBOA only outperform P3 on the smallest 5, 4, and 1 Deceptive
-Step Trap instances, respectively. Random Restart Hill Climbing outperforms P3 on the smallest 3 Nearest Neighbor NK instances
-and the smallest Ising Spin Glass. $1+(\lambda, \lambda)$ has the most success outperforming P3, doing so
-on the smallest 5 Deceptive Traps, 3 smallest Deceptive Step Traps, and 2 smallest Rastrigin.
+As expected, Parameter-less hBOA was generally less efficient than hBOA using an optimal population size. The slopes
+of the two lines are relatively similar across all problems, meeting with the theoretical expectation that
+Parameter-less hBOA is no more than a logarithmic factor worse than hBOA.  The only problem which reversed
+this trend was MAX-SAT, where Parameter-less hBOA actually outperformed hBOA and LTGA. A potential explanation for
+this is that hBOA and LTGA are using the optimal population size for the entire problem class, not for each instance.
+Therefore both must use a population size sufficiently large to solve the hardest instances in the class.
+Parameter-less hBOA, on the other hand, is able to solve easy instances using much smaller population sizes.
+The net effect is therefore that by being more adaptable Parameter-less hBOA is able to achieve better results
+on instances of median difficulty.
 
-On Deceptive Trap P3 significantly outperforms both hill climbing
-and LTGA by combining the best features of each, using hill climbing to optimize each trap and crossover
-to perfectly mix traps. Deceptive Step Trap is less amenable to local search with P3's quality effectively
-tied with both LTGA and hBOA. The slight improvement here may be due to P3's ability to solve some runs
-using smaller population sizes than LTGA and hBOA due to lucky initialization. Using local search on HIFF
-likely saves P3 a generation over LTGA and hBOA as all pairwise subproblems will already be solved. Combined
-with P3's ability to add diversity only as needed this likely explains why P3 is able to solve HIFF a constant
-multiple faster than either population based technique. P3 likely solves its median run of Nearest Neighbor
-NK and Ising Spin Glasses faster than both hBOA and LTGA again by using population sizes fit to each instance
-and not fit to the entire problem class. On MAX-SAT, where the most effective solvers are Hill Climber and
-$1+(\lambda, \lambda)$, P3 outperforms both likely due to its use of local search with a better ability to
-overcome deception.
+Scaling population size to the problem instance instead of the problem class may explain some of why P3 outperforms
+LTGA and hBOA on large problem sizes. P3 solves its median run of Nearest Neighbor
+NK and Ising Spin Glasses faster than both hBOA and LTGA.
 
 To more fully examine the hypothesis that some of P3's success is do to its ability to scale to differences in problem difficulty,
 Figure~\ref{fig-evals-to-success-range} shows the upper and lower quartiles for P3 and LTGA. On each problem
@@ -853,8 +870,8 @@ LTGA has a much smaller difference between its best and worst runs. This makes s
 population size regardless of instance and progresses search generationally. In contrast P3 has a much
 higher split, with some runs finishing very quickly. This added variability is generally on only the lower
 end as P3's upper quartile is only worse than LTGA's upper quartile on Deceptive Step Trap and Nearest
-Neighbor NK. A possible explanation for this is that as P3 has not pre-learned the amount of diversity required
-to solve all instances does not take as risky of behavior as LTGA.
+Neighbor NK. On these problems the difference in upper quartile is very small, suggesting that even in the worst
+case P3 is no worse than LTGA.
 
 \section{Fitness Over Time}
 \label{sec-overtime}
@@ -874,27 +891,31 @@ size for hBOA, but the trends shown are representative of all larger problem siz
 is set to include the slowest P3 run to reach the global optimum.
 
 % 181 total
-% 126 has P3 best
-% 27 LTGA
-% 20 hboa
-% 50 lambdalambda
-% hc 9
-% phboa 18
+% 121 has P3 best
+%   9 hc
+%  50 lambdalambda
+%  20 hboa
+%  18 phboa
+%  27 LTGA
 
-At 63\% of the recording intervals hBOA has the worst fitness of any solver. Many of the exceptions occur when
-the total number of evaluations performed is significantly less than the genome size. Under these circumstances hBOA reaches better fitness
-than the Hill Climber, $1+(\lambda, \lambda)$, and P3. Early in search hBOA and LTGA are both still evaluating
-individuals in their randomly generated initial populations, while the three techniques worse than hBOA have started
-from a single solution and are attempting to optimize. Of the methods, hBOA uses by far the largest population sizes,
-about 55 times larger than LTGA on average for problems shown. As such it makes sense that hBOA would take a long time to reach high
-quality solutions.
+\subsection{Quantitative Comparison}
+Of 181 sample points, P3 had the highest median fitness in 121. In pairwise competition, $1+(\lambda, \lambda)$
+was the most likely to outperform P3, doing so on 50 sample points. LTGA, hBOA, and Parameter-less hBOA
+were the next best, outperforming P3 on 27, 20, and 18 sample points. Random Restart Hill Climbing almost
+never outperformed P3, doing so only 9 times.
 
-Parameter-less hBOA reported equal or higher fitness than hBOA when using the same number of total evaluations in 68\% of intervals. This makes
-sense as Parameter-less hBOA's use of small populations allows it to begin to optimize long before hBOA has even evaluated
-its entire initial population. However, this trend is reversed after a sufficient number of evaluations, as is apparent
-on Deceptive Step Trap and Ising Spin Glasses. This makes sense as hBOA's population is set to quickly find the global
-optimum.
+\subsection{Local Search}
+Perhaps the most striking result is the quality of $1+(\lambda, \lambda)$. Until quite far into search this
+method performs better than both LTGA and hBOA. Given sufficient evaluations $1+(\lambda, \lambda)$ outperforms
+Random Restart Hill Climbing on all 7 problems. For brief periods in the middle of search it performs the
+best of all techniques on both Trap functions, HIFF, Ising Spin Glass, and MAX-SAT problems. A likely
+explanation is $1+(\lambda, \lambda)$'s ability to efficiently incorporate gene modifications of larger
+than one bit. This allows it to overcome the deception and plateaus in Deceptive Trap and Deceptive Step Trap, solve medium sized subproblems
+in HIFF, flip the signs on multiple adjacent bits in Ising Spin Glass, and cross plateaus in MAX-SAT. However,
+this method is not enough to quickly reach the global optima in many of these problems which causes it to eventually
+be overtaken by the model building techniques.
 
+The integration of hill climbing into P3 makes it strictly better than using hill climbing alone.
 Early in optimization P3 and the Random Restart Hill Climber have effectively identical quality. This is because
 P3 performs the same evaluations as the Hill Climber for the first two restarts. Once P3 begins
 performing crossover it immediately improves over the Hill Climber. In 95\% of intervals P3 had a fitness at
@@ -902,18 +923,13 @@ least as high as Hill Climbing. As such P3 is likely better than a simple
 hill climber regardless of how long each technique is run and irrespective of how high quality the solution
 found has to be.
 
-Perhaps the most striking result is the quality of $1+(\lambda, \lambda)$. Until quite far into search this
-method performs better than both LTGA and hBOA. Given sufficient evaluations $1+(\lambda, \lambda)$ outperforms
-Random Restart Hill Climbing on all 7 problems. For brief periods in the middle of search it performs the
-best of all techniques on the Deceptive Step Trap, HIFF, Ising Spin Glass, and MAX-SAT problems. A likely
-explanation is $1+(\lambda, \lambda)$'s ability to efficiently incorporate gene modifications of larger
-than one bit. This allows it to overcome the plateaus in Deceptive Step Trap, solve medium sized subproblems
-in HIFF, flip the signs on multiple adjacent bits in Ising Spin Glass, and cross plateaus in MAX-SAT. However,
-this method is not enough to quickly reach the global optima in many of these problems which causes it to eventually
-be overtaken by the model building techniques.
+\subsection{Model Building}
+Both hBOA and LTGA are marked by periods of little improvement and rapid improvement. Initially this is due to
+population size effects (Section~\ref{sec-pop-sizing}). In hBOA this is taken to the extreme, with all fitness
+improvement made at the very end of search. In both cases this is caused by model building. Before the model
+is accurate little improvement is made. Once it is accurate, fitness improves dramatically.
 
-For all problems, LTGA lags behind P3 in fitness improvement, but has a similar overall shape. On every problem except
-Rastrigin, LTGA has five distinct periods: fitness plateau, near instantaneous improvement, fitness plateau,
+On every problem LTGA has five distinct periods: fitness plateau, near instantaneous improvement, fitness plateau,
 and improvement to global optimum. The early period corresponds with
 initialization of the population, with the first fitness gain achieved immediately upon completing the first generation.
 This can be explained as LTGA's mixing strategy performs a sort of local search when the model has not yet detected gene epistasis.
@@ -938,6 +954,25 @@ remains stuck, P3's use of crossover slowly begins to combine optimal trap value
 performs this improvement all at once, P3 integrates all optimal trap values immediately, waiting only on random restarts to find
 the optimal trap setting.
 
+\subsection{Population Sizing}
+\label{sec-pop-sizing}
+
+At 58\% of the recording intervals hBOA has the worst fitness of any solver. Many of the exceptions occur when
+the total number of evaluations performed is significantly less than the genome size. Under these circumstances hBOA reaches better fitness
+than the Random Restart Hill Climber, $1+(\lambda, \lambda)$, and P3. Early in search hBOA and LTGA are both still evaluating
+individuals in their randomly generated initial populations, while the three techniques worse than hBOA have started
+from a single solution and are attempting to optimize. Of the methods, hBOA uses by far the largest population sizes,
+about 64 times larger than LTGA on average for problems shown. As such it makes sense that hBOA would take a long time to reach high
+quality solutions.
+
+Parameter-less hBOA reported equal or higher fitness than hBOA when using the same number of total evaluations in 62\% of intervals. This makes
+sense as Parameter-less hBOA's use of small populations allows it to begin to optimize long before hBOA has even evaluated
+its entire initial population. However, this trend is reversed after a sufficient number of evaluations, as is apparent
+on Deceptive Step Trap and Ising Spin Glasses. This makes sense as hBOA's population is set to quickly find the global
+optimum.
+
+
+
 \begin{figure}[t]
   \begin{centering}
     \begin{subfigure}{.5\textwidth}
@@ -961,7 +996,7 @@ the optimal trap setting.
 \end{figure}
 
 
-It is important to note that while P3 achieved the best fitness across 70\% of time points, hBOA and LTGA were tuned specifically
+It is important to note that hBOA and LTGA were tuned specifically
 to find the global optimum and are not necessarily using the optimal population size for finding intermediate fitnesses. Consider
 that for both reducing the population size would almost certainly improve their fitness for evaluation steps less than their population
 size. To examine the effect of population size we tested LTGA using one tenth of the population size required for reliably finding the
@@ -970,7 +1005,9 @@ a smaller population size on the other five problems. In aggregate, P3 still ach
 least as high as LTGA using the smaller population size at 80\% of intervals.
 Reducing the population size resulted in LTGA's initial fitness improvement
 occurring earlier, as the first generation is completed much more quickly. On Deceptive Step Trap this means that
-LTGA leaps ahead of P3 due to its ability to overcome the two bit fitness plateaus. Across all tested problems using the smaller
+LTGA leaps ahead of P3 due to its ability to overcome the two bit fitness plateaus.
+%
+Across all tested problems using the smaller
 population size reduced the quality of LTGA's first fitness plateau, likely due to missing required diversity to reach higher quality.
 The second period of improvement also comes earlier and reaches a lower quality fitness. On Deceptive Step Trap 0
 runs reach the global optimum, down from 100 successful for the full population size. On Nearest Neighbor NK this drops the number
@@ -979,6 +1016,12 @@ at early points during optimization, doing so reduces the robustness of the fina
 which balances high quality intermediate fitness without trading away eventual optimality.
 
 \section{Computational Expenses}
+While it is common in evolutionary computation to assume the evaluation function will dominate algorithm
+complexity, in some domains this will not be true. Model based methods are especially likely to violate
+this norm. Therefore in order to assess P3's quality in solving problems with efficient fitness functions,
+we provide data on both its algorithmic complexity and wall clock time.
+
+\subsection{Operation Counting}
 \begin{figure}[t]
   \begin{centering}
     \begin{subfigure}{.5\textwidth}
@@ -1026,6 +1069,7 @@ important note is that each donation may range in size from a single bit up to $
 donations far more likely to result in repeated attempts. As such this may cause some super-linear growth
 in P3, but its unlikely to be very high.
 
+\subsection{Wall Clock Performance}
 \begin{figure}
   \begin{center}
   \includegraphicsfit{seconds-to-success}
@@ -1089,6 +1133,7 @@ While analysis of optimization speed is useful from a practitioner standpoint, d
 little insight into algorithm behavior. To better understand how P3 works in detail we present here
 a look at some internal features specific to P3.
 
+\subsection{Crossover}
 P3 performs optimization using a mixture of hill climbing and crossover. Exactly how much time the algorithm
 dedicates to each is not clear from the algorithm description alone. As such, Figure~\ref{fig-cross} shows
 that the relationship between the two is strongly problem dependent but relatively independent of problem size.
@@ -1135,6 +1180,7 @@ and quickly fell behind P3 in intermediate fitness quality. Therefore even the i
 critical to success. This does however suggest a potential avenue for future improvement as different modeling and donation algorithms
 may improve P3's crossover success.
 
+\subsection{Pyramid}
 \begin{figure}[t]
   \begin{centering}
     \begin{subfigure}{.5\textwidth}
