@@ -788,7 +788,7 @@ on the smallest 5 Deceptive Traps, 3 smallest Deceptive Step Traps, and 2 smalle
 The Random Restart Hill Climber and $1+(\lambda, \lambda)$ are both relatively effective on small problem
 sizes. This is especially true for the three randomly generated problem problem classes. These problems
 may contain relatively few local optima or just be exceptionally difficult for the model based algorithms.
-For Deceptive Trap and Deceptive Step Trap using 4 or less traps, $1+(\lambda, \lambda)$ performs significantly
+On Deceptive Trap and Deceptive Step Trap using 4 or less traps, $1+(\lambda, \lambda)$ performs significantly
 better than any other algorithm. This is likely
 because $1+(\lambda, \lambda)$ is able to overcome deception by probabilistically
 flipping entire traps.
@@ -801,11 +801,11 @@ at larger tested problem sizes. However, this may just be an artifact as the lar
 was an order of magnitude smaller than the largest size tested for most other problems. As the problem
 size increases the number of local optima increases exponentially, which explains why Random Restart Hill
 Climbing was unable to scale.
-For larger problems it becomes increasingly unlikely that $1+(\lambda, \lambda)$'s mutation and crossover can
-create enough changes to the correct parts of an individual required to overcome deception without negatively changing others. This
-behavior also causes high variance in success rate, as evident by the occasional successes on large Deceptive Trap problems.
+For larger problems it also becomes increasingly unlikely for $1+(\lambda, \lambda)$ to make the right combination
+of changes required to reach the global optimum. This
+behavior causes high variance in success rate, as evident by the occasional successes on large Deceptive Trap problems.
 
-By integrating local search, P3 gains most of the benefits. Unlike the other model based methods, P3 generally outperforms
+P3's integration of local search gives it similar benefits. Unlike the other model based methods, P3 generally outperforms
 both Random Restart Hill Climber and $1+(\lambda, \lambda)$ on small problem sizes. On larger problem sizes
 P3's ability to perform targeted crossover quickly allows it to surpass $1+(\lambda, \lambda)$'s uninformed
 crossover. This targeted crossover may also explain why P3 is able to outperform $1+(\lambda, \lambda)$ on MAX-SAT.
@@ -818,11 +818,11 @@ Using local search on HIFF likely saves P3 a generation over LTGA and hBOA as al
 accounting for some of its improvement.
 
 \subsection{Model Building}
-Only techniques which explicitly built models of the search landscape were able to solve the largest problem
+Only techniques which explicitly built models of gene epistasis were able to solve the largest problem
 instances. On single instance problems LTGA was generally more effective than hBOA, with hBOA outperforming
 LTGA on Nearest Neighbor NK and Ising Spin Glasses. This may be caused by the differences in modeling method:
-the single instance problems can all be perfectly represented with a linkage tree while none of the randomly generated
-problem classes can.
+unlike the single instance problems, gene epistasis in the randomly generated
+problem classes cannot be be perfectly represented with a linkage tree.
 
 Considering how different hBOA and LTGA are in performing optimization, it is somewhat surprising how similar
 their results are on HIFF. hBOA utilizes Bayesian decision trees to stochastically generate solutions while
@@ -861,10 +861,8 @@ The net effect is therefore that by being more adaptable Parameter-less hBOA is 
 on instances of median difficulty.
 
 Scaling population size to the problem instance instead of the problem class may explain some of why P3 outperforms
-LTGA and hBOA on large problem sizes. P3 solves its median run of Nearest Neighbor
-NK and Ising Spin Glasses faster than both hBOA and LTGA.
-
-To more fully examine the hypothesis that some of P3's success is do to its ability to scale to differences in problem difficulty,
+LTGA and hBOA on large problem sizes.
+To more fully examine this hypothesis,
 Figure~\ref{fig-evals-to-success-range} shows the upper and lower quartiles for P3 and LTGA. On each problem
 LTGA has a much smaller difference between its best and worst runs. This makes sense as LTGA uses the same
 population size regardless of instance and progresses search generationally. In contrast P3 has a much
@@ -886,8 +884,8 @@ case P3 is no worse than LTGA.
 For some applications, finding the global optimum is less important than finding good solutions quickly. Therefore
 we examine this behavior in Figure~\ref{fig-fitness-over-time}. At regular intervals during optimization
 Figure~\ref{fig-fitness-over-time} shows the median of the best fitnesses found at that point of search across
-100 runs. For each problem we show the largest problem size for which we were able to successfully set a population
-size for hBOA, but the trends shown are representative of all larger problem sizes. The maximum reporting interval
+100 runs. For each problem we show the largest problem size for which we were able to successfully gather results
+for all six algorithms, but the trends shown are representative of all larger problem sizes. The maximum reporting interval
 is set to include the slowest P3 run to reach the global optimum.
 
 % 181 total
@@ -908,7 +906,7 @@ never outperformed P3, doing so only 9 times.
 Perhaps the most striking result is the quality of $1+(\lambda, \lambda)$. Until quite far into search this
 method performs better than both LTGA and hBOA. Given sufficient evaluations $1+(\lambda, \lambda)$ outperforms
 Random Restart Hill Climbing on all 7 problems. For brief periods in the middle of search it performs the
-best of all techniques on both Trap functions, HIFF, Ising Spin Glass, and MAX-SAT problems. A likely
+best of all techniques on Deceptive Trap, Deceptive Step Trap, HIFF, Ising Spin Glass, and MAX-SAT problems. A likely
 explanation is $1+(\lambda, \lambda)$'s ability to efficiently incorporate gene modifications of larger
 than one bit. This allows it to overcome the deception and plateaus in Deceptive Trap and Deceptive Step Trap, solve medium sized subproblems
 in HIFF, flip the signs on multiple adjacent bits in Ising Spin Glass, and cross plateaus in MAX-SAT. However,
@@ -942,15 +940,16 @@ enters a second period of rapid improvement.
 This behavior is easiest to understand on the two Trap problems. LTGA's first generation will push individual traps toward a
 local optima, but it requires more than a single generation to do so completely. Until that occurs, the model is likely behaving
 no better than random as there is little apparent linkage between bits. Once the model begins to identify individual traps, crossover
-can begin to increase the frequency of higher fitness local optima. This process begins slowly as low fitness local optima are more
+can begin to increase the frequency of higher fitness trap settings. This process begins slowly as low fitness local optima are more
 likely to be chosen for donation than high fitness local optima due to their frequency in the population. The process becomes
 self-catalysing as increased frequency of the global optimum trap genes means increased likelihood of the global optimum being spread by crossover.
 
 An almost identical behavior exists in P3, most strikingly in the Deceptive Trap. When solving
 Deceptive Trap, P3 immediately achieves a high fitness, equaled only by the Random Restart Hill Climber in quality. This rise is
 nothing more than bringing every trap to one of the two local optima, with the majority of traps set suboptimally. $1+(\lambda, \lambda)$
-is slightly less efficient about performing single bit improvements, but is the next quickest to reach this plateau. While the hill climber
-remains stuck, P3's use of crossover slowly begins to combine optimal trap values found by multiple independent restarts. Unlike LTGA which
+is slightly less efficient about performing single bit improvements, but is the next quickest to reach this plateau.
+While the Random Restart Hill Climber
+remains stuck, P3's use of crossover slowly begins to combine optimal trap values found by multiple independent restarts. Unlike LTGA, which
 performs this improvement all at once, P3 integrates all optimal trap values immediately, waiting only on random restarts to find
 the optimal trap setting.
 
@@ -1273,7 +1272,7 @@ of fitness as the competitive techniques when using the same number of evaluatio
 modeling overhead, the expense of this overhead is approximately linear with respect to genome size. There
 is some evidence to suggest that even when compared on wall clock time, P3 performs at least as well as
 the best comparison techniques. All of these achievements are made without any problem specific parameter
-tuning, making P3 easier to apply to new domains that its two closets competitors in quality.
+tuning, making P3 easier to apply to new domains than its two closets competitors in quality.
 
 P3's quality is likely due to a number of desirable traits. First, mixing local search with model based
 crossover lets search focus on properly mixing high quality solutions. Second, by adding diversity only
@@ -1294,7 +1293,7 @@ to be prohibitively expensive for genome sizes in the hundreds of thousands or m
 and our work suggests the inability of the model to capture overlapping linkage may be hindering
 search efficiency. Overcoming these limitations by using a new modeling technique may allow
 the pyramid model even greater flexibility. Similarly, while P3 is able to overcome low
-order deception via linkage learning the iterative improvement method by which crossovers
+order deception via linkage learning, the iterative improvement method by which crossovers
 are made may mislead search on landscapes with higher order deception. Even without
 these improvements our results suggest that P3 will be highly efficient at finding
 global optima on black box problems without any problem specific tuning.
