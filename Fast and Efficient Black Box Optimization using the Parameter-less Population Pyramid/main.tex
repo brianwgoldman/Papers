@@ -39,6 +39,26 @@
 %Should be about 200 words
 The Parameter-less Population Pyramid (P3) is a recently introduced method for performing
 evolutionary optimization without requiring any user specified parameters.
+P3's primary innovation is to replace the generational model with the pyramid model,
+in which multiple populations are iteratively created and expanded. In combination
+with local search and advanced crossover P3 scales to problem difficulty, exploiting
+previously learned information before adding more diversity.
+
+Across seven problems, each tested using on average 18 problem sizes, P3 outperformed
+all five advanced comparison algorithms. This improvement includes requiring less evaluations
+and less wall clock seconds to find the global optimum and better fitness when using
+the same number of evaluations. From algorithm analysis and comparison we find P3's
+effectiveness is likely due to its ability to properly maintain, add, and exploit diversity.
+
+Unlike the best comparison algorithms, P3 was able to achieve this quality without any
+problem specific tuning. Thus, unlike previous parameter-less methods, P3 does not
+sacrifice quality for applicability. Therefore we conclude that
+P3 is an efficient, general, parameter-less approach to black box
+optimization which is more effective than existing state-of-the-art techniques.
+
+\begin{comment}
+The Parameter-less Population Pyramid (P3) is a recently introduced method for performing
+evolutionary optimization without requiring any user specified parameters.
 This is achieved by combining local search with advanced crossover to iteratively construct
 and exploit multiple populations simultaneously, with each population akin to a generation
 in traditional evolutionary computation.
@@ -55,7 +75,7 @@ This quality is made even more striking in that unlike P3, the best comparison a
 problem specific tuning to achieve their performance. As a result we conclude that, in contrast to
 previous parameter-less techniques, P3 is an efficient, general, parameter-less approach to black box
 optimization which is more effective than existing state-of-the-art techniques.
-
+\end{comment}
 \end{abstract}
 
 \begin{keywords}
@@ -349,7 +369,7 @@ evaluations~\citep{pelikan:1999:worstparameter-less}.
 \subsection{Linkage Tree Genetic Algorithm}
 ~\cite{thierens:2010:ltga} introduced the Linkage Tree Genetic Algorithm (LTGA) which automatically
 detects and exploits problem epistasis by examining pairwise gene entropy. Due to its enhanced
-ability to preserve high fitness gene subsets, LTGA was able to outperform state of the art
+ability to preserve high fitness gene subsets, LTGA was able to outperform state-of-the-art
 GAs across many benchmarks. Since its introduction, many variants of LTGA have been
 proposed~\citep{goldman:2012:ltga} so for clarity we have chosen the version
 presented by \cite{thierens:2013:ltgahiff} as our model. This variant was chosen as it is
@@ -712,14 +732,14 @@ problem is challenging chose a clause to variable ratio of $4.27$.
         \includegraphicsfit{pop-hboa}
       \end{centering}
       \caption{Tuned Population Sizes for hBOA}
-      \label{fig-small-pop-dst}
+      \label{fig-pop-hboa}
     \end{subfigure}%
     \begin{subfigure}{.5\textwidth}
       \begin{centering}
         \includegraphicsfit{pop-ltga}
       \end{centering}
       \caption{Tuned Population Sizes for LTGA}
-      \label{fig-small-pop-nk}
+      \label{fig-pop-ltga}
     \end{subfigure}
   \end{centering}
   \caption{Optimal population sizes found using bisection on each size
@@ -1266,7 +1286,7 @@ which learns a linkage tree from gene epistasis. Combined with a simple hill cli
 many synergistic features.
 
 Across a large number of problems and problem sizes P3 required less evaluations to reach the global optimum
-than optimally tuned state of the art competitors. On single instance problems P3's improvement was by a
+than optimally tuned state-of-the-art competitors. On single instance problems P3's improvement was by a
 constant factor, while for the three problem classes P3's improvement increased with problem size. This
 quality extends to intermediate points during evolution, with P3 generally reaching at least as high
 of fitness as the competitive techniques when using the same number of evaluations. While P3 does require
