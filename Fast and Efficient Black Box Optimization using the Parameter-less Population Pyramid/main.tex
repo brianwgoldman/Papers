@@ -39,16 +39,16 @@
 %Should be about 200 words
 The Parameter-less Population Pyramid (P3) is a recently introduced method for performing
 evolutionary optimization without requiring any user specified parameters.
-P3's primary innovation is to replace the generational model with the pyramid model,
-in which multiple populations are iteratively created and expanded. In combination
+P3's primary innovation is to replace the generational model with a pyramid of
+multiple populations that are iteratively created and expanded. In combination
 with local search and advanced crossover P3 scales to problem difficulty, exploiting
 previously learned information before adding more diversity.
 
 Across seven problems, each tested using on average 18 problem sizes, P3 outperformed
 all five advanced comparison algorithms. This improvement includes requiring less evaluations
 and less wall clock seconds to find the global optimum and better fitness when using
-the same number of evaluations. From algorithm analysis and comparison we find P3's
-effectiveness is likely due to its ability to properly maintain, add, and exploit diversity.
+the same number of evaluations. Using both algorithm analysis and comparison we find P3's
+effectiveness is due to its ability to properly maintain, add, and exploit diversity.
 
 Unlike the best comparison algorithms, P3 was able to achieve this quality without any
 problem specific tuning. Thus, unlike previous parameter-less methods, P3 does not
@@ -56,26 +56,6 @@ sacrifice quality for applicability. Therefore we conclude that
 P3 is an efficient, general, parameter-less approach to black box
 optimization which is more effective than existing state-of-the-art techniques.
 
-\begin{comment}
-The Parameter-less Population Pyramid (P3) is a recently introduced method for performing
-evolutionary optimization without requiring any user specified parameters.
-This is achieved by combining local search with advanced crossover to iteratively construct
-and exploit multiple populations simultaneously, with each population akin to a generation
-in traditional evolutionary computation.
-
-When compared with five advanced search algorithms across dozens of problem sizes for
-seven different benchmarks, P3 reliably required at least a constant factor less evaluations to find the global optimum
-than all tested competitors. When compared using fixed numbers of evaluations, P3
-generally finds the highest quality solutions. Some evidence also suggests that P3
-is better when compared using the number seconds to find the global optimum even when using efficient fitness functions.
-We investigate the causes of this efficiency and provide some evidence that P3's ability to
-add diversity only as needed may be contributing to its success.
-
-This quality is made even more striking in that unlike P3, the best comparison algorithms received extensive
-problem specific tuning to achieve their performance. As a result we conclude that, in contrast to
-previous parameter-less techniques, P3 is an efficient, general, parameter-less approach to black box
-optimization which is more effective than existing state-of-the-art techniques.
-\end{comment}
 \end{abstract}
 
 \begin{keywords}
@@ -100,11 +80,11 @@ In evolutionary optimization, and genetic algorithms~(GAs) in particular, search
 biased through parameters. This can be beneficial as it allows practitioners to inject their
 knowledge about the shape of the search landscape into the algorithm.
 However, the quality of solutions found, and the speed at which they are found, is strongly tied to setting these parameters
-correctly~\citep{goldberg:1991:gasize}. As such, expert knowledge or exceedingly
+correctly~\citep{goldberg:1991:gasize}. As such, either expert knowledge or exceedingly
 expensive parameter tuning~\citep{grefenstette:1986:optimalga} may be required to leverage
 this feature to its fullest potential. Furthermore,  parameters such as population size, mutation rate, crossover
 rate, tournament size, etc. may have no clear relationship to the problem being solved, meaning even
-domain experts may not understand how they will interact with the problem or with each other.
+domain experts may not understand how the parameters will interact with the problem or with each other.
 
 There have been periodic efforts to reduce or remove the need for parameter tuning.
 \cite{Back:1992:selfadapt} introduced self-adaptive parameters, in which parameter values
@@ -125,15 +105,9 @@ Most recently \cite{goldman:2014:p3} introduced the Parameter-less Population Py
 This method uses a pyramid structure of populations to combine model based search with local search
 to achieve parameter-less optimization. Initial results suggest that unlike
 previous parameter-less methods, P3 is actually more efficient than current state-of-the-art
-parameterized search algorithms. In this work we shall extend these results to cover more
-comparison algorithms, compare both efficiency in reaching the global optimum and intermediate
-fitnesses, algorithm complexity analysis, and provide more in depth analysis of P3 itself.
-\begin{comment}
-Section~\ref{sec-optimizers}
-explains how each of these algorithms, including P3, perform search. Section~\ref{sec-problems}
-provides a description of each test problem. As hBOA and LTGA require a population size parameter
-Section~\ref{sec-tuning} provides our methodology to ensure each is optimally tuned to each problem.
-\end{comment}
+parameterized search algorithms. In this work we shall: extend these results to cover more
+comparison algorithms; compare both efficiency in reaching the global optimum and intermediate
+fitnesses; algorithm complexity analysis; and provide more in depth analysis of P3 itself.
 
 \section{Comparison Optimizers}
 \label{sec-optimizers}
@@ -141,7 +115,7 @@ Section~\ref{sec-tuning} provides our methodology to ensure each is optimally tu
 In order to fully understand the effectiveness of P3, we compare it with five advanced algorithms which
 have related features to P3. The Random Restart Hill Climber~\citep{goldman:2014:p3} was chosen as an efficient form of repeated
 local search. As P3 combines this hill climber with crossover,
-comparing with local search alone shows the advantages of performing the other portions of P3.
+comparing with local search alone shows the advantages of P3's overall approach.
 The $1+(\lambda, \lambda)$ algorithm is the current best theory supported simple genetic algorithm
 and its method of crossover is in some sense a macro-mutation just as in P3. hBOA and Parameter-less
 hBOA are advanced model building search techniques which are very effective at learning complex
@@ -167,7 +141,7 @@ Perhaps the simplest black box search heuristic is stochastic local search, or h
 This optimization technique focuses on improving a single solution until it reaches a local
 optimum. Here we use the first improvement hill climber defined by \cite{goldman:2014:p3}
 and given in Figure~\ref{fig-hc}. This algorithm works by flipping each bit in a random
-order, keeping modifications when fitness is improved, until doing so cannot result in
+order, keeping modifications when fitness is improved, until single bit flips cannot result in
 further fitness improvements.
 
 \begin{figure}
@@ -177,7 +151,7 @@ further fitness improvements.
     \State $tried \leftarrow \emptyset$
     \While{$|tried| < |options|$}
       \ForAll{$index \in shuffled(options)$}
-        \If{$index \notin tried$}
+        \If{$index \notin tried$}\label{fig-hc-tried}
           \State Flip bit $index$ in solution
           \If{solution's fitness increased}
             \State $tried \leftarrow \emptyset$
@@ -199,15 +173,10 @@ The hill climber requires an amortized cost of $O(1)$ operations per evaluation.
 terminate, at least one evaluation must be performed for each of the $N$ bits in the solution.
 As such any operation that happens only once per search can be amortized over at least $N$
 evaluations, covering the initialization of $options$ on Line~\ref{fig-hc-options}.
-
-With the use of proper hashing data structures, determining if $index \notin tried$ requires $O(1)$
-time. While this operation may be called without a directly related evaluation, amortized cost
-provides an upper bound. Consider that in order to add an $index$ into $tried$ an evaluation must
-be performed. Lets say this evaluation pays for two checks of that $index$, one of which was used
-during this loop. If no fitness improving move is found, the next time through the loop the second check
-is used. A third check is only necessary if no fitness improving move was found for any index.
-This is a contradiction as the loop terminates when no improving move was found. Therefore this check
-is called at most twice per evaluation.
+Line~\ref{fig-hc-tried}, which prevents wasted evaluations, can be called at most twice
+per evaluation: once to add $index$ into $tried$ and once to prevent $index$ from being unnecessarily
+evaluated again. The only way three or more calls could happen is if
+no fitness improvement was made for the entire previous iteration, which contradicts the loop invariant.
 
 Due to its nature, this hill climber cannot escape basins of attraction. Once a solution is reached
 such that none of the single bit neighbors are fitness improvements, search stops. Thus
@@ -250,7 +219,7 @@ against the original parent.
 \cite{pelikan:2006:hboa} used statistical principles in combination with a decision tree structure
 to create the Hierarchical Bayesian Optimization Algorithm (hBOA). This method creates a model of
 epistatic relationships between genes which is then used to stochastically generate new solutions.
-Each generation a binary tournament with replacement is used to selection $\mu$ solutions from
+Each generation a binary tournament with replacement is used to select $\mu$ solutions from
 the population. These solutions are then used to build the model, which in turn is used to generate $\mu$ new
 solutions. The new solutions are then integrated into the population using restricted tournament
 replacement.
@@ -262,51 +231,19 @@ in the solution. In the decision tree $T_i$, which is used to set the value of g
 each internal node represents previous decisions on how to set
 some other gene $x_j$, with the children of that node representing how the decision was made. The
 leaves of each tree give the probability that $x_i$ should be set to each possible value.
-Therefore in binary alphabets binary trees with a single probability $p$ stored at each leaf
-can be used, where $p$ is the probability $x_i$ should be set to one.
 
 The forest is constructed iteratively, with each tree initially containing a single leaf
 and with each leaf storing a pointer for each selected solution. Each iteration the algorithm considers
 all possible ways of splitting an existing leaf using another gene $x_j$, such that solutions in the
 leaf are moved to the newly created leaves based on their value for $x_j$. The general goal is to
 separate the solutions such that all solutions with $x_i = 0$ move to one leaf while solutions with
-$x_j = 1$ move to the other. Whichever split maximizes Equation~\ref{eq-hboa} is then kept.
-This process continues until none of the splits result in a higher quality model than the current one. To favor compact
-models, Equation~\ref{eq-hboa} is scaled by Equation~\ref{eq-hboa-stop}, which provides increased cost
-for more total leaves.
+$x_j = 1$ move to the other.
 
-\begin{equation}
-  BDe(B) = \prod_{i=0}^{N}\prod_{l\in L_i} \frac{\Gamma(m'_i(l))}{\Gamma(m_i(l) + m'_i(l))}
-  \prod_{x_i}\frac{\Gamma(m_i(x_i, l) + m'_i(x_i,l))}{\Gamma(m'_i(x_i,l))}
-  \label{eq-hboa}
-\end{equation}
-
-\begin{equation}
-  p(B) = c2^{-0.5(\sum_i|L_i|)log_2\mu}
-  \label{eq-hboa-stop}
-\end{equation}
-
-While Equation~\ref{eq-hboa} is very complex and almost always results in near infinitesimal results, many
-of the terms can be canceled out as it is only important to know the relative quality between two models:
-$p(B)BDe(B) < p(B')BDe(B')$.
-The outermost product of Equation~\ref{eq-hboa} iterates over all trees in the forest. However, each split
-can modify only one of the trees and therefore the contribution of all others can be canceled. The middle
-product is across all leaves in the tree. Again since only one leaf can be changed, all other terms can
-be canceled. By convention hBOA uses uninformed Bayesian priors of $m'_i(l)= 2$ and $m'_i(x_i, l)=1$ for
-binary alphabets. As $\Gamma(a) = (a-1)!$ this means the top term in the middle product and the bottom
-term in the third product reduce to 1. The only remaining terms are then $m_i(l)$ and $m_i(x_i, l)$ which
-represent the number of solutions which reached leaf $l$ and the number of solutions which reached leaf $l$
-with a specific value for $x_i$, respectively.
-
-Equation~\ref{eq-hboa-stop} can also be simplified when doing comparisons. If model $B'$ has exactly one more
-leaf than model $B$ than the ratio $\frac{p(B)}{p(B')}$ simplifies to $2^{0.5 log_2\mu}$ regardless of
-total model size.
-
-All combined, this means the expression $p(B)BDe(B) < p(B')BDe(B')$ can be calculated using Equation~\ref{eq-hboa-final},
-where $B'$ is different from $B$ by exactly 1 split, such that $l$ was split to create $l'$ and $l''$. Only splits that
-satisfy this inequality are considered good enough to keep. Furthermore, whichever split maximizes the right side of the
-Equation~\ref{eq-hboa-final} is chosen each iteration. Note that these factorials can be exceedingly large and
-therefore it is imperative that implementations avoid rounding errors and overflows.
+This goal is formalized using model scoring from Bayesian statistics. In its raw form this
+almost always creates near infinitesimal results, calculating fractions which include factorials of $\mu$
+and products over $N$. However, through algebraic manipulation discussed in Appendix~\ref{sec-appendix} we
+derived the simplified Equation~\ref{eq-hboa-final}. If no proposed split satisfies the inequality, iteration stops.
+If multiple splits do, whichever maximizes the right side is chosen.
 
 \begin{equation}
   2^{0.5 log_2\mu} < \frac{(m_i(l) + 1)!}{m_i(0, l)!m_i(1,l)!} \cdot
@@ -332,9 +269,9 @@ are used to follow each $T_i$ until a leaf is reached. The value of $x_i$ is the
 probably that other solutions reached that leaf with each value of $x_i$.
 
 To perform replacement, hBOA uses restricted tournament replacement. After each new solution is generated
-and evaluated, $w$ solutions are chosen at random from the population, where $w=\min\{N, \frac{\mu}{20}\}$.
-Whichever of the $w$ solutions is the most genetically similar to the offspring compares its fitness with the offspring.
-If the fitness of the offspring is no worse, it replaces the genetically similar member of $w$, otherwise the
+and evaluated, a set of $w$ solutions are chosen at random from the population, where $w=\min\{N, \frac{\mu}{20}\}$.
+From this set the solution which is most genetically similar to the offspring is chosen. If the offspring
+is at least as fit as the chosen solution, it replaces the chosen solution in the population. Otherwise the
 offspring is discarded. This method is designed to preserve genetic diversity as only genetically similar
 solutions must compete on fitness.
 
@@ -372,8 +309,7 @@ detects and exploits problem epistasis by examining pairwise gene entropy. Due t
 ability to preserve high fitness gene subsets, LTGA was able to outperform state-of-the-art
 GAs across many benchmarks. Since its introduction, many variants of LTGA have been
 proposed~\citep{goldman:2012:ltga} so for clarity we have chosen the version
-presented by \cite{thierens:2013:ltgahiff} as our model. This variant was chosen as it is
-modern and appears to approach the consensus in the literature.
+presented by \cite{thierens:2013:ltgahiff} as our model.
 
 LTGA's effectiveness comes from its method of performing crossover. Instead of blindly
 mixing genes between parents, LTGA attempts to preserve important interrelationships
@@ -549,10 +485,10 @@ or populations, meaning the user does not need to specify a population size.
   \label{fig-p3}
 \end{figure}
 
-To accommodate P3's unique population structure, some of LTGA's clustering procedures were adapted. In LTGA,
-clusters are identified at the start of each generation, with those clusters used
-to create all solutions produced in that generation. As P3 does not perform serial
-generations, this process had to be modified. Instead, P3 updates the model each
+To accommodate P3's unique population structure, some of LTGA's clustering procedures were modified. In LTGA,
+clusters are identified at the start of each generation and are used
+to create all offspring in that generation. As P3 does not perform serial
+generations, P3 instead updates the model each
 time a solution is added to a population. Furthermore, unlike
 LTGA all solutions in the population are used to generate the model, not just the
 winners of a binary tournament. We can do this because even the
@@ -561,15 +497,15 @@ Using local search in LTGA was examined by \cite{bosman:2011:lsbbo} and found
 to provide no significant improvement. A likely cause was that that study applied
 local search to every solution, not just the initial population, resulting in significant overhead.
 
-Beyond the changes in population structuring, P3 also has slight modifications to
+Beyond the changes in population structuring, P3 modifies
 LTGA's version of \Call{Cluster-Creation}{} and \Call{Cluster-Usage}{}.
 P3 changes Line~\ref{fig-cluster-creation-ordering} in Figure~\ref{fig-cluster-creation}
 from \emph{last merged first} ordering to \emph{smallest first} ordering.
 This method applies gene clusters during crossover based on how many genes
 are in each cluster\footnote{Ties are broken randomly.}, and not on how tightly linked those genes are.
 \cite{goldman:2012:ltga} found that this alternative was better at preserving
-diversity, and therefore required smaller populations, but has  not been integrated into
-the canonical LTGA variant we used.
+diversity, and therefore required smaller populations, but has not yet been integrated into
+canonical LTGA.
 
 P3 also modified Line~\ref{fig-cluster-usage-donate} in Figure~\ref{fig-cluster-usage}.
 Instead of choosing a single genetic donor for each cluster, P3 iterates over the
@@ -610,7 +546,7 @@ Other algorithms have proposed using multiple concurrent populations.
 \cite{hornby:2006:alps} had a hierarchy of populations with solutions periodically advancing
 upward. This allows for continuous integration of diversity as the lowest population is reseeded
 with random solutions. However, this method resulted in increased parameterization as not only was
-a population size required, parameters for how frequently generations advanced between levels and
+a population size required, but also parameters for how frequently generations advanced between levels and
 how many total levels to have were added. \cite{harik:1999:parameterlessga} used multiple independent
 populations of different sizes as a method for removing the population size parameter, but
 doing was provably less efficient than using an optimal population size as no information is shared
@@ -630,8 +566,8 @@ Perhaps the most common such landscape is the Deceptive Trap problem \citep{gold
 In this landscape the genome is broken up into $k$ bit non-overlapping subproblems referred
 to as traps.
 Each subproblem is scored using Equation~\ref{eq-deceptive-trap}, where $t$ is the number of
-bits in the trap set to 1. To global optimum in each trap is a string of all 1s, while all
-other solutions lead to a local optima of all 0s. As a result this problem tests an algorithm's
+bits in the trap set to 1. The global optimum in each trap is a string of all 1s, while all
+other solutions lead to a local optima of all 0s. This problem tests an algorithm's
 ability to overcome $k$ sized deception and is commonly used to determine how effective crossover
 is at preserving building blocks. Any crossover event that mixes bits from different parents in
 the same trap will likely result in that trap being optimized to the local optima. For our experiments
@@ -650,7 +586,7 @@ we chose $k=7$ to ensure highly deceptive traps.
 \cite{goldman:2012:ltga} found that mixing local search with linkage learning rendered the Deceptive
 Trap problem trivial. This is because local search is able to optimize each trap to one of the two
 optima (all 1s or all 0s), and then linkage learning can have perfect knowledge of gene interactions.
-In order to make the problem more difficult yet still deceptive, the authors proposed the Deceptive
+In order to make the problem more difficult, the authors proposed the Deceptive
 Step Trap problem, given in Equation~\ref{eq-deceptive-step-trap}. This function modifies the results
 of Equation~\ref{eq-deceptive-trap} to include plateaus of size $s$, introducing an exponential number
 of local optima in each trap. As a result the Deceptive Step Trap is much more challenging for linkage
@@ -720,7 +656,7 @@ Each term is a randomly chosen variable, which may also be negated. A clause sco
 at least one term in the clause evaluates to true. In order to make MAX-SAT instances with a known global
 optimum, \cite{goldman:2014:p3} proposed constructing clauses around a fixed solution. In this way the
 signs of the terms are set to ensure the target solution satisfies the clause. To ensure each
-problem is challenging chose a clause to variable ratio of $4.27$.
+problem is challenging we chose a clause to variable ratio of $4.27$.
 
 \section{Comparison Algorithm Parameter Tuning}
 \label{sec-tuning}
@@ -750,11 +686,11 @@ problem is challenging chose a clause to variable ratio of $4.27$.
 
 While four of the six algorithms in our experiments do not require any user specified parameters,
 hBOA and LTGA both use a population size parameter. To ensure these techniques are not unfairly
-handicapped, we have extensively tuned each using the bisection method \citep{sastry:2001:bisection}
-to determine the optimal population size for each size of each problem.
+handicapped, we extensively tuned each using the bisection method \citep{sastry:2001:bisection}
+to determine the optimal population size for each problem size.
 Extended by \cite{goldman:2012:ltga}, this method iteratively
 doubles the population size until some success criteria is met and then performs bisection
-between the lowest successful and highest unsuccessful sizes. Thus the minimum population size
+between the lowest successful and highest unsuccessful sizes. In this way the minimum population size
 which meets the success criteria is found. \cite{goldman:2014:p3} proposed a success criteria
 of performing $r$ successful runs in a row, such that the expected failure rate can be bounded
 above by $\frac{3}{r+1}$~\citep{jovanovic:1997:ruleofthree}. As P3 and the other three algorithms
@@ -764,12 +700,12 @@ optimum after 100 million evaluations or 128 computing hours was considered unsu
 
 Figure~\ref{fig-pop-sizes} shows the results from performing bisection. In general hBOA
 required population sizes which were at least an order of magnitude larger than LTGA. Due to
-runtime and memory usage finding the optimal value for hBOA was much less tractable than LTGA
+runtime and memory overhead, finding the optimal value for hBOA was much less tractable than LTGA
 for moderate to large problem sizes. LTGA's population size also grew significantly slower
 than hBOA's as problem size increased, especially on the two Trap problems and Rastrigin.
 Both algorithms were very ineffective on MAX-SAT, neither able to tune to problems sizes over 60 bits.
 This is likely due to the fact that some randomly generated MAX-SAT landscapes are very flat
-and highly deceptive.
+and highly deceptive~\cite{rana:1998:gamaxsat}.
 \section{Finding the Global Optimum}
 \label{sec-optimum}
 
@@ -784,21 +720,17 @@ and highly deceptive.
   \label{fig-evals-to-success}
 \end{figure}
 
-The goal of black box optimization is to quickly and reliably obtain high quality solutions. In this
-section we will compare how many evaluations each algorithm requires to find the global optimum on
-each problem.
-
 Figure~\ref{fig-evals-to-success} shows the median number of evaluations required by each of the six
 algorithms to find the global optimum for multiple sizes of each problem.  Each data point in
 Figure~\ref{fig-evals-to-success} represents the median of 100 runs, where unsuccessful runs
 are treated as requiring more evaluations than any successful run. If the median run was not successful
 no point is shown. The maximum problem size used for each problem was set to be the largest size we could
-feasibly determine an optimal population size for LTGA. For many larger problems results are not shown
+feasibly determine LTGA's optimal population size. For many larger problems results are not shown
 for hBOA due to the extreme computational cost required to optimally set the population size.
 
 \subsection{Quantitative Comparison}
 Of the 130 tested configurations, P3 found the global optimum using the least median evaluations on 114.
-The largest of these used 49 bits, with P3 achieving the best results on all 92 larger
+The largest problem size for any problem where P3 was not the most efficient used 49 bits, with P3 achieving the best results on all 92 larger
 configurations. hBOA, LTGA, and Parameter-less hBOA only outperform P3 on the smallest 5, 4, and 1 Deceptive
 Step Trap instances, respectively. Random Restart Hill Climbing outperforms P3 on the smallest 3 Nearest Neighbor NK instances
 and the smallest Ising Spin Glass. $1+(\lambda, \lambda)$ has the most success outperforming P3, doing so
@@ -870,8 +802,8 @@ scalability (slope) as LTGA, in most cases performing better only by a constant 
   \label{fig-evals-to-success-range}
 \end{figure}
 
-As expected, Parameter-less hBOA was generally less efficient than hBOA using an optimal population size. The slopes
-of the two lines are relatively similar across all problems, meeting with the theoretical expectation that
+As expected, Parameter-less hBOA was generally less efficient than optimally tuned hBOA. The slopes
+of the two lines are relatively similar across all problems, affirming the expectation that
 Parameter-less hBOA is no more than a logarithmic factor worse than hBOA.  The only problem which reversed
 this trend was MAX-SAT, where Parameter-less hBOA actually outperformed hBOA and LTGA. A potential explanation for
 this is that hBOA and LTGA are using the optimal population size for the entire problem class, not for each instance.
@@ -1323,6 +1255,48 @@ global optima on black box problems without any problem specific tuning.
 
 \bibliographystyle{apalike}
 \bibliography{../main}
+
+\appendix
+\section{hBOA formula simplification}
+\label{sec-appendix}
+To measure the quality of a decision forest, hBOA applies Equation~\ref{eq-hboa}.
+To favor compact
+models, Equation~\ref{eq-hboa} is scaled by Equation~\ref{eq-hboa-stop}, which provides increased cost
+for more total leaves.
+This quality is used for two purposes: comparison of potential changes from the existing model
+and comparison of that change with the existing model. The basis for our simplication
+is to rearrange $p(B)BDe(B) < p(B')BDe(B')$ to be $\frac{p(B)}{p(B')} < \frac{BDe(B')}{BDe(B)}$.
+
+\begin{equation}
+  BDe(B) = \prod_{i=0}^{N}\prod_{l\in L_i} \frac{\Gamma(m'_i(l))}{\Gamma(m_i(l) + m'_i(l))}
+  \prod_{x_i}\frac{\Gamma(m_i(x_i, l) + m'_i(x_i,l))}{\Gamma(m'_i(x_i,l))}
+  \label{eq-hboa}
+\end{equation}
+
+\begin{equation}
+  p(B) = c2^{-0.5(\sum_i|L_i|)log_2\mu}
+  \label{eq-hboa-stop}
+\end{equation}
+
+The outermost product of Equation~\ref{eq-hboa} iterates over all trees in the forest. However, each split
+can modify only one of the trees and therefore the contribution of all others can be canceled. The middle
+product is across all leaves in the tree. Again since only one leaf can be changed, all other terms can
+be canceled. By convention hBOA uses uninformed Bayesian priors of $m'_i(l)= 2$ and $m'_i(x_i, l)=1$ for
+binary alphabets. As $\Gamma(a) = (a-1)!$ this means the top term in the middle product and the bottom
+term in the third product reduce to 1. The only remaining terms are then $m_i(l)$ and $m_i(x_i, l)$ which
+represent the number of solutions which reached leaf $l$ and the number of solutions which reached leaf $l$
+with a specific value for $x_i$, respectively.
+
+Equation~\ref{eq-hboa-stop} can also be simplified when doing comparisons. If model $B'$ has exactly one more
+leaf than model $B$ then the ratio $\frac{p(B)}{p(B')}$ simplifies to $2^{0.5 log_2\mu}$ regardless of
+total model size.
+
+The resulting simplifications create Equation~\ref{eq-hboa-final},
+where $B'$ is different from $B$ by exactly 1 split, such that $l$ was split to create $l'$ and $l''$.
+The best split is whichever maximizes its improvement over $B$, which is equal to the right side
+of the inequality. Note that these factorials can be exceedingly large and
+therefore it is imperative that implementations avoid rounding errors and overflows.
+
 
 
 \end{document}
