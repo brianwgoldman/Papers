@@ -705,7 +705,7 @@ for moderate to large problem sizes. LTGA's population size also grew significan
 than hBOA's as problem size increased, especially on the two Trap problems and Rastrigin.
 Both algorithms were very ineffective on MAX-SAT, neither able to tune to problems sizes over 60 bits.
 This is likely due to the fact that some randomly generated MAX-SAT landscapes are very flat
-and highly deceptive~\cite{rana:1998:gamaxsat}.
+and highly deceptive~\citep{rana:1998:gamaxsat}.
 \section{Finding the Global Optimum}
 \label{sec-optimum}
 
@@ -730,7 +730,7 @@ for hBOA due to the extreme computational cost required to optimally set the pop
 
 \subsection{Quantitative Comparison}
 Of the 130 tested configurations, P3 found the global optimum using the least median evaluations on 114.
-The largest problem size for any problem where P3 was not the most efficient used 49 bits, with P3 achieving the best results on all 92 larger
+The largest problem size for any problem where P3 was not the most efficient has 49 bits, with P3 achieving the best results on all 92 larger
 configurations. hBOA, LTGA, and Parameter-less hBOA only outperform P3 on the smallest 5, 4, and 1 Deceptive
 Step Trap instances, respectively. Random Restart Hill Climbing outperforms P3 on the smallest 3 Nearest Neighbor NK instances
 and the smallest Ising Spin Glass. $1+(\lambda, \lambda)$ has the most success outperforming P3, doing so
@@ -764,11 +764,10 @@ LTGA on Nearest Neighbor NK and Ising Spin Glasses. This may be caused by the di
 unlike the single instance problems, gene epistasis in the randomly generated
 problem classes cannot be be perfectly represented with a linkage tree.
 
-%TODO Simplify this paragraph
 Considering how different hBOA and LTGA are in performing optimization, it is somewhat surprising how similar
 their results are on HIFF.
-Both techniques rely on populations large enough to support the diversity required to reach the global optimum
-and to model epistasis. Both techniques also rebuild models once per generation. As the subproblems of HIFF
+However, both techniques rely on populations large enough to support the diversity required to reach the global optimum
+and to model epistasis. Both techniques also only rebuild models once per generation. As the subproblems of HIFF
 are nested, it is unlikely that either technique can accurately model higher order epistasis before solving
 lower order subproblems. Therefore both methods require one generation per subproblem order.
 
@@ -861,7 +860,7 @@ hill climber regardless of how long each technique is run and irrespective of ho
 found has to be.
 
 Unlike the model based methods, which struggle until model accuracy improves, P3's iterative solution
-integration makes it improve much sooner. This behavior exists in most problems, but is easies to understand on Deceptive Trap.
+integration makes it improve much sooner. This behavior exists in most problems, but is easiest to understand on Deceptive Trap.
 On this problem, P3 immediately brings all traps to local optima, equaled only by the Random Restart Hill Climber in quality.
 In comparison LTGA must evaluate the entire population and perform multiple generations to reach similar quality.
 P3 is able to immediately integrate optimal versions of each
@@ -934,13 +933,18 @@ in P3, but its unlikely to be very high.
 \end{figure}
 
 
-To assess wall clock performance we provide Figure~\ref{fig-seconds-to-success}. In total these runs
+To assess wall clock performance we provide Figure~\ref{fig-seconds-to-success}.
+Similar to Figure~\ref{fig-evals-to-success}, each point represents the median
+of 100 runs, with unsuccessful runs treated as slower than successful runs.
+In total these runs
 took over 6 computing years to complete. We were therefore forced to use
 diverse hardware potentially running multiple processes in parallel.
 As such these timings should be considered very skeptically as a number
-of sources may contribute to biased error in the results.
+of sources may contribute to biased error in the results. However, due to
+the size of the dataset and the general regularity in the results general conclusions
+can still be made.
 
-\subsection{Model Building}
+\subsubsection{Model Building}
 When considering wall clock time hBOA and Parameter-less hBOA perform significantly worse than when using
 evaluations. This makes sense as hBOA's model building requires $\Omega(N^2)$ time per evaluation while under reasonable
 assumptions P3 and LTGA require $O(N)$ time per evaluation. This penalty is most clear on Ising Spin Glass where
@@ -948,7 +952,7 @@ hBOA goes from being slightly more efficient than LTGA in terms of evaluations t
 As P3 and LTGA require a similar asymptotic complexity per
 evaluation as the Hill Climber and $1+(\lambda, \lambda)$, no similar change in ordering occurs.
 
-\subsection{P3}
+\subsubsection{P3}
 Any increase in P3's algorithmic complexity is offset by its efficient use of evaluations.
 In aggregate P3 found the global optimum the fastest on 72 of 130 configurations,
 with LTGA, $1+(\lambda, \lambda)$, Hill Climber, hBOA outperforming P3 on 44, 18, 10, and 1 configurations, respectively.
@@ -967,12 +971,11 @@ to initialization and no need to sacrifice intermediate fitness for eventual opt
 
 \subsection{Problem Instance versus Problem Class}
 Our procedure for tuning LTGA and hBOA outlined in Section~\ref{sec-tuning} involved finding
-the optimal population size for each class of problem. For black box optimization this is
-realistically the best either algorithm could hope for in practice. Tuning to a problem
-instance or population initialization when solving real world problems is pointless as
-there is no reason to repeat search once the instance has been solved.
+the optimal population size for each class of problem. For real world black box optimization this is
+realistically the best either algorithm could hope for as tuning to a problem
+instance or population initialization involves repeatedly solving the problem being tuned.
 This limitation does not exist in parameter-less methods, which scale their diversity
-based on the problem instance without needing to solve the instance repeatedly.
+based on the problem instance without needing to solve that instance repeatedly.
 
 To achieve high success rates on randomly generated problem classes LTGA and hBOA must use a population size
 large enough to solve the hardest instances in that class. Therefore these methods will have
@@ -1004,7 +1007,7 @@ wholly infeasible for tuned population sizing to do.
 
 This tuning distinction is also apparent when comparing Parameter-less hBOA with hBOA in Figure~\ref{fig-evals-to-success}.
 While generally performing worse than hBOA, the difference between the two algorithms is smallest
-on randomly generated problem classes. On MAX-SAT Parameter-less hBOA actually outperformed both hBOA and LTGA,
+on randomly generated problem classes. On MAX-SAT, Parameter-less hBOA actually outperformed both hBOA and LTGA,
 likely due to its ability to scale diversity to the problem instance instead of the entire problem class.
 
 \subsection{Fast versus Optimal}
@@ -1019,8 +1022,8 @@ At 58\% of the recording intervals hBOA has the worst fitness of any solver. Mos
 occur when hBOA is still evaluating its initial population, allowing this random search to temporarily surpass the
 local search methods. After $N$ evaluations, however, hBOA and LTGA both fall behind until their models begin
 to improve.
-Parameter-less hBOA reaches intermediate fitnesses faster, doing so on 62\% of intervals, as its models begin
-to optimize earlier than hBOA.  However, this trend is reversed after a sufficient number of evaluations, as is apparent
+Parameter-less hBOA reaches intermediate fitnesses faster than hBOA, doing so on 62\% of intervals, as its models begin
+to optimize earlier than hBOA.  However, this trend is reversed after a sufficient number of evaluations, most clearly
 on Deceptive Step Trap and Ising Spin Glasses, as hBOA's tuned population overtakes Parameter-less hBOA's parallel populations.
 
 
@@ -1102,6 +1105,22 @@ little insight into algorithm behavior. To better understand how P3 works in det
 a look at some internal features specific to P3.
 
 \subsection{Crossover}
+Figure~\ref{fig-cross} shows the proportion of evaluations P3 spends on crossover, as opposed to hill climbing,
+and Figure~\ref{fig-cross-success} shows what percentage of crossover evaluations resulted in a fitness improvement.
+Together these figures provide some insight into the role of crossover within P3. The behavior
+for each is clearly problem dependent and generally asymptoticly stable as problem size increases.
+
+When solving problems where epistasis can be effectively detected and represented by a linkage tree, P3 tends to spend
+less evaluations performing crossover and each crossover is more likely to be successful.
+Deceptive Trap and Rastrigin are the easiest problems to model epistasis, with local search quickly
+reducing pairwise entropy in each. These are also the problems where P3 uses the least evaluations
+on crossover and has the highest success rates for crossover. At the other extreme are Nearest Neighbor
+NK and Ising Spin Glasses, which both have overlapping linkage not representable by a linkage tree.
+These problems have the highest crossover usage and lowest crossover success of any problem except Deceptive
+Step Trap.  While Deceptive Step Trap's epistasis can be accurately modeled by a linkage tree, the
+exponential number of plateaus makes detecting gene linkage very challenging.
+
+\begin{comment}
 P3 performs optimization using a mixture of hill climbing and crossover. Exactly how much time the algorithm
 dedicates to each is not clear from the algorithm description alone. As such, Figure~\ref{fig-cross} shows
 that the relationship between the two is strongly problem dependent but relatively independent of problem size.
@@ -1134,15 +1153,16 @@ However, the reason for this is that even exceedingly uninformed crossover can m
 flipping two bits in the same trap will move between two local optima. Nearest Neighbor NK had the least successful crossovers,
 with only 0.007\% successful on the largest tested problems. In comparison to Ising Spin Glass, NK's overlap is far more extensive.
 As a result it makes sense that individual crossovers are very unlikely to be fitness improvements.
+\end{comment}
 
-In comparison with LTGA, the crossover success rates of P3 are lower but similar in problem ordering. This is almost certainly
-a consequence of P3's use of local search. Counterintuitively the use of hill climbing on the initial population reduces
+When compared with LTGA, P3's crossover success rates are lower but similar in problem ordering.
+Counterintuitively the use of hill climbing on the initial population reduces
 P3's crossover success, not because it reduces model quality or the donation pool, but because it is much more challenging to improve
 locally optimal solutions than randomly generated ones. LTGA's crossover benefits from application to unoptimized solutions, which
 makes its aggregate crossover success incomparable to P3's.
 
-While the frequency of crossover changes per problem, and the likelihood of an individual crossover making a fitness improvement can be
-quite low, the results from Section~\ref{sec-optimum} and Section~\ref{sec-overtime} show it's still critical to optimization. Without
+Even when crossover success rates are quite low, such as Nearest Neighbor NK's 0.007\% success,
+the results from Section~\ref{sec-optimum} and Section~\ref{sec-overtime} show it's still critical to optimization. Without
 crossover P3's performance would be identical to the Random Restart Hill Climber, which was unable to solve even moderately sized problems
 and quickly fell behind P3 in intermediate fitness quality. Therefore even the infrequently successful crossover donation are
 critical to success. This does however suggest a potential avenue for future improvement by using more successful
@@ -1179,51 +1199,49 @@ is effected by problem size, the overall shape is not. As such the behavior show
 is representative of that for all other tested problem sizes.
 
 With the exception of the dip in Deceptive Step Trap, all of the pyramids show a monotonic reduction
-in size as the level increases. This makes sense from an algorithmic standpoint as solutions are
-added to the first level as long as they are unique local optima. For each subsequent level a
-solution must be unique and a strict fitness improvement over its previously added version.
-As a result solutions are less likely to be added to
-higher levels than lower ones. This shape is also in many ways desirable from a population
-genetics standpoint. When using a generational model \cite{lobo:2011:dynamicpop} found theoretical
-evidence that the optimal population size reduces each generation and \cite{goldman:2011:dynamic-parameters}
-made similar empirically based conclusions. In P3, levels of the pyramid are akin to generations as solutions
-stored in each level have undergone the same number of variation and selection events,
-with higher levels representing more of both. Therefore it is possible that P3's
-pyramid shape is related to its ability to outperform competitors using an optimal
-fixed population size. Subsequently smaller levels are able to focus search,
-preserving only the diversity required by that stage of search. In comparison,
-LTGA and hBOA set the population size at each generation equal to that required
-to ensure sufficient initial diversity.
+in size as the level increases. This is because a solution must be a strict fitness improvement
+over its previously added version to be added to a higher level, which becomes less likely
+each time the solution improves. \cite{lobo:2011:dynamicpop} found theoretical evidence
+and \cite{goldman:2011:dynamic-parameters} found empirical evidence that the optimal
+population size decreases each generation of traditional evolutionary search.
+By decreasing in size, P3 implicitly stores more diversity in low levels and focuses
+search on high quality solutions at higher levels. In comparison,
+LTGA and hBOA suboptimally use a fixed population size at each generation.
 
+Figure~\ref{fig-level-success} examines how crossover success changes at different
+levels of the pyramid. At low levels, success gets progressively lower
+as solution quality increases faster than the model's ability to improve solutions.
+At higher levels modeling becomes more accurate and donations contain higher frequencies
+of high quality building blocks, resulting in increased crossover success. The
+highest level of most problems has a low crossover success rate, as solutions
+crossing with that level have already been improved by previous operations to
+the point where the only improvement would be to create the global optimum, which can
+only happen once.
+
+\subsection{Deceptive Step Trap}
 The number of solutions stored at the fourth level of Deceptive Step Trap is
 significantly lower than that of the third or fifth levels, breaking the decreasing
-trend of the other six problems. This behavior is rooted in the peculiar nature
-of this landscape, and is also present in all other problem sizes tested.
+trend of the other six problems. Figure~\ref{fig-level-success} has a similar
+aberration, with crossover success dropping to  0.0004\% before rebounding and
+following the more common trajectory. This behavior exists in all other problem
+sizes tested, with the dips occurring at exactly the same level.
+
+This behavior is rooted in the peculiar nature
+of this landscape.
 After local search, all traps in all solutions have a total
 number of 1 bits equal to \{0, 1, 3, 5, 7\} as these correspond to the local
 optima when using $k=7$ and $s=2$. Crossover is very likely to overcome the
 two bit plateaus, and as a result solutions in the second level generally do not
-contain the lowest fitness local optima of 5 set bits. Similarly the third
-level has very few traps set to the next worst local optima of 3 bits. As a result,
-most solutions which reach the third level can only be improved by overcoming deception
-and replacing the second best local optima of zero or one bits set to having all seven bits set.
-At this point in search the population has not significantly increased the frequency of optimal
-trap settings and with 8 ways to represent suboptimal local optima linkage is generally
-inaccurate. As a result our expectation is that when performing crossover with the third level
-of the pyramid very few fitness improvements will actually be made, meaning
-few solutions will be added to the fourth level. Those solutions that are added must, by definition,
-contain a higher frequency of optimal trap settings to have achieved a fitness improvement. As
-a result the crossover success rate and modeling quality at level four is much better
-than at level three, increasing the frequency of solutions being improved by crossover.
-
-When examining the crossover success rate shown in Figure~\ref{fig-level-success} these suppositions are
-supported. The success rate for Deceptive Step Trap decreases for the first three levels, with the third level
-successful only 0.0004\% of the time. This quickly rebounds at higher levels. On all other problems, the
-crossover success rate follows a trajectory closer to expectation. Low levels are more successful than medium
-levels as it is easier to make improvements to less optimized solutions. This trend reverses somewhat at
-higher levels as solution filtering allows for highly accurate models and high frequencies of high quality
-building blocks. The highest level on most problems has a very low crossover success rate because
-so few solutions other than the global optimum every cross with that level.
+contain the lowest fitness local optima (5 bits set) and the third
+level has very few traps set to the next worst local optima (3 bits set). As a result,
+solutions which reach the third level can only be improved by replacing the deceptive
+local optima (0 and 1 bits set) with the global optimum (7 bits set).
+The global optimum is very rare in the population, and with 8 ways to represent local optima
+linkage learning is inaccurate. Therefore it is very unlikely for crossover to be successful,
+meaning few solutions will be added to the fourth level. Solutions that do improve by
+definition must have a higher frequency of optimal trap settings, meaning level four's model
+will be more accurate and donations are more likely to contain optimal trap values.
+Thus the level size and crossover success rates increase after contracting around level four.
 
 \section{Conclusions and Future Work}
 The Parameter-less Population Pyramid (P3) is a recently introduced method for performing black box
@@ -1263,7 +1281,9 @@ and the inability of the model to capture overlapping linkage may be hindering
 search efficiency. Overcoming these limitations by using a new modeling technique may allow
 the pyramid model even greater flexibility. Similarly, while P3 is able to overcome low
 order deception via linkage learning, the iterative improvement method by which crossovers
-are made may mislead search on landscapes with higher order deception. Even without
+are made may mislead search on landscapes with higher order deception.
+
+However, even without
 these improvements our results show P3 is highly efficient at finding
 global optima on black box problems without any problem specific tuning.
 
@@ -1311,7 +1331,7 @@ total model size.
 The resulting simplifications create Equation~\ref{eq-hboa-final},
 where $B'$ is different from $B$ by exactly 1 split, such that $l$ was split to create $l'$ and $l''$.
 The best split is whichever maximizes its improvement over $B$, which is equal to the right side
-of the inequality. Note that these factorials can be exceedingly large and
+of the inequality. Note that these factorials can still be exceedingly large and
 therefore it is imperative that implementations avoid rounding errors and overflows.
 
 
