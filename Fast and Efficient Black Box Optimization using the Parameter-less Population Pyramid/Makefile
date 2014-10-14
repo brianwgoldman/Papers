@@ -3,8 +3,8 @@ all:
 	bibtex main
 	latex main
 	latex main
-	dvipdf main
 	dvips main
+	ps2pdf14 -dPDFSETTINGS=/prepress main.ps
 
 double:
 	sed -e 's/%\\linespread/\\linespread/g' main.tex > temp.txt; mv temp.txt main.tex
