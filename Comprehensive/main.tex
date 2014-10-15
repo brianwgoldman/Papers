@@ -1,0 +1,248 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%  Doctor of Philosophy Template
+%%%  Approved for Michigan State University
+%%%
+%%%  Author:  Brian W. Goldman
+%%%  PID:  
+%%%  Email:  goldma72@msu.edu
+%%%
+%%%  Advisor:  	Dr. William F. Punch
+%%%  Committee: 	Dr. Erik Goodman,
+%%%  		    	Dr. Charles A. Ofria
+%%%            	Dr. Kalyanmoy Deb
+%%%
+%%%  Last Edit:  August 10, 2014
+%%%
+%%%  Resume With: 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%% Define the actual document parameters:
+\documentclass[12pt,letterpaper]{report}
+
+
+%%%  Include packages used throughout the dissertation:
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage[euler]{textgreek}
+\usepackage{graphicx}
+\usepackage{graphics}
+\usepackage{setspace}
+\usepackage{indentfirst}
+\usepackage{rotating}
+\usepackage{multirow}
+\usepackage{amssymb}
+\usepackage{comment}
+\usepackage{epsfig}
+\usepackage{moreverb}
+\usepackage{subcaption}
+\usepackage{setspace}
+\usepackage{listings}
+\usepackage{url}
+\usepackage[usenames,dvipsnames]{color}
+
+\newcommand*\cut{\textcolor{red}}
+\newcommand*\add{\textcolor{ForestGreen}}
+\newcommand*\alter{\textcolor{blue}}
+
+%%% Use the following to format your titles for the Table of Contents, List of Figures, List of Tables. 
+\renewcommand{\contentsname}{\large\centering{Table of Contents}}
+\renewcommand{\listfigurename}{\large\centering{List of Figures}}
+\renewcommand{\listtablename}{\large\centering{List of Tables}}
+\renewcommand{\bibname}{\large\centering{Bibliography}}
+
+%%% Renew command for full page figures:
+\renewcommand{\topfraction}{1.0}
+
+
+%%%  Set the margins as required by the MSU graduate school. 
+%%%  Specifically, set the margins 1 inch top bottom and right, 
+%%%  1.5 inch on left.  Now, Latex has margin origins at 1 in on the top 
+%%%  and left so for 1.5 in the margin is set at 1.5 - 1 = .5 inch
+\setlength{\oddsidemargin}{.5in}   % This is the left margin for both
+\setlength{\evensidemargin}{1.5in} % even and odd pages (in case you use the book format)
+\setlength{\topmargin}{0in} % Top margin (remember latex starts from 1 in)
+
+% Pagewidth(8.5in) - textwidth(6in) - leftmargins(1.5in) = 1 inch for right margin
+\setlength{\textwidth}{6in}
+
+% Page height (11in) - Topmargin (1in) - Textheight (1in) = 1 in for
+%                                                      bottom margin
+\setlength{\textheight}{9in} %
+\setlength{\footskip}{.5in}
+%%% Headings are not required, thus suppress:
+\setlength{\headheight}{0in} 
+\setlength{\headsep}{0in}
+
+
+%%%  Include any definitions you wish to use throughout the dissertation:
+%\input{definitions}
+
+\newcommand{\includegraphicsfit}[1]
+{\includegraphics[width=\columnwidth,height=\textheight,keepaspectratio]{figures/#1}}
+
+%TODO Remove this
+\newcommand{\citep}[1]{\cite{#1}}
+
+%%%  Begin the actual dissertation:
+\begin{document}
+\sloppy
+
+
+%%%  Title Page:
+\begin{titlepage}
+\begin{center}
+\ \\[1in]%
+Analyzing the Parameter-less Population Pyramid\\
+\begin{doublespace}
+By\\ %
+Brian W. Goldman\\[4.5 in]%[2.5 in] %
+A THESIS PROPOSAL\\
+%\end{doublespace}
+
+%Submitted to \\ Michigan State University \\ in partial
+%fulfillment of the requirements \\ for the degree of\\
+%\begin{doublespace}
+%Change the next line as needed for your degree
+%DOCTOR OF PHILOSOPHY\\
+%insert your department
+Department of Computer Science and Engineering\\
+Michigan State University\\
+%put in the appropriate year
+2014\\
+Advisor: Dr. William F. Punch\\%
+ \end{doublespace}
+\end{center}
+\end{titlepage}
+\newpage
+
+%%% Set the page numbering scheme:
+\pagenumbering{roman}
+
+\include{abstract}
+
+
+%%%  Copyright page:
+%\thispagestyle{empty}
+%\mbox{}\vspace{5in}\\
+%Copyright by \\
+%ANDRES J. RAMIREZ \\
+%2011\\
+%\newpage
+
+
+%%%  Dedication:
+%\begin{centering}
+%\ \vfill
+%Empty for now...
+%
+%\vfill
+%\end{centering}
+%\newpage
+%
+%
+%
+%%%%  Acknowledgements:
+%\begin{centering}
+%\vspace{5ex}
+%Acknowledgments \par
+%\end{centering}
+%\vspace{10ex}
+
+%\begin{doublespace}
+%
+%
+%
+%\end{doublespace}
+
+
+\begin{singlespace}
+\tableofcontents %
+
+%\newpage
+%
+%%%  List of tables:
+%\addcontentsline{toc}{chapter}{LIST OF TABLES}
+%
+%\begin{doublespace}
+%\listoftables
+%\end{doublespace}
+
+\newpage
+
+%%%  List of Figures:
+\addcontentsline{toc}{chapter}{LIST OF FIGURES}
+
+\makeatletter
+\let\l@figureOLD \l@figure
+\renewcommand{\l@figure}{\vspace{\baselineskip}\l@figureOLD}
+\makeatother
+\addtocontents{lof}{\vspace*{-\baselineskip}}
+
+\listoffigures
+
+\setlength{\topmargin}{0in}
+\newpage
+\setlength{\parskip}{0 cm} \setlength{\topmargin}{0in}
+\end{singlespace}
+
+
+
+%%%  This concludes the mandatory formatting for a dissertation.
+%%%  Now, reset the page counter, and use arabic numerals for the remainder:
+\setcounter{page}{1}\pagenumbering{arabic}
+
+
+%%%  Last few formatting commands:
+\setlength{\parindent}{2 em}
+\begin{doublespace}
+
+
+
+%% Change this for spacing:
+%\onehalfspacing
+\linespread{1.2}
+
+
+%%%  Include the chapters of your dissertation:
+\include{chapter-introduction}
+\include{chapter-comparison_algorithms}
+\include{chapter-p3}
+\include{chapter-problems}
+\include{chapter-benchmarking}
+\include{chapter-internal}
+\include{chapter-graybox}
+\include{chapter-proposed}
+
+
+%%%  Appendices, if necessary:
+
+\begin{centering}
+\ \vfill
+\appendix{APPENDICES}                      %Make sure the names in
+\addcontentsline{toc}{chapter}{APPENDICES} %brackets match
+\vfill
+\end{centering}
+\newpage
+\input{appendix-hboa} %====Put you Appendix text here
+\clearpage
+
+
+%%%  Bibliography:
+\newpage
+\vspace*{\fill}
+\begin{center}
+BIBLIOGRAPHY
+\vspace*{\fill}
+\end{center}
+
+
+\newpage
+\begin{singlespace}
+%% Comment out the next line if you don't have any references
+\addcontentsline{toc}{chapter}{LIST OF REFERENCES}
+\bibliographystyle{plain}% your bst file here
+\bibliography{../main} %your bib file here
+\end{singlespace}
+\end{doublespace}
+\end{document}

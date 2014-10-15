@@ -1,0 +1,40 @@
+\chapter{hBOA Simplification}
+\label{chap-appendix}
+To measure the quality of a decision forest, hBOA applies Equation~\ref{eq-hboa}.
+To favor compact
+models, Equation~\ref{eq-hboa} is scaled by Equation~\ref{eq-hboa-stop}, which provides increased cost
+for more total leaves.
+This quality is used for two purposes: comparison of potential changes from the existing model
+and comparison of that change with the existing model. The basis for our simplication
+is to rearrange $p(B)BDe(B) < p(B')BDe(B')$ to be $\frac{p(B)}{p(B')}<\frac{BDe(B')}{BDe(B)}$.
+
+\begin{equation}
+  BDe(B) = \prod_{i=0}^{N}\prod_{l\in L_i} \frac{\Gamma(m'_i(l))}{\Gamma(m_i(l) + m'_i(l))}
+  \prod_{x_i}\frac{\Gamma(m_i(x_i, l) + m'_i(x_i,l))}{\Gamma(m'_i(x_i,l))}
+  \label{eq-hboa}
+\end{equation}
+
+\begin{equation}
+  p(B) = c2^{-0.5(\sum_i|L_i|)log_2\mu}
+  \label{eq-hboa-stop}
+\end{equation}
+
+The outermost product of Equation~\ref{eq-hboa} iterates over all trees in the forest. However, each split
+can modify only one of the trees and therefore the contribution of all others can be canceled. The middle
+product is across all leaves in the tree. Again since only one leaf can be changed, all other terms can
+be canceled. By convention hBOA uses uninformed Bayesian priors of $m'_i(l)= 2$ and $m'_i(x_i, l)=1$ for
+binary alphabets. As $\Gamma(a) = (a-1)!$ this means the top term in the middle product and the bottom
+term in the third product reduce to 1. The only remaining terms are then $m_i(l)$ and $m_i(x_i, l)$ which
+represent the number of solutions which reached leaf $l$ and the number of solutions which reached leaf $l$
+with a specific value for $x_i$, respectively.
+
+Equation~\ref{eq-hboa-stop} can also be simplified when doing comparisons. If model $B'$ has exactly one more
+leaf than model $B$ then the ratio $\frac{p(B)}{p(B')}$ simplifies to $2^{0.5 log_2\mu}$ regardless of
+total model size.
+
+The resulting simplifications create Equation~\ref{eq-hboa-final},
+where $B'$ is different from $B$ by exactly 1 split, such that $l$ was split to create $l'$ and $l''$.
+The best split is whichever maximizes its improvement over $B$, which is equal to the right side
+of the inequality. Note that these factorials can still be exceedingly large and
+therefore it is imperative that implementations avoid rounding errors and overflows.
+

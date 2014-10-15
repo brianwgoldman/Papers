@@ -1,0 +1,381 @@
+\chapter{Comparison Optimizers}
+\label{chap-optimizers}
+
+In order to fully understand the effectiveness of P3, we compare it with five advanced algorithms which
+have related features to P3. The Random Restart Hill Climber~\citep{goldman:2014:p3} was chosen as an efficient form of repeated
+local search. As P3 combines this hill climber with crossover,
+comparing with local search alone shows the advantages of P3's overall approach.
+The $1+(\lambda, \lambda)$ algorithm is the current best theory supported simple genetic algorithm
+and its method of crossover is in some sense a macro-mutation just as in P3. hBOA and Parameter-less
+hBOA are advanced model building search techniques which are very effective at learning complex
+problem structure, designed to achieve similar goals as P3's linkage learning but using very different
+methods. Finally LTGA represents the current state-of-the-art in black box search and is the origin
+of P3's linkage learning and crossover methods.
+
+Finally, only hBOA and LTGA require any parameters, with each of these only requiring a population
+size. This makes knowing the optimal behavior of these algorithms much more tractable. All of the
+algorithms are also gene order independent, fitness scale invariant, and unbiased. This means,
+for any problem, the order in which problem variables appear in the genome can be changed
+without changing the behavior of the search. The fitness can also be manipulated in any fashion
+as long as the rank ordering of solutions is unchanged. These algorithms are also unaffected by the meaning
+assigned to each bit, such that inverting a predetermined random subset of genes before evaluation
+will not impact search efficiency.
+
+Our implementations of all of these algorithms as well as all of the population size information, raw results,
+and processing scripts
+are available from our website.\footnote{\url{https://github.com/brianwgoldman/FastEfficientP3}}
+
+%%%%%%%%%% HC %%%%%%%%%%%%%%%%
+\section{Random Restart Hill Climber}
+\label{sec-hill-climber}
+Perhaps the simplest black box search heuristic is stochastic local search, or hill climbing.
+This optimization technique focuses on improving a single solution until it reaches a local
+optimum. Here we use the first improvement hill climber defined by \cite{goldman:2014:p3}
+and given in Figure~\ref{fig-hc}. This algorithm works by flipping each bit in a random
+order, keeping modifications when fitness is improved, until single bit flips cannot result in
+further fitness improvements.
+
+\begin{figure}
+  \begin{algorithmic}[1]
+  \Procedure{Hill-Climber}{}
+    \State $options \leftarrow [0 \dots N-1]$\label{fig-hc-options}
+    \State $tried \leftarrow \emptyset$
+    \While{$|tried| < |options|$}
+      \ForAll{$index \in shuffled(options)$}
+        \If{$index \notin tried$}\label{fig-hc-tried}
+          \State Flip bit $index$ in solution
+          \If{solution's fitness increased}
+            \State $tried \leftarrow \emptyset$
+          \Else
+            \State Revert change
+          \EndIf
+          \State $tried \leftarrow tried \cup \{index\}$
+        \EndIf
+      \EndFor
+    \EndWhile
+  \EndProcedure
+\end{algorithmic}
+  \caption{Hill climbing algorithm used to improve randomly generated solutions until no single
+           bit change results in a fitness improvement.}
+  \label{fig-hc}
+\end{figure}
+
+The hill climber requires an amortized cost of $O(1)$ operations per evaluation. In order to
+terminate, at least one evaluation must be performed for each of the $N$ bits in the solution.
+As such any operation that happens only once per search can be amortized over at least $N$
+evaluations, covering the initialization of $options$ on Line~\ref{fig-hc-options}.
+Line~\ref{fig-hc-tried}, which prevents wasted evaluations, can be called at most twice
+per evaluation: once to add $index$ into $tried$ and once to prevent $index$ from being unnecessarily
+evaluated again. The only way three or more calls could happen is if
+no fitness improvement was made for the entire previous iteration, which contradicts the loop invariant.
+
+Due to its nature, this hill climber cannot escape basins of attraction. Once a solution is reached
+such that none of the single bit neighbors are fitness improvements, search stops. Thus
+this algorithm requires a restart mechanism to solve multimodal problems. We have
+chosen here to naively restart search from a random solution whenever a local optima is found. This
+ensures that on all landscapes there is always a non-zero probability of search finding the global optimum.
+
+%%%%%%%%%%%% Lambda Lambda %%%%%%%%%%%%%%%%
+\section{$1+(\lambda, \lambda)$}
+\cite{doerr:2013:lambdalambda} presented the first genetic algorithm to provably show
+the advantages of performing crossover on simple landscapes. This comparatively simple
+algorithm maintains only a single individual and a self-controlled parameter $\lambda$.
+
+Each iteration, the number of bits to flip is chosen from the binomial distribution $b\sim B(N, \frac{\lambda}{N})$,
+where $N$ is the number of bits in the genome.
+Next, $\lfloor\lambda\rfloor$ offspring are produced by flipping $b$ bits. The
+best mutant then produces $\lfloor\lambda\rfloor$ offspring via uniform crossover with the original parent, such that each gene comes from the
+mutant with probability $\frac{1}{\lambda}$. In the original algorithm the best
+offspring produced by crossover then replaces the original parent if its fitness is no worse.
+The $\lambda$ parameter, which is initialized to 1, is decreased if the offspring replaced
+its parent and increased otherwise.
+
+The original formulation was designed specifically for unimodal landscapes and as such were
+not directly suitable for multimodal problems. \cite{goldman:2014:p3} extended $1+(\lambda, \lambda)$
+to include random restarts. As search stagnates, the $\lambda$ parameter increases in value. Eventually
+this results in $\lambda \ge N$ causing mutation to always flip all bits of the individual.
+As this prevents any future improvement, whenever $\lambda \ge N$ search is restarted from a random solution with $\lambda$
+reset to 1.
+
+A few other efficiency modifications were also made. If there is a tie in crossover offspring fitness,
+whichever has a larger hamming distance from the parent is retained. This encourages drifting across plateaus.
+The ``mod'' control strategy proposed by \cite{doerr:2013:lambdalambda} was not used as it conflicted with
+the random restart strategy.
+If a crossover individual is identical to either of its parents, it is not evaluated.
+If mutation produces an offspring which is better than the best crossover offspring, it is used to compare
+against the original parent.
+
+%%%%%%%%%%%%%%%%%% HBOA %%%%%%%%%%%%%%%%%%%%
+\section{Hierarchical Bayesian Optimization Algorithm}
+
+\cite{pelikan:2006:hboa} used statistical principles in combination with a decision tree structure
+to create the Hierarchical Bayesian Optimization Algorithm (hBOA). This method creates a model of
+epistatic relationships between genes which is then used to stochastically generate new solutions.
+Each generation a binary tournament with replacement is used to select $\mu$ solutions from
+the population. These solutions are then used to build the model, which in turn is used to generate $\mu$ new
+solutions. The new solutions are then integrated into the population using restricted tournament
+replacement.
+
+Conceptually, the model built by hBOA is trying to infer rules of the form ``Given that this
+subset of genes are set to these values, how frequently is gene $x_i$ set to value v?'' This can
+be represented using a directed acyclic decision forest, with each tree in the forest representing one gene
+in the solution. In the decision tree $T_i$, which is used to set the value of gene $x_i$,
+each internal node represents previous decisions on how to set
+some other gene $x_j$, with the children of that node representing how the decision was made. The
+leaves of each tree give the probability that $x_i$ should be set to each possible value.
+
+The forest is constructed iteratively, with each tree initially containing a single leaf
+and with each leaf storing a pointer for each selected solution. Each iteration the algorithm considers
+all possible ways of splitting an existing leaf using another gene $x_j$, such that solutions in the
+leaf are moved to the newly created leaves based on their value for $x_j$. The general goal is to
+separate the solutions such that all solutions with $x_i = 0$ move to one leaf while solutions with
+$x_j = 1$ move to the other.
+
+This goal is formalized using model scoring from Bayesian statistics. In its raw form this
+almost always creates near infinitesimal results, calculating fractions which include factorials of $\mu$
+and products over $N$. However, through algebraic manipulation discussed in Appendix~\ref{appendix-hboa}, we
+derived a simplified form shown in Equation~\ref{eq-hboa-final}. If no proposed split satisfies the inequality, iteration stops.
+If multiple splits do, whichever maximizes the right side is chosen.
+
+\begin{equation}
+  2^{0.5 log_2\mu} < \frac{(m_i(l) + 1)!}{m_i(0, l)!m_i(1,l)!} \cdot
+  \frac{m_i(0, l')!m_i(1,l')!m_i(0, l'')!m_i(1,l'')!}{(m_i(l') + 1)!(m_i(l'') + 1)!}
+  \label{eq-hboa-final}
+\end{equation}
+
+Initially there are $\Theta(N^2)$ possible ways to split existing leaves, as each of the $N$ single node
+trees can be split by any of the other $N-1$ genes. Each iteration a new edge is added to the decision
+forest, meaning some of the previously tested splits cannot be used. For instance, if $T_i$, which is used
+to decide the value of $x_i$, is split using the value of $x_j$, $T_j$ can no longer be split using $x_i$.
+As a split creates two new leaves, $O(N)$ new potential splits must also be tested. Equation~\ref{eq-hboa-final}
+parses all solutions which reach a leaf to count gene frequencies, requiring $\mu$ time.
+The number of total leaves created depends heavily on the problem and $\mu$.
+However, assuming no splits are accepted or that the cost of testing all future splits is less than
+the initial $\Theta(N^2)$, constructing the model requires $\Omega(\mu N^2)$ time. Each
+model is used to generate $\mu$ solutions, leading to a cost per evaluation of $\Omega(N^2)$.
+
+To generate a solution, the value of each gene $x_i$ is set using its corresponding decision tree $T_i$. Because
+the forest is directed acyclic, there must be an ordering of $T_i$ such that before $T_i$ is executed all
+$x_j$ it uses to make decisions have already been set. As such, previous decisions made by other trees
+are used to follow each $T_i$ until a leaf is reached. The value of $x_i$ is then set based on the
+probability that other solutions reached that leaf with each value of $x_i$.
+
+To perform replacement, hBOA uses restricted tournament replacement. After each new solution is generated
+and evaluated, a set of $w$ solutions are chosen at random from the population, where $w=\min\{N, \frac{\mu}{20}\}$.
+From this set the solution which is most genetically similar to the offspring is chosen. If the offspring
+is at least as fit as the chosen solution, it replaces the chosen solution in the population. Otherwise the
+offspring is discarded. This method is designed to preserve genetic diversity as only genetically similar
+solutions must compete on fitness.
+
+hBOA is designed to work with large population sizes, resulting in a large number of
+evaluations per generation. As hBOA utilizes explicit diversity maintenance, standard methods for determining
+convergence are not considered very accurate. Therefore the authors suggest that an hBOA run should be
+terminated after performing generations equal to $N$.
+
+Like other model based techniques, hBOA has very few parameters. There is no mutation or crossover,
+and modeling does not rely on any explicit parameters. Solution selection, generation, and replacement
+are all derived from the population size, which must be set by the user.
+
+%%%%%%%%%%%%%%% Parameter-less HBOA %%%%%%%%%%%%%%%%%%%%%%
+\section{Parameter-less hBOA}
+Using the methods first introduced by \cite{harik:1999:parameterlessga} for the Parameter-less GA,
+\cite{pelikan:2004:parameterlesshboa} created Parameter-less hBOA which automatically scales its
+population size to fit the problem. This is done by maintaining a list of concurrent populations
+using exponentially scaled population sizes.
+
+A run of Parameter-less hBOA starts with a single population of size $\mu_0$, conventionally set
+to $\mu_0=10$. After two generations are performed, a new population of size $\mu_1 = 2\mu_0$ is created
+and performs a generation. Evolution then continues with the $\mu_0$ population performing two generations
+for each one performed by $\mu_1$. Each time population $\mu_i$ performs its second generation a new population
+$\mu_{i+1}=2\mu_i$ is created, which performs generations half as often as $\mu_i$. In this way an infinite number of
+parallel population can be simulated, with each population receiving the same number of total evaluations.
+
+In all other aspects each population is identical to an hBOA population using a fixed $\mu$. No search information
+is shared among populations, and each search is independently terminated. As such Parameter-less hBOA cannot
+perform better than hBOA using the optimal population size for a given instance, as it must also spend evaluations
+on populations of different sizes. This inefficiency is bounded by a log multiple of the total number of
+evaluations~\citep{pelikan:1999:worstparameter-less}.
+
+%%%%%%%%%%%%%%%%%%%% LTGA %%%%%%%%%%%%%%%%%%%%%%%%
+\section{Linkage Tree Genetic Algorithm}
+~\cite{thierens:2010:ltga} introduced the Linkage Tree Genetic Algorithm (LTGA) which automatically
+detects and exploits problem epistasis by examining pairwise gene entropy. Due to its enhanced
+ability to preserve high fitness gene subsets, LTGA was able to outperform state-of-the-art
+GAs across many benchmarks. Since its introduction, many variants of LTGA have been
+proposed~\citep{goldman:2012:ltga} so for clarity we have chosen the version
+presented by \cite{thierens:2013:ltgahiff} as our model.
+
+LTGA's effectiveness comes from its method of performing crossover. Instead of blindly
+mixing genes between parents, LTGA attempts to preserve important interrelationships
+between genes. Before performing any crossovers in a generation, LTGA first builds
+a set of hierarchical gene clusters which are then used to dictate how genes are mixed
+during crossover.
+
+\begin{figure}
+  \begin{algorithmic}[1]
+  \Procedure{Cluster-Creation}{}
+    \State $unmerged \leftarrow \{\{0\}, \{1\}, \{2\}, \dots, \{N-1\}\}$
+    \State $useful \leftarrow unmerged$
+    \While{$|unmerged|>1$}
+      \State $C_i, C_j \leftarrow \min_{C_i,C_j \in unmerged} D(C_i, C_j)$
+      \State $unmerged \leftarrow unmerged - \{C_i, C_j\} + \{C_i \cup C_j\}$
+      \State $useful \leftarrow useful + \{C_i \cup C_j\}$
+      \If{$D(C_i, C_j) = 0$}
+        \State $useful \leftarrow useful - \{C_i, C_j\}$
+      \EndIf
+    \EndWhile
+    \State Order $useful$ based based on last merged first\label{fig-cluster-creation-ordering}
+    \State Remove largest cluster from $useful$
+
+    \Return $useful$
+  \EndProcedure
+\end{algorithmic}
+  \caption{Algorithm describing how LTGA creates clusters using Equation~\ref{eq-distance}
+           for a population. $unmerged$ and $useful$ are ordered sets of sets of gene loci.}
+  \label{fig-cluster-creation}
+\end{figure}
+
+Figure~\ref{fig-cluster-creation} provides the agglomerative method LTGA uses to create gene clusters.
+This algorithm creates a tree of sets using pairwise gene entropy, such that the leaves of the tree contain a single gene and
+internal nodes are the union of their children's sets. These sets are then used by crossover to specify epistatic
+relationships which should be preserved.
+The process begins by creating the set of sets $unmerged$ which tracks all top level clusters. Initially
+$unmerged$ contains single member sets for each gene. After each iteration the two sets with the minimum average pairwise
+distance (given in Equation~\ref{eq-distance}) are merged to create a single cluster. This process is repeated
+until only a single set remains in $unmerged$ which contains all of the genes in the genome.
+
+\begin{equation}
+  D(C_i,C_j) = \frac{1}{\left | C_i \right |\cdot \left |C_j \right|}\sum_{c_i \in C_i}\sum_{c_j \in C_j}
+  2 - \frac{H(c_i) + H(c_j)}{H(c_i \cup c_j)}
+  \label{eq-distance}
+\end{equation}
+\begin{equation}
+  H(c) = -\sum_{s\in S} p_c(s)\log(p_c(s))
+  \label{eq-entropy}
+\end{equation}
+
+Throughout this process $useful$ tracks the set of all gene clusters which should be preserved for use by crossover.
+This set begins with all genes in separate clusters, and each time a new cluster is created it is added to $useful$.
+However, not all clusters are necessarily worth keeping. For instance, in all versions of LTGA the cluster
+containing all genes is removed from $useful$ as preserving all genes during crossover can only create clones.
+\cite{thierens:2013:ltgahiff} extended this removal to include any unsupported subsets. If the pairwise distance
+between two clusters is 0, this means there are no individuals in the population which disrupt the relationships between the two
+clusters. Therefore when performing crossover there is no reason to believe a fitness improvement can be achieved
+by breaking the stored pattern. As such a cluster is only kept if its direct superset has a non-zero distance.
+As a final step Line~\ref{fig-cluster-creation-ordering} reorders $useful$ such that clusters appear in reversed
+order from which they were added to $useful$. Thus the most linked clusters and those containing single genes
+appear at the end of the returned list.
+
+\cite{thierens:2013:ltgahiff}'s version of LTGA does not use the entire population when determining pairwise entropy.
+Instead, binary tournament is used to select half of the population. This is done to ensure the model is built
+using only high quality solutions, even during the first generation.
+
+In order to efficiently perform clustering, a pairwise gene frequency table is constructed from the selected solutions.
+To calculate Equation~\ref{eq-distance}, Equation~\ref{eq-entropy} is called for each
+gene ($H(c_i)$) and pair of genes ($H(c_i \cup c_j)$). Extracting this information requires $O(\mu N^2)$
+time, where $\mu$ is the population size and $N$ is the genome size. The process of converting
+this pairwise frequency information into clusters can be achieved in $O(N^2)$ using the bookkeeping
+methods presented by \cite{gronau:2007:upgma}. This cost is performed only once per generation,
+and is then used to perform approximately $O(\mu N)$ crossover evaluations. As a result, the amortized cost of
+LTGA's model building is $O(N)$.
+
+\begin{figure}
+  \begin{algorithmic}[1]
+  \Procedure{Cluster-Usage}{}
+    \ForAll{$C_i \in useful$}
+      %\ForAll{$d \in shuffled(P_i)$}
+        \State $d \leftarrow rand\_choice(P)$\label{fig-cluster-usage-donate}
+        \State Copy $d$'s gene values for $C_i$ into solution
+        \If{solution was changed}
+          \If{solution's fitness decreased}
+            \State Revert changes
+          \EndIf
+          %\State \textbf{break}
+        \EndIf
+      %\EndFor
+    \EndFor
+  \EndProcedure
+\end{algorithmic}
+  \caption{Algorithm describing how clusters are used to perform crossover.}
+  \label{fig-cluster-usage}
+\end{figure}
+
+Figure~\ref{fig-cluster-usage} describes how the identified clusters are used by crossover to preserve
+gene linkage while still exploring the search space. Unlike more traditional crossover methods, LTGA
+crosses each individual with the entire population. Also, to produce a single offspring, multiple evaluations
+of the fitness function are performed.
+
+Each generation, each individual in the population undergoes crossover. In a single crossover event, each
+cluster of genes $C_i$ in $useful$ is applied as a crossover mask. A random donor $d$
+is chosen from the entire population (not just the model selected population), and $d$'s gene's for $C_i$ are copied
+into the working solution. If a modification is made, an evaluation is then performed. If the crossover
+resulted in no worse fitness then the changes are kept. This allows for neutral drift across plateaus.
+The resulting solution, which must be at least as fit as its parent, is then
+copied into the next generation.
+
+
+In total each individual can cause up to $|useful|$ evaluations. If all clusters were kept, even those deemed
+unhelpful, and all donations were evaluated, even those which did not change any genes, then \Call{Cluster-Usage}{}
+would perform exactly $2N-2$ evaluations for each of the $\mu$ solutions in the population. This provides the amortizing evaluations
+required to make clustering only $O(N)$ operations per evaluation. However, by skipping some evaluations, its
+possible that clustering may be super-linear.
+
+LTGA has no explicit form of diversity control and has no method for introducing new genetic information once
+the population has converged. Therefore an LTGA run is considered converged once two consecutive populations
+contain the same unique solutions.
+
+By design, LTGA only has a single parameter: population size. LTGA uses no mutation, and crossover is defined
+in terms of the clustering algorithm. Selection between generations is fully elitist and embedded in the crossover,
+with selection of model building solutions fixed to a binary tournament. Neither \Call{Cluster-Creation}{} nor
+\Call{Cluster-Usage}{} rely on parameter values. LTGA does not provide any method for controlling or setting
+the population size, and uses a fixed user specified size for each generation.
+
+%%%%%%%%%%%%%%%% Tuning %%%%%%%%%%%%%%%%%%%%%
+\section{Comparison Algorithm Parameter Tuning}
+\label{sec-tuning}
+
+\begin{figure}[t]
+  \begin{centering}
+    \begin{subfigure}{.5\textwidth}
+      \begin{centering}
+        \includegraphicsfit{pop-hboa}
+      \end{centering}
+      \caption{Tuned Population Sizes for hBOA}
+      \label{fig-pop-hboa}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+      \begin{centering}
+        \includegraphicsfit{pop-ltga}
+      \end{centering}
+      \caption{Tuned Population Sizes for LTGA}
+      \label{fig-pop-ltga}
+    \end{subfigure}
+  \end{centering}
+  \caption{Optimal population sizes found using bisection on each size
+           for each problem.}
+  \label{fig-pop-sizes}
+\end{figure}
+
+
+While four of the six algorithms in our experiments do not require any user specified parameters,
+hBOA and LTGA both use a population size parameter. To ensure these techniques are not unfairly
+handicapped, we extensively tuned each using the bisection method \citep{sastry:2001:bisection}
+to determine the optimal population size for each problem size.
+Extended by \cite{goldman:2012:ltga}, this method iteratively
+doubles the population size until some success criteria is met and then performs bisection
+between the lowest successful and highest unsuccessful sizes. In this way the minimum population size
+which meets the success criteria is found. \cite{goldman:2014:p3} proposed a success criteria
+of performing $r$ successful runs in a row, such that the expected failure rate can be bounded
+above by $\frac{3}{r+1}$~\citep{jovanovic:1997:ruleofthree}. As P3 and the other three algorithms
+do not prematurely converge, we chose $r=100$ to similarly ensure hBOA and LTGA almost never do.
+As bisection can make infinitely large population sizes, any run which had not found the global
+optimum after 100 million evaluations or 128 computing hours was considered unsuccessful.
+
+Figure~\ref{fig-pop-sizes} shows the results from performing bisection. In general hBOA
+required population sizes which were at least an order of magnitude larger than LTGA. Due to
+runtime and memory overhead, finding the optimal value for hBOA was much less tractable than LTGA
+for moderate to large problem sizes. LTGA's population size also grew significantly slower
+than hBOA's as problem size increased, especially on the two Trap problems and Rastrigin.
+Both algorithms were very ineffective on MAX-SAT, neither able to tune to problems sizes over 60 bits.
+This is likely due to the fact that some randomly generated MAX-SAT landscapes are very flat
+and highly deceptive~\citep{rana:1998:gamaxsat}.

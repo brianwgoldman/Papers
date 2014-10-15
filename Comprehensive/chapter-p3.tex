@@ -1,0 +1,115 @@
+\chapter{Parameter-less Population Pyramid}
+\label{chap-p3}
+\cite{goldman:2014:p3} introduced the Parameter-less Population Pyramid (P3) as a method for
+performing optimization which does not require the user to provide any parameters. This is
+achieved by combining efficient local search with the model building methods of LTGA using
+an iteratively constructed hierarchy of populations.
+
+The high level algorithm of P3 is presented in Figure~\ref{fig-p3}. Unlike more traditional
+GAs, P3 does not follow a generational model. Instead, it maintains an iteratively
+expanding pyramid of expanding populations. Each iteration, a new random solution is generated.
+This solution is brought to a local optimum using the hill climbing algorithm in Figure~\ref{fig-hc}. If that
+local optimum has not yet been added to the pyramid, the solution is added to the lowest
+population $P_0$.
+
+Next, the solution is iteratively improved by applying LTGA's crossover algorithm (Figure~\ref{fig-cluster-usage})
+with each population $P_i$ in the pyramid. If this process results in a strict fitness improvement and has
+created a solution not yet stored in the pyramid, it is added to the next highest pyramid level $P_{i+1}$.
+If $P_{i+1}$ does not yet exist, it is created. In this way populations in the pyramid expand over time,
+and the number of populations stored increases over time. Initially the pyramid contains no solutions
+or populations, meaning the user does not need to specify a population size.
+
+
+\begin{figure}
+  \begin{algorithmic}[1]
+  \Procedure{Iterate-P3}{}
+    \State Create random solution
+    \State Apply hill climber
+    \If{solution $\notin hashset$}
+      \State Add solution to $P_0$
+      \State Add solution to $hashset$
+    \EndIf
+
+    \ForAll{$P_i \in pyramid$}
+      \State Mix solution with $P_i$
+      \If{solution's fitness has improved}
+        \If{solution $\notin hashset$}
+          \State Add solution to $P_{i+1}$
+          \State Add solution to $hashset$
+        \EndIf
+      \EndIf
+    \EndFor
+  \EndProcedure
+\end{algorithmic}
+  \caption{One iteration of P3 optimization. $pyramid$ is an
+           ordered set of populations and $hashset$ is a set
+           of all solutions in $pyramid$.}
+  \label{fig-p3}
+\end{figure}
+
+To accommodate P3's unique population structure, some of LTGA's clustering procedures were modified. In LTGA,
+clusters are identified at the start of each generation and are used
+to create all offspring in that generation. As P3 does not perform serial
+generations, P3 instead updates the model each
+time a solution is added to a population. Furthermore, unlike
+LTGA all solutions in the population are used to generate the model, not just the
+winners of a binary tournament. We can do this because even the
+worst solutions in the pyramid are already high quality due to local search.
+Using local search in LTGA was examined by \cite{bosman:2011:lsbbo} and found
+to provide no significant improvement. A likely cause was that that study applied
+local search to every solution, not just the initial population, resulting in significant overhead.
+
+Beyond the changes in population structuring, P3 modifies
+LTGA's version of \Call{Cluster-Creation}{} and \Call{Cluster-Usage}{}.
+P3 changes Line~\ref{fig-cluster-creation-ordering} in Figure~\ref{fig-cluster-creation}
+from \emph{last merged first} ordering to \emph{smallest first} ordering.
+This method applies gene clusters during crossover based on how many genes
+are in each cluster\footnote{Ties are broken randomly.}, and not on how tightly linked those genes are.
+\cite{goldman:2012:ltga} found that this alternative was better at preserving
+diversity, and therefore required smaller populations, but has not yet been integrated into
+canonical LTGA.
+
+P3 also modified Line~\ref{fig-cluster-usage-donate} in Figure~\ref{fig-cluster-usage}.
+Instead of choosing a single genetic donor for each cluster, P3 iterates over the
+population in a random order until a solution in the population is found which
+has a least one gene different for that cluster of genes from the improving solution.
+This process increases the likelihood of an evaluation being performed for every cluster,
+and helps test rare gene patterns in the population.
+
+In LTGA the cost of rebuilding the model is $O(\mu N^2)$ as it must collect pairwise
+gene frequency information for all $\mu$ solutions in the population. P3 does not store
+a single population, and it does not have a fixed $\mu$ size for any population. However,
+each time a solution is added to the population, it requires $O(N^2)$ time to update
+the table of pairwise frequencies and another $O(N^2)$ time to rebuild the linkage model.
+The model is then used immediately to perform up to one evaluation for each of the up
+to $2N-2$ clusters. Just as in LTGA, if no evaluation shortcuts were made, P3
+has an amortized cost of $O(N)$ modeling cost per evaluation. While P3 does
+rebuild the model more frequently per solution in the population, it also performs
+a number of local search evaluations which are quite efficient, meaning theoretical
+comparisons of their speed are difficult to perform. As a final note, P3's repeated
+attempts to find a useful donation make it less likely than LTGA to skip evaluations,
+but has an added cost to find these donations. Repeated donations could require as much
+as $O(\mu)$ attempts per evaluation, but experimental evidence suggest that this
+operation actually saves more overhead than it costs by increasing the number of evaluations
+per model rebuild.
+
+Each of the pieces of the P3 algorithm were selected not just for their stand alone efficacy,
+but for the ways in which they interact. By using the hill climber to ensure each solution
+is at a local optima, the underlying pairwise relationships in the problem are exposed. As
+a result, detecting clusters for use by crossover is much more effective. The crossover operator
+is extremely elitist, as each gene donation must result in no fitness loss, and a solution must
+strictly improve to be added to the next level of the pyramid. This is balanced by continual
+integration of new random solutions. Furthermore, each random restart decreases the probability
+of spurious linkages caused by shared ancestry. This diversity is further preserved by applying
+gene clusters in smallest first order during crossover as this reduces the probability of genetic
+hitchhikers.
+
+Other algorithms have proposed using multiple concurrent populations.
+\cite{hornby:2006:alps} had a hierarchy of populations with solutions periodically advancing
+upward. This allows for continuous integration of diversity as the lowest population is reseeded
+with random solutions. However, this method resulted in increased parameterization as not only was
+a population size required, but also parameters for how frequently generations advanced between levels and
+how many total levels to have were added. \cite{harik:1999:parameterlessga} used multiple independent
+populations of different sizes as a method for removing the population size parameter, but
+doing was provably less efficient than using an optimal population size as no information is shared
+between the populations.
