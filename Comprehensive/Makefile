@@ -12,7 +12,7 @@ double:
 	sed -e 's/\\linespread/%\\linespread/g' main.tex > temp.txt; mv temp.txt main.tex
 
 clean:
-	rm -f *.log *.aux *.bbl *.blg *~
+	rm -f *.log *.aux *.bbl *.blg *~ main.lof main.lot main.toc
 
 extra_clean: clean
-	rm -f main.pdf main.dvi main.ps main.lof main.lot main.toc
+	rm -f main.pdf main.dvi main.ps

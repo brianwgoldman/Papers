@@ -7,3 +7,6 @@ main.pdf
 main.dvi
 main.ps
 *.pdf
+*.lof
+*.toc
+*.lot
