@@ -1,11 +1,346 @@
 \chapter{New Problem Domain: Gray Box Optimization}
+\label{chap-graybox}
+All of the work presented so far has focused on the black box optimization
+domain. These problems are characterized by a complete lack of available
+problem specific information. All the algorithm has to perform search
+is a ``black box'' which measures the quality of arbitrary proposed
+solutions. Optimizers which are successful in this domain are very general
+as there are minimal requirements to apply them to a new problem.
+
+However, for many real world applications there is potentially more information
+available. The other end of the spectrum is white box optimization, in which
+the algorithm knows the exact problem class it is trying to solve. This domain
+is dominated by problem specific search
+heuristics~\cite{een:2004:satsolver,sherrington:1975:isingsolver,wright:2000:solvingnk} which
+leverage all aspects of the problem to achieve efficiency. This makes such
+algorithms very specific, such that outside of their target domain they
+either cannot be applied or have no expectation of quality. As such,
+each must also be designed by hand for each new problem class, requiring
+deep understanding of the problem and the time to develop the algorithm.
+
+In between those two domains there is another: gray box optimization. In this
+domain some features general to multiple problem classes are exploited, beyond
+just an evaluation function. The goal is to create optimization methods which
+benefits from these features without those methods becoming specialized to
+a small set of problem classes.
+
+In addition to the black box evaluation function, we shall
+add in two more exploitable features accessible to search algorithms:
+known variable epistasis and partial function evaluation.
 
 \section{Problems in this domain}
+To understand the types of problems in this domain, lets first examine
+a very simple artificial problem we'll call 3-Equal. The quality
+of a solution is determined by how often three consecutive bits are set
+to the same value. As a result the maximum fitness is $N$ (all zero or all one) and the minimum fitness
+is 0.
+
+The 3-Equal problem has both known epistasis and partial function evaluation. From the definition
+we know that each bit is epistatically linked to the two variables that precede it and the two
+that follow it. There are no other non-linear relationships with that bit. This also means
+it is possible to evaluate the fitness contribution of that bit only knowing the value of at
+most four others, regardless of the size of $N$. As we'll discuss in Section~\ref{sec-whitley-ls}
+this has enormous implications on search efficiency.
+
+Every problem discussed in Chapter~\ref{chap-problems} except HIFF fit into this domain. Deceptive
+Trap and Deceptive Step Trap both can have known epistasis (which bits are in which traps) and
+partial reevaluation (score a single trap), the same as Rastrigin (separable). All NK problems
+where $K \ll N $ have a knowable epistasis table and the fitness contribution of each is subfunction
+calculable without evaluating the entire string. Similarly, MAX-SAT's clause list specifies epistasis,
+with each clause independently evaluable. Ising Spin Glasses are even simpler, with each edge in the
+graph evaluable using only two problem variables.
+
+Beyond MAX-SAT and Ising Spin Glasses, which are interesting real world problems unto themselves,
+many $NP$-Hard real world problems can be expressed in these two requirements. This is especially true
+of graph problems.
+
+\begin{itemize}
+\item \textbf{Dominating set}: Find a minimum vertex
+set such that all vertices are either in the set or adjacent to something in the set.
+The fitness of a vertex is determined by if it is in the set (add to set size) and if
+it is dominated (add to undominated size). Epistasis is the adjacency set for each
+vertex, plus itself. Used in ad hoc wireless sensor networks~\cite{todo-dominating-set}.
+
+\item \textbf{Vertex Cover}: Find a minimum vertex
+set such that all edges are incident on at least one vertex in the set.
+Epistasis and fitness are calculated using each vertex (add to set size)
+and each edge (add to uncovered size), independently. Used in computation biology~\cite{todo-vertex-cover}.
+
+\item \textbf{Max-Cut}: Find the set of vertices which maximize the number of edges
+incident on exactly one vertex in the set. Epistasis and fitness are calculated
+using each edge independently. Used in VLSI design~\cite{todo-max-cut}.
+
+\item \textbf{Set Cover}: Given a universe of elements and a set of subsets of that universe,
+find a minimum set of subsets whose union recreates the entire universe. Each element in
+the universe is epistatically linked with subsets that contain that element (add to uncovered size)
+and with each subset also contributing directly to fitness (add to set size). Used in
+computer vision~\cite{todo-set-cover}.
+
+\item \textbf{Zero-One Linear Programming}: Given a set of constraints, maximize an
+objective function, all of which are linear combinations of variables. Each constraint
+creates an epistatic relationship between the variables in that constraint, and fitness
+is a linear combination of variables allowing for partial evaluation. Used in power systems~\cite{todo-linear-programming}.
+\end{itemize}
 
 \section{Formal Requirements}
+In order to draw conclusions about search efficiency, it is necessary to make the features
+of the target problem domain more explicit.
+
+The overall quality of a solution must be equal to the sum of applying all subfunctions to that
+solution. As a consequence each subfunction must be independently evaluable.
+The mapping of variables to subfunctions (epistasis) must also be known, and
+the maximum number of variables participating in each subfunction is $k$.
+To achieve maximum efficiency $k$ should be constant in regards to problem size. The cost
+of evaluating a subfunction should also be bounded by some function $b(k)$. For example, on MAX-SAT
+$k$ is the clause size, with $b(k)$ linear in clause size, and the fitness equal to the sum of
+all clause terms. On NK, $k=K+1$ as each subfunction in NK depends on a variable and $K$ others.
+
+As the mapping of variables to subfunctions is known, it is also possible to calculate $c$, which
+is the maximum number of subfunctions any variable participates in. For best efficiency $c$ should
+be constant in regards to problem size. For example for all Nearest Neighbor NK landscapes all variables
+participate in exactly $c=k=K+1$ subfunctions. Randomly generated MAX-SAT instances have no guarantee
+that $c$ is constant, but in general the expected number of subfunctions in which a variable appears is set to 12.81.
+Assuming that all subfunctions use $k$ variables and each variable appears in $c$ subfunctions
+provides a bound on the total number of subfunctions of $\frac{cN}{k}$.
 
 \section{Efficient Local Search}
+\label{sec-whitley-ls}
+Section~\ref{sec-hill-climber} presented an efficient method for performing local search for the black
+box domain. Each potential bit flip, referred to here as a move, requires the entire solution to be reevaluated, which takes $\Omega(N)$ time.
+Furthermore, each time a fitness improving move is made all previously tested moves must be tested again. As a result
+improving a random solution to be a local optimum using this algorithm requires between $\Omega(N^2)$ and $O(IN^2)$, where $I$ is the number
+of improving moves. The lower bound is achieved when the while loop in Figure~\ref{fig-hc} runs a constant number of times.
+For instance on One Max, Deceptive Trap, Deceptive Step Trap, and HIFF all possible single bit improvements are found during
+the first time through the loop. The worst case is when each loop is expected to only make a single improving move, which causes
+all $N$ moves to be reevaluated once per improvement, such as on the Leading Ones problem.
 
-\section{Efficient Hamming Search}
+Local search in the gray box domain can be significantly more efficient~\cite{whitley:2013:greedy}. This is due
+to two consequences of the domain: the fitness effect of making a move can be calculated in $O(1)$ time, not $O(N)$,
+and the number of moves which must be reevaluated per improvement is $O(1)$, not $O(N)$. This results in local
+search requiring $O(N+I)$ time. If $I$ is within a constant factor of $N$, this means generating random local
+optima is at most a constant factor slower than generating random solutions in the search space.
 
+\begin{figure}
+  \begin{algorithmic}[1]
+  \Procedure{InitializeDelta}{$solution$}
+    \State $fitness \leftarrow 0$
+    \State $\forall_{m} delta[m] \leftarrow 0$
+    \ForAll{$s \in subfunctions$}
+      \State $pre\_move \leftarrow f_s(solution)$
+      \State $fitness \leftarrow fitness + pre\_move$
+      \ForAll{$m \in effected\_moves(s)$}
+        \State $post\_move \leftarrow f_s(solution \oplus m)$
+        \State $delta[m] \leftarrow delta[m] + (post\_move - pre\_move)$
+      \EndFor
+    \EndFor
+  \EndProcedure
+\end{algorithmic}
+  \caption{Algorithm used to efficiently determine the change in fitness
+           associated with each potential move from a given solution.}
+  \label{fig-initialize-delta}
+\end{figure}
+
+To achieve this performance, this local search technique begins by determining the change in fitness
+caused by making each potential move $m$, denoted as $delta[m]$. Figure~\ref{fig-initialize-delta}
+calculates the $delta$ for each $m$ starting at a given solution, as well as the fitness of the solution.
+Here, $f_s$ evaluates
+the subfunction $s$ on the given solution, and $solution \oplus m$ is the result of making move $m$ on $solution$.
+For each of the $\frac{cN}{k}$ subfunctions \Call{InitializeDelta}{} must determine the fitness of that
+subfunction before and after making each of $k$ moves which overlap that subfunction. Combined this
+results in less than $cN2b(k)$ operations, which is $O(N)$ assuming $c$ and $b(k)$ do not grow with $N$.
+Also, this procedure calls $f_s$ only $k+1$ times more than is required to find the fitness of the solution itself.
+
+When performing hill climbing, only moves $m$ such that $delta[m] > 0$ are fitness improving moves. Initially
+all moves are considered $open$, meaning that they could potentially be fitness improvements. Each iteration
+a random move $m$ is chosen from $open$, and $delta[m]$ is checked. If $m$ is a fitness improving move,
+\Call{MakeMove}{$m$}, shown in Figure~\ref{fig-make-move}, is called.
+
+\begin{figure}
+  \begin{algorithmic}[1]
+  \Procedure{MakeMove}{$m$}
+    \State $fitness \leftarrow fitness + delta[m]$
+    \ForAll{$s \in effected\_subfunctions(m)$}
+      \State $pre\_both \leftarrow f_s(solution)$
+      \State $just\_m \leftarrow f_s(solution \oplus m)$
+      \ForAll{$m' \in effected\_moves(s)$}
+        \State $just\_m' \leftarrow f_s(solution \oplus m')$
+        \State $post\_both \leftarrow f_s(solution \oplus m \oplus m')$
+        \State $delta[m'] \leftarrow delta[m'] - (just\_m' - pre\_both) + (post\_both - just\_m)$
+        \State $open(m')$
+      \EndFor
+    \EndFor
+    \State $close(m)$
+    \State $solution \leftarrow solution \oplus m$
+  \EndProcedure
+\end{algorithmic}
+  \caption{Algorithm for updating stored information related to a solution when
+           making a move.}
+  \label{fig-make-move}
+\end{figure}
+
+\Call{MakeMove}{} updates the fitness and $delta$ values to reflect the change in the solution. The fitness
+of the solution after making the move does not require any calls to $f_s$ as $delta[m]$ already stores the
+change in fitness. This process requires updating all the $delta$ values for the $k$ moves which interact with each of the $c$ subfunctions
+effected by $m$. This update replaces outdated information which used the original solution ($just\_m' - pre\_both$)
+with how much the move improves over the new solution ($post\_both - just\_m$). As $delta[m']$ has updated, $m'$ could
+potentially become a fitness improving move and is therefore added into $open$. As $m$ was just flipped,
+it cannot be a fitness improvement and is therefore removed from $open$.  In total this requires less than
+$ck4b(k)$ time, which is $O(1)$ assuming $c$, $k$, and $b(k)$ do not scale with $N$.
+
+Each time an improving move is found at most $ck$ additional moves are added to $open$. If $open$ ever
+becomes empty a local optimum has been reached. Therefore the number of times $delta[m]$ is checked
+is no more than $N + Ick$. As a result the total cost of improving a random solution until it reaches
+a global optimum is only $O(N+I)$.
+
+As an interesting addition, this method can actually be used to efficiently perform approximate steepest ascent hill
+climbing~\cite{whitley:2013:greedy}. Instead of choosing moves from $open$ at random, the moves are binned
+using their $delta$ values. Moves are then chosen randomly from the highest quality non-empty bin, and changes
+in $delta$ can cause moves to change bins. Assuming the total number of bins does not increase with $N$, both steps
+can be done in $O(1)$ time. However, at least for MAX-SAT, there is evidence that when used in combination with subsequent
+search heuristics the less greedy first improvement algorithm was more effective.
+
+\subsection{Preliminary Empirical Comparison}
+\begin{figure}[t]
+  \begin{centering}
+    \begin{subfigure}{.5\textwidth}
+      \begin{centering}
+        \includegraphicsfit{hc-time}
+      \end{centering}
+      \caption{Seconds per local optima.}
+      \label{fig-hc-time}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+      \begin{centering}
+        \includegraphicsfit{hc-radius}
+      \end{centering}
+      \caption{Moves in Hamming Ball}
+      \label{fig-hc-radius}
+    \end{subfigure}
+  \end{centering}
+  \caption{Comparison of performing hill climbing
+           using the black box and gray box domains on Nearest Neighbor NK with $K=5$.
+           Figure~\ref{fig-hc-time} shows the time required to bring a random
+           solution to a local optima, averaged over 900 restarts across 30 instances.
+           Figure~\ref{fig-hc-radius} shows the number of moves which must be
+           tested by hill climbing when $N=500$ as $r$ increases.}
+  \label{fig-hc-compare}
+\end{figure}
+
+Figure~\ref{fig-hc-time} compares the black box hill climber presented in Section~\ref{sec-hill-climber}
+with the gray box hill climber presented in Section~\ref{sec-whitley-ls}.  Each algorithm was
+used 30 times on each of 30 instances to improve random solutions until they reached a local optimum.
+Both methods use first improvement hill climbing and achieved statistically indistinguishable fitness results.
+However, the amount of time each used is drastically different. On the largest tested size of $N=8,000$ the gray box
+hill climber was 800 times faster than using the black box method. This improvement was so extreme
+that the gray box hill climber is able to find local optima on $N=8,000$ problems faster than the black box
+method can optimize $N=400$ problems.  When compared asymptotically the black box optimizer empirically requires
+$O(N^{2.14})$ time while the gray box requires $O(N)$. This matches the theoretical conclusions for both algorithms.
+
+\section{Efficient Hamming Ball Search}
+Another consequence of the gray box domain is that increasing the neighborhood of local search becomes
+more tractable~\cite{chicano:2014:ball}.  Instead of improving solutions until no single bit flip
+is a fitness improvement, this can be expanded to no flip of $r$ or less bits can improve the solution.
+
+In a black box setting, verifying that no $r$ bit flip can improve a solution requires testing all
+$n \choose r$ neighbors. This quickly becomes intractable as $r$ increases. However in the gray
+box domain not all combinations need to be tested. Consider that if two variables do not participate
+in the same subfunction, the relationship between their effects is by definition additive. As such
+there is no way for flipping both together to be a fitness improvement without flipping one of them
+being a fitness improvement. Therefore it is not necessary to try all possible $r$ sized subsets
+of the solution.
+
+Consider the 3-Equal problem.  If there are at least two loci between $x_i$ and $x_j$ they do
+not share a common subfunction. Therefore, the change in fitness resulting from flipping
+both is equal to $delta[x_i] + delta[x_j]$. As such if $delta[x_i] \leq 0$ and $delta[x_j] \leq 0$
+then $delta[x_i,x_j] \leq 0$. Now consider a solution such that the first half is set to 0
+and the second half is set to 1. Even though $c=3$ there is no way to improve this solution without
+simultaneously flipping all 0's to 1's or vice versa. Any smaller flip will not
+be a fitness improvement.
+
+To determine which of the $n \choose r$ flips which must be checked, consider a graph where
+each vertex is a variable in the solution. An edge exists between two vertices if and only
+if the corresponding variables participate in at least one subfunction together. Restated,
+there is only an edge if the two variables have a non-linear relationship. The maximum
+degree of a vertex in this graph is $c(k-1)$, making it sparse for sufficiently large $N$.
+If a subset of vertices is connected then it is possible that flipping all of those
+variables together will result in a fitness improvement even when flipping any subset
+of the subset will not. However, if the subset is not connected then each component
+of the subset can be tested independently.
+
+\begin{figure}
+  \begin{algorithmic}[1]
+  \Procedure{ConnectedSubgraphs}{$v$, $subset$, $closed$, $open$}
+    \State $new\_subset \leftarrow subset \cup \{v\}$
+    \State $found \leftarrow [new\_subset]$
+    \If{$|new\_subset| \geq r$}
+      \Return $found$
+    \EndIf
+    \State $closed\_here \leftarrow \emptyset$
+    \State $open' \leftarrow open \cup adjacent(v)$
+    \ForAll{$v' \in open'$}
+      \If{$v' \notin closed$}
+        \State $closed\_here \leftarrow closed\_here \cup \{v'\}$
+        \State $closed \leftarrow closed \cup \{v'\}$
+        \State $recurse \leftarrow $\Call{ConnectedSubgraphs}{$v'$, $new\_subset$, $closed$, $open'$}
+        \State $found \leftarrow found + recurse$
+      \EndIf
+    \EndFor
+    \State $closed \leftarrow closed - closed\_here$
+    \State \Return $found$
+  \EndProcedure
+\end{algorithmic}
+  \caption{Algorithm to recursively find all connected induced subgraphs of size $r$ or less which
+           contain $subset \cup \{v\}$ and no additional vertices in $closed$.}
+  \label{fig-connected-subgraphs}
+\end{figure}
+
+The problem of finding which subsets must be checked is therefore equivalent to
+finding all induced subgraphs of $r$ or less vertices which are connected. For sparse
+graphs this can be efficiently calculated using \Call{ConnectedSubgraphs}{} outlined
+in Figure~\ref{fig-connected-subgraphs}. To our knowledge this is a novel algorithm
+as previous work did not specify how connected subgraphs were found.
+
+$subset$ and $open$ are both empty for the first top level call of \Call{ConnectedSubgraphs}{}, and
+$closed$ contains only $v$.
+The result of that call is to find all induced connected subgraphs which contain $v$.
+Subsequent top level calls expand $closed$ to also include their $v$.
+Each recursive level explores how $new\_subset$ can be expanded by including all $v'$ which are adjacent
+to at least one vertex in $new\_subset$. Once all subsets including $new\_subset \cup v'$ have been found,
+$v'$ is closed to prevent duplicates. However, when recursion ends $closed$ is returned to its previous state.
+The maximum recursive depth for this algorithm is $r$ as each level increases $|subset|$ by 1. Each level
+makes at most $|open'|$ recursive calls, with $|open'| \leq |open| + c(k-1)$. Finally there must be a top level
+call with each of the $N$ variables. This creates a loose bound of $O(r!(c(k-1))^rN)$, which is $O(N)$ under the
+assumption that $r$ and $c$ do not increase with $N$. The bound is loose because some portion of recursions
+are prevented by $closed$ and because overlapping adjacency will reduce the rate at which $|open'|$ increases.
+
+As this algorithm finds all connected subsets in $O(N)$ time for a fixed $r$, the number of moves
+which must be tested to determine if a solution is an $r$-bit local optima is $O(N)$. This means that
+while on Nearest Neighbor NK with $N=8000$, $K=5$, and $r=3$ the black box method would require 85 billion
+checks, the gray box method requires only 248,000. Even when allowing connections to be completely random,
+which results in $c$ increasing with $N$, the gray box method still only requires approximately 375 million checks,
+two and a half orders of magnitude less than assuming a black box.
+
+From these conclusions it is possible to modify the hill climber presented in Section~\ref{sec-whitley-ls} to
+efficiently find $r$-bit local optima~\cite{chicano:2014:ball}. The only change is that instead of having a move
+and $delta$ for each bit, there must be a move and delta for each connected induced subgraph of $r$ or less bits.
+The efficiency analysis is unchanged with the exception that the constant increases exponentially with $r$ as
+the number of $delta$ values which must be updated each move increases. Still, with $c$, $r$, and $k$ constant
+with respect to $N$, it is possible to find $r$-bit hamming ball local optima in $O(N+I)$ time.
+
+\subsection{Preliminary Empirical Comparison}
+Figure~\ref{fig-hc-radius} shows how the number of moves increases as the radius of the hamming ball increases.
+Even on this relatively small problem ($N=500$) the black box method quickly becomes intractable. The gray box
+method is able to use less moves to find 4-bit local optima than the black box needs to find 2-bit local optima,
+and when solving 6-bit local optima the black box method requires 653,635 times as many moves as gray box. However,
+gray box still increases exponentially as $r$ increases, limiting how large $r$ can grow before becoming intractable.
+This relationship depends heavily on $c$ and how variables are distributed among subfunctions.
+
+\begin{comment}
 \section{Memetic Algorithms}
+~\cite{chen:2011:memetic}
+
+
+Local search, even $r$-bit hamming ball search, is not sufficient to robustly find global optimums on
+highly multi-modal problems. This limitation was shown in Figure~\ref{fig-evals-to-success} with hill climbing
+unable to reach the global optima on almost any large size problem.
+\end{comment}

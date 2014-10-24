@@ -1753,3 +1753,150 @@
   pages =	"785--794",
   note = 	"{L}ecture {N}otes in {C}omputer {S}cience 1498",
 }
+
+@inproceedings{whitley:2013:greedy,
+  title={Greedy or Not? Best Improving versus First Improving Stochastic Local Search for MAXSAT.},
+  author={Whitley, Darrell and Howe, Adele E and Hains, Doug},
+  booktitle={AAAI},
+  year={2013}
+}
+
+@InProceedings{chicano:2014:ball,
+  author =	"Francisco Chicano and Darrell Whitley and Andrew M.
+		 Sutton",
+  title =	"Efficient identification of improving moves in a ball
+		 for pseudo-boolean problems",
+  booktitle =	"GECCO '14: Proceedings of the 2014 conference on
+		 Genetic and evolutionary computation",
+  year = 	"2014",
+  isbn13 =	"978-1-4503-2662-9",
+  pages =	"437--444",
+  month =	"12-16 " # jul,
+  organisation = "SIGEVO",
+  address =	"Vancouver, BC, Canada",
+  URL =  	"http://doi.acm.org/10.1145/2576768.2598304",
+  doi =  	"doi:10.1145/2576768.2598304",
+  publisher =	"ACM",
+  publisher_address = "New York, NY, USA",
+  abstract =	"Hill climbing algorithms are at the core of many
+		 approaches to solve optimisation problems. Such
+		 algorithms usually require the complete enumeration of
+		 a neighbourhood of the current solution. In the case of
+		 problems defined over binary strings of length n, we
+		 define the r-ball neighborhood as the set of solutions
+		 at Hamming distance r or less from the current
+		 solution. For r ll n this neighborhood contains
+		 Theta(nr) solutions. In this paper efficient methods
+		 are introduced to locate improving moves in the r-ball
+		 neighbourhood for problems that can be written as a sum
+		 of a linear number of sub-functions depending on a
+		 bounded number of variables. NK-landscapes and MAX-kSAT
+		 are examples of these problems. If the number of
+		 subfunctions depending on any given variable is also
+		 bounded, then we prove that the method can explore the
+		 neighbourhood in constant time, despite the fact that
+		 the number of solutions in the neighbourhood is
+		 polynomial in n. We develop a hill climber based on our
+		 exploration method and we analyse its efficiency and
+		 efficacy using experiments with NKq-landscapes
+		 instances.",
+  notes =	"Also known as \cite{2598304} GECCO-2014 A joint
+		 meeting of the twenty third international conference on
+		 genetic algorithms (ICGA-2014) and the nineteenth
+		 annual genetic programming conference (GP-2014)",
+  doi-url =	"http://dx.doi.org/10.1145/2576768.2598304",
+}
+
+@article{chen:2011:memetic,
+  title={A multi-facet survey on memetic computation},
+  author={Chen, Xianshun and Ong, Yew-Soon and Lim, Meng-Hiot and Tan, Kay Chen},
+  journal={IEEE Transactions on Evolutionary Computation},
+  volume={15},
+  number={5},
+  pages={591--607},
+  year={2011},
+  publisher={Institute of Electrical and Electronics Engineers, Inc., 3 Park Avenue, 17 th Fl New York NY 10016-5997 United States}
+}
+
+@InProceedings{sadowski:2013:ltga-maxsat,
+  author =	"Krzysztof L. Sadowski and Peter A. N. Bosman and Dirk
+		 Thierens",
+  title =	"On the usefulness of linkage processing for solving
+		 {MAX}-{SAT}",
+  booktitle =	"GECCO '13: Proceeding of the fifteenth annual
+		 conference on Genetic and evolutionary computation
+		 conference",
+  year = 	"2013",
+  ISBN = 	"978-1-4503-1963-8",
+  pages =	"853--860",
+  month =	"6-10 " # jul,
+  organisation = "SIGEVO",
+  address =	"Amsterdam, The Netherlands",
+  URL =  	"http://doi.acm.org/10.1145/2463372.2463474",
+  doi =  	"doi:10.1145/2463372.2463474",
+  publisher =	"ACM",
+  publisher_address = "New York, NY, USA",
+  abstract =	"Mixing of partial solutions is a key mechanism used
+		 for creating new solutions in many Genetic Algorithms
+		 (GAs). However, this mixing can be disruptive and
+		 generate improved solutions inefficiently. Exploring a
+		 problem's structure can help in establishing less
+		 disruptive operators, leading to more efficient mixing.
+		 One way of using a problem's structure is to consider
+		 variable linkage information. Once a proper linkage
+		 model for a problem is obtained, mixing becomes more
+		 efficient. This paper focuses on exploring different
+		 methods of building family of subsets (FOS) linkage
+		 models, which are then used with the Gene-pool Optimal
+		 Mixing Evolutionary Algorithm (GOMEA) to solve MAX-SAT
+		 problems. Individual algorithms from the GOMEA family
+		 are distinguished by how the FOS linkage models are
+		 constructed. The Linkage Tree Genetic Algorithm (LTGA)
+		 is a GOMEA instance which learns the linkage between
+		 problem variables by building a linkage tree in every
+		 generation. In this paper, we introduce SAT-GOMEA. This
+		 algorithm uses a predetermined FOS linkage model based
+		 on the SAT-problem's definition. Both algorithms use
+		 linkage information. We show that because of this
+		 information they are capable of performing
+		 significantly better than other algorithms from the
+		 GOMEA family which do not explore linkage. In a
+		 black-box (BBO) setting, LTGA performs well. We further
+		 study the use of linkage models outside of the typical
+		 BBO approach by examining the behaviour of LTGA and the
+		 problem-specific SAT-GOMEA in a white-box setting,
+		 where more of the problem information is known. We show
+		 that with this white-box optimisation (WBO) approach,
+		 exploring linkage information can still be beneficial.
+		 We further compare the performance of these algorithms
+		 with a selection of non-GOMEA based algorithms. From
+		 the BBO perspective, we compare LTGA with the
+		 well-known hBOA. In the WBO setting, many very
+		 efficient problem-specific local search (LS) algorithm
+		 exist. We specifically consider Walksat and GSAT and
+		 show that combining LS with LTGA or SAT-GOMEA increases
+		 their performance.",
+  notes =	"Also known as \cite{2463474} GECCO-2013 A joint
+		 meeting of the twenty second international conference
+		 on genetic algorithms (ICGA-2013) and the eighteenth
+		 annual genetic programming conference (GP-2013)",
+  doi-url =	"http://dx.doi.org/10.1145/2463372.2463474",
+}
+@inproceedings{een:2004:satsolver,
+  title={An extensible SAT-solver},
+  author={E{\'e}n, Niklas and S{\"o}rensson, Niklas},
+  booktitle={Theory and applications of satisfiability testing},
+  pages={502--518},
+  year={2004},
+  organization={Springer}
+}
+@article{sherrington:1975:isingsolver,
+  title={Solvable model of a spin-glass},
+  author={Sherrington, David and Kirkpatrick, Scott},
+  journal={Physical review letters},
+  volume={35},
+  number={26},
+  pages={1792},
+  year={1975},
+  publisher={APS}
+}
