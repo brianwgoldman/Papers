@@ -59,27 +59,27 @@ of graph problems.
 set such that all vertices are either in the set or adjacent to something in the set.
 The fitness of a vertex is determined by if it is in the set (add to set size) and if
 it is dominated (add to undominated size). Epistasis is the adjacency set for each
-vertex, plus itself. Used in ad hoc wireless sensor networks~\cite{todo-dominating-set}.
+vertex, plus itself. Used in wireless sensor networks~\cite{zhao:2013:dominatingset}.
 
 \item \textbf{Vertex Cover}: Find a minimum vertex
 set such that all edges are incident on at least one vertex in the set.
 Epistasis and fitness are calculated using each vertex (add to set size)
-and each edge (add to uncovered size), independently. Used in computation biology~\cite{todo-vertex-cover}.
+and each edge (add to uncovered size), independently. Used in network security~\cite{richter:2007:vertexcover}.
 
 \item \textbf{Max-Cut}: Find the set of vertices which maximize the number of edges
 incident on exactly one vertex in the set. Epistasis and fitness are calculated
-using each edge independently. Used in VLSI design~\cite{todo-max-cut}.
+using each edge independently. Used in VLSI design~\cite{festa:2002:maxcut}.
 
 \item \textbf{Set Cover}: Given a universe of elements and a set of subsets of that universe,
 find a minimum set of subsets whose union recreates the entire universe. Each element in
 the universe is epistatically linked with subsets that contain that element (add to uncovered size)
 and with each subset also contributing directly to fitness (add to set size). Used in
-computer vision~\cite{todo-set-cover}.
+computational biology~\cite{painsky:2014:setcover}.
 
 \item \textbf{Zero-One Linear Programming}: Given a set of constraints, maximize an
 objective function, all of which are linear combinations of variables. Each constraint
 creates an epistatic relationship between the variables in that constraint, and fitness
-is a linear combination of variables allowing for partial evaluation. Used in power systems~\cite{todo-linear-programming}.
+is a linear combination of variables allowing for partial evaluation. Used in power systems~\cite{arroyo:2000:linearprogram}.
 \end{itemize}
 
 \section{Formal Requirements}
