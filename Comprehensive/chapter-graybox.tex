@@ -200,6 +200,29 @@ can be done in $O(1)$ time. However, at least for MAX-SAT, there is evidence tha
 search heuristics the less greedy first improvement algorithm was more effective.
 
 \subsection{Preliminary Empirical Comparison}
+Figure~\ref{fig-hc-time} compares the black box hill climber presented in Section~\ref{sec-hill-climber}
+with the gray box hill climber presented in Section~\ref{sec-whitley-ls}.  Each algorithm was
+used 30 times on each of 30 instances to improve random solutions until they reached a local optimum.
+Both methods use first improvement hill climbing and achieved statistically indistinguishable fitness results.
+However, the amount of time each used is drastically different. On the largest tested size of $N=8,000$ the gray box
+hill climber was 800 times faster than using the black box method. This improvement was so extreme
+that the gray box hill climber is able to find local optima on $N=8,000$ problems faster than the black box
+method can optimize $N=400$ problems.  When compared asymptotically the black box optimizer empirically requires
+$O(N^{2.14})$ time while the gray box requires $O(N)$. This matches the theoretical conclusions for both algorithms.
+
+\section{Efficient Hamming Ball Search}
+Another consequence of the gray box domain is that increasing the neighborhood of local search becomes
+more tractable~\cite{chicano:2014:ball}.  Instead of improving solutions until no single bit flip
+is a fitness improvement, this can be expanded to no flip of $r$ or less bits can improve the solution.
+
+In a black box setting, verifying that no $r$ bit flip can improve a solution requires testing all
+$n \choose r$ neighbors. This quickly becomes intractable as $r$ increases. However in the gray
+box domain not all combinations need to be tested. Consider that if two variables do not participate
+in the same subfunction, the relationship between their effects is by definition additive. As such
+there is no way for flipping both together to be a fitness improvement without flipping one of them
+being a fitness improvement. Therefore it is not necessary to try all possible $r$ sized subsets
+of the solution.
+
 \begin{figure}[t]
   \begin{centering}
     \begin{subfigure}{.5\textwidth}
@@ -225,29 +248,6 @@ search heuristics the less greedy first improvement algorithm was more effective
            tested by hill climbing when $N=500$ as $r$ increases.}
   \label{fig-hc-compare}
 \end{figure}
-
-Figure~\ref{fig-hc-time} compares the black box hill climber presented in Section~\ref{sec-hill-climber}
-with the gray box hill climber presented in Section~\ref{sec-whitley-ls}.  Each algorithm was
-used 30 times on each of 30 instances to improve random solutions until they reached a local optimum.
-Both methods use first improvement hill climbing and achieved statistically indistinguishable fitness results.
-However, the amount of time each used is drastically different. On the largest tested size of $N=8,000$ the gray box
-hill climber was 800 times faster than using the black box method. This improvement was so extreme
-that the gray box hill climber is able to find local optima on $N=8,000$ problems faster than the black box
-method can optimize $N=400$ problems.  When compared asymptotically the black box optimizer empirically requires
-$O(N^{2.14})$ time while the gray box requires $O(N)$. This matches the theoretical conclusions for both algorithms.
-
-\section{Efficient Hamming Ball Search}
-Another consequence of the gray box domain is that increasing the neighborhood of local search becomes
-more tractable~\cite{chicano:2014:ball}.  Instead of improving solutions until no single bit flip
-is a fitness improvement, this can be expanded to no flip of $r$ or less bits can improve the solution.
-
-In a black box setting, verifying that no $r$ bit flip can improve a solution requires testing all
-$n \choose r$ neighbors. This quickly becomes intractable as $r$ increases. However in the gray
-box domain not all combinations need to be tested. Consider that if two variables do not participate
-in the same subfunction, the relationship between their effects is by definition additive. As such
-there is no way for flipping both together to be a fitness improvement without flipping one of them
-being a fitness improvement. Therefore it is not necessary to try all possible $r$ sized subsets
-of the solution.
 
 Consider the 3-Equal problem.  If there are at least two loci between $x_i$ and $x_j$ they do
 not share a common subfunction. Therefore, the change in fitness resulting from flipping
