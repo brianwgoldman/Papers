@@ -1,0 +1,347 @@
+
+\documentclass{sig-alternate}
+%\linespread{2.5}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage[noend]{algpseudocode}
+\newcommand{\includegraphicsfit}[1]
+{\includegraphics[width=\columnwidth,height=\textheight,keepaspectratio]{#1}}
+
+\newcommand{\includegraphicswide}[1]
+{\includegraphics[width=.9\textwidth,height=\textheight,keepaspectratio]{#1}}
+
+\newcommand{\BigO}[1]{$\mathcal{O}{(#1)}$}
+
+\usepackage{bm}
+
+\newfont{\mycrnotice}{ptmr8t at 7pt}
+\newfont{\myconfname}{ptmri8t at 7pt}
+\let\crnotice\mycrnotice%
+\let\confname\myconfname%
+
+\permission{Permission to make digital or hard copies of all or part of this work
+for personal or classroom use is granted without fee provided that copies are not
+made or distributed for profit or commercial advantage and that copies bear this
+notice and the full citation on the first page. Copyrights for components of this
+work owned by others than ACM must be honored. Abstracting with credit is permitted.
+To copy otherwise, or republish, to post on servers or to redistribute to lists,
+requires prior specific permission and/or a fee. Request permissions from permissions@acm.org.}
+\conferenceinfo{GECCO'15,} {July 11-15, 2015, Madrid, Spain.}
+\CopyrightYear{2015}
+\crdata{TBA}
+\clubpenalty=10000
+\widowpenalty = 10000
+
+\begin{document}
+\title{Gray Box Optimization using the Parameter-less Population Pyramid}
+%\subtitle{[Genetic Algorithms Track]}
+
+\numberofauthors{2} %
+\begin{comment}
+\author{
+% 1st. author
+\alignauthor
+Brian W. Goldman\\
+       \affaddr{BEACON Center for the Study of Evolution in Action}\\
+       \affaddr{Michigan State University, U.S.A.}\\
+       \email{brianwgoldman@acm.org}
+% 2nd. author
+\alignauthor
+William F. Punch\\
+       \affaddr{BEACON Center for the Study of Evolution in Action}\\
+       \affaddr{Michigan State University, U.S.A.}\\
+       \email{punch@msu.edu}
+}
+%\end{comment}
+%\begin{comment}
+\author{
+% 1st. author
+\alignauthor
+Anonymous\\
+       \affaddr{Group}\\
+       \affaddr{Group}\\
+       \affaddr{Organization}\\
+       \email{email@site.com}
+% 2nd. author
+\alignauthor
+Anonymous\\
+       \affaddr{Group}\\
+       \affaddr{Group}\\
+       \affaddr{Organization}\\
+       \email{email@site.com}
+}
+%\end{comment}
+
+\maketitle
+\begin{abstract}
+%Maximum 200 Words
+TODO
+\end{abstract}
+
+% A category with the (minimum) three required fields
+%\category{Computing Methodologies}{Artificial Intelligence}{Search Methodologies}
+\category{I.2.8}{Artificial Intelligence}{Problem Solving, Control Methods, and Search}
+%A category including the fourth, optional field follows...
+%\category{D.2.8}{Software Engineering}{Metrics}[complexity measures, performance measures]
+
+\terms{Algorithms, Performance, Experimentation}
+
+\keywords{TODO; Local Search; Parameter-less}
+
+\section{Introduction}
+~\cite{chen:2011:memetic}
+
+~\cite{whitley:2013:greedy}~\cite{chicano:2014:ball}
+
+~\cite{goldman:2014:p3}
+
+\section{Gray Box Domain}
+\label{sec-gray-box}
+In black box optimization, the only information available is a specification
+for what constitutes a valid solution and a function which returns the quality
+of a given solution. While these very simple requirements allow almost any
+optimization task to fit into this domain, it may prevent additional knowledge
+about a problem from being provided to search algorithms. At the other end of
+the spectrum is white box optimization, such that everything about the problem
+is known allowing search techniques to specialize at the cost of generality.
+In between these two extremes is gray box optimization, such that some additional
+information about the problem is known, but the interface is still general enough
+to allow optimization algorithms to solve a variety of problems.
+
+Here we shall consider the gray box optimization domain with the following
+characteristics. The quality of a solution is determined by the summation
+of subfunctions. Each subfunction uses at most $k$ variables in the solution,
+such that as the total number of solution variables $N$ increases, $k$ remains constant.
+Each subfunction must be independently evaluable, and the variables each uses is known.
+
+While more restrictive than black box optimization, this domain is very general.
+MAX-SAT, and by extension all NP-hard problems, can be represented
+as a summation of subfunctions to evaluate each clause~\cite{whitley:2013:greedy}.
+Previous approximation studies of Vertex Cover~\cite{oliveto:2009:vertexcover},
+Set Cover~\cite{yu:2010:setcover}, MAX-CUT~\cite{festa:2002:maxcut}, and
+Ising Spin Glasses~\cite{pelikan:2003:hboaising} all work with problems which fit
+in the gray box domain. These relate back to problems of real world interest such
+as network security, computational biology, VLSI design, and statistical physics.
+
+In order to obtain efficiency bounds for optimization algorithms, the following
+assertions are included. The total number of subfunctions grows no more than
+linearly with $N$, which holds true for randomized MAX-SAT, mesh spin glasses, and NK Landscapes.
+Furthermore, each variable must participate in at most $c$ subfunctions, which holds true
+for mesh spin glasses and Nearest Neighbor NK. If violated these assertions do not
+necessarily prevent the gray box optimization algorithms from solving the problem, but may result
+in slower than predicted performance.
+
+\section{Hamming Ball Hill Climbing}
+The first algorithm to rigorously exploit the features of the gray box domain
+described in Section~\ref{sec-gray-box} was \cite{whitley:2013:greedy}. In this study
+a hill climber was developed which found the approximate next best improving move in \BigO{1} time.
+This is achieved by first determining the fitness effect $delta$ of making each move, and then updating
+only effected move each time a change to the solution is made. Due to the requirements of the domain,
+at most \BigO{ck} moves can be effected, with each requiring at most \BigO{1} subfunction calls
+to update their $delta$. Combined with move binning, this technique is able to perform both
+first improvement and next best hill climbing in \BigO{I+N}, where $I$ is the number of improving
+moves required to reach a local optimum. In comparison, the black box approach for these searches can require
+\BigO{IN^2}.
+
+By again leveraging the properties of this domain, \cite{chicano:2014:ball} extended their
+local search algorithm to find $r$-bit local optima. Termed the Hamming Ball Hill Climber,
+this method efficiently searches the space of all moves which flip up to $r$ bits in the
+solution. While na\"ively this create \BigO{N^r} moves, in the gray box domain only
+\BigO{(3ck)^rN} must be checked. This is due to the bounded relationships between variables.
+Consider that if $i$ and $j$ do not share a subfunction the effect of flipping both variables
+must be equal to the sum of flipping both separately. Therefore only variables which share
+a subfunction must be flipped together when checking $r=2$. The problem of determining
+which variables must be flipped together is equivalent to finding the connected induced
+subgraphs of $G$ with $r$ or fewer vertices, such that each vertex in $G$ is a variable
+and an edge exists between two vertices if and only if those variables share a subfunction.
+In \cite{chicano:2014:ball} an upper bound is derived for how many moves this could create,
+but no algorithm was given to efficiently discover these moves.
+
+Under the assertion that $r \ll N$ and that $r$ does not increase with $N$, the Hamming
+Ball Hill Climber requires only \BigO{I+N} time to find $r$-bit local optimum starting
+from a random solution. As $I$ is likely in \BigO{N} this means finding random $r$-bit local optima
+is no more than a constant amount slower than generating random solutions.
+
+\subsection{Novel r-order Subgraphs Algorithm}
+\begin{figure}
+  \begin{algorithmic}[1]
+  \Procedure{CISG}{$v$, $subset$, $closed$, $open$}
+    \State $subset' \leftarrow subset \cup \{v\}$
+    \State $found \leftarrow [subset']$
+    \If{$|subset'| \geq r$}
+      \Return $found$
+    \EndIf
+    \State $closed\_here \leftarrow \emptyset$
+    \State $open' \leftarrow open \cup adjacent(v)$
+    \ForAll{$v' \in open'$ such that $v' \notin closed$}
+        \State $closed\_here \leftarrow closed\_here \cup \{v'\}$
+        \State $closed \leftarrow closed \cup \{v'\}$
+        \State $recurse \leftarrow $\Call{CISG}{$v'$, $subset'$, $closed$, $open'$}
+        \State $found \leftarrow found + recurse$
+    \EndFor
+    \State $closed \leftarrow closed - closed\_here$
+    \State \Return $found$
+  \EndProcedure
+\end{algorithmic}
+  \caption{Algorithm to recursively find all connected induced subgraphs of size $r$ or fewer which
+           contain $subset \cup \{v\}$ and no additional vertices in $closed$.}
+  \label{fig-connected-subgraphs}
+\end{figure}
+
+In order to determine which moves in the hamming ball must be evaluated,
+we developed \Call{CISG}{} given in Figure~\ref{fig-connected-subgraphs}
+to discover all Connected Induced Subgraphs of $r$ or fewer vertices.
+\Call{CISG}{} is a recursive algorithm which finds all subgraphs
+which contain a given $subset$ and a given vertex $v$, while excluding
+any other vertices added to $closed$. To find all subgraphs, \Call{CISG}{}
+is called once for each vertex in the graph, such that $closed$ contains
+all previously searched vertices, and $subset=open=\emptyset$. In the initial
+call all desired subgraphs which contain $v$ are found, which is why subsequent
+top level calls include $v$ in $closed$ to prevent duplicate subgraphs from being
+returned.
+
+At each recursive level \Call{CISG}{} expands $open$ to include any vertices
+adjacent to $v$ in the graph. By construction this means that $open$ contains
+all possible ways of adding a single vertex to the current $subset$. As $v'$
+are tested they are temporarily added to $closed$ to prevent recursive calls
+from creating duplicates.
+
+When applied to the sparse graphs inherent in the gray box domain, this algorithm
+requires \BigO{r!(c(k-1))^rN} time, which reduces to \BigO{N}. The time spent
+in each call is dominated by the loop over $open'$. In the worst case, $open'$
+increases in size by the full adjacency of $v$, which is bounded by $c(k-1)$.
+This creates a worse case complexity for a single top level call of
+$\prod_{i}^{r} ic(k-1) = r!(c(k-1))^r$. This must be called once for each
+of the $N$ variables resulting in \BigO{r!(c(k-1))^rN}.
+
+\section{Tournament Uniform Crossover: TUX}
+\begin{figure}
+  \begin{algorithmic}[1]
+  \Procedure{Iterate-TUX}{}
+    \State Create random solution
+    \State Apply hamming ball hill climber to solution
+    \ForAll{$T_i \in T$}
+      \If{$T_i$ is empty}
+        \State $T_i \leftarrow$ solution
+        \State \Return
+      \EndIf
+      \State Cross solution with $T_i$ to create $2^i$ offspring
+      \State Apply hamming ball hill climber to each offspring
+      \State solution $\leftarrow$ best of offspring, solution, and $T_i$
+      \State $T_i \leftarrow$ empty
+    \EndFor
+    \State Add solution to end of $T$
+  \EndProcedure
+\end{algorithmic}
+  \caption{One iteration of TUX optimization. $T$ is an
+           ordered list of solution, each of which could be empty,
+           awaiting a crossover partner.}
+  \label{fig-TUX}
+\end{figure}
+
+
+
+\section{Parameter-less Population Pyramid: P3}
+
+\subsection{Origins}
+~\cite{goldman:2014:p3}
+\begin{figure}
+  \begin{algorithmic}
+  \Procedure{Iterate-P3}{}
+    \State Create random solution
+    \State Apply hill climber
+    \If{solution $\notin hashset$}
+      \State Add solution to $P_0$
+      \State Add solution to $hashset$
+    \EndIf
+
+    \ForAll{$P_i \in pyramid$}
+      \State Mix solution with $P_i$
+      \If{solution's fitness has improved}
+        \If{solution $\notin hashset$}
+          \State Add solution to $P_{i+1}$
+          \State Add solution to $hashset$
+        \EndIf
+      \EndIf
+    \EndFor
+  \EndProcedure
+\end{algorithmic}
+  \caption{One iteration of P3 optimization. $pyramid$ is an
+           ordered set of populations and $hashset$ is a set
+           of all solutions in $pyramid$.}
+  \label{fig-p3}
+\end{figure}
+
+
+\subsection{Gray Box Specialization}
+\begin{figure}
+  \begin{algorithmic}[1]
+  \Procedure{SubfunctionTree}{}
+    \State $clusters \leftarrow [\{0\}, \{1\}, \{2\}, \dots, \{N-1\}]$
+    \State $cluster\_number \leftarrow [0 .. N-1]$
+    \ForAll{$subfunction \in shuffled(subfunctions)$}
+      \State $to\_merge \leftarrow \emptyset$
+      \ForAll{$b \in subfunction$}
+        \State $to\_merge \leftarrow to\_merge \cup \{cluster\_number[b]\}$
+      \EndFor
+      \If{$|to\_merge| > 1$}
+        \State $new\_cluster \leftarrow \emptyset$
+        \ForAll{$i \in to\_merge$}
+          \State $new\_cluster \leftarrow new\_cluster \cup clusters[i]$
+        \EndFor
+        \ForAll{$b \in new\_cluster$}
+          \State $cluster\_number[b] \leftarrow |clusters|$
+        \EndFor
+        \State $clusters \leftarrow clusters + new\_cluster$
+      \EndIf
+    \EndFor
+    \State Remove first $N~clusters$
+    \State Remove any cluster containing all variables
+  \EndProcedure
+\end{algorithmic}
+  \caption{Algorithm used to convert a list of subfunctions into linkage tree clusters.}
+  \label{fig-sfx-tree}
+\end{figure}
+
+TODO State that unlike BBP3, GBP3 performs hill climbing after each donation
+\subsection{Time Complexity}
+
+
+\section{Experimentation}
+~\cite{wright:2000:solvingnk}
+
+\subsection{The Effect of Radius}
+TODO Plot for single K value with x=radius, y=fitness, color=solver
+
+TODO Plot for just Pyramid with x=radius, y=seconds to optimum, color=k
+
+TODO Explain k==1
+
+\subsection{Fitness Over Time}
+TODO Plot for fixed N, K, and R with x=seconds, y=fitness, color=solver
+
+TODO Explain best Pyramid R versus best TUX R.
+
+\subsection{Scalability}
+TODO Plot for seconds to global optimum as N increases, include Black Box P3
+
+TODO Consider O(N) statistics
+
+\section{Conclusions and Future Work}
+%
+% The following two commands are all you need in the
+% initial runs of your .tex file to
+% produce the bibliography for the citations in your paper.
+\bibliographystyle{abbrv}
+\bibliography{../main}  % sigproc.bib is the name of the Bibliography in this case
+% You must have a proper ".bib" file
+%  and remember to run:
+% latex bibtex latex latex
+% to resolve all references
+%
+% ACM needs 'a single self-contained file'!
+%
+%APPENDICES are optional
+\balancecolumns
+% That's all folks!
+\end{document}
