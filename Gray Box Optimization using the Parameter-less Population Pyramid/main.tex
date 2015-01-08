@@ -130,6 +130,9 @@ Furthermore, each variable must participate in at most $c$ subfunctions, which h
 for mesh spin glasses and Nearest Neighbor NK. If violated these assertions do not
 necessarily prevent the gray box optimization algorithms from solving the problem, but may result
 in slower than predicted performance.
+We also include the trivial requirements that all problem variables must participate
+in at least one subfunction and that the problem is not separable. Any problem which
+violates these requirements can be restated either using less variables or as multiple separate problems.
 
 \section{Hamming Ball Hill Climbing}
 The first algorithm to rigorously exploit the features of the gray box domain
@@ -155,12 +158,19 @@ which variables must be flipped together is equivalent to finding the connected 
 subgraphs of $G$ with $r$ or fewer vertices, such that each vertex in $G$ is a variable
 and an edge exists between two vertices if and only if those variables share a subfunction.
 In \cite{chicano:2014:ball} an upper bound is derived for how many moves this could create,
-but no algorithm was given to efficiently discover these moves.
+but no algorithm was given to efficiently discover these moves. This process was not included
+in their timing calculations has it only has to be performed once per problem.
 
 Under the assertion that $r \ll N$ and that $r$ does not increase with $N$, the Hamming
 Ball Hill Climber requires only \BigO{I+N} time to find $r$-bit local optimum starting
 from a random solution. As $I$ is likely in \BigO{N} this means finding random $r$-bit local optima
 is no more than a constant amount slower than generating random solutions.
+
+While these techniques make it possible to choose the best improving move just as efficiently
+as choosing any random improving move, the findings of~\cite{whitley:2013:greedy} suggest that,
+especially when paired with subsequent search heuristics, using random improving moves is more effective.
+In \cite{chicano:2014:ball} this decision was amended slightly to include the requirement that smaller
+distance moves should be chosen before larger distance moves.
 
 \subsection{Novel r-order Subgraphs Algorithm}
 \begin{figure}
@@ -225,7 +235,7 @@ of the $N$ variables resulting in \BigO{r!(c(k-1))^rN}.
         \State $T_i \leftarrow$ solution
         \State \Return
       \EndIf
-      \State Cross solution with $T_i$ to create $2^i$ offspring
+      \State Cross solution with $T_i$ to create $2^{i+1}$ offspring
       \State Apply hamming ball hill climber to each offspring
       \State solution $\leftarrow$ best of offspring, solution, and $T_i$
       \State $T_i \leftarrow$ empty
@@ -239,12 +249,42 @@ of the $N$ variables resulting in \BigO{r!(c(k-1))^rN}.
   \label{fig-TUX}
 \end{figure}
 
+Hamming Ball Hill Climbing is not sufficient to efficiently find the global optimum
+on problems with even moderate epistasis~\cite{chicano:2014:ball}. This is because
+like all random restart hill climbers, it relies on random initialization to fall
+inside the global optimum's basin of attraction.
 
+To remedy this limitation, we set out to develop a minimally complex memetic
+algorithm to help increase this probability. Figure~\ref{fig-TUX} presents
+the Tournament Uniform Crossover (TUX) algorithm, which combines simplistic
+selection with equal probability uniform crossover to generate starting
+solutions likely to be in the global optimum's basin of attraction.
+
+Conceptually TUX iteratively builds a structure similar to a single elimination
+bracket for solutions. Each "match" in the tournament takes in two candidate solutions,
+produces offspring via uniform crossover, applies hill climbing to each offspring, with
+the "winner" being the best of all those solutions. The tournament "bracket" is constructed
+iteratively, storing a single list of solutions $T$, such that $|T|$ is equal to the height
+of the tournament. This is possible because when a sub-bracket is complete only a single solution
+emerges and solutions only need to be stored until their partner is found.
+TUX is fully elitist but does not prematurely converge. This is because search continuously
+integrates new randomly generated solutions through other parts of the bracket. Whenever the
+top of the current bracket is reached, TUX doubles the size of the virtual tournament.
+
+When crossing solutions at $T_i$, TUX produces $2^{i+1}$ offspring. This relationship
+ensures that in total all levels of the tournament, including random initialization,
+perform the same number of hill climbing steps. It also shifts the focus of search toward
+areas expected to be of higher fitness. The expectation is also that it becomes progressively
+harder to improve solutions the higher up the tournament you advance, so more attempts
+are necessary to create new useful solutions.
+
+The primary advantages of TUX is that it does not introduce any new parameters (still
+requires an $r$ for the hill climber) and is relatively simple to implement. Even so
+it allows for learning from previous local optima and as Section~\ref{sec-experiments}
+will show it is quite effective at optimization.
 
 \section{Parameter-less Population Pyramid: P3}
-
 \subsection{Origins}
-~\cite{goldman:2014:p3}
 \begin{figure}
   \begin{algorithmic}
   \Procedure{Iterate-P3}{}
@@ -272,6 +312,22 @@ of the $N$ variables resulting in \BigO{r!(c(k-1))^rN}.
   \label{fig-p3}
 \end{figure}
 
+The Parameter-less Population Pyramid (P3) is a recently introduced
+black box optimization method which requires no problem specific configuration~\cite{goldman:2014:p3}.
+Unlike previous parameter-less methods it was shown to be more efficient than
+competing state-of-the-art algorithms across a number of problem classes.
+
+P3 combines hill climbing and model building using a novel, iteratively constructed, pyramid
+of populations. Figure~\ref{fig-p3} provides the high level description of how the algorithm
+works. In order to perform solution mixing, P3 learns a linkage tree from pairwise variable
+entropy which is then used to perform global optima mixing~\cite{thierens:2011:gomea}. In global
+optimal mixing a series of variable subsets are used to copy genetic information from multiple
+sources into a single solution. Each time variables are donated, the modified solution is evaluated,
+with the change being reverted if solution quality did not improve. In this way P3 performs
+multiple evaluations per mixing event, with a single solution receiving genes from randomly chosen
+donors in the pyramid level.
+Due to this model building, P3 requires \BigO{N} amortized time per evaluation and \BigO{N^2}
+memory usage.
 
 \subsection{Gray Box Specialization}
 \begin{figure}
@@ -303,11 +359,45 @@ of the $N$ variables resulting in \BigO{r!(c(k-1))^rN}.
   \label{fig-sfx-tree}
 \end{figure}
 
-TODO State that unlike BBP3, GBP3 performs hill climbing after each donation
-\subsection{Time Complexity}
+P3 represents a natural method for integrating the Hamming Ball Hill Climber into
+a global optimization algorithm as P3 already utilizes local search. However, there
+are also a number of ways in which P3 can be made more efficient by leveraging the
+additional information available in the gray box domain.
 
+First and foremost, linkage learning is no longer necessary. By definition
+the direct non-linear relationships between variables are known. As a result
+P3 no longer needs to store the pairwise frequency information which leads
+the black box version to require \BigO{N^2} memory. Instead the subfunction
+information itself can be used to construct the linkage clusters.
+Figure~\ref{fig-sfx-tree} provides an efficient method for creating a linkage
+tree similar to that used in black box P3 given subfunction information.
+Each variable starts in its own cluster. Each subfunction in a random order
+is used to determine how to link existing clusters. If a subfunction overlaps
+multiple top level clusters, all overlapped clusters are merged to create a new
+top level cluster. This process creates a linkage tree similar to that learned
+for P3, with the difference that a node in the tree can have up to $k$ children.
+
+\Call{SubfunctionTree}{} requires \BigO{|cluster|} time to construct each $cluster$
+in the linkage tree. In the gray box domain the total number of subfunctions is required
+to be $\Theta(N)$ in order to ensure the problem is not separable. As all variables must
+participate in a subfunction, at least $\Omega(N)$ clusters must be created. Therefore
+the only cost which cannot be amortized over the clusters to \BigO{1} is the creation
+of each new $cluster$, leading to a time of \BigO{|cluster|} per $cluster$.
+
+TODO Efficiency comparison of cluster creation / usage, creates new clusters every time
+
+TODO Random subsample of clusters, not smallest first
+
+TODO Doesn't recalculate entire fitness, just tracks delta changes.
+
+TODO State that unlike BBP3, GBP3 performs hill climbing after each donation
+
+TODO Compare P3 storage with TUX to highlight full population versus single solution mixing
+
+TODO Overall Time Complexity
 
 \section{Experimentation}
+\label{sec-experiments}
 ~\cite{wright:2000:solvingnk}
 
 \subsection{The Effect of Radius}
