@@ -325,7 +325,8 @@ optimal mixing a series of variable subsets are used to copy genetic information
 sources into a single solution. Each time variables are donated, the modified solution is evaluated,
 with the change being reverted if solution quality did not improve. In this way P3 performs
 multiple evaluations per mixing event, with a single solution receiving genes from randomly chosen
-donors in the pyramid level.
+donors in the pyramid level. This also means that unlike TUX, which uses information from only two
+solutions to perform crossover, P3 uses information from an entire population.
 Due to this model building, P3 requires \BigO{N} amortized time per evaluation and \BigO{N^2}
 memory usage.
 
@@ -384,15 +385,36 @@ participate in a subfunction, at least $\Omega(N)$ clusters must be created. The
 the only cost which cannot be amortized over the clusters to \BigO{1} is the creation
 of each new $cluster$, leading to a time of \BigO{|cluster|} per $cluster$.
 
-TODO Efficiency comparison of cluster creation / usage, creates new clusters every time
+This method of constructing clusters has a number of desirable properties beyond its
+efficiency. As all non-linear relationships are denoted by subfunctions, mixing
+complete subfunctions between individual has a high likelihood of preserving quality.
+Each cluster created contains at least one entire subfunction, and two
+clusters must differ by at least one entire subfunction. The probability two
+variables appear in the same cluster increases with the number of subfunctions
+they share. The more paths that exist between two variables in the subfunction
+connectivity graph, the more likely those variables will appear in the same cluster.
 
-TODO Random subsample of clusters, not smallest first
+Due to this change, a few compensatory adjustments to P3's algorithm were required.
+First, in black box P3 the number of clusters discovered by linkage learning is
+limited by the number of solutions at that level of the pyramid. To duplicate this
+behavior, after calling \Call{SubfunctionTree}{} a random subset of the discovered
+clusters is chosen, such that the size is limited to the number of solutions
+stored at the current level of the pyramid. As the clusters produced do not
+rely on the solutions stored in the pyramid, clusters are regenerated before each
+mixing event, unlike black box P3 in which they are regenerated only when the stored
+solutions change. Finally, unlike previous work, the clusters are applied in random order
+to avoid the time required to sort them based on length.
 
-TODO Doesn't recalculate entire fitness, just tracks delta changes.
-
-TODO State that unlike BBP3, GBP3 performs hill climbing after each donation
-
-TODO Compare P3 storage with TUX to highlight full population versus single solution mixing
+Another efficiency gain possible due to the gray box domain is that each time a
+donation is made, only the effected part of the solution's fitness needs to be
+recalculated. As a result the number of subfunction evaluations required
+to determine the change in fitness is only \BigO{|cluster|}. This also
+allows for gray box P3 to efficiently reapply hill climbing after each
+donation as only effected moves need to be rechecked. As a result a donation,
+and its resulting modifications from hill climbing, are kept only if the
+new local optima is at least as fit as the solution before the donation occurred.
+All combined a single donation plus returning to a local optimum requires \BigO{|cluster| + I} time,
+while just the donation in black box P3 requires \BigO{N}.
 
 TODO Overall Time Complexity
 
