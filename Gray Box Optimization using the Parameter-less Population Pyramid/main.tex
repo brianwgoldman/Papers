@@ -135,6 +135,7 @@ in at least one subfunction and that the problem is not separable. Any problem w
 violates these requirements can be restated either using less variables or as multiple separate problems.
 
 \section{Hamming Ball Hill Climbing}
+\label{sec-hamming}
 The first algorithm to rigorously exploit the features of the gray box domain
 described in Section~\ref{sec-gray-box} was \cite{whitley:2013:greedy}. In this study
 a hill climber was developed which found the approximate next best improving move in \BigO{1} time.
@@ -416,13 +417,51 @@ new local optima is at least as fit as the solution before the donation occurred
 All combined a single donation plus returning to a local optimum requires \BigO{|cluster| + I} time,
 while just the donation in black box P3 requires \BigO{N}.
 
-TODO Overall Time Complexity
-
 \section{Experimentation}
 \label{sec-experiments}
-~\cite{wright:2000:solvingnk}
+To compare these gray box optimization techniques we have chosen
+NKq-Landscapes~\cite{chicano:2014:ball}. NKq-Landscapes create
+a collection of randomly generated problem instances given a
+higher level problem class description. Each instance is described
+by a series of $N$ subfunctions, each corresponding to a variable
+in the solution. This subfunction uses its variable and $K$ other
+variables in the solution to calculate a fitness value. Fitness values
+are represented as a randomly generated lookup table, such that table
+entries are integers in the range $[0..q-1]$. As each subfunction reads
+$K+1$ variables, the table's size and $q$ are set to $2^{K+1}$. The quality
+of a solution is equal to the sum of the values returned by these subfunctions.
+
+In this work we shall consider two methods for choosing the $K$ variables
+each $x_i$'s subfunction depends on: Nearest Neighbor NKq and Unrestricted NKq.
+In Nearest Neighbor NKq each variable depends on the $K$ which immediately follow
+it in the genome, with variables at the end of the solution wrapping to depend on the
+starting variables. Landscapes of this form can be solved in polynomial
+time~\cite{wright:2000:solvingnk}, allowing comparisons of how quickly each optimization
+algorithm can find the global optima. Nearest Neighbor NKq also ensures that $c=k=K+1$
+and that both $c$ and $k$ do not increase as $N$ increases, ensuring that the efficiency
+conclusions made in Section~\ref{sec-hamming} are applicable.
+
+Unrestricted NKq landscapes draw the $K$ dependencies at random. For $K > 1$ it is
+NP-Hard to find the global optimum of these landscapes. This also means that while
+$k$ remains fixed, the maximum number of subfunctions a variable appears in ($c$) can increase
+as $N$ increases. As a result some of the efficiency claims in Section~\ref{sec-hamming}
+may not be applicable.
+
+For each $N$ and $K$ tested, we generated 50 Nearest Neighbor NKq and Unrestricted NKq instances.
+Each method was run once on each instance, and limited to 3 hours of computation and 4 GB of memory.
+Runs were performed on 2.5GHz Intel Xeon E5-2670v2 processors using the C++11 code provided
+from our website.\footnote{\url{https://github.com/name_of_repository/anonymous_name_of_project}}
+Each time the run achieved a new best fitness we record current amount of processing time used.
+Timing includes the discovery of subgraphs to allow for comparison between different radius values.
+When reporting the ``best'' fitness for an instance we mean the best fitness found by any method before
+the time limit is reached. On all Nearest Neighbor NKq instances the ``best'' fitness
+is the global optimum, verified using dynamic programming.
+
 
 \subsection{The Effect of Radius}
+The only algorithm parameter in the Hamming Ball Hill Climber, TUX, and Gray Box P3
+is the radius of the hamming ball.
+
 TODO Plot for single K value with x=radius, y=fitness, color=solver
 
 TODO Plot for just Pyramid with x=radius, y=seconds to optimum, color=k
