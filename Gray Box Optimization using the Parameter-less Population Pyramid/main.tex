@@ -102,11 +102,10 @@ for what constitutes a valid solution and a function which returns the quality
 of a given solution. While these very simple requirements allow almost any
 optimization task to fit into this domain, it may prevent additional knowledge
 about a problem from being provided to search algorithms. At the other end of
-the spectrum is white box optimization, such that everything about the problem
+the spectrum is white box optimization, in which everything about the problem
 is known allowing search techniques to specialize at the cost of generality.
-In between these two extremes is gray box optimization, such that some additional
-information about the problem is known, but the interface is still general enough
-to allow optimization algorithms to solve a variety of problems.
+Gray box optimization exists between these two extremes, exposing additional
+information which is available for a variety of problems.
 
 Here we shall consider the gray box optimization domain with the following
 characteristics. The quality of a solution is determined by the summation
@@ -124,7 +123,7 @@ in the gray box domain. These relate back to problems of real world interest suc
 as network security, computational biology, VLSI design, and statistical physics.
 
 In order to obtain efficiency bounds for optimization algorithms, the following
-assertions are included. The total number of subfunctions grows no more than
+assertions are also included. The total number of subfunctions grows no more than
 linearly with $N$, which holds true for randomized MAX-SAT, mesh spin glasses, and NK Landscapes.
 Furthermore, each variable must participate in at most $c$ subfunctions, which holds true
 for mesh spin glasses and Nearest Neighbor NK. If violated these assertions do not
@@ -140,17 +139,15 @@ The first algorithm to rigorously exploit the features of the gray box domain
 described in Section~\ref{sec-gray-box} was \cite{whitley:2013:greedy}. In this study
 a hill climber was developed which found the approximate next best improving move in \BigO{1} time.
 This is achieved by first determining the fitness effect $delta$ of making each move, and then updating
-only effected move each time a change to the solution is made. Due to the requirements of the domain,
+only effected moves each time a change to the solution is made. Due to the requirements of the domain,
 at most \BigO{ck} moves can be effected, with each requiring at most \BigO{1} subfunction calls
 to update their $delta$. Combined with move binning, this technique is able to perform both
 first improvement and next best hill climbing in \BigO{I+N}, where $I$ is the number of improving
 moves required to reach a local optimum. In comparison, the black box approach for these searches can require
 \BigO{IN^2}.
 
-By again leveraging the properties of this domain, \cite{chicano:2014:ball} extended their
-local search algorithm to find $r$-bit local optima. Termed the Hamming Ball Hill Climber,
-this method efficiently searches the space of all moves which flip up to $r$ bits in the
-solution. While na\"ively this create \BigO{N^r} moves, in the gray box domain only
+By again leveraging the properties of this domain, the Hamming Ball Hill Climber~\cite{chicano:2014:ball} extends this
+method to find $r$-bit local optima. While na\"ively this would require testing \BigO{N^r} moves, in the gray box domain only
 \BigO{(3ck)^rN} must be checked. This is due to the bounded relationships between variables.
 Consider that if $i$ and $j$ do not share a subfunction the effect of flipping both variables
 must be equal to the sum of flipping both separately. Therefore only variables which share
@@ -160,7 +157,7 @@ subgraphs of $G$ with $r$ or fewer vertices, such that each vertex in $G$ is a v
 and an edge exists between two vertices if and only if those variables share a subfunction.
 In \cite{chicano:2014:ball} an upper bound is derived for how many moves this could create,
 but no algorithm was given to efficiently discover these moves. This process was not included
-in their timing calculations has it only has to be performed once per problem.
+in their timing calculations as it only has to be performed once per problem.
 
 Under the assertion that $r \ll N$ and that $r$ does not increase with $N$, the Hamming
 Ball Hill Climber requires only \BigO{I+N} time to find $r$-bit local optimum starting
@@ -171,11 +168,20 @@ While these techniques make it possible to choose the best improving move just a
 as choosing any random improving move, the findings of~\cite{whitley:2013:greedy} suggest that,
 especially when paired with subsequent search heuristics, using random improving moves is more effective.
 In \cite{chicano:2014:ball} this decision was amended slightly to include the requirement that smaller
-distance moves should be chosen before larger distance moves.
+distance moves are chosen before larger distance moves.
 
 \subsection{Novel r-order Subgraphs Algorithm}
 \begin{figure}
   \begin{algorithmic}[1]
+  \Procedure{ConnectedInducedSubgraphs}{}
+    \State $closed \leftarrow \emptyset$
+    \State $found \leftarrow []$
+    \ForAll{$v \in V$}
+      \State $closed \leftarrow closed \cup \{v\}$
+      \State $found \leftarrow found + $\Call{CISG}{$v$, $\emptyset$, $closed$, $\emptyset$}
+    \EndFor
+    \State \Return $found$
+  \EndProcedure
   \Procedure{CISG}{$v$, $subset$, $closed$, $open$}
     \State $subset' \leftarrow subset \cup \{v\}$
     \State $found \leftarrow [subset']$
@@ -194,26 +200,23 @@ distance moves should be chosen before larger distance moves.
     \State \Return $found$
   \EndProcedure
 \end{algorithmic}
-  \caption{Algorithm to recursively find all connected induced subgraphs of size $r$ or fewer which
-           contain $subset \cup \{v\}$ and no additional vertices in $closed$.}
+  \caption{Algorithm to recursively find all connected induced subgraphs of size $r$ or fewer.}
   \label{fig-connected-subgraphs}
 \end{figure}
 
 In order to determine which moves in the hamming ball must be evaluated,
-we developed \Call{CISG}{} given in Figure~\ref{fig-connected-subgraphs}
-to discover all Connected Induced Subgraphs of $r$ or fewer vertices.
-\Call{CISG}{} is a recursive algorithm which finds all subgraphs
+we developed \Call{ConnectedInducedSubgraphs}{} given in Figure~\ref{fig-connected-subgraphs}.
+\Call{CISG}{} is a recursive helper function which finds all subgraphs
 which contain a given $subset$ and a given vertex $v$, while excluding
 any other vertices added to $closed$. To find all subgraphs, \Call{CISG}{}
 is called once for each vertex in the graph, such that $closed$ contains
 all previously searched vertices, and $subset=open=\emptyset$. In the initial
-call all desired subgraphs which contain $v$ are found, which is why subsequent
-top level calls include $v$ in $closed$ to prevent duplicate subgraphs from being
-returned.
+call all desired subgraphs which contain $v$ are found, which is why $v$ remains
+in $closed$ to prevent duplicate subgraphs from being returned.
 
 At each recursive level \Call{CISG}{} expands $open$ to include any vertices
 adjacent to $v$ in the graph. By construction this means that $open$ contains
-all possible ways of adding a single vertex to the current $subset$. As $v'$
+all possible ways of adding a single vertex to the current $subset'$. As $v'$
 are tested they are temporarily added to $closed$ to prevent recursive calls
 from creating duplicates.
 
@@ -229,19 +232,19 @@ of the $N$ variables resulting in \BigO{r!(c(k-1))^rN}.
 \begin{figure}
   \begin{algorithmic}[1]
   \Procedure{Iterate-TUX}{}
-    \State Create random solution
-    \State Apply hamming ball hill climber to solution
+    \State Create random $solution$
+    \State Hamming Ball Hill Climb $solution$
     \ForAll{$T_i \in T$}
       \If{$T_i$ is empty}
-        \State $T_i \leftarrow$ solution
+        \State $T_i \leftarrow solution$
         \State \Return
       \EndIf
-      \State Cross solution with $T_i$ to create $2^{i+1}$ offspring
-      \State Apply hamming ball hill climber to each offspring
-      \State solution $\leftarrow$ best of offspring, solution, and $T_i$
+      \State Cross $solution$ with $T_i$ to create $2^{i+1}$ offspring
+      \State Hamming Ball Hill Climb each offspring
+      \State $solution \leftarrow$ best of offspring, $solution$, and $T_i$
       \State $T_i \leftarrow$ empty
     \EndFor
-    \State Add solution to end of $T$
+    \State Add $solution$ to end of $T$
   \EndProcedure
 \end{algorithmic}
   \caption{One iteration of TUX optimization. $T$ is an
@@ -262,9 +265,9 @@ selection with equal probability uniform crossover to generate starting
 solutions likely to be in the global optimum's basin of attraction.
 
 Conceptually TUX iteratively builds a structure similar to a single elimination
-bracket for solutions. Each "match" in the tournament takes in two candidate solutions,
+bracket for solutions. Each ``match'' in the tournament takes in two candidate solutions,
 produces offspring via uniform crossover, applies hill climbing to each offspring, with
-the "winner" being the best of all those solutions. The tournament "bracket" is constructed
+the ``winner'' being the best of all those solutions. The tournament ``bracket'' is constructed
 iteratively, storing a single list of solutions $T$, such that $|T|$ is equal to the height
 of the tournament. This is possible because when a sub-bracket is complete only a single solution
 emerges and solutions only need to be stored until their partner is found.
@@ -322,9 +325,9 @@ P3 combines hill climbing and model building using a novel, iteratively construc
 of populations. Figure~\ref{fig-p3} provides the high level description of how the algorithm
 works. In order to perform solution mixing, P3 learns a linkage tree from pairwise variable
 entropy which is then used to perform global optima mixing~\cite{thierens:2011:gomea}. In global
-optimal mixing a series of variable subsets are used to copy genetic information from multiple
+optimal mixing these learned clusters of variables are used to donate genetic information from multiple
 sources into a single solution. Each time variables are donated, the modified solution is evaluated,
-with the change being reverted if solution quality did not improve. In this way P3 performs
+with the change being reverted if solution quality decreased. In this way P3 performs
 multiple evaluations per mixing event, with a single solution receiving genes from randomly chosen
 donors in the pyramid level. This also means that unlike TUX, which uses information from only two
 solutions to perform crossover, P3 uses information from an entire population.
@@ -382,14 +385,14 @@ for P3, with the difference that a node in the tree can have up to $k$ children.
 \Call{SubfunctionTree}{} requires \BigO{|cluster|} time to construct each $cluster$
 in the linkage tree. In the gray box domain the total number of subfunctions is required
 to be $\Theta(N)$ in order to ensure the problem is not separable. As all variables must
-participate in a subfunction, at least $\Omega(N)$ clusters must be created. Therefore
+participate in a subfunction, $\Theta(N)$ clusters must be created. Therefore
 the only cost which cannot be amortized over the clusters to \BigO{1} is the creation
 of each new $cluster$, leading to a time of \BigO{|cluster|} per $cluster$.
 
 This method of constructing clusters has a number of desirable properties beyond its
 efficiency. As all non-linear relationships are denoted by subfunctions, mixing
-complete subfunctions between individual has a high likelihood of preserving quality.
-Each cluster created contains at least one entire subfunction, and two
+complete subfunctions between individuals has a high likelihood of preserving quality.
+Each cluster contains at least one entire subfunction, and two
 clusters must differ by at least one entire subfunction. The probability two
 variables appear in the same cluster increases with the number of subfunctions
 they share. The more paths that exist between two variables in the subfunction
@@ -432,13 +435,13 @@ $K+1$ variables, the table's size and $q$ are set to $2^{K+1}$. The quality
 of a solution is equal to the sum of the values returned by these subfunctions.
 
 In this work we shall consider two methods for choosing the $K$ variables
-each $x_i$'s subfunction depends on: Nearest Neighbor NKq and Unrestricted NKq.
-In Nearest Neighbor NKq each variable depends on the $K$ which immediately follow
-it in the genome, with variables at the end of the solution wrapping to depend on the
-starting variables. Landscapes of this form can be solved in polynomial
+each subfunction depends on: Nearest Neighbor NKq and Unrestricted NKq.
+In Nearest Neighbor NKq each variable depends on the $K$ variables which immediately follow
+it in the solution, with dependencies wrapping around the end of the solution.
+Landscapes of this form can be solved in polynomial
 time~\cite{wright:2000:solvingnk}, allowing comparisons of how quickly each optimization
 algorithm can find the global optima. Nearest Neighbor NKq also ensures that $c=k=K+1$
-and that both $c$ and $k$ do not increase as $N$ increases, ensuring that the efficiency
+and that both $c$ and $k$ do not increase as $N$ increases, meaning the efficiency
 conclusions made in Section~\ref{sec-hamming} are applicable.
 
 Unrestricted NKq landscapes draw the $K$ dependencies at random. For $K > 1$ it is
@@ -455,7 +458,7 @@ Each time the run achieved a new best fitness we record current amount of proces
 Timing includes the discovery of subgraphs to allow for comparison between different radius values.
 When reporting the ``best'' fitness for an instance we mean the best fitness found by any method before
 the time limit is reached. On all Nearest Neighbor NKq instances the ``best'' fitness
-is the global optimum, verified using dynamic programming.
+is also the global optimum, verified using dynamic programming.
 
 
 \subsection{The Effect of Radius}
