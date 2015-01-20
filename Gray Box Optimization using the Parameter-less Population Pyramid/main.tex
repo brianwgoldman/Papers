@@ -75,7 +75,25 @@ Anonymous\\
 \maketitle
 \begin{abstract}
 %Maximum 200 Words
-TODO
+
+For many challenging problems, the non-linear relationships between variables
+are known and bounded. Previous work has developed local search operators
+which require a linear factor less time than black box methods. Furthermore,
+this Hamming-Ball Hill Climber is capable of efficiently finding $r$-bit local optima.
+In this paper we extend this operator to perform efficient global optimization.
+We create a simple memetic algorithm to demonstrate how even trivial
+extensions can improve search results. We then modify the Parameter-less
+Population Pyramid (P3), shown to be highly effective for black box optimization,
+to leverage the additional information available in the gray box domain.
+
+We provide experimental evidence on both NKq-Landscapes and Ising Spin Glasses
+that Gray Box P3 is effective at finding the global optima even for problems with
+thousands of variables. This capability is complemented by its efficiency, with
+running time and memory usage decreased by a linear factor from Black Box P3.
+On NKq this results in a x374 speedup for problems with at least 1000 variables.
+While local search introduces a parameter, we experimentally show this parameter
+can likely be fixed to 1 without significant loss in search quality.
+
 \end{abstract}
 
 % A category with the (minimum) three required fields
