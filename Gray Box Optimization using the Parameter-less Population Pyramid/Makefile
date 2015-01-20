@@ -3,7 +3,7 @@ all:
 	bibtex main
 	latex main
 	latex main
-	dvipdf main
+	dvipdfmx main
 	dvips main
 	#cp main.tex pap632-goldman.tex
 	#mv main.ps pap632-goldman.ps

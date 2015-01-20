@@ -5,7 +5,7 @@
 \usepackage{verbatim}
 \usepackage[noend]{algpseudocode}
 \newcommand{\includegraphicsfit}[1]
-{\includegraphics[width=\columnwidth,height=\textheight,keepaspectratio]{#1}}
+{\includegraphics[width=\columnwidth,height=.4\textheight,keepaspectratio]{#1}}
 
 \newcommand{\includegraphicswide}[1]
 {\includegraphics[width=.9\textwidth,height=\textheight,keepaspectratio]{#1}}
@@ -89,11 +89,21 @@ TODO
 \keywords{TODO; Local Search; Parameter-less}
 
 \section{Introduction}
-~\cite{chen:2011:memetic}
 
-~\cite{whitley:2013:greedy}~\cite{chicano:2014:ball}
+Recent work~\cite{whitley:2013:greedy,chicano:2014:ball} has shown that by
+providing local search with more than just an evaluation function can lead
+to extraordinary improvements search power and efficiency. These improvements
+require information easily derived for a broad range of interesting NP-Hard
+problems.
 
-~\cite{goldman:2014:p3}
+Here we set out to extend these benefits to global optimization by integrating
+this local search with additional heuristics~\cite{chen:2011:memetic}.
+We introduce a novel algorithm designed to combine local
+and global search as simply as possible. To test the true power of this
+process we also extend the Parameter-less Population Pyramid~\cite{goldman:2014:p3},
+current state-of-the-art in black box optimization. This ``Gray Box P3''
+utilizes both efficient local search and the additional problem information
+to drastically improve performance and reduce memory usage.
 
 \section{Gray Box Domain}
 \label{sec-gray-box}
@@ -105,15 +115,15 @@ about a problem from being provided to search algorithms. At the other end of
 the spectrum is white box optimization, in which everything about the problem
 is known allowing search techniques to specialize at the cost of generality.
 Gray box optimization exists between these two extremes, exposing additional
-information which is available for a variety of problems.
+information to be exploited by search and which is available for a variety of problems.
 
 Here we shall consider the gray box optimization domain with the following
-characteristics. The quality of a solution is determined by the summation
-of subfunctions. Each subfunction uses at most $k$ variables in the solution,
+characteristics. The function which evaluates the quality of a solution is determined by the summation
+of subfunctions. Each subfunction uses at most $k$ variables in the given solution,
 such that as the total number of solution variables $N$ increases, $k$ remains constant.
-Each subfunction must be independently evaluable, and the variables each uses is known.
+Each subfunction must be independently evaluable, and the variables each uses are known.
 
-While more restrictive than black box optimization, this domain is very general.
+While more restrictive than black box optimization, this domain is still very general.
 MAX-SAT, and by extension all NP-hard problems, can be represented
 as a summation of subfunctions to evaluate each clause~\cite{whitley:2013:greedy}.
 Previous approximation studies of Vertex Cover~\cite{oliveto:2009:vertexcover},
@@ -125,15 +135,15 @@ as network security, computational biology, VLSI design, and statistical physics
 In order to obtain efficiency bounds for optimization algorithms, the following
 assertions are also included. The total number of subfunctions grows no more than
 linearly with $N$, which holds true for randomized MAX-SAT, mesh spin glasses, and NK Landscapes.
-Furthermore, each variable must participate in at most $c$ subfunctions, which holds true
-for mesh spin glasses and Nearest Neighbor NK. If violated these assertions do not
+Furthermore, each variable participates in at most $c$ subfunctions, which holds true
+for mesh spin glasses and Nearest Neighbor NK. If violated, these assertions do not
 necessarily prevent the gray box optimization algorithms from solving the problem, but may result
 in slower than predicted performance.
 We also include the trivial requirements that all problem variables must participate
 in at least one subfunction and that the problem is not separable. Any problem which
 violates these requirements can be restated either using less variables or as multiple separate problems.
 
-\section{Hamming Ball Hill Climbing}
+\section{Hamming-Ball Hill Climbing}
 \label{sec-hamming}
 The first algorithm to rigorously exploit the features of the gray box domain
 described in Section~\ref{sec-gray-box} was \cite{whitley:2013:greedy}. In this study
@@ -146,10 +156,10 @@ first improvement and next best hill climbing in \BigO{I+N}, where $I$ is the nu
 moves required to reach a local optimum. In comparison, the black box approach for these searches can require
 \BigO{IN^2}.
 
-By again leveraging the properties of this domain, the Hamming Ball Hill Climber~\cite{chicano:2014:ball} extends this
+By again leveraging the properties of this domain, the Hamming-Ball Hill Climber~\cite{chicano:2014:ball} extends this
 method to find $r$-bit local optima. While na\"ively this would require testing \BigO{N^r} moves, in the gray box domain only
 \BigO{(3ck)^rN} must be checked. This is due to the bounded relationships between variables.
-Consider that if $i$ and $j$ do not share a subfunction the effect of flipping both variables
+If $i$ and $j$ do not share a subfunction, the effect of flipping both variables
 must be equal to the sum of flipping both separately. Therefore only variables which share
 a subfunction must be flipped together when checking $r=2$. The problem of determining
 which variables must be flipped together is equivalent to finding the connected induced
@@ -204,7 +214,7 @@ distance moves are chosen before larger distance moves.
   \label{fig-connected-subgraphs}
 \end{figure}
 
-In order to determine which moves in the hamming ball must be evaluated,
+In order to determine which moves in the hamming-ball must be evaluated,
 we developed \Call{ConnectedInducedSubgraphs}{} given in Figure~\ref{fig-connected-subgraphs}.
 \Call{CISG}{} is a recursive helper function which finds all subgraphs
 which contain a given $subset$ and a given vertex $v$, while excluding
@@ -229,18 +239,19 @@ $\prod_{i}^{r} ic(k-1) = r!(c(k-1))^r$. This must be called once for each
 of the $N$ variables resulting in \BigO{r!(c(k-1))^rN}.
 
 \section{Tournament Uniform Crossover: TUX}
+\label{sec-tux}
 \begin{figure}
   \begin{algorithmic}[1]
   \Procedure{Iterate-TUX}{}
     \State Create random $solution$
-    \State Hamming Ball Hill Climb $solution$
+    \State Hamming-Ball Hill Climb $solution$
     \ForAll{$T_i \in T$}
       \If{$T_i$ is empty}
         \State $T_i \leftarrow solution$
         \State \Return
       \EndIf
       \State Cross $solution$ with $T_i$ to create $2^{i+1}$ offspring
-      \State Hamming Ball Hill Climb each offspring
+      \State Hamming-Ball Hill Climb each offspring
       \State $solution \leftarrow$ best of offspring, $solution$, and $T_i$
       \State $T_i \leftarrow$ empty
     \EndFor
@@ -253,8 +264,8 @@ of the $N$ variables resulting in \BigO{r!(c(k-1))^rN}.
   \label{fig-TUX}
 \end{figure}
 
-Hamming Ball Hill Climbing is not sufficient to efficiently find the global optimum
-on problems with even moderate epistasis~\cite{chicano:2014:ball}. This is because
+Hamming-Ball Hill Climbing is not sufficient to efficiently find the global optimum
+on problems with even moderate epistasis~\cite{chicano:2014:ball}. This is because,
 like all random restart hill climbers, it relies on random initialization to fall
 inside the global optimum's basin of attraction.
 
@@ -364,7 +375,7 @@ memory usage.
   \label{fig-sfx-tree}
 \end{figure}
 
-P3 represents a natural method for integrating the Hamming Ball Hill Climber into
+P3 represents a natural method for integrating the Hamming-Ball Hill Climber into
 a global optimization algorithm as P3 already utilizes local search. However, there
 are also a number of ways in which P3 can be made more efficient by leveraging the
 additional information available in the gray box domain.
@@ -462,8 +473,29 @@ is also the global optimum, verified using dynamic programming.
 
 
 \subsection{The Effect of Radius}
-The only algorithm parameter in the Hamming Ball Hill Climber, TUX, and Gray Box P3
-is the radius of the hamming ball.
+The only algorithm parameter in the Hamming-Ball Hill Climber, TUX, and Gray Box P3
+is the radius of the hamming-ball.
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{fitness-nn}
+  \caption{Nearest Neighbor NKq}
+  \label{fig-fitness-nn}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{fitness-un}
+  \caption{Unrestricted NKq}
+  \label{fig-fitness-un}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{p3-seconds}
+  \caption{Timing}
+  \label{fig-p3-seconds}
+\end{figure}
 
 TODO Plot for single K value with x=radius, y=fitness, color=solver
 
@@ -478,6 +510,13 @@ TODO Explain best Pyramid R versus best TUX R.
 
 \subsection{Scalability}
 TODO Plot for seconds to global optimum as N increases, include Black Box P3
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{length}
+  \caption{Length}
+  \label{fig-length}
+\end{figure}
 
 TODO Consider O(N) statistics
 
