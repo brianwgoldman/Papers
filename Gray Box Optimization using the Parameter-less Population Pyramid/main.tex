@@ -77,23 +77,23 @@ Anonymous\\
 %Maximum 200 Words
 
 Unlike black-box optimization problems, gray-box optimization problems have known,
-limited-cardinality relationships between variables. Such problems are
-well-known and exist in many real world problems (network security, computational biology, VLSI design, and statistical physics). These
-problems are amenable to local search using a Hamming-Ball Hill Climber
-(HBHC) that can efficiently find r-bit local optimal. We show how a
+limited-cardinality non-linear relationships between variables. This domain contains many
+real world problems with examples in network security, computational biology, VLSI design, and statistical physics.
+Leveraging these restrictions, the Hamming-Ball Hill Climber
+(HBHC) can efficiently find r-bit local optimal. We show how a
 simple memetic algorithm in conjunction with HBHC can find \emph{global}
-optima for gray-box problems. Finally a gray-box version of P3, which
-utilizes the information about variable relationships given by the gray-box
-problem itself, is the most efficient of the examined algorithms.
+optima for gray-box problems. We also develop a gray-box version of the Parameter-less
+Population Pyramid (P3) utilizing both the HBHC and the known information about variable relationships
+which outperforms all of the examined algorithms
+
 
 We provide experimental evidence on both NKq-Landscapes and Ising Spin Glasses
 that Gray-Box P3 is effective at finding the global optima even for problems with
 thousands of variables. This capability is complemented by its efficiency, with
-running time and memory usage decreased by a linear factor from Black-Box P3.
+running time and memory usage decreased by up to a linear factor from Black-Box P3.
 On NKq this results in a x375 speedup for problems with at least 1000 variables.
 While local search introduces a parameter, we experimentally show this parameter
 can likely be fixed to 1 without significant loss in search quality.
-
 \end{abstract}
 
 % A category with the (minimum) three required fields
