@@ -5,7 +5,7 @@
 \usepackage{verbatim}
 \usepackage[noend]{algpseudocode}
 \newcommand{\includegraphicsfit}[1]
-{\includegraphics[width=\columnwidth,height=.4\textheight,keepaspectratio]{#1}}
+{\includegraphics[width=.9\columnwidth,height=.4\textheight,keepaspectratio]{#1}}
 
 \newcommand{\includegraphicswide}[1]
 {\includegraphics[width=.9\textwidth,height=\textheight,keepaspectratio]{#1}}
@@ -33,7 +33,7 @@ requires prior specific permission and/or a fee. Request permissions from permis
 \widowpenalty = 10000
 
 \begin{document}
-\title{Gray Box Optimization using the Parameter-less Population Pyramid}
+\title{Gray-Box Optimization using the Parameter-less Population Pyramid}
 %\subtitle{[Genetic Algorithms Track]}
 
 \numberofauthors{2} %
@@ -76,21 +76,21 @@ Anonymous\\
 \begin{abstract}
 %Maximum 200 Words
 
-For many challenging problems, the non-linear relationships between variables
-are known and bounded. Previous work has developed local search operators
-which require a linear factor less time than black box methods. Furthermore,
-this Hamming-Ball Hill Climber is capable of efficiently finding $r$-bit local optima.
-In this paper we extend this operator to perform efficient global optimization.
-We create a simple memetic algorithm to demonstrate how even trivial
-extensions can improve search results. We then modify the Parameter-less
-Population Pyramid (P3), shown to be highly effective for black box optimization,
-to leverage the additional information available in the gray box domain.
+Unlike black-box optimization problems, gray-box optimization problems have known,
+limited-cardinality relationships between variables. Such problems are
+well-known and exist in many real world problems (network security, computational biology, VLSI design, and statistical physics). These
+problems are amenable to local search using a Hamming-Ball Hill Climber
+(HBHC) that can efficiently find r-bit local optimal. We show how a
+simple memetic algorithm in conjunction with HBHC can find \emph{global}
+optima for gray-box problems. Finally a gray-box version of P3, which
+utilizes the information about variable relationships given by the gray-box
+problem itself, is the most efficient of the examined algorithms.
 
 We provide experimental evidence on both NKq-Landscapes and Ising Spin Glasses
-that Gray Box P3 is effective at finding the global optima even for problems with
+that Gray-Box P3 is effective at finding the global optima even for problems with
 thousands of variables. This capability is complemented by its efficiency, with
-running time and memory usage decreased by a linear factor from Black Box P3.
-On NKq this results in a x374 speedup for problems with at least 1000 variables.
+running time and memory usage decreased by a linear factor from Black-Box P3.
+On NKq this results in a x375 speedup for problems with at least 1000 variables.
 While local search introduces a parameter, we experimentally show this parameter
 can likely be fixed to 1 without significant loss in search quality.
 
@@ -119,35 +119,35 @@ this local search with additional heuristics~\cite{chen:2011:memetic}.
 We introduce a novel algorithm designed to combine local
 and global search as simply as possible. To test the true power of this
 process we also extend the Parameter-less Population Pyramid~\cite{goldman:2014:p3},
-current state-of-the-art in black box optimization. This ``Gray Box P3''
+current state-of-the-art in black-box optimization. This ``Gray-Box P3''
 utilizes both efficient local search and the additional problem information
 to drastically improve performance and reduce memory usage.
 
-\section{Gray Box Domain}
+\section{Gray-Box Domain}
 \label{sec-gray-box}
-In black box optimization, the only information available is a specification
+In black-box optimization, the only information available is a specification
 for what constitutes a valid solution and a function which returns the quality
 of a given solution. While these very simple requirements allow almost any
 optimization task to fit into this domain, it may prevent additional knowledge
 about a problem from being provided to search algorithms. At the other end of
 the spectrum is white box optimization, in which everything about the problem
 is known allowing search techniques to specialize at the cost of generality.
-Gray box optimization exists between these two extremes, exposing additional
+Gray-box optimization exists between these two extremes, exposing additional
 information to be exploited by search and which is available for a variety of problems.
 
-Here we shall consider the gray box optimization domain with the following
+Here we shall consider the gray-box optimization domain with the following
 characteristics. The function which evaluates the quality of a solution is determined by the summation
 of subfunctions. Each subfunction uses at most $k$ variables in the given solution,
 such that as the total number of solution variables $N$ increases, $k$ remains constant.
 Each subfunction must be independently evaluable, and the variables each uses are known.
 
-While more restrictive than black box optimization, this domain is still very general.
+While more restrictive than black-box optimization, this domain is still very general.
 MAX-SAT, and by extension all NP-hard problems, can be represented
 as a summation of subfunctions to evaluate each clause~\cite{whitley:2013:greedy}.
 Previous approximation studies of Vertex Cover~\cite{oliveto:2009:vertexcover},
 Set Cover~\cite{yu:2010:setcover}, MAX-CUT~\cite{festa:2002:maxcut}, and
 Ising Spin Glasses~\cite{pelikan:2003:hboaising} all work with problems which fit
-in the gray box domain. These relate back to problems of real world interest such
+in the gray-box domain. These relate back to problems of real world interest such
 as network security, computational biology, VLSI design, and statistical physics.
 
 In order to obtain efficiency bounds for optimization algorithms, the following
@@ -155,7 +155,7 @@ assertions are also included. The total number of subfunctions grows no more tha
 linearly with $N$, which holds true for randomized MAX-SAT, mesh spin glasses, and NK Landscapes.
 Furthermore, each variable participates in at most $c$ subfunctions, which holds true
 for mesh spin glasses and Nearest Neighbor NK. If violated, these assertions do not
-necessarily prevent the gray box optimization algorithms from solving the problem, but may result
+necessarily prevent the gray-box optimization algorithms from solving the problem, but may result
 in slower than predicted performance.
 We also include the trivial requirements that all problem variables must participate
 in at least one subfunction and that the problem is not separable. Any problem which
@@ -163,7 +163,7 @@ violates these requirements can be restated either using less variables or as mu
 
 \section{Hamming-Ball Hill Climbing}
 \label{sec-hamming}
-The first algorithm to rigorously exploit the features of the gray box domain
+The first algorithm to rigorously exploit the features of the gray-box domain
 described in Section~\ref{sec-gray-box} was \cite{whitley:2013:greedy}. In this study
 a hill climber was developed which found the approximate next best improving move in \BigO{1} time.
 This is achieved by first determining the fitness effect $delta$ of making each move, and then updating
@@ -171,11 +171,11 @@ only effected moves each time a change to the solution is made. Due to the requi
 at most \BigO{ck} moves can be effected, with each requiring at most \BigO{1} subfunction calls
 to update their $delta$. Combined with move binning, this technique is able to perform both
 first improvement and next best hill climbing in \BigO{I+N}, where $I$ is the number of improving
-moves required to reach a local optimum. In comparison, the black box approach for these searches can require
+moves required to reach a local optimum. In comparison, the black-box approach for these searches can require
 \BigO{IN^2}.
 
 By again leveraging the properties of this domain, the Hamming-Ball Hill Climber~\cite{chicano:2014:ball} extends this
-method to find $r$-bit local optima. While na\"ively this would require testing \BigO{N^r} moves, in the gray box domain only
+method to find $r$-bit local optima. While na\"ively this would require testing \BigO{N^r} moves, in the gray-box domain only
 \BigO{(3ck)^rN} must be checked. This is due to the bounded relationships between variables.
 If $i$ and $j$ do not share a subfunction, the effect of flipping both variables
 must be equal to the sum of flipping both separately. Therefore only variables which share
@@ -248,7 +248,7 @@ all possible ways of adding a single vertex to the current $subset'$. As $v'$
 are tested they are temporarily added to $closed$ to prevent recursive calls
 from creating duplicates.
 
-When applied to the sparse graphs inherent in the gray box domain, this algorithm
+When applied to the sparse graphs inherent in the gray-box domain, this algorithm
 requires \BigO{r!(c(k-1))^rN} time, which reduces to \BigO{N}. The time spent
 in each call is dominated by the loop over $open'$. In the worst case, $open'$
 increases in size by the full adjacency of $v$, which is bounded by $c(k-1)$.
@@ -346,7 +346,7 @@ will show it is quite effective at optimization.
 \end{figure}
 
 The Parameter-less Population Pyramid (P3) is a recently introduced
-black box optimization method which requires no problem specific configuration~\cite{goldman:2014:p3}.
+black-box optimization method which requires no problem specific configuration~\cite{goldman:2014:p3}.
 Unlike previous parameter-less methods it was shown to be more efficient than
 competing state-of-the-art algorithms across a number of problem classes.
 
@@ -363,7 +363,8 @@ solutions to perform crossover, P3 uses information from an entire population.
 Due to this model building, P3 requires \BigO{N} amortized time per evaluation and \BigO{N^2}
 memory usage.
 
-\subsection{Gray Box Specialization}
+\subsection{Gray-Box Specialization}
+\begin{comment}
 \begin{figure}
   \begin{algorithmic}[1]
   \Procedure{SubfunctionTree}{}
@@ -392,19 +393,57 @@ memory usage.
   \caption{Algorithm used to convert a list of subfunctions into linkage tree clusters.}
   \label{fig-sfx-tree}
 \end{figure}
+\end{comment}
 
 P3 represents a natural method for integrating the Hamming-Ball Hill Climber into
 a global optimization algorithm as P3 already utilizes local search. However, there
 are also a number of ways in which P3 can be made more efficient by leveraging the
-additional information available in the gray box domain.
+additional information available in the gray-box domain.
 
 First and foremost, linkage learning is no longer necessary. By definition
 the direct non-linear relationships between variables are known. As a result
 P3 no longer needs to store the pairwise frequency information which leads
-the black box version to require \BigO{N^2} memory. Instead the subfunction
-information itself can be used to construct the linkage clusters.
+the black-box version to require \BigO{N^2} memory. Instead,
+we have developed a method for creating a linkage tree which learns clusters
+from the same graph defined in Section~\ref{sec-hamming}. The goal is for each
+cluster to be a connected induced subgraph, with the size of clusters
+mirroring those produced by the agglomerative linkage learning process normally
+used with P3. To form a single cluster, a random graph search is performed from
+a random starting vertex until a desired number of unique vertices have been explored.
+Cluster sizes are set by recursively such that for every cluster created of size $l>1$
+clusters of size $a$ and $l-a$ are also created, such that $a$ is chosen uniformly
+from the range $[1..l-1]$, with the largest clusters created by similarly splitting $l=N$.
+
+This linking algorithm has a number of useful properties. First, it creates exactly
+$2N-2$ clusters, distributed in size similarly to the black-box clustering algorithm.
+Performing a random graph search to find $l$ unique vertices requires \BigO{lck} time,
+meaning cluster creation is optimally efficient.
+The cluster splitting process has identical properties as random pivot quicksort,
+meaning the sum of cluster sizes is \BigO{N\log N} in the average case.
+This efficiency allows new clusters to be created before every mixing event,
+unlike black-box P3 where they are created only when new solutions are added to the population.
+For simplicity the clusters are shuffled after the are created, not sorted on size like in
+black-box P3.
+
+Beyond efficiency, there are good reasons to believe these clusters will be useful
+to search. The closer two variables are in the dependency graph, the more likely
+they are to appear in the same cluster. All variables on average are expected to appear
+in at least one cluster, but variables which are central in the graph will appear in more
+clusters than those on the periphery. If all else is equal, the more paths of a given
+size between two variables, the higher the probability of them being in the same cluster.
+Unlike black-box P3, this linkage tree does not require clusters to be nested, allowing
+more diversity in the types of clusters appearing in a single tree.
+
+In effect the clusters are sampling moves which the Hamming-Ball Hill Climber
+would make if $r \ge l$. As clusters are used to move values between solutions, these
+moves are restricted to moving in the direction of previously found high quality moves.
+As a result if the density of high quality solutions is higher between good solutions than
+outside of good solutions, this method will perform better than random search or sampling from
+all possible moves of size $l$.
+
+\begin{comment}
 Figure~\ref{fig-sfx-tree} provides an efficient method for creating a linkage
-tree similar to that used in black box P3 given subfunction information.
+tree similar to that used in black-box P3 given subfunction information.
 Each variable starts in its own cluster. Each subfunction in a random order
 is used to determine how to link existing clusters. If a subfunction overlaps
 multiple top level clusters, all overlapped clusters are merged to create a new
@@ -412,7 +451,7 @@ top level cluster. This process creates a linkage tree similar to that learned
 for P3, with the difference that a node in the tree can have up to $k$ children.
 
 \Call{SubfunctionTree}{} requires \BigO{|cluster|} time to construct each $cluster$
-in the linkage tree. In the gray box domain the total number of subfunctions is required
+in the linkage tree. In the gray-box domain the total number of subfunctions is required
 to be $\Theta(N)$ in order to ensure the problem is not separable. As all variables must
 participate in a subfunction, $\Theta(N)$ clusters must be created. Therefore
 the only cost which cannot be amortized over the clusters to \BigO{1} is the creation
@@ -426,33 +465,23 @@ clusters must differ by at least one entire subfunction. The probability two
 variables appear in the same cluster increases with the number of subfunctions
 they share. The more paths that exist between two variables in the subfunction
 connectivity graph, the more likely those variables will appear in the same cluster.
+\end{comment}
 
-Due to this change, a few compensatory adjustments to P3's algorithm were required.
-First, in black box P3 the number of clusters discovered by linkage learning is
-limited by the number of solutions at that level of the pyramid. To duplicate this
-behavior, after calling \Call{SubfunctionTree}{} a random subset of the discovered
-clusters is chosen, such that the size is limited to the number of solutions
-stored at the current level of the pyramid. As the clusters produced do not
-rely on the solutions stored in the pyramid, clusters are regenerated before each
-mixing event, unlike black box P3 in which they are regenerated only when the stored
-solutions change. Finally, unlike previous work, the clusters are applied in random order
-to avoid the time required to sort them based on length.
-
-Another efficiency gain possible due to the gray box domain is that each time a
+Another efficiency gain possible due to the gray-box domain is that each time a
 donation is made, only the effected part of the solution's fitness needs to be
 recalculated. As a result the number of subfunction evaluations required
-to determine the change in fitness is only \BigO{|cluster|}. This also
-allows for gray box P3 to efficiently reapply hill climbing after each
+to determine the change in fitness is only \BigO{l}. This also
+allows for gray-box P3 to efficiently reapply hill climbing after each
 donation as only effected moves need to be rechecked. As a result a donation,
 and its resulting modifications from hill climbing, are kept only if the
 new local optima is at least as fit as the solution before the donation occurred.
-All combined a single donation plus returning to a local optimum requires \BigO{|cluster| + I} time,
-while just the donation in black box P3 requires \BigO{N}.
+All combined a single donation plus returning to a local optimum requires \BigO{l + I} time,
+while just the donation in black-box P3 requires \BigO{N}.
 
 \section{Experimentation}
 \label{sec-experiments}
-To compare these gray box optimization techniques we have chosen
-NKq-Landscapes~\cite{chicano:2014:ball}. NKq-Landscapes create
+To compare these gray-box optimization techniques we have chosen
+NKq-Landscapes~\cite{chicano:2014:ball} and Ising Spin Glasses~\cite{saul:1994:spinglass}. NKq-Landscapes create
 a collection of randomly generated problem instances given a
 higher level problem class description. Each instance is described
 by a series of $N$ subfunctions, each corresponding to a variable
@@ -479,61 +508,95 @@ $k$ remains fixed, the maximum number of subfunctions a variable appears in ($c$
 as $N$ increases. As a result some of the efficiency claims in Section~\ref{sec-hamming}
 may not be applicable.
 
-For each $N$ and $K$ tested, we generated 50 Nearest Neighbor NKq and Unrestricted NKq instances.
+Ising Spin Glasses are a type of MAX-CUT problem relevant in statistical physics. Each spin glass
+encodes spins (vertices) and their relationships (edges) with the goal of assigning each spin a direction
+which minimizes relationship energy. Just as with NKq-Landscapes, Ising Spin Glasses as a whole
+are NP-Hard, but the $2D\pm J$ subset is polynomially solvable~\cite{saul:1994:spinglass}\footnote{\url{http://www.informatik.uni-koeln.de/spinglass/}}. In this
+subset the graph is a 2D toroidal grid, with each edge's weight either -1 or 1. In gray-box terms
+problems of this subset have $k=2$ and $c=4$ regardless of $N$. While Ising Spin Glasses are traditionally
+a minimization problem, here we present them as a maximization problem by negating the normal fitness.
+
+For each problem class tested, we generated 50 instances.
 Each method was run once on each instance, and limited to 3 hours of computation and 4 GB of memory.
-Runs were performed on 2.5GHz Intel Xeon E5-2670v2 processors using the C++11 code provided
+Runs were performed on 2.5GHz Intel Xeon E5-2670v2 processors using the C++11 code available
 from our website.\footnote{\url{https://github.com/name_of_repository/anonymous_name_of_project}}
 Each time the run achieved a new best fitness we record current amount of processing time used.
 Timing includes the discovery of subgraphs to allow for comparison between different radius values.
 When reporting the ``best'' fitness for an instance we mean the best fitness found by any method before
 the time limit is reached. On all Nearest Neighbor NKq instances the ``best'' fitness
-is also the global optimum, verified using dynamic programming.
+is also the global optimum, verified using dynamic programming. The same is true of all Ising Spin Glass
+problems except for 6 of 50 on N=6084.
 
+All figures report the median run for either percentage error or seconds to reach the best. A run's percentage error is
+equal to its how much less its fitness is than the best, divided by the best. When reporting seconds
+to reach the best fitness, any run which did not find the best fitness is treated as slower than any run that did.
+If the median run was unsuccessful, no data point is drawn.
 
 \subsection{The Effect of Radius}
-The only algorithm parameter in the Hamming-Ball Hill Climber, TUX, and Gray Box P3
-is the radius of the hamming-ball.
+The only algorithm parameter in the Hamming-Ball Hill Climber, TUX, and Gray-Box P3
+is the radius of the hamming-ball. Therefore our first experiments are designed to determine
+the effect of this parameter on solution quality.
 
-\begin{figure}
+\begin{figure*}
   \centering
-  \includegraphicsfit{fitness-nn}
-  \caption{Nearest Neighbor NKq}
-  \label{fig-fitness-nn}
-\end{figure}
-
-\begin{figure}
-  \centering
-  \includegraphicsfit{fitness-un}
-  \caption{Unrestricted NKq}
-  \label{fig-fitness-un}
-\end{figure}
+  \includegraphicswide{fitness}
+  \caption{Comparison of how radius effects solution quality. For NKq-Landscapes $N=6000$ and $K=4$ and
+  for Ising Spin Glasses $N=6084$.}
+  \label{fig-fitness}
+\end{figure*}
 
 \begin{figure}
   \centering
   \includegraphicsfit{p3-seconds}
-  \caption{Timing}
+  \caption{Median time required for Gray-Box P3 to reach the global optimum of Nearest Neighbor NKq instances with $N=6000$.}
   \label{fig-p3-seconds}
 \end{figure}
-
-TODO Plot for single K value with x=radius, y=fitness, color=solver
-
-TODO Plot for just Pyramid with x=radius, y=seconds to optimum, color=k
 
 TODO Explain k==1
 
 \subsection{Fitness Over Time}
+
+\begin{figure*}
+  \centering
+  \includegraphicswide{solver-over}
+  \caption{solver-over.}
+  \label{fig-solver-over}
+\end{figure*}
+
+\begin{figure*}
+  \centering
+  \includegraphicswide{radius-over}
+  \caption{radius-over.}
+  \label{fig-radius-over}
+\end{figure*}
+
+
 TODO Plot for fixed N, K, and R with x=seconds, y=fitness, color=solver
 
 TODO Explain best Pyramid R versus best TUX R.
 
 \subsection{Scalability}
-TODO Plot for seconds to global optimum as N increases, include Black Box P3
+TODO Plot for seconds to global optimum as N increases, include Black-Box P3
 
 \begin{figure}
   \centering
-  \includegraphicsfit{length}
-  \caption{Length}
-  \label{fig-length}
+  \includegraphicsfit{length-nn}
+  \caption{Length-nn}
+  \label{fig-length-nn}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{length-is}
+  \caption{Length-is}
+  \label{fig-length-is}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{length-un}
+  \caption{Length-un}
+  \label{fig-length-un}
 \end{figure}
 
 TODO Consider O(N) statistics
