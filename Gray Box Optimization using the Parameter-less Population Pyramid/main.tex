@@ -110,9 +110,9 @@ can likely be fixed to 1 without significant loss in search quality.
 
 \section{Introduction}
 
-Recent work~\cite{whitley:2013:greedy,chicano:2014:ball} has shown that by
-providing local search with more than just an evaluation function can lead
-to extraordinary improvements search power and efficiency. These improvements
+Recent work~\cite{whitley:2013:greedy,chicano:2014:ball} has shown that
+providing local search with more than just an evaluation function can
+extraordinarily improve search power and efficiency. These improvements
 require information easily derived for a broad range of interesting NP-Hard
 problems.
 
@@ -120,7 +120,7 @@ Here we set out to extend these benefits to global optimization by integrating
 this local search with additional heuristics~\cite{chen:2011:memetic}.
 We introduce a novel algorithm designed to combine local
 and global search as simply as possible. To test the true power of this
-process we also extend the Parameter-less Population Pyramid~\cite{goldman:2014:p3},
+process we also extend the Parameter-less Population Pyramid (P3)~\cite{goldman:2014:p3}, the
 current state-of-the-art in black-box optimization. This ``Gray-Box P3''
 utilizes both efficient local search and the additional problem information
 to drastically improve performance and reduce memory usage.
@@ -135,7 +135,7 @@ about a problem from being provided to search algorithms. At the other end of
 the spectrum is white box optimization, in which everything about the problem
 is known allowing search techniques to specialize at the cost of generality.
 Gray-box optimization exists between these two extremes, exposing additional
-information to be exploited by search and which is available for a variety of problems.
+information which is available for a variety of problems to be exploited by search.
 
 Here we shall consider the gray-box optimization domain with the following
 characteristics. The function which evaluates the quality of a solution is determined by the summation
@@ -168,10 +168,10 @@ violates these requirements can be restated either using less variables or as mu
 The first algorithm to rigorously exploit the features of the gray-box domain
 described in Section~\ref{sec-gray-box} was \cite{whitley:2013:greedy}. In this study
 a hill climber was developed which found the approximate next best improving move in \BigO{1} time.
-This is achieved by first determining the fitness effect $delta$ of making each move, and then updating
+This is achieved by first determining the fitness effect of making each move, and then updating
 only effected moves each time a change to the solution is made. Due to the requirements of the domain,
 at most \BigO{ck} moves can be effected, with each requiring at most \BigO{1} subfunction calls
-to update their $delta$. Combined with move binning, this technique is able to perform both
+to update their fitness effects. Combined with move binning, this technique is able to perform both
 first improvement and next best hill climbing in \BigO{I+N}, where $I$ is the number of improving
 moves required to reach a local optimum. In comparison, the black-box approach for these searches can require
 \BigO{IN^2}.
@@ -245,7 +245,7 @@ call all desired subgraphs which contain $v$ are found, which is why $v$ remains
 in $closed$ to prevent duplicate subgraphs from being returned.
 
 At each recursive level \Call{CISG}{} expands $open$ to include any vertices
-adjacent to $v$ in the graph. By construction this means that $open$ contains
+adjacent to $v$ in the graph. By construction this means that $open'$ contains
 all possible ways of adding a single vertex to the current $subset'$. As $v'$
 are tested they are temporarily added to $closed$ to prevent recursive calls
 from creating duplicates.
@@ -279,28 +279,28 @@ of the $N$ variables resulting in \BigO{r!(c(k-1))^rN}.
   \EndProcedure
 \end{algorithmic}
   \caption{One iteration of TUX optimization. $T$ is an
-           ordered list of solution, each of which could be empty,
+           ordered list of solutions, each of which could be empty,
            awaiting a crossover partner.}
   \label{fig-TUX}
 \end{figure}
 
-Hamming-Ball Hill Climbing is not sufficient to efficiently find the global optimum
+Hamming-Ball Hill Climbing is not sufficient to efficiently find the global optima
 on problems with even moderate epistasis~\cite{chicano:2014:ball}. This is because,
 like all random restart hill climbers, it relies on random initialization to fall
-inside the global optimum's basin of attraction.
+inside the global optima's basin of attraction.
 
 To remedy this limitation, we set out to develop a minimally complex memetic
 algorithm to help increase this probability. Figure~\ref{fig-TUX} presents
 the Tournament Uniform Crossover (TUX) algorithm, which combines simplistic
 selection with equal probability uniform crossover to generate starting
-solutions likely to be in the global optimum's basin of attraction.
+solutions likely to be in the global optima's basin of attraction.
 
 Conceptually TUX iteratively builds a structure similar to a single elimination
 bracket for solutions. Each ``match'' in the tournament takes in two candidate solutions,
 produces offspring via uniform crossover, applies hill climbing to each offspring, with
 the ``winner'' being the best of all those solutions. The tournament ``bracket'' is constructed
 iteratively, storing a single list of solutions $T$, such that $|T|$ is equal to the height
-of the tournament. This is possible because when a sub-bracket is complete only a single solution
+of the tournament. Iterative construction is possible because when a sub-bracket is complete only a single solution
 emerges and solutions only need to be stored until their partner is found.
 TUX is fully elitist but does not prematurely converge. This is because search continuously
 integrates new randomly generated solutions through other parts of the bracket. Whenever the
@@ -438,11 +438,15 @@ Unlike Black-Box P3, this linkage tree does not require clusters to be nested, a
 more diversity in the types of clusters appearing in a single tree.
 
 In effect the clusters are sampling moves which the HBHC
-would make if $r \ge l$. As clusters are used to move values between solutions, these
-moves are restricted to moving in the direction of previously found high quality solutions.
-As a result if the density of high quality solutions is higher between good solutions than
-outside of good solutions, this method will perform better than random search or sampling from
-all possible moves of size $l$.
+would make if $r \ge l$. For any solution in the search space which is not globally optimal, there
+must exist some move which will improve its quality. However, this move may
+be arbitrarily large and it is intractable to test all possible moves of even moderate size.
+By sampling from all possible large moves, we can maintain tractability while gaining
+a potentially non-zero probability of improvement.
+As clusters are used to donate values between solutions, these
+moves are always in the direction of previously found high quality solutions.
+This assumes that the density of high quality solutions is higher between good solutions than
+outside of good solutions.
 
 \begin{comment}
 Figure~\ref{fig-sfx-tree} provides an efficient method for creating a linkage
@@ -704,13 +708,15 @@ would be to explore methods of performing efficient learning on top of the known
 
 Somewhat surprising is the difference in behavior between the polynomially solvable problems
 and Unrestricted NKq. While Black-Box P3 performed very well in the former, it was the least
-successful in the latter. The optimal radius for Gray-Box P3 also shifted from 1 to 2. One
-potential explanation is the change in topological bottlenecking. In both Ising Spin Glass
-and Nearest Neighbor NKq the number of variables reachable from any one variable in $r$
-or less steps is significantly lower than the worst case. This explains why on Unrestricted NKq
+successful in the latter. The optimal radius for Gray-Box P3 also shifted from 1 to 2.
+A potential explanation is that in both Ising Spin Glass
+and Nearest Neighbor NKq the number of unique variables $r$ steps
+or less steps away from a given variable is significantly lower than the worst case. This explains why on Unrestricted NKq
 even moderately high $r$ values hit our memory limit.
 For Black-Box P3 this may also be causing increased difficulty in linkage learning as variables
-become indirectly dependent on much larger sets.
+become indirectly dependent on much larger sets. Furthermore, Black-Box
+P3 may be benefiting from an increased rate of duplicate dependencies on Nearest Neighbor NKq
+not present in Unrestricted NKq.
 
 While the inclusion of HBHC into Gray-Box P3 introduces a parameter value, it requires
 trivial configuration. In the worst case there may be a handful of $r$ values to test.
