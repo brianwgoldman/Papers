@@ -91,7 +91,7 @@ We provide experimental evidence on both NKq-Landscapes and Ising Spin Glasses
 that Gray-Box P3 is effective at finding the global optima even for problems with
 thousands of variables. This capability is complemented by its efficiency, with
 running time and memory usage decreased by up to a linear factor from Black-Box P3.
-On NKq this results in a x375 speedup for problems with at least 1000 variables.
+On NKq this results in a x375 speedup for problems with at least 1,000 variables.
 While local search introduces a parameter, we experimentally show this parameter
 can likely be fixed to 1 without significant loss in search quality.
 \end{abstract}
@@ -104,7 +104,7 @@ can likely be fixed to 1 without significant loss in search quality.
 
 \terms{Algorithms, Performance, Experimentation}
 
-\keywords{TODO; Local Search; Parameter-less}
+\keywords{Local Search; Global Search; Parameter-less}
 
 \newpage
 
@@ -354,13 +354,14 @@ competing state-of-the-art algorithms across a number of problem classes.
 
 P3 combines hill climbing and model building using a novel, iteratively constructed, pyramid
 of populations. Figure~\ref{fig-p3} provides the high level description of how the algorithm
-works. In order to perform solution mixing, P3 learns a linkage tree from pairwise variable
-entropy which is then used to perform global optima mixing~\cite{thierens:2011:gomea}. In global
-optimal mixing these learned clusters of variables are used to donate genetic information from multiple
-sources into a single solution. Each time variables are donated, the modified solution is evaluated,
+works. To exploit information from multiple solutions, P3 performs global optimal mixing~\cite{thierens:2011:gomea}.
+Each time a solution is added to a level of the pyramid $P_i$, linkage learning is performed to
+create a collection of variable clusters. These clusters, collectively referred to as a linkage tree,
+are learned from the pairwise variable entropy of $P_i$. When a solution is mixed with $P_i$
+each cluster is used to donate variable values from a random donor in $P_i$ into the solution.
+After each donation the modified solution is evaluated,
 with the change being reverted if solution quality decreased. In this way P3 performs
-multiple evaluations per mixing event, with a single solution receiving genes from randomly chosen
-donors in the pyramid level. This also means that unlike TUX, which uses information from only two
+multiple evaluations per mixing event. This also means that unlike TUX, which uses information from only two
 solutions to perform crossover, P3 uses information from an entire population.
 Due to this model building, P3 requires \BigO{N} amortized time per evaluation and \BigO{N^2}
 memory usage.
@@ -412,9 +413,9 @@ cluster to be a connected induced subgraph, with the size of clusters
 mirroring those produced by the agglomerative linkage learning process normally
 used with P3. To form a single cluster, a random graph search is performed from
 a random starting vertex until a desired number of unique vertices have been explored.
-Cluster sizes are set by recursively such that for every cluster created of size $l>1$
-clusters of size $a$ and $l-a$ are also created, such that $a$ is chosen uniformly
-from the range $[1..l-1]$, with the largest clusters created by similarly splitting $l=N$.
+Cluster sizes are set recursively. For each cluster of size $l>1$
+a cluster of size $a$ and a cluster of size $l-a$ are also created, with $a$ chosen uniformly
+from the range $[1..l-1]$. This recursive process begins by similarly splitting $l=N$.
 
 This linking algorithm has a number of useful properties. First, it creates exactly
 $2N-2$ clusters, distributed in size similarly to the black-box clustering algorithm.
@@ -423,29 +424,29 @@ meaning cluster creation is optimally efficient.
 The cluster splitting process has identical properties as random pivot quicksort,
 meaning the sum of cluster sizes is \BigO{N\log N} in the average case.
 This efficiency allows new clusters to be created before every mixing event,
-unlike black-box P3 where they are created only when new solutions are added to the population.
+unlike Black-Box P3 where they are created only when new solutions are added to the population.
 For simplicity the clusters are shuffled after the are created, not sorted on size like in
-black-box P3.
+Black-Box P3.
 
 Beyond efficiency, there are good reasons to believe these clusters will be useful
 to search. The closer two variables are in the dependency graph, the more likely
 they are to appear in the same cluster. All variables on average are expected to appear
 in at least one cluster, but variables which are central in the graph will appear in more
 clusters than those on the periphery. If all else is equal, the more paths of a given
-size between two variables, the higher the probability of them being in the same cluster.
-Unlike black-box P3, this linkage tree does not require clusters to be nested, allowing
+length between two variables, the higher the probability of them being in the same cluster.
+Unlike Black-Box P3, this linkage tree does not require clusters to be nested, allowing
 more diversity in the types of clusters appearing in a single tree.
 
 In effect the clusters are sampling moves which the HBHC
 would make if $r \ge l$. As clusters are used to move values between solutions, these
-moves are restricted to moving in the direction of previously found high quality moves.
+moves are restricted to moving in the direction of previously found high quality solutions.
 As a result if the density of high quality solutions is higher between good solutions than
 outside of good solutions, this method will perform better than random search or sampling from
 all possible moves of size $l$.
 
 \begin{comment}
 Figure~\ref{fig-sfx-tree} provides an efficient method for creating a linkage
-tree similar to that used in black-box P3 given subfunction information.
+tree similar to that used in Black-Box P3 given subfunction information.
 Each variable starts in its own cluster. Each subfunction in a random order
 is used to determine how to link existing clusters. If a subfunction overlaps
 multiple top level clusters, all overlapped clusters are merged to create a new
@@ -473,12 +474,12 @@ Another efficiency gain possible due to the gray-box domain is that each time a
 donation is made, only the effected part of the solution's fitness needs to be
 recalculated. As a result the number of subfunction evaluations required
 to determine the change in fitness is only \BigO{l}. This also
-allows for gray-box P3 to efficiently reapply hill climbing after each
+allows for Gray-Box P3 to efficiently reapply hill climbing after each
 donation as only effected moves need to be rechecked. As a result a donation,
 and its resulting modifications from hill climbing, are kept only if the
 new local optima is at least as fit as the solution before the donation occurred.
 All combined a single donation plus returning to a local optimum requires \BigO{l + I} time,
-while just the donation in black-box P3 requires \BigO{N}.
+while just the donation in Black-Box P3 requires \BigO{N}.
 
 \section{Experimentation}
 \label{sec-experiments}
@@ -527,10 +528,10 @@ Timing includes the discovery of subgraphs to allow for comparison between diffe
 When reporting the ``best'' fitness for an instance we mean the best fitness found by any method before
 the time limit is reached. On all Nearest Neighbor NKq instances the ``best'' fitness
 is also the global optimum, verified using dynamic programming. The same is true of all Ising Spin Glass
-problems except for 6 of 50 on N=6084.
+problems except for 6 of 50 on N=6,084.
 
 All figures report the median run for either percentage error or seconds to reach the best. A run's percentage error is
-equal to its how much less its fitness is than the best, divided by the best. When reporting seconds
+equal to how much less its fitness is than the best, divided by the best. When reporting seconds
 to reach the best fitness, any run which did not find the best fitness is treated as slower than any run that did.
 If the median run was unsuccessful, no data point is drawn.
 
@@ -539,8 +540,8 @@ If the median run was unsuccessful, no data point is drawn.
 \begin{figure*}
   \centering
   \includegraphicswide{fitness}
-  \caption{Comparison of how radius effects solution quality at termination. For NKq-Landscapes $N=6000$ and $K=4$ and
-  for Ising Spin Glasses $N=6084$.}
+  \caption{Comparison of how radius effects solution quality at termination. For NKq-Landscapes $N=6,000$ and $K=4$ and
+  for Ising Spin Glasses $N=6,084$.}
   \label{fig-fitness}
 \end{figure*}
 
@@ -558,7 +559,7 @@ optimum in every run for $r < 4$, with only a single unsuccessful run at $r=4$.
 \begin{figure}
   \centering
   \includegraphicsfit{p3-seconds}
-  \caption{Median time required for Gray-Box P3 to reach the global optimum of Nearest Neighbor NKq instances with $N=6000$.}
+  \caption{Median time required for Gray-Box P3 to reach the global optimum of Nearest Neighbor NKq instances with $N=6,000$.}
   \label{fig-p3-seconds}
 \end{figure}
 
@@ -572,8 +573,8 @@ that with a sufficiently high $r$ the HBHC is able to find the global optimum.
 \begin{figure*}
   \centering
   \includegraphicswide{solver-over}
-  \caption{Comparison of solution quality during optimization on a log-log scale for different algorithms. For NKq-Landscapes $N=6000$ and $K=4$ and
-  for Ising Spin Glasses $N=6084$. Each algorithm uses its best found $r$ value.}
+  \caption{Comparison of solution quality during optimization on a log-log scale for different algorithms. For NKq-Landscapes $N=6,000$ and $K=4$ and
+  for Ising Spin Glasses $N=6,084$. Each algorithm uses its best found $r$ value.}
   \label{fig-solver-over}
 \end{figure*}
 
@@ -588,7 +589,7 @@ which quickly descends to the global optimum, outperforming HBHC and TUX at ever
   \centering
   \includegraphicswide{radius-over}
   \caption{Comparison of Gray-Box P3's solution quality during optimization on a log-log scale for different $r$ values.
-  For NKq-Landscapes $N=6000$ and $K=4$ and for Ising Spin Glasses $N=6084$.}
+  For NKq-Landscapes $N=6,000$ and $K=4$ and for Ising Spin Glasses $N=6,084$.}
   \label{fig-radius-over}
 \end{figure*}
 
@@ -619,7 +620,7 @@ However, due to memory and time restrictions it is difficult to know if this tre
 Perhaps the most critical test of an optimization algorithm's quality is
 how it scales as problem difficulty increases. To test this behavior,
 we ran all three algorithms using the best found $r$ values in Section~\ref{sec-radius}
-varying $N$ from 200 to 10,000 for NKq and 196 to 6084 for Ising Spin Glass.
+varying $N$ from 200 to 10,000 for NKq and 196 to 6,084 for Ising Spin Glass.
 In these plots we also include the black-box version of P3 to show the efficiency
 gains available for using gray-box information.
 
@@ -628,12 +629,12 @@ algorithm required to reach the best found on Nearest Neighbor NKq
 and Ising Spin Glass, respectively. For Nearest Neighbor NKq the best found
 is the global optimum for all runs of all lengths, while Ising Spin Glass
 the best found by any method was worse than the global optimum in 7 runs of
-$N=4096$ and 21 runs of $N=6084$. The median run of the HBHC was unable to reach the best fitness
+$N=4,096$ and 21 runs of $N=6,084$. The median run of the HBHC was unable to reach the best fitness
 for any problems tested using more than 200 bits. TUX performed somewhat better, reaching
 the best fitness on problem sizes up to $N=800$ and $N=625$ for Nearest Neighbor NKq and Ising
 Spin Glass, respectively. Black-Box P3, which does not utilize partial reevaluation or the HBHC,
-was able to consistently reach the best fitness until it it hit the memory limit on $N=2000$ for
-NKq and $N=2916$ for Ising Spin Glass. This is because unlike the other methods, Black-Box P3
+was able to consistently reach the best fitness until it it hit the memory limit on $N=2,000$ for
+NKq and $N=2,916$ for Ising Spin Glass. This limitation is because unlike the other methods, Black-Box P3
 requires \BigO{N^2} memory.
 
 For all sizes of both problems, Gray-Box P3 was the fastest to reach the best fitness. On
@@ -641,13 +642,13 @@ Nearest Neighbor NKq the improvement is very significant, with no alternative fi
 two orders of magnitude. On its largest successful problem size, the mean time to completion for
 Black-Box P3 was 375 times slower than Gray-Box P3. This is especially impressive considering
 previous work has shown Black-Box P3 is faster to reach the global optimum than other leading black-box
-methods. Applying regression to both lines, we estimate that Black-Box P3's time to global optimum
+methods. Applying regression, we estimate that Black-Box P3's time to global optimum
 on Nearest Neighbor NKq is \BigO{N^{2.75}} while Gray-Box P3's is \BigO{N^{1.98}}.
 
 The results on Ising Spin Glass are similar, with a less extreme difference between
 Black-Box P3 and Gray-Box P3. In general Gray-Box is the fastest technique to
 find the global optimum by an order of magnitude, with Black-Box P3's mean run finishing
-4.6 times slower than Gray-Box on $N=2025$. The regression line suggests that while
+4.6 times slower than Gray-Box on $N=2,025$. The regression line suggests that while
 Gray-Box P3 scales at \BigO{N^{3.35}}, Black-Box P3 scales at \BigO{N^{3.05}}.
 
 
@@ -662,7 +663,7 @@ Gray-Box P3 scales at \BigO{N^{3.35}}, Black-Box P3 scales at \BigO{N^{3.05}}.
 As Unrestricted NKq does not have a known global optimum, and the different algorithms
 rarely found the same best fitness, Figure~\ref{fig-length-un} compares the median error
 for each technique at termination. Gray-Box P3 in general finds the best fitness,
-with TUX occasionally performing better. When $N>2000$, Gray-Box P3 finds better quality
+with TUX occasionally performing better. When $N>2,000$, Gray-Box P3 finds better quality
 solutions that all other methods for every single instance.  HBHC and Black-Box P3 only reach similar
 qualities as TUX and Gray-Box P3 when $N=200$, doing so in 4 and 7 runs, respectively. As the problem
 size increase TUX begins to fall behind Gray-Box P3, with the HBHC stabilizing at about 2.5\% worse than
@@ -671,7 +672,7 @@ falling further behind as the problem size increases.
 
 \section{Discussion and Conclusions}
 In line with previous work, we have found that HBHC cannot effectively find global optima
-on problems with even moderate epistasis. Furthermore, in general is obtains almost no improvement
+on problems with even moderate epistasis. In general it also obtains almost no improvement
 in fitness after only a few restarts. We designed TUX as a simplistic way of choosing
 restart locations based on previously found local optima. Unlike HBHC alone, TUX
 was able to continue improving given more time, finding global optima on problems three
@@ -679,12 +680,12 @@ times as large.
 
 TUX's effectiveness is likely due to the HBHC acting as a super repair operator for uniform crossover.
 Given a sufficiently large $r$ the HBHC can return sections of the crossover offspring to either
-parents original version of a given subfunction. The HBHC is elitist meaning there is a bias toward
+parents' original version of a given subfunction. The HBHC is elitist meaning there is a bias toward
 returning to the better of the two parent's versions. Furthermore, by being so disruptive,
-uniform crossover potentially allows for the HBHC to find unrelated improvements.
+uniform crossover potentially allows for the HBHC to also find unrelated improvements.
 
 While TUX improves over plain HBHC, Gray-Box P3 is required to perform truly successful
-global optimization. Gray-Box P3 replaces na\"{i}ve local search the HBHC and utilizes
+global optimization. Gray-Box P3 replaces na\"{i}ve local search with the HBHC and utilizes
 known non-linear relationships instead of statistical linkage learning. On NKq-Landscapes this drastically
 improves search effectiveness. A major source of this improvement is likely how difficult it is
 for Black-Box P3 to learn linkage relationships on these landscapes. Furthermore, Gray-Box P3
@@ -699,7 +700,7 @@ Nothing in its design suggests that Gray-Box P3 should be more effective at neut
 issue is that on these landscapes the importance of each non-linear relationship may be detectably unequal.
 As a result the Black-Box linkage learning may be able to better cluster variables which having meaningful
 impact on fitness while Gray-Box assumes all are equally important. A useful direction for future work
-would be to explore methods of performing efficient learning on top of the known variable iterations.
+would be to explore methods of performing efficient learning on top of the known variable interactions.
 
 Somewhat surprising is the difference in behavior between the polynomially solvable problems
 and Unrestricted NKq. While Black-Box P3 performed very well in the former, it was the least
@@ -707,8 +708,17 @@ successful in the latter. The optimal radius for Gray-Box P3 also shifted from 1
 potential explanation is the change in topological bottlenecking. In both Ising Spin Glass
 and Nearest Neighbor NKq the number of variables reachable from any one variable in $r$
 or less steps is significantly lower than the worst case. This explains why on Unrestricted NKq
-even moderately high $r$ values hit our memory limit, and may be causing Black-Box P3 to have
-difficulty learning clusters.
+even moderately high $r$ values hit our memory limit.
+For Black-Box P3 this may also be causing increased difficulty in linkage learning as variables
+become indirectly dependent on much larger sets.
+
+While the inclusion of HBHC into Gray-Box P3 introduces a parameter value, it requires
+trivial configuration. In the worst case there may be a handful of $r$ values to test.
+Furthermore, our evidence suggests setting $r=1$ is quite powerful, with higher values
+likely to be only a time shift in quality. This is in contrast to $r$'s role in HBHC,
+where low $r$ values are never expected to reach the same quality has higher $r$ values.
+Therefore we conclude that Gray-Box P3 maintains the out-of-the-box quality of Black-Box
+P3, while drastically improving efficiency for this new domain of problems.
 
 %
 % The following two commands are all you need in the
