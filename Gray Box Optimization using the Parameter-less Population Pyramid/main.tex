@@ -80,7 +80,7 @@ Unlike black-box optimization problems, gray-box optimization problems have know
 limited-cardinality non-linear relationships between variables. This domain contains many
 real world problems with examples in network security, computational biology, VLSI design, and statistical physics.
 Leveraging these restrictions, the Hamming-Ball Hill Climber
-(HBHC) can efficiently find r-bit local optimal. We show how a
+(HBHC) can efficiently find r-bit local optima. We show how a
 simple memetic algorithm in conjunction with HBHC can find \emph{global}
 optima for gray-box problems. We also develop a gray-box version of the Parameter-less
 Population Pyramid (P3) utilizing both the HBHC and the known information about variable relationships
@@ -132,13 +132,13 @@ for what constitutes a valid solution and a function which returns the quality
 of a given solution. While these very simple requirements allow almost any
 optimization task to fit into this domain, it may prevent additional knowledge
 about a problem from being provided to search algorithms. At the other end of
-the spectrum is white box optimization, in which everything about the problem
+the spectrum is white-box optimization, in which everything about the problem
 is known allowing search techniques to specialize at the cost of generality.
 Gray-box optimization exists between these two extremes, exposing additional
 information which is available for a variety of problems to be exploited by search.
 
 Here we shall consider the gray-box optimization domain with the following
-characteristics. The function which evaluates the quality of a solution is determined by the summation
+characteristics: The function which evaluates the quality of a solution is determined by the summation
 of subfunctions. Each subfunction uses at most $k$ variables in the given solution,
 such that as the total number of solution variables $N$ increases, $k$ remains constant.
 Each subfunction must be independently evaluable, and the variables each uses are known.
@@ -161,13 +161,13 @@ necessarily prevent the gray-box optimization algorithms from solving the proble
 in slower than predicted performance.
 We also include the trivial requirements that all problem variables must participate
 in at least one subfunction and that the problem is not separable. Any problem which
-violates these requirements can be restated either using less variables or as multiple separate problems.
+violates these requirements can be restated either using fewer variables or as multiple separate problems.
 
 \section{Hamming-Ball Hill Climbing}
 \label{sec-hamming}
 The first algorithm to rigorously exploit the features of the gray-box domain
 described in Section~\ref{sec-gray-box} was \cite{whitley:2013:greedy}. In this study
-a hill climber was developed which found the approximate next best improving move in \BigO{1} time.
+a hill climber was developed that found the approximate next-best move in \BigO{1} time.
 This is achieved by first determining the fitness effect of making each move, and then updating
 only effected moves each time a change to the solution is made. Due to the requirements of the domain,
 at most \BigO{ck} moves can be effected, with each requiring at most \BigO{1} subfunction calls
@@ -180,7 +180,7 @@ By again leveraging the properties of this domain, the Hamming-Ball Hill Climber
 method to find $r$-bit local optima. While na\"ively this would require testing \BigO{N^r} moves, in the gray-box domain only
 \BigO{(3ck)^rN} must be checked. This is due to the bounded relationships between variables.
 If $i$ and $j$ do not share a subfunction, the effect of flipping both variables
-must be equal to the sum of flipping both separately. Therefore only variables which share
+must be equal to the sum of flipping both separately. Therefore, only variables that share
 a subfunction must be flipped together when checking $r=2$. The problem of determining
 which variables must be flipped together is equivalent to finding the connected induced
 subgraphs of $G$ with $r$ or fewer vertices, such that each vertex in $G$ is a variable
@@ -189,12 +189,12 @@ In \cite{chicano:2014:ball} an upper bound is derived for how many moves this co
 but no algorithm was given to efficiently discover these moves. This process was not included
 in their timing calculations as it only has to be performed once per problem.
 
-Under the assertion that $r \ll N$ and that $r$ does not increase with $N$, the Hamming
-Ball Hill Climber requires only \BigO{I+N} time to find $r$-bit local optimum starting
+Under the assertion that $r \ll N$ and that $r$ does not increase with $N$, the
+Hamming-Ball Hill Climber requires only \BigO{I+N} time to find $r$-bit local optima starting
 from a random solution. As $I$ is likely in \BigO{N} this means finding random $r$-bit local optima
 is no more than a constant amount slower than generating random solutions.
 
-While these techniques make it possible to choose the best improving move just as efficiently
+While these techniques make it possible to choose the best move just as efficiently
 as choosing any random improving move, the findings of~\cite{whitley:2013:greedy} suggest that,
 especially when paired with subsequent search heuristics, using random improving moves is more effective.
 In \cite{chicano:2014:ball} this decision was amended slightly to include the requirement that smaller
@@ -246,8 +246,8 @@ in $closed$ to prevent duplicate subgraphs from being returned.
 
 At each recursive level \Call{CISG}{} expands $open$ to include any vertices
 adjacent to $v$ in the graph. By construction this means that $open'$ contains
-all possible ways of adding a single vertex to the current $subset'$. As $v'$
-are tested they are temporarily added to $closed$ to prevent recursive calls
+all possible ways of adding a single vertex to the current $subset'$. As each $v'$
+is tested it is temporarily added to $closed$ to prevent recursive calls
 from creating duplicates.
 
 When applied to the sparse graphs inherent in the gray-box domain, this algorithm
@@ -535,7 +535,7 @@ is also the global optimum, verified using dynamic programming. The same is true
 problems except for 6 of 50 on N=6,084.
 
 All figures report the median run for either percentage error or seconds to reach the best. A run's percentage error is
-equal to how much less its fitness is than the best, divided by the best. When reporting seconds
+equal to the difference between its fitness and the best, divided by the best. When reporting seconds
 to reach the best fitness, any run which did not find the best fitness is treated as slower than any run that did.
 If the median run was unsuccessful, no data point is drawn.
 
@@ -711,7 +711,7 @@ and Unrestricted NKq. While Black-Box P3 performed very well in the former, it w
 successful in the latter. The optimal radius for Gray-Box P3 also shifted from 1 to 2.
 A potential explanation is that in both Ising Spin Glass
 and Nearest Neighbor NKq the number of unique variables $r$ steps
-or less steps away from a given variable is significantly lower than the worst case. This explains why on Unrestricted NKq
+or fewer steps away from a given variable is significantly lower than the worst case. This explains why on Unrestricted NKq
 even moderately high $r$ values hit our memory limit.
 For Black-Box P3 this may also be causing increased difficulty in linkage learning as variables
 become indirectly dependent on much larger sets. Furthermore, Black-Box
