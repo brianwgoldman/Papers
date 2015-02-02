@@ -92,8 +92,8 @@ that Gray-Box P3 is effective at finding the global optima even for problems wit
 thousands of variables. This capability is complemented by its efficiency, with
 running time and memory usage decreased by up to a linear factor from Black-Box P3.
 On NKq this results in a x375 speedup for problems with at least 1,000 variables.
-While local search introduces a parameter, we experimentally show this parameter
-can likely be fixed to 1 without significant loss in search quality.
+%While local search introduces a parameter, we experimentally show this parameter
+%can likely be fixed to 1 without significant loss in search quality.
 \end{abstract}
 
 % A category with the (minimum) three required fields
@@ -106,7 +106,7 @@ can likely be fixed to 1 without significant loss in search quality.
 
 \keywords{Local Search; Global Search; Parameter-less}
 
-\newpage
+%\newpage
 
 \section{Introduction}
 
@@ -590,6 +590,13 @@ $r$'s require a large amount of initial partial evaluation before performing hil
 is complete HBHC effectively stalls, with TUX improving at a faster rate. Both are eclipsed by Gray-Box P3,
 which quickly descends to the global optimum, outperforming HBHC and TUX at every point.
 
+Figure~\ref{fig-radius-over} further illustrates the effect of $r$ on Gray-Box P3. On Nearest Neighbor NKq
+and Ising Spin Glasses, increasing $r$ does not change the shape of the curve. Instead the quality reached is simply time shifted,
+such that given more time higher $r$ values will reach the same quality. As a result, for these problems we conclude
+that higher $r$ values simply add more expense for no overall gain.
+On Unrestricted NKq this relationship is less certain, with $r=1$ potentially having a different, and worse, shape than $r>1$.
+However, due to memory and time restrictions it is difficult to know if this trend continues.
+
 \begin{figure*}
   \centering
   \includegraphicswide{radius-over}
@@ -598,14 +605,28 @@ which quickly descends to the global optimum, outperforming HBHC and TUX at ever
   \label{fig-radius-over}
 \end{figure*}
 
-Figure~\ref{fig-radius-over} further illustrates the effect of $r$ on Gray-Box P3. On Nearest Neighbor NKq
-and Ising Spin Glasses, increasing $r$ does not change the shape of the curve. Instead the quality reached is simply time shifted,
-such that given more time higher $r$ values will reach the same quality. As a result, for these problems we conclude
-that higher $r$ values simply add more expense for no overall gain.
-On Unrestricted NKq this relationship is less certain, with $r=1$ potentially having a different, and worse, shape than $r>1$.
-However, due to memory and time restrictions it is difficult to know if this trend continues.
-
 \subsection{Scalability}
+Perhaps the most critical test of an optimization algorithm's quality is
+how it scales as problem difficulty increases. To test this behavior,
+we ran all three algorithms using the optimal $r$ values determined experimentally in Section~\ref{sec-radius}
+varying $N$ from 200 to 10,000 for NKq and 196 to 6,084 for Ising Spin Glass.
+In these plots we also include the black-box version of P3 to show the efficiency
+gains available for using gray-box information.
+
+
+Figure~\ref{fig-length-nn} and Figure~\ref{fig-length-is} show how long each
+algorithm required to reach the best overall quality found on Nearest Neighbor NKq
+and Ising Spin Glasses, respectively. For Nearest Neighbor NKq the best found
+is the global optimum for all runs of all lengths, while for Ising Spin Glasses
+the best quality found by any method was worse than the global optimum in 7 runs of
+$N=4,096$ and 21 runs of $N=6,084$. The median run of the HBHC was unable to reach the best fitness
+for any problems tested using more than 200 bits. TUX performed somewhat better, reaching
+the best fitness on problem sizes up to $N=800$ and $N=625$ for Nearest Neighbor NKq and Ising
+Spin Glass, respectively. Black-Box P3, which does not utilize partial reevaluation or the HBHC,
+was able to consistently reach the best fitness until it it hit the memory limit on $N=2,000$ for
+NKq and $N=2,916$ for Ising Spin Glass. This limitation is due to Black-Box P3's
+\BigO{N^2} memory requirements.
+
 \begin{figure}
   \centering
   \includegraphicsfit{length-nn}
@@ -621,26 +642,6 @@ However, due to memory and time restrictions it is difficult to know if this tre
   on Ising Spin Glass.}
   \label{fig-length-is}
 \end{figure}
-
-Perhaps the most critical test of an optimization algorithm's quality is
-how it scales as problem difficulty increases. To test this behavior,
-we ran all three algorithms using the optimal $r$ values determined experimentally in Section~\ref{sec-radius}
-varying $N$ from 200 to 10,000 for NKq and 196 to 6,084 for Ising Spin Glass.
-In these plots we also include the black-box version of P3 to show the efficiency
-gains available for using gray-box information.
-
-Figure~\ref{fig-length-nn} and Figure~\ref{fig-length-is} show how long each
-algorithm required to reach the best overall quality found on Nearest Neighbor NKq
-and Ising Spin Glasses, respectively. For Nearest Neighbor NKq the best found
-is the global optimum for all runs of all lengths, while for Ising Spin Glasses
-the best quality found by any method was worse than the global optimum in 7 runs of
-$N=4,096$ and 21 runs of $N=6,084$. The median run of the HBHC was unable to reach the best fitness
-for any problems tested using more than 200 bits. TUX performed somewhat better, reaching
-the best fitness on problem sizes up to $N=800$ and $N=625$ for Nearest Neighbor NKq and Ising
-Spin Glass, respectively. Black-Box P3, which does not utilize partial reevaluation or the HBHC,
-was able to consistently reach the best fitness until it it hit the memory limit on $N=2,000$ for
-NKq and $N=2,916$ for Ising Spin Glass. This limitation is due to Black-Box P3's
-\BigO{N^2} memory requirements.
 
 For all sizes of both problems, Gray-Box P3 was the fastest to reach the best fitness. On
 Nearest Neighbor NKq the improvement is very significant, with no alternative finishing within
@@ -658,15 +659,6 @@ find the global optimum by an order of magnitude, with Black-Box P3's mean run f
 results in $p < 10^{-14}$. The regression line suggests that while
 Gray-Box P3 scales at \BigO{N^{3.35}}, Black-Box P3 scales at \BigO{N^{3.05}}.
 
-
-\begin{figure}
-  \centering
-  \includegraphicsfit{length-un}
-  \caption{Relative qualities of each method as problem size increases on Unrestricted NKq
-  with $K=4$.}
-  \label{fig-length-un}
-\end{figure}
-
 As Unrestricted NKq does not have a known global optimum, and the different algorithms
 rarely found the same best fitness, Figure~\ref{fig-length-un} compares the median error
 for each technique at termination. Gray-Box P3 in general finds the best fitness,
@@ -677,6 +669,14 @@ qualities as TUX and Gray-Box P3 when $N=200$, doing so in 4 and 7 runs, respect
 size increase TUX begins to fall behind Gray-Box P3, with the HBHC stabilizing at about 2.5\% worse than
 the best found. Here Black-Box P3 performs worse than the other techniques,
 falling further behind as the problem size increases.
+
+\begin{figure}
+  \centering
+  \includegraphicsfit{length-un}
+  \caption{Relative qualities of each method as problem size increases on Unrestricted NKq
+  with $K=4$.}
+  \label{fig-length-un}
+\end{figure}
 
 \section{Discussion and Conclusions}
 In line with previous work, we have found that HBHC cannot effectively find global optima
