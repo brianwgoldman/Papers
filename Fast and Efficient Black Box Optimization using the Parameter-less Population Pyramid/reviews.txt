@@ -1,0 +1,154 @@
+> When testing the LTGA outside P3 however, the code is still recomputing the entropies to  update the mutual information matrix. This is highly inefficient, the original LTGA only has to recompute the mutual information matrix once in each generation, not whenever a better solution is found.
+> The experiments with LTGA should be run with the original LTGA implementation, not the modified P3 version. The code can be found at  http://homepages.cwi.nl/~bosman/source_code.php
+
+We would like to thank the reviewer for finding this oversight. By moving entropy recalculation out of "add" and into "rebuild_tree" we achieved significant speedup in LTGA's runtime. This was a 2 line fix (cut and paste) which has no effect on evaluation counts. We had done our best to match published work in evaluations, but to our knowledge no wall clock time experiments have been reported for either LTGA or hBOA.
+
+Before starting on this project we had informally requested code from Dr. Bosman and Dr. Thierens, and were told it was not ready for public release. The code this reviewer states we should have used was posted December 22, 2014, over two full months after we submitted our article (October 14, 2014). Similarly, before reimplementing hBOA we requested code from Dr. Pelikan and received no response.
+
+After repairing the entropy calculation mistake, and a few other additional improvements to our code, we were able to reach timing parity with Dr. Bosman's implementation. We have rerun all of our timing results and <TODO updated our findings accordingly>. In general we find that for single instance problems, optimally tuned LTGA finds the global optimum using less seconds than P3. However, on randomly generated problem classes P3's reduction in evaluations overcomes its increased CPU usage per evaluation. <TODO As a result we have changed our conclusions to be that P3 achieved comparable wall clock times.>
+
+> The authors believe it is very important to always run P3 from an initial population of hillclimbed solutions. I explain below this is not always the case, but at least when comparing algorithms one should compare them on an equal footing, so LTGA and hBOA should also be run when started with a initial population of local optima (besides the runs without the initial local search).
+
+Existing literature for both LTGA and hBOA do not integrate local search by default, only when partial evaluations are possible. We are explicitly
+not allowing for partial evaluation, and count every local search evaluation P3 performs just like any other evaluation. Furthermore, in the original submission we cite research that LTGA should not use local search: Bosman and Thierens (2011). Doing as this reviewer suggests would at minimum result in novel research for these existing techniques, when our goal is only to use them as comparisons. Trying both with and without local search populations would double all of our experiments, including population size tuning, and represent even more problem specific bias in their favor. Therefore, we feel this is an unreasonable request.
+
+> P3 seems to be very noisy in its results: the paper only reports median results after 100 runs. More information about variance and outliers (e.g. through boxplots) should be shown for at least one hard problem, for instance spin glasses.
+
+In the original submission Section 9.1 explicitly discusses the variance in outcomes, and Figure 10 shows the upper and lower quartiles (just as boxplots do) for all 7 problems. <TODO Should we add a boxplot for outliers?>
+
+> P3 stores all improving solutions ever found in a huge hash table. It should be reported how many solutions are typically stored and again what is the variance in these numbers. We have found that this varies a lot.
+
+While the original work did not report the aggregate value, you can estimate it in the original submission using the area under each curve in Figure 13a. <TODO We have added a boxplot to show variances, with LTGA plotted for perspective>
+
+> My main point would be that their paper shows that the EA community should rethink its population management scheme and not blindly follow the fixed population size generational scheme.
+
+In the original submission Section 9, Section 10.2,  Figure 11, and Figure 13a explicitly discuss the benefits we believe P3 achieves due to side stepping the fixed size generational scheme. We also had previously mentioned it in the third paragraph of the conclusion. <TODO We have now added some additional references and discussion expanding those sections.>
+
+> [For local search] Other problems do not allow this fast incremental fitness calculation and then it depends on the fitness landscape whether it is useful or not.
+
+In this work we do not make use of incremental fitness, and across our 7 problems using local search did not negatively impact P3's evaluation counts enough to make it perform worse than the comparisons which do not. While we respect the reviewers argument that it is a design choice, we have chosen that by default P3 includes local search. Applying it in a problem specific way introduces undesirable user configuration.
+
+> we have recently looked at a network transmission problem where flipping bits - even swapping bits - did not make any fitness difference at all, so all the local search steps are completely a waste of computing time.
+
+Unless a landscape is entirely flat, there must exist points which can be improved by local search. Note that we are only using local search from randomly initialized points, making the likelihood of improvement much higher. However, we do explicitly test on a landscape where local search is very unhelpful (Deceptive Step Trap), and still perform better than comparison algorithms which are not using local search. Note that on Deceptive
+Step Trap with s=2 half of all trap settings are local optima, and the rest can be brought to a local optima using a single bit flip.
+
+> P3's LTGA however will keep searching for another donor solution until a donor with different  gene values at the linkage set is found. This becomes very expensive when the population is starting to convergence on certain solutions, since now the search for donors often requires to go through the entire population only to realize there simply is no donor in the population that has different gene values at that linkage set.
+
+To be clear, our LTGA implementation does not perform repeated donor search. However, P3 does perform repeated donor search. The original submission makes this clear in Section 3, and discusses the effects in Section 8.1 and Figure 8b. This shows that in the worst case this decision results in on average less than a 7x increase in donations. There is no reason to believe the computational expense of repeated donations will outweigh the cost of model rebuilding, however we believe it does reduce evaluation counts.
+
+> Only strictly better solutions are excepted: this is a big problem for LTGA with (at least) MAXSAT, see  "On the usefulness of linkage processing for solving MAX-SAT" (GECCO 2013). I wonder how P3 would do on MAXSAT when allowing equal solutions.
+The LTGA part within P3 might do better but the number of stored solutions probably will run behind control.
+
+We are already allowing for neutral changes to solutions in both LTGA and P3. In Section 2.5 of the original submission we state "If the crossover resulted in no worse fitness then the changes are kept." The source of the confusion is likely that after crossover is complete, P3 only stores the solution if it is a strict improvement over the last time it was stored. This has no impact on LTGA.
+
+> The abstract states that P3 requires "less wall clock seconds" and "is more effective than existing state-of-the-art techniques".
+
+<TODO Updated to reflect new timing results>
+
+> Self-adaptation has been around since the '70's in Evolution Strategies.
+
+<TODO Updated to older reference.>
+
+> RRHC is used very often in the past, you cannot refer to it in this way.
+
+<TODO We have updated the text to clarify that we are referring to a specific RRHC and not suggesting it was the first RRHC>
+
+>"Doerr et al. (2013) presented the first genetic algorithm to provably show the advantage of performing crossover on simple landscapes."
+I understand some people have a very restricted view on provably showing something but this statement is arguably wrong.
+
+<TODO Cleaned up the description to be less offensive.>
+
+> It is not updating the model, it is completely rebuilding an O(L^2) linkage tree model 
+
+<TODO Replaced "updating" with "rebuilding">
+
+> naively implemented it is O(L^3) !!!
+
+This seems irrelevant as we provide citations and code for how to do it efficiently.
+
+> "Furthermore, unlike LTGA all solutions in the population are used to generate the model, not just the winners of a binary tournament".
+This is not a major design choice, this only influences the selection pressure. Actually, the most recent papers report all experiments with LTGA using the entire population instead of a set of selected solutions.
+
+As discussed in Section 2.5 we are aware that there are many variants of LTGA. However, for clarity and to perform experiments we had to choose a reference version, and Thierens and Bosman (2013) uses binary tournament.
+
+> Fig. 4: ITERATE-P3, line 12: the model rebuilding should be stated here.
+
+Model rebuilding is part of adding solutions to a Pyramid level (which is what the line currently says), along with extracting pairwise frequency. We feel the purpose of this figure is to express how P3 deviates from generational search.
+
+> We have seen problems where smallest first is not better. Basically any a priori ordering represents a bias to the LTGA search algorithm.
+
+We are not arguing that smallest first will find the global optimum faster than other orderings for all problems, just that it has desirable diversity preservation features which are problem independent.
+
+> "This function modifies the results of Equation 4 to include plateaus of size s, introducing an exponential number of local optima in each trap."
+Exponential number ? Clarify with a small example of Deceptive Step Trap.
+
+For k=7 and s=2, all traps with 0, 1, 3, 5, and 7 bits set are local optima. This means that half of all ways to set the trap are 1 bit local optima. This holds true as trap size increases, meaning the number of local optima grows at 2^{k-1}+1.
+
+> HIFF: needs a reference to Watson
+
+<TODO Add reference>
+
+> Equation (6): what is A ?
+
+<TODO A=10>
+
+> Figure 5(b): The performance of LTGA on MaXSat is weird: see  "On the usefulness of linkage processing for solving MAX-SAT" (GECCO 2013).
+
+The difference between that paper and ours is that we require LTGA to reliably reach the global optimum, not just high quality solutions. From their results it does not appear that LTGA reliably reaches the global optimum in the black box setting or without the inclusion of GSAT / WalkSAT.
+
+> "To ensure each problem is challenging we chose a clause to variable ratio of 4.27"
+Reference to support this number.
+
+<TODO Added>
+
+> Figure 8: This is a confusing figure: please elaborate.
+
+<TODO We have added more explanation about the figure and its corresponding conclusions>
+
+> "An important note is that each donation may range in size from a single bit up to N &#8722; 1, with smaller donations far more likely to result in repeated attempts. As such this may cause some super-linear growth in P3, but its unlikely to be very high."
+Speculative ?
+
+Due to the tree structure there are more small clusters than large ones. The nested nature of clusters means that if most solutions agree for a large cluster, at least that many solutions must agree for both of its subset clusters. As to the super-linear growth, we draw that conclusion from Figure 8b and its discussion.
+
+> " In total these runs took over 6 computing years to complete."
+This is huge and in no way comparable to how fast our experiments with LTGA are.
+
+In our original submission 95% of all computing time was used by hBOA and Parameter-less hBOA. The other 4 algorithms combined took less than 100 days to complete. After fixing our LTGA inefficiency and rerunning on uniform, modern hardware, the non hBOA algorithms took in total 31 days of computing to complete 124 trillion evaluations.
+
+> How can this be only a constant factor, when P3 uses a O(L^2) operation each time an improved solution is found (= thousands of times) versus only a dozen O(L^2) operations for LTGA ???
+
+This is covered in detail in the original submission, Section 2.4 and 2.5, in discussing amortized run time. The run time bottleneck for LTGA is extracting pairwise frequency information which requires O(mu*N^2) time per generation. This happens approximately once every mu*N evaluations, meaning the time per evaluation is (mu*N^2) / (N^2) = O(N). In P3 both entropy extraction and model rebuilding is O(N^2) and must be done every O(N) evaluations, meaning the time per evaluation is N^2 / N = O(N). Therefore, excluding caveats mentioned in the paper, the two techniques should be within a constant factor runtime of each other. This relationship in general holds true for our updated experiments.
+
+> "There is some evidence that even when compared on wall clock time, P3 performs at least as well as the best comparison techniques"
+
+<TODO Updated to suggest P3 is only comparable, not better.>
+
+> "While asymptotically linear"   Linear in what ?
+
+<TODO Clarified.>
+
+> Do not refer to TRs, refer to actual publications.
+
+<TODO Fixed.>
+
+> Add a reference, important modifications of LTGA you use were first published in:...
+
+<TODO Added.>
+
+================================= Reviewer 2 ===========================================
+> My only gripe is that all algorithms are compared according to their median results and it would be nice to see at least a discussion of what this implies in terms of statistical significance.
+
+<TODO Added explanation for why medians are the correct choice here. Added statistical tests to data from Figure 6.>
+
+> Last sentence of section 1, penultimate clause doesn't have  verb in it. I suggest you rephrase as " ...; analyse the algorithm complexity; 
+
+<TODO Fixed>
+
+> Around equation (1) you need to state what m(i), m(i,l), l' and l'' denote rather than leaving the reader to find those in the appendix.
+
+<TODO Added.>
+
+> Section 8.2.1 uses the phrase "significantly worse".  This suggests that you have some specific confidence in the results according to some hypothesis testing method.  Please clarify or rephrase.
+
+<TODO Rephrased to avoid conflation with statistics as this is not something you can test statistically.>
