@@ -1,0 +1,240 @@
+\documentclass[]{article}
+\usepackage{hyperref}
+
+\begin{document}
+
+We would like to first take the opportunity to thank our reviewers for their thorough and insightful comments. It is for this reason, the review process and diligent reviewers, that papers are of such high quality in Evolutionary Computation.
+
+We believe that the comments can be broken into three classes:
+\begin{itemize}
+\item Errors in the paper that need correcting
+\item Minor fixes/modifications that we can implement.
+\item Items of disagreement
+\end{itemize}
+
+\section{Errors}
+\begin{quote}
+ When testing the LTGA outside P3 however, the code is still recomputing the entropies to update the mutual information matrix. This is highly inefficient, the original LTGA only has to recompute the mutual information matrix once in each generation, not whenever a better solution is found. The experiments with LTGA should be run with the original LTGA implementation, not the modified P3 version. The code can be found at \url{http://homepages.cwi.nl/~bosman/source_code.php}
+\end{quote}
+
+This was indeed an error on our part. Unfortunately the source code was not made available to us, despite a request, and the code was not yet released to the public until after the paper was submitted. The fix, a two line modification, does not affect any of the evaluation counts but does indeed modify our timed comparisons (wall clock time experiments). Subsequently, after repairing the entropy calculation, we were able to reach timing parity with Dr. Bosman's implementation. We have rerun all of our timing results and <TODO updated our findings accordingly>. In general we find that for single instance problems, optimally tuned LTGA (where we of course do not count the evaluations or timing necessary to find the optimal population size) finds the global optimum using less seconds than P3. However, on randomly generated problem classes P3's reduction in evaluations overcomes its increased CPU usage per evaluation. We have updated our figures and discussion to reflect these changes.
+
+\section{Fixes}
+\subsection{Reviewer 1}
+\begin{itemize}
+
+\item
+\begin{quote}
+P3 seems to be very noisy in its results: the paper only reports median results after 100 runs. More information about variance and outliers (e.g. through boxplots) should be shown for at least one hard problem, for instance spin glasses. 
+\end{quote}
+
+In the original submission Section 9.1 explicitly discusses the variance in outcomes, and Figure 10 shows the upper and lower quartiles (just as boxplots do) for all 7 problems. We have, however, added a boxplot in this section to reflect this idea more clearly
+
+\item
+\begin{quote}
+P3 stores all improving solutions ever found in a huge hash table. It should be reported how many solutions are typically stored and again what is the variance in these numbers. We have found that this varies a lot. 
+\end{quote}
+
+While the original work did not explictly report the aggregate value, you can estimate it in the original submission using the area under each curve in Figure 13a. We have added text to the Figure caption to reflect this
+
+\item
+\begin{quote}
+My main point would be that their paper shows that the EA community should rethink its population management scheme and not blindly follow the fixed population size generational scheme.
+\end{quote}
+
+We agree, though our overall point is more general in that we are trying to get the community to rethink \textbf{all} parameter settings. In the original submission Section 9, Section 10.2,  Figure 11, and Figure 13a explicitly discuss the benefits we believe P3 achieves due to side stepping the fixed size generational scheme. We also had previously mentioned it in the third paragraph of the conclusion. Nonetheless, we have now added some additional references and discussion expanding those sections
+
+\item
+\begin{quote}
+The abstract states that P3 requires "less wall clock seconds" and "is more effective than existing state-of-the-art techniques".
+\end{quote}
+
+This has been updated based on the new timing results
+
+\item
+\begin{quote}
+ Self-adaptation has been around since the '70's in Evolution Strategies.
+\end{quote}
+
+Quite true. We have updated to more appropriate references.
+
+\item
+\begin{quote}
+RRHC is used very often in the past, you cannot refer to it in this way.
+\end{quote}
+
+We have updated the text to clarify that we are referring to a specific RRHC and not suggesting it was the first RRHC
+
+\item
+\begin{quote}
+"Doerr et al. (2013) presented the first genetic algorithm to provably show the advantage of performing crossover on simple landscapes."
+I understand some people have a very restricted view on provably showing something but this statement is arguably wrong.
+\end{quote}
+
+We did not intend to be offensive and have cleaned up that text.
+
+\item
+\begin{quote}
+It is not updating the model, it is completely rebuilding an $O(L^2)$ linkage tree model 
+\end{quote}
+
+Replaced "updating" with "rebuilding"
+
+\item
+\begin{quote}
+"Furthermore, unlike LTGA all solutions in the population are used to generate the model, not just the winners of a binary tournament".
+This is not a major design choice, this only influences the selection pressure. Actually, the most recent papers report all experiments with LTGA using the entire population instead of a set of selected solutions.
+\end{quote}
+
+As discussed in Section 2.5 we are aware that there are many variants of LTGA. However, for clarity and to perform experiments we had to choose a reference version, and Thierens and Bosman (2013) uses binary tournament. We updated the wording to indicate there are other versions.
+
+\item
+\begin{quote}
+Fig. 4: ITERATE-P3, line 12: the model rebuilding should be stated here.
+\end{quote}
+
+Though we have stated previously that adding to the pyramid triggers modelbuilding, we have added text to the figure to restate it.
+
+\item
+\begin{quote}
+We have seen problems where smallest first is not better. Basically any a priori ordering represents a bias to the LTGA search algorithm.
+\end{quote}
+
+Our argument is not that smallest first is the \textit{best}, only that it has desirable diversity preservation features which are problem independent.
+
+\item
+\begin{quote}
+ "This function modifies the results of Equation 4 to include plateaus of size s, introducing an exponential number of local optima in each trap."
+Exponential number ? Clarify with a small example of Deceptive Step Trap.
+\end{quote}
+
+We have added the following text for clarity. 
+For k=7 and s=2, all traps with 0, 1, 3, 5, and 7 bits set are local optima. This means that half of all ways to set the trap are 1 bit local optima. This holds true as trap size increases, meaning the number of local optima grows at $2^{k-1}+1$
+
+\item
+\begin{quote}
+HIFF: needs a reference to Watson
+\end{quote}
+
+Done
+
+\item
+\begin{quote}
+Equation (6): what is A ?
+\end{quote}
+
+A= 10 (updated in paper)
+
+\item
+\begin{quote}
+"To ensure each problem is challenging we chose a clause to variable ratio of 4.27"
+Reference to support this number.
+\end{quote}
+
+Added 
+
+\item
+\begin{quote}
+Figure 8: This is a confusing figure: please elaborate.
+\end{quote}
+
+It is a busy figure. We have added more about the figure and its conclusions to the text.
+
+\item
+\begin{quote}
+ "An important note is that each donation may range in size from a single bit up to N-1, with smaller donations far more likely to result in repeated attempts. As such this may cause some super-linear growth in P3, but its unlikely to be very high."
+Speculative ?
+\end{quote}
+
+Due to the tree structure there are more small clusters than large ones. The nested nature of clusters means that if most solutions agree for a large cluster, at least that many solutions must agree for both of its subset clusters. As to the super-linear growth, we draw that conclusion from Figure 8b and its discussion.
+
+\item
+\begin{quote}
+" In total these runs took over 6 computing years to complete."
+\end{quote}
+
+The quote is correct, but being taken slightly out of context. This is the report for \textbf{all} runs. In our original submission 95\% of all computing time was used by hBOA and Parameter-less hBOA. The other 4 algorithms combined took less than 100 days to complete. After fixing our LTGA inefficiency and rerunning on uniform, modern hardware, the non hBOA algorithms took in total 31 days of computing to complete 124 trillion evaluations.
+
+We have updated the text to distinguish the different algorithm classes.
+
+\item
+\begin{quote}
+How can this be only a constant factor, when P3 uses a $O(L^2)$ operation each time an improved solution is found (= thousands of times) versus only a dozen $O(L^2)$ operations for LTGA ???
+\end{quote}
+
+This is covered in the original text, Section 2.4 and 2.5. However, to review, the run time bottleneck for LTGA is extracting pairwise frequency information which requires $O(mu*N^2)$ time per generation. This happens approximately once every $mu*N$ evaluations, meaning the time per evaluation is $(mu*N^2) / (N^2) = O(N)$. In P3 both entropy extraction and model rebuilding is $O(N^2)$ and must be done every $O(N)$ evaluations, meaning the time per evaluation is $N^2 / N = O(N)$. Therefore, excluding caveats mentioned in the paper, the two techniques should be within a constant factor runtime of each other. This relationship in general holds true for our updated experiments. 
+
+
+\item
+\begin{quote}
+ "There is some evidence that even when compared on wall clock time, P3 performs at least as well as the best comparison techniques"
+\end{quote}
+
+Fixed based on the algorithmic fix. Now ``comparable'' instead of ``better''
+
+\item
+\begin{quote}
+"While asymptotically linear"   Linear in what ?
+\end{quote}
+
+Fixed
+
+\item
+\begin{quote}
+ Do not refer to TRs, refer to actual publications.
+\end{quote}
+
+Removed
+
+\item
+\begin{quote}
+Add a reference, important modifications of LTGA you use were first published in:...
+\end{quote}
+
+Done
+\end{itemize}
+
+\subsection{Reviewer 2}
+\begin{itemize}
+
+\item
+\begin{quote}
+My only gripe is that all algorithms are compared according to their median results and it would be nice to see at least a discussion of what this implies in terms of statistical significance.
+\end{quote}
+
+Added explanation for why medians are the correct choice here. Added statistical tests to data from Figure 6.
+
+\item
+\begin{quote}
+Last sentence of section 1, penultimate clause doesn't have  verb in it. I suggest you rephrase as " ...; analyse the algorithm complexity; 
+\end{quote}
+
+Fixed
+
+\item
+\begin{quote}
+Around equation (1) you need to state what m(i), m(i,l), l' and l'' denote rather than leaving the reader to find those in the appendix.
+\end{quote}
+
+\item
+\begin{quote}
+Section 8.2.1 uses the phrase "significantly worse".  This suggests that you have some specific confidence in the results according to some hypothesis testing method.  Please clarify or rephrase.
+\end{quote}
+
+You are correct, you cannot test that statistically. Rephrased to avoid that impression.
+
+\end{itemize}
+
+\section{Disagreements}
+
+There is some disagreement, reflected in multiple comments, that local search is either unnecessary or an unfair advantage when used in P3. Our view is this.
+
+We have explained that, for the particular situation in the bottom pyramid level, before a randomly generated solution is added to that level, that solution should be hill climbed. Our reasoning is straightforward; a randomly generated solution is unlikely to have any useful linkage information to be incorporated into that level. Once hill-climbed, that solution is more likely to provide useful linkage information to that bottom level. There is no guarantee that \textbf{every} such hill-climbed solution will be improved, and to the extent that it is not the erroneous linkage information added at the bottom level will need to be repaired at higher levels.  The bottom line is that local search, in this particular role, is a fundamental aspect of P3 and P3's performance as we see it. 
+
+When we count evaluations and wall-clock time, we include the local search performance. That is, we are explicitly not allowing for partial evaluations, and count every local search evaluation P3 performs just like any other evaluation. Thus our timings and evaluations are fair and accurate.
+
+Our job, as algorithm designers, is to compare our approach against the best possible competing algorithms and report how our approach fares. We have taken, to the best of our ability using available published resources, those best algorithms and  P3 and compare them each against a rigourous set of problems. In fact, we feel we went quite a bit out of our way to \textbf{tune} these algorithms so that we may compare on the best possible footing, in other words to be fair.
+
+Our jobs is not to speculate on possible changes to these algorithms and how, given those changes, the ``new and improved'' algorithms might perform. If subsequent researchers wish to do so, we welcome their work. In fact, we hope that this paper inspires others to go in new directions (paramaterless algorithms, local search integration regardless of problem, etc.)
+
+\end{document}  
