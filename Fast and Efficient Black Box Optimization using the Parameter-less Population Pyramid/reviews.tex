@@ -216,6 +216,8 @@ Fixed
 Around equation (1) you need to state what m(i), m(i,l), l' and l'' denote rather than leaving the reader to find those in the appendix.
 \end{quote}
 
+Done
+
 \item
 \begin{quote}
 Section 8.2.1 uses the phrase "significantly worse".  This suggests that you have some specific confidence in the results according to some hypothesis testing method.  Please clarify or rephrase.
@@ -229,12 +231,26 @@ You are correct, you cannot test that statistically. Rephrased to avoid that imp
 
 There is some disagreement, reflected in multiple comments, that local search is either unnecessary or an unfair advantage when used in P3. Our view is this.
 
-We have explained that, for the particular situation in the bottom pyramid level, before a randomly generated solution is added to that level, that solution should be hill climbed. Our reasoning is straightforward; a randomly generated solution is unlikely to have any useful linkage information to be incorporated into that level. Once hill-climbed, that solution is more likely to provide useful linkage information to that bottom level. There is no guarantee that \textbf{every} such hill-climbed solution will be improved, and to the extent that it is not the erroneous linkage information added at the bottom level will need to be repaired at higher levels.  The bottom line is that local search, in this particular role, is a fundamental aspect of P3 and P3's performance as we see it. 
+We have explained that, for the particular situation in the bottom pyramid level,
+before a randomly generated solution is added to that level, that solution should be hill climbed.
+Our reasoning is straightforward; a randomly generated solution is unlikely to
+have any useful linkage information to be incorporated into that level.
+Once hill-climbed, that solution is more likely to provide useful linkage information to that bottom level.
+This is true even for problems with large fitness plateaus, such as Deceptive Step Trap.
+As such we feel the application of local search should be considered the standard approach
+with P3, only to be removed under exceptional circumstances.
 
 When we count evaluations and wall-clock time, we include the local search performance. That is, we are explicitly not allowing for partial evaluations, and count every local search evaluation P3 performs just like any other evaluation. Thus our timings and evaluations are fair and accurate.
 
-Our job, as algorithm designers, is to compare our approach against the best possible competing algorithms and report how our approach fares. We have taken, to the best of our ability using available published resources, those best algorithms and  P3 and compare them each against a rigourous set of problems. In fact, we feel we went quite a bit out of our way to \textbf{tune} these algorithms so that we may compare on the best possible footing, in other words to be fair.
+Our job, as algorithm designers, is to compare our approach against the best possible competing algorithms
+and report how our approach fares. We have taken, to the best of our ability using available published resources,
+those best algorithms and compared them with P3 on a rigorous set of problems.
+We went out of our way to tune these algorithms
+so that we may compare on the best possible footing, giving them an advantage not available to P3.
 
-Our jobs is not to speculate on possible changes to these algorithms and how, given those changes, the ``new and improved'' algorithms might perform. If subsequent researchers wish to do so, we welcome their work. In fact, we hope that this paper inspires others to go in new directions (paramaterless algorithms, local search integration regardless of problem, etc.)
+However, adding initial local search as a tunable parameter to hboa and LTGA when partial evaluations are not available is not part
+of existing work for either method. Doing so would represent novel research outside the scope of our topic, and provide those techniques
+with even more problem specific configuration. We welcome future work by other researchers exploring the possible effects of combining
+local search with their techniques.
 
-\end{document}  
+\end{document}

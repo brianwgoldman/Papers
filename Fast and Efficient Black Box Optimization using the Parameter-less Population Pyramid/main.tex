@@ -107,7 +107,7 @@ to achieve parameter-less optimization. Initial results suggest that unlike
 previous parameter-less methods, P3 is actually more efficient than current state-of-the-art
 parameterized search algorithms. In this work we shall: extend these results to cover more
 comparison algorithms; compare both efficiency in reaching the global optimum and intermediate
-fitnesses; algorithm complexity analysis; and provide more in depth analysis of P3 itself.
+fitnesses; analyze algorithm complexity; and provide more in depth analysis of P3 itself.
 
 \section{Comparison Optimizers}
 \label{sec-optimizers}
@@ -242,7 +242,11 @@ $x_j = 1$ move to the other.
 This goal is formalized using model scoring from Bayesian statistics. In its raw form this
 almost always creates near infinitesimal results, calculating fractions which include factorials of $\mu$
 and products over $N$. However, through algebraic manipulation discussed in Appendix~\ref{sec-appendix}, we
-derived a simplified form shown in Equation~\ref{eq-hboa-final}. If no proposed split satisfies the inequality, iteration stops.
+derived a simplified form shown in Equation~\ref{eq-hboa-final}.
+Here $l$ is a leaf in tree $i$, with $l'$ and $l''$ the results of splitting $l$. $m_i(l)$ is the number
+of solutions which reach $l$ and $m_i(x_i, l)$ is the number of solutions which reach $l$ with the given value
+for $x_i$.
+If no proposed split satisfies the inequality, iteration stops.
 If multiple splits do, whichever maximizes the right side is chosen.
 
 \begin{equation}
@@ -464,7 +468,7 @@ or populations, meaning the user does not need to specify a population size.
     \State Create random solution
     \State Apply hill climber
     \If{solution $\notin hashset$}
-      \State Add solution to $P_0$
+      \State Add solution to $P_0$ and rebuild model
       \State Add solution to $hashset$
     \EndIf
 
@@ -472,7 +476,7 @@ or populations, meaning the user does not need to specify a population size.
       \State Mix solution with $P_i$
       \If{solution's fitness has improved}
         \If{solution $\notin hashset$}
-          \State Add solution to $P_{i+1}$
+          \State Add solution to $P_{i+1}$ and rebuild model
           \State Add solution to $hashset$
         \EndIf
       \EndIf
@@ -735,6 +739,8 @@ configurations. hBOA, LTGA, and Parameter-less hBOA only outperform P3 on the sm
 Step Trap instances, respectively. Random Restart Hill Climbing outperforms P3 on the smallest 3 Nearest Neighbor NK instances
 and the smallest Ising Spin Glass. $1+(\lambda, \lambda)$ has the most success outperforming P3, doing so
 on the smallest 5 Deceptive Traps, 3 smallest Deceptive Step Traps, and 2 smallest Rastrigin.
+Pairwise comparison of LTGA and P3 on the largest problem size using the Mann-Whitney~U test results in
+$p < 10^{-5}$ for all problems.
 
 \subsection{Local Search}
 The Random Restart Hill Climber and $1+(\lambda, \lambda)$ are both relatively effective on small problem
@@ -945,10 +951,10 @@ the size of the dataset and the general regularity in the results some general c
 can still be made.
 
 \subsubsection{Model Building}
-hBOA and Parameter-less hBOA perform significantly worse when using wall clock time as the unit of comparison than when using
+hBOA and Parameter-less hBOA perform much worse when using wall clock time as the unit of comparison than when using
 evaluations. This makes sense as hBOA's model building requires $\Omega(N^2)$ time per evaluation while, under reasonable
 assumptions, P3 and LTGA require $O(N)$ time per evaluation. This penalty is most clear on Ising Spin Glass where
-hBOA goes from being slightly more efficient than LTGA in terms of evaluations to significantly worse in terms of seconds.
+hBOA goes from being slightly more efficient than LTGA in terms of evaluations to three orders of magnitude worse in terms of seconds.
 As P3 and LTGA require a similar asymptotic complexity per
 evaluation as the Hill Climber and $1+(\lambda, \lambda)$, no similar change in ordering occurs.
 
@@ -965,6 +971,28 @@ the results from Figure~\ref{fig-evals-to-success} under the assumption that P3'
 than LTGA but by no more than a constant factor.
 
 \section{Population Sizing}
+\begin{figure}[t]
+  \begin{centering}
+    \begin{subfigure}{.5\textwidth}
+      \begin{centering}
+        \includegraphicsfit{pop-p3}
+      \end{centering}
+      \caption{As problem size increases}
+      \label{fig-pop-p3}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+      \begin{centering}
+        \includegraphicsfit{solutions-stored}
+      \end{centering}
+      \caption{Largest problem size}
+      \label{fig-solutions-stored}
+    \end{subfigure}
+  \end{centering}
+  \caption{The total number of solutions stored by P3 when the global optimum is found.
+           In Figure~\ref{fig-solutions-stored} the red ``+'' indicates LTGA's tuned population size.}
+  \label{fig-p3-storage}
+\end{figure}
+
 A major advantage to P3 is that it does not require the user to set a population size parameter.
 Beyond making P3 easier to apply, this also conveys two additional advantages: diversity scaled
 to initialization and no need to sacrifice intermediate fitness for eventual optimality.
@@ -986,11 +1014,11 @@ much larger than the best random initialization.
 
 \begin{figure}
   \begin{center}
-  \includegraphicsfit{evals-to-success-range}
+  \includegraphicsfit{evals-to-success-boxplot}
   \end{center}
   \caption{Comparison of the upper and lower quartiles of evaluations required
            to reach the global optimum for P3 and LTGA with respect to problem size.}
-  \label{fig-evals-to-success-range}
+  \label{fig-evals-to-success-boxplot}
 \end{figure}
 
 
