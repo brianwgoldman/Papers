@@ -85,6 +85,8 @@ expensive parameter tuning~\citep{grefenstette:1986:optimalga} are required to l
 this feature to its fullest potential. Furthermore,  parameters such as population size, mutation rate, crossover
 rate, tournament size, etc. usually have no clear relationship to the problem being solved, meaning even
 domain experts may not understand how the parameters will interact with the problem or with each other.
+To further complicate matters, there is mounting evidence that parameter values should change
+during search~\citep{goldman:2011:dynamic-parameters,laporte:2014:adaptivepop}.
 
 There have been periodic efforts to reduce or remove the need for parameter tuning.
 \cite{rechenberg:1973:es} introduced self-adaptive parameters, in which parameter values
@@ -901,7 +903,7 @@ we provide data on both its algorithmic complexity and wall clock time.
       \label{fig-donations}
     \end{subfigure}
   \end{centering}
-  \caption{Computation costs incurred by model rebuilding (Figure~\ref{fig-rebuilds}) and
+  \caption{Estimated computation costs incurred by model rebuilding (Figure~\ref{fig-rebuilds}) and
            repeated donations (Figure~\ref{fig-donations}) per evaluation as problem size increases.}
   \label{fig-costs}
 \end{figure}
@@ -912,8 +914,8 @@ provides some insight into how often these two aspects of the algorithm are util
 
 Figure~\ref{fig-rebuilds} reports in an algorithmic sense how expensive model rebuilding is for search.
 In order to calculate this value we recorded how many times search rebuilt the model during each run.
-Under the minimal assumption that an evaluation costs $\Omega(N)$ time and that model rebuilds cost $O(N^2)$,
-Figure~\ref{fig-rebuilds} shows the ratio cost of model rebuilding per evaluation. If the cost of model building
+Figure~\ref{fig-rebuilds} shows the estimated ratio of model rebuilding cost ($N^2$ per rebuild) over evaluation cost ($N$ per evaluation).
+If the cost of model building
 scaled linearly with evaluations, the relationship plotted for each problem should be asymptotically constant.
 For Nearest Neighbor NK, Ising Spin Glasses, and Rastrigin this is the case. For both Trap problems
 and HIFF there is slow growth in the ratio. The problem sizes used for MAX-SAT were not sufficient
@@ -1107,8 +1109,8 @@ on Deceptive Step Trap and Ising Spin Glasses, as hBOA's tuned population overta
   \label{fig-small-pop}
 \end{figure}
 
-Figure~\ref{fig-small-pop} examines the effect of population size on LTGA's intermediate fitness by examining the effect
-of reducing LTGA's population size to one tenth of the tuned value. The two problems shown are representative of the behavior of using
+Figure~\ref{fig-small-pop} examines the effect of population size on LTGA's intermediate fitness by
+reducing LTGA's population size to one tenth of the tuned value. The two problems shown are representative of the behavior of using
 a smaller population size on the other five problems. Reducing the population size caused LTGA to improve earlier but plateau
 at lower fitnesses. This caused LTGA's success rate to drop from 100 to 0 on Deceptive Step Trap and from 98 to 68 on Nearest
 Neighbor NK.
