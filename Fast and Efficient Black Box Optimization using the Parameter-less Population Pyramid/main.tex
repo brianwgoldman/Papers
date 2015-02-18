@@ -46,7 +46,7 @@ previously learned information before adding more diversity.
 
 Across seven problems, each tested using on average 18 problem sizes, P3 outperformed
 all five advanced comparison algorithms. This improvement includes requiring less evaluations
-and less wall clock seconds to find the global optimum and better fitness when using
+to find the global optimum and better fitness when using
 the same number of evaluations. Using both algorithm analysis and comparison we find P3's
 effectiveness is due to its ability to properly maintain, add, and exploit diversity.
 
@@ -87,7 +87,7 @@ rate, tournament size, etc. usually have no clear relationship to the problem be
 domain experts may not understand how the parameters will interact with the problem or with each other.
 
 There have been periodic efforts to reduce or remove the need for parameter tuning.
-\cite{Back:1992:selfadapt} introduced self-adaptive parameters, in which parameter values
+\cite{rechenberg:1973:es} introduced self-adaptive parameters, in which parameter values
 were included in each solution's genome and themselves underwent evolution. This allowed search
 to optimize some of its own parameters resulting in a reduced the need for expert tuning.
 \cite{harik:1999:parameterlessga} were able to design an entirely parameter-less GA by
@@ -113,10 +113,10 @@ fitnesses; analyze algorithm complexity; and provide more in depth analysis of P
 \label{sec-optimizers}
 
 In order to fully understand the effectiveness of P3, we compare it with five advanced algorithms which
-have related features to P3. The Random Restart Hill Climber~\citep{goldman:2014:p3} was chosen as an efficient form of repeated
+have related features to P3. The Random Restart Hill Climber defined by ~\cite{goldman:2014:p3} was chosen as an efficient form of repeated
 local search. As P3 combines this hill climber with crossover,
 comparing with local search alone shows the advantages of P3's overall approach.
-The $1+(\lambda, \lambda)$ algorithm is the current best theory supported simple genetic algorithm
+The $1+(\lambda, \lambda)$ algorithm~\citep{doerr:2013:lambdalambda} is the current best theory supported simple genetic algorithm
 and its method of crossover is in some sense a macro-mutation just as in P3. hBOA and Parameter-less
 hBOA are advanced model building search techniques which are very effective at learning complex
 problem structure, designed to achieve similar goals as P3's linkage learning but using very different
@@ -186,7 +186,7 @@ ensures that on all landscapes there is always a non-zero probability of search 
 
 \subsection{$1+(\lambda, \lambda)$}
 \cite{doerr:2013:lambdalambda} presented the first genetic algorithm to provably show
-the advantages of performing crossover on simple landscapes. This comparatively simple
+the advantages of performing crossover on One Max. This comparatively simple
 algorithm maintains only a single individual and a self-controlled parameter $\lambda$.
 
 Each iteration, the number of bits to flip is chosen from the binomial distribution $b\sim B(N, \frac{\lambda}{N})$,
@@ -312,7 +312,7 @@ evaluations~\citep{pelikan:1999:worstparameter-less}.
 detects and exploits problem epistasis by examining pairwise gene entropy. Due to its enhanced
 ability to preserve high fitness gene subsets, LTGA was able to outperform state-of-the-art
 GAs across many benchmarks. Since its introduction, many variants of LTGA have been
-proposed~\citep{goldman:2012:ltga} so for clarity we have chosen the version
+proposed~\citep{thierens:2011:gomea,goldman:2012:ltga} so for clarity we have chosen the version
 presented by \cite{thierens:2013:ltgahiff} as our model.
 
 LTGA's effectiveness comes from its method of performing crossover. Instead of blindly
@@ -492,9 +492,9 @@ or populations, meaning the user does not need to specify a population size.
 To accommodate P3's unique population structure, some of LTGA's clustering procedures were modified. In LTGA,
 clusters are identified at the start of each generation and are used
 to create all offspring in that generation. As P3 does not perform serial
-generations, P3 instead updates the model each
+generations, P3 instead rebuilds the model each
 time a solution is added to a population. Furthermore, unlike
-LTGA all solutions in the population are used to generate the model, not just the
+our chosen variant of LTGA, all solutions in the population are used to generate the model, not just the
 winners of a binary tournament. We can do this because even the
 worst solutions in the pyramid are already high quality due to local search.
 Using local search in LTGA was examined by \cite{bosman:2011:lsbbo} and found
@@ -506,10 +506,9 @@ LTGA's version of \Call{Cluster-Creation}{} and \Call{Cluster-Usage}{}.
 P3 changes Line~\ref{fig-cluster-creation-ordering} in Figure~\ref{fig-cluster-creation}
 from \emph{last merged first} ordering to \emph{smallest first} ordering.
 This method applies gene clusters during crossover based on how many genes
-are in each cluster\footnote{Ties are broken randomly.}, and not on how tightly linked those genes are.
+are in each cluster,\footnote{Ties are broken randomly.} and not on how tightly linked those genes are.
 \cite{goldman:2012:ltga} found that this alternative was better at preserving
-diversity, and therefore required smaller populations, but has not yet been integrated into
-canonical LTGA.
+diversity, and therefore required smaller populations.
 
 P3 also modified Line~\ref{fig-cluster-usage-donate} in Figure~\ref{fig-cluster-usage}.
 Instead of choosing a single genetic donor for each cluster, P3 iterates over the
@@ -593,16 +592,19 @@ optima (all 1s or all 0s), and then linkage learning can have perfect knowledge 
 In order to make the problem more difficult, the authors proposed the Deceptive
 Step Trap problem, given in Equation~\ref{eq-deceptive-step-trap}. This function modifies the results
 of Equation~\ref{eq-deceptive-trap} to include plateaus of size $s$, introducing an exponential number
-of local optima in each trap. As a result the Deceptive Step Trap is much more challenging for linkage
-learning techniques, while still being highly deceptive. We chose to use $s=2$ to create the maximum
-number of local optima.
+of local optima in each trap.
+With $k=7$ and $s=2$, as used in our experiments, all traps with 0, 1, 3, 5, and 7 bits set are local optima.
+This means that half of all ways to set the trap are 1 bit local optima.
+More generally, the number of local optima grows at $\Theta(2^{k-1})$.
+As a result, the Deceptive Step Trap is much more challenging for linkage
+learning techniques, while still being highly deceptive.
 \begin{equation}
    step\_trap(t) = \left \lfloor \frac{(k-s)\pmod{s} + trap(t)}{s} \right \rfloor
   \label{eq-deceptive-step-trap}
 \end{equation}
 
 Another challenging aspect of landscapes can be higher order relationships. The Hierarchical If
-and only If (HIFF) problem is designed to capture the difficulties of this class of problem.
+and only If (HIFF) problem~\citep{watson:1998:hiff} is designed to capture the difficulties of this class of problem.
 In HIFF the genome is broken up into a complete binary tree, such that each gene appears in exactly one
 leaf and each internal node is the subset of genes contained in its children. If all genes represented
 in a node of the tree are set to the same value, they score equal to the size of the set. In this way
@@ -616,7 +618,7 @@ optimization. This problem's landscape, determined by Equation~\ref{eq-rast}, is
 the oscillating cosine function. \cite{goldman:2014:p3} proposed the Discretized Rastrigin problem, such
 that each floating point $x_i$ in Equation~\ref{eq-rast} is encoded using a 10 bit gray code.
 \begin{equation}
-  An + \sum_{i=1}^{n}\left [ x_i^2-A\cos (2\pi x_i) \right ] \forall x\in [-5.12,5.12]
+  10n + \sum_{i=1}^{n}\left [ x_i^2-10\cos (2\pi x_i) \right ] \forall x\in [-5.12,5.12]
   \label{eq-rast}
 \end{equation}
 
@@ -660,7 +662,7 @@ Each term is a randomly chosen variable, which may also be negated. A clause sco
 at least one term in the clause evaluates to true. In order to make MAX-SAT instances with a known global
 optimum, \cite{goldman:2014:p3} proposed constructing clauses around a fixed solution. In this way the
 signs of the terms are set to ensure the target solution satisfies the clause. To ensure each
-problem is challenging we chose a clause to variable ratio of $4.27$.
+problem is challenging we chose a clause to variable ratio of $4.27$~\citep{selman:1996:maxsat}.
 
 \section{Comparison Algorithm Parameter Tuning}
 \label{sec-tuning}
@@ -725,10 +727,13 @@ and highly deceptive~\citep{rana:1998:gamaxsat}.
 \end{figure}
 
 Figure~\ref{fig-evals-to-success} shows the median number of evaluations required by each of the six
-algorithms to find the global optimum for multiple sizes of each problem.  Each data point in
+algorithms to find the global optimum for multiple sizes of each problem. Each data point in
 Figure~\ref{fig-evals-to-success} represents the median of 100 runs, where unsuccessful runs
 are treated as requiring more evaluations than any successful run. If the median run was not successful
-no point is shown. The maximum problem size used for each problem was set to be the largest size we could
+no point is shown.
+Medians are used as the data is not normally distributed, and because it allows for more meaningful comparison
+between techniques with different success rates.
+The maximum problem size used for each problem was set to be the largest size we could
 feasibly determine LTGA's optimal population size. For many larger problems results are not shown
 for hBOA due to the extreme computational cost required to optimally set the population size.
 
@@ -922,8 +927,9 @@ Figure~\ref{fig-donations} examines the observed average number of donations per
 Ising Spin Glass, HIFF, and Rastrigin all achieve effectively constant behavior here, implying repeated
 donation does not impact the asymptotic runtime of P3. Both Trap functions and Nearest Neighbor NK all
 increase in number of donations as problem size increases, potentially increasing algorithmic costs. An
-important note is that each donation may range in size from a single bit up to $N-1$, with smaller
-donations far more likely to result in repeated attempts. As such this may cause some super-linear growth
+important note is that each donation may range in size from a single bit up to $N-1$. However,
+repeated donation attempts are far more likely to happen with smaller clusters.
+As such this may cause some super-linear growth
 in P3, but its unlikely to be very high.
 
 \subsection{Wall Clock Performance}
@@ -942,6 +948,7 @@ in P3, but its unlikely to be very high.
 To assess wall clock performance we provide Figure~\ref{fig-seconds-to-success}.
 Similar to Figure~\ref{fig-evals-to-success}, each point represents the median
 of 100 runs, with unsuccessful runs treated as slower than successful runs.
+\begin{comment}
 In total these runs
 took over 6 computing years to complete. We were therefore forced to use
 diverse hardware potentially running multiple processes in parallel.
@@ -949,6 +956,8 @@ As such these timings should be considered very skeptically as a number
 of sources may contribute to biased error in the results. However, due to
 the size of the dataset and the general regularity in the results some general conclusions
 can still be made.
+\end{comment}
+These results were collected using 2.5GHz Intel Xeon E5-2670v2 processors.
 
 \subsubsection{Model Building}
 hBOA and Parameter-less hBOA perform much worse when using wall clock time as the unit of comparison than when using
@@ -959,16 +968,25 @@ As P3 and LTGA require a similar asymptotic complexity per
 evaluation as the Hill Climber and $1+(\lambda, \lambda)$, no similar change in ordering occurs.
 
 \subsubsection{P3}
-Any increase in P3's algorithmic complexity is offset by its efficient use of evaluations.
-In aggregate P3 found the global optimum the fastest on 72 of 130 configurations,
-with LTGA, $1+(\lambda, \lambda)$, Hill Climber, hBOA outperforming P3 on 44, 18, 10, and 1 configurations, respectively.
-On
-Deceptive Trap, Nearest Neighbor NK, Ising Spin Glasses, and MAX-SAT P3 still finds the global
-optimum faster than all comparison techniques. LTGA is able to match P3's performance almost exactly on HIFF,
-and on Rastrigin P3 falls behind only on moderate sized problems. Deceptive Step Trap yields the worst performance,
-with LTGA using optimal population sizes having a significantly lower growth curve than P3. This mirrors
-the results from Figure~\ref{fig-evals-to-success} under the assumption that P3's computational time per evaluation is higher
-than LTGA but by no more than a constant factor.
+When LTGA is optimally tuned to a single instance problem with an efficient evaluation function
+it can find the global optimum faster than P3 in terms of wall clock time. However, on randomly
+generated problem classes P3's efficient use of evaluations is enough to overtake LTGA.
+
+On the four single instance problems LTGA not only finds the global optimum using less wall clock time,
+the factor speedup increases as problem length does. Na\"{i}vely this suggests LTGA is achieving
+a lower order of complexity. However, for these experiments LTGA is growing at sub-linear time per
+evaluation, which is not asymptotically stable due to (at minimum) the time required to perform an evaluation.
+We suspect that the true cause is that $N$ is small enough to be overshadowed by lower order polynomial terms.
+For example, LTGA requires $O(N/\mu)$ time per evaluation to rebuild the linkage
+model from the frequency table. As a result, for small $\mu$ model building, and not extracting pairwise
+frequency, can dominate runtime.
+
+When applied to randomly generated problem classes, the differences in P3 and LTGA's evaluation complexity
+dominates runtime complexity. Similar to with Figure~\ref{fig-evals-to-success}, the amount of speedup P3
+achieves over LTGA increases with problem size on Nearest Neighbor NK, Ising Spin Glasses, and MAX-SAT.
+
+Across both types of problems we find that P3's time per evaluation grows approximately linearly. As such,
+we conclude that P3 requires asymptotically similar amounts of time per evaluation as the other efficient techniques.
 
 \section{Population Sizing}
 \begin{figure}[t]
@@ -997,6 +1015,15 @@ A major advantage to P3 is that it does not require the user to set a population
 Beyond making P3 easier to apply, this also conveys two additional advantages: diversity scaled
 to initialization and no need to sacrifice intermediate fitness for eventual optimality.
 
+Figure~\ref{fig-pop-p3} shows how the number of total solutions stored in the pyramid changes
+as problem size increases, similar to Figure~\ref{fig-pop-sizes} for hBOA and LTGA's tuned population sizes.
+As expected, the number of concurrently stored solutions increases as problem difficult increases, with the
+exact behavior dependent on the problem landscape. Figure~\ref{fig-solutions-stored} examines how the number
+of solutions stored is distributed on the largest problem sizes. Here we see that the behavior depends
+on the type of problem. On single instance problems P3's stored variance is relatively low, and generally
+higher than optimally tuned LTGA's population size. On randomly generated problem classes P3 has a much
+higher variance in stored solutions, but in general requires smaller sizes than LTGA.
+
 \subsection{Problem Instance versus Problem Class}
 Our procedure for tuning LTGA and hBOA outlined in Section~\ref{sec-tuning} involved finding
 the optimal population size for each class of problem. For real world black box optimization this is
@@ -1016,20 +1043,23 @@ much larger than the best random initialization.
   \begin{center}
   \includegraphicsfit{evals-to-success-boxplot}
   \end{center}
-  \caption{Comparison of the upper and lower quartiles of evaluations required
-           to reach the global optimum for P3 and LTGA with respect to problem size.}
+  \caption{Distribution of evaluations required to reach the global optimum for
+           P3 and LTGA on the largest size of each problem.}
   \label{fig-evals-to-success-boxplot}
 \end{figure}
 
 
-Figure~\ref{fig-evals-to-success-range}
+Figure~\ref{fig-evals-to-success-boxplot}
 highlights how this can effect the required number of evaluations to reach the global optimum, showing
-the upper and lower quartiles for P3 and LTGA. On each problem
+the distribution of results when solving the largest size of each problem. On each problem
 LTGA has a much smaller difference between its best and worst runs. This makes sense as LTGA uses the same
 population size regardless of instance and progresses search generationally. In contrast P3 has a much
-higher split, with many runs finishing very quickly. This added variability is also generally on the lower
-quartile, with P3's upper quartile only worse than LTGA's on Deceptive Step Trap and Nearest
-Neighbor NK. This supports the hypothesis that P3 is able to scale its diversity not just
+higher split, with many runs finishing very quickly.
+On all problems except Deceptive Step Trap, P3's upper quartile is lower than LTGA's lower quartile.
+Furthermore, on Deceptive Trap, HIFF, and Ising Spin Glasses, P3's worst run is better than LTGA's best run.
+For Nearest Neighbor NK, most of P3's runs finish much faster than the fastest LTGA runs. However, some
+of P3's outliers take approximately as long as LTGA's tuned performance.
+This supports the hypothesis that P3 is able to scale its diversity not just
 to the problem class, but to the problem instance or even problem initialization, something
 wholly infeasible for tuned population sizing to do.
 
@@ -1285,7 +1315,7 @@ constant factor, while for the three problem classes P3's improvement increased 
 quality extends to intermediate points during evolution, with P3 generally reaching at least as high
 of fitness as the competitive techniques when using the same number of evaluations. While P3 does require
 modeling overhead, the expense of this overhead is approximately linear with respect to genome size. There
-is some evidence that even when compared on wall clock time, P3 performs at least as well as
+is some evidence that even when compared on wall clock time, P3 performs on par with
 the best comparison techniques. All of these achievements are made without any problem specific parameter
 tuning, making P3 easier to apply to new domains than its two closets competitors in quality.
 
@@ -1303,7 +1333,7 @@ pressing for practitioner acceptance is to apply P3 to real world problems and c
 its results with other black box or even problem specific heuristics. While parameter-less,
 P3 is currently limited to discrete, fixed length genomes evaluated using single objective
 fitness. These limitations can be relaxed with future work to make P3 more widely applicable.
-While asymptotically linear, P3's modeling techniques and local search methods are likely going
+While asymptotically linear in problem size, P3's modeling techniques and local search methods are likely going
 to be prohibitively expensive for genome sizes in the hundreds of thousands or millions of genes,
 and the inability of the model to capture overlapping linkage may be hindering
 search efficiency. Overcoming these limitations by using a new modeling technique may allow
@@ -1314,6 +1344,13 @@ are made may mislead search on landscapes with higher order deception.
 However, even without
 these improvements our results show P3 is highly efficient at finding
 global optima on black box problems without any problem specific tuning.
+
+
+\section{Acknowledgements}
+This material is based in part upon work supported by the National Science Foundation
+under Cooperative Agreement No. DBI-0939454. Any opinions, findings, and conclusions
+or recommendations expressed in this material are those of the author(s) and do not
+necessarily reflect the views of the National Science Foundation.
 
 \small
 

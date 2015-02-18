@@ -17,7 +17,16 @@ We believe that the comments can be broken into three classes:
  When testing the LTGA outside P3 however, the code is still recomputing the entropies to update the mutual information matrix. This is highly inefficient, the original LTGA only has to recompute the mutual information matrix once in each generation, not whenever a better solution is found. The experiments with LTGA should be run with the original LTGA implementation, not the modified P3 version. The code can be found at \url{http://homepages.cwi.nl/~bosman/source_code.php}
 \end{quote}
 
-This was indeed an error on our part. Unfortunately the source code was not made available to us, despite a request, and the code was not yet released to the public until after the paper was submitted. The fix, a two line modification, does not affect any of the evaluation counts but does indeed modify our timed comparisons (wall clock time experiments). Subsequently, after repairing the entropy calculation, we were able to reach timing parity with Dr. Bosman's implementation. We have rerun all of our timing results and <TODO updated our findings accordingly>. In general we find that for single instance problems, optimally tuned LTGA (where we of course do not count the evaluations or timing necessary to find the optimal population size) finds the global optimum using less seconds than P3. However, on randomly generated problem classes P3's reduction in evaluations overcomes its increased CPU usage per evaluation. We have updated our figures and discussion to reflect these changes.
+This was indeed an error on our part. Unfortunately the source code was not made available to us, despite a request,
+and the code was not yet released to the public until after the paper was submitted. The fix,
+a two line modification, does not affect any of the evaluation counts but does indeed modify our
+timed comparisons (wall clock time experiments). Subsequently, after moving the entropy calculation,
+we were able to reach timing parity with Dr. Bosman's implementation. We have rerun all of our timing results
+and updated our findings accordingly. In general we find that for single instance problems,
+optimally tuned LTGA %(where we of course do not count the evaluations or timing necessary to find the optimal population size)
+finds the global optimum using less seconds than P3. However, on randomly generated problem classes,
+P3's reduction in evaluations overcomes its increased CPU usage per evaluation.
+We have updated our figures and discussion to reflect these changes.
 
 \section{Fixes}
 \subsection{Reviewer 1}
@@ -28,14 +37,18 @@ This was indeed an error on our part. Unfortunately the source code was not made
 P3 seems to be very noisy in its results: the paper only reports median results after 100 runs. More information about variance and outliers (e.g. through boxplots) should be shown for at least one hard problem, for instance spin glasses. 
 \end{quote}
 
-In the original submission Section 9.1 explicitly discusses the variance in outcomes, and Figure 10 shows the upper and lower quartiles (just as boxplots do) for all 7 problems. We have, however, added a boxplot in this section to reflect this idea more clearly
+In the original submission Section 9.1 explicitly discussed the variance in outcomes,
+and Figure 10 showed the upper and lower quartiles (just as boxplots do) for all 7 problems.
+We have, however, replaced Figure 10 (Now Figure 11) with a boxplot to show outliers.
 
 \item
 \begin{quote}
 P3 stores all improving solutions ever found in a huge hash table. It should be reported how many solutions are typically stored and again what is the variance in these numbers. We have found that this varies a lot. 
 \end{quote}
 
-While the original work did not explictly report the aggregate value, you can estimate it in the original submission using the area under each curve in Figure 13a. We have added text to the Figure caption to reflect this
+While the original work did not explicitly report the aggregate value,
+you can estimate it in the original submission using the area under each curve in Figure 13a.
+We have added a new figure (Figure 10, parts A and B) to more clearly show total number of solutions stored.
 
 \item
 \begin{quote}
@@ -43,13 +56,24 @@ My main point would be that their paper shows that the EA community should rethi
 \end{quote}
 
 We agree, though our overall point is more general in that we are trying to get the community to rethink \textbf{all} parameter settings. In the original submission Section 9, Section 10.2,  Figure 11, and Figure 13a explicitly discuss the benefits we believe P3 achieves due to side stepping the fixed size generational scheme. We also had previously mentioned it in the third paragraph of the conclusion. Nonetheless, we have now added some additional references and discussion expanding those sections
+%TODO Add references and discussion
+
+\item
+\begin{quote}
+Only strictly better solutions are excepted: this is a big problem for LTGA with (at least) MAXSAT
+\end{quote}
+
+We agree that it is important for neutral drift to occur during mixing. Our original submission included that feature,
+as stated in Figure 3 line 6 and near the end of Section 2.5. We believe the source of this confusion is that P3
+requires strict fitness improvement when adding solutions to the pyramid, as stated in Figure 4 line 9 and near the beginning
+of Section 3.
 
 \item
 \begin{quote}
 The abstract states that P3 requires "less wall clock seconds" and "is more effective than existing state-of-the-art techniques".
 \end{quote}
 
-This has been updated based on the new timing results
+The abstract no longer mentions wall clock time.
 
 \item
 \begin{quote}
@@ -100,7 +124,7 @@ Though we have stated previously that adding to the pyramid triggers modelbuildi
 We have seen problems where smallest first is not better. Basically any a priori ordering represents a bias to the LTGA search algorithm.
 \end{quote}
 
-Our argument is not that smallest first is the \textit{best}, only that it has desirable diversity preservation features which are problem independent.
+Our argument is not that smallest first is the \textit{best}, only that it has desirable diversity preservation features which are problem independent. We have attempted to clarify this point.
 
 \item
 \begin{quote}
@@ -109,7 +133,9 @@ Exponential number ? Clarify with a small example of Deceptive Step Trap.
 \end{quote}
 
 We have added the following text for clarity. 
-For k=7 and s=2, all traps with 0, 1, 3, 5, and 7 bits set are local optima. This means that half of all ways to set the trap are 1 bit local optima. This holds true as trap size increases, meaning the number of local optima grows at $2^{k-1}+1$
+With $k=7$ and $s=2$, as used in our experiments, all traps with 0, 1, 3, 5, and 7 bits set are local optima.
+This means that half of all ways to set the trap are 1 bit local optima.
+More generally, the number of local optima grows at $\Theta(2^{k-1})$.
 
 \item
 \begin{quote}
@@ -139,6 +165,7 @@ Figure 8: This is a confusing figure: please elaborate.
 \end{quote}
 
 It is a busy figure. We have added more about the figure and its conclusions to the text.
+%TODO add explanation
 
 \item
 \begin{quote}
@@ -146,23 +173,31 @@ It is a busy figure. We have added more about the figure and its conclusions to 
 Speculative ?
 \end{quote}
 
-Due to the tree structure there are more small clusters than large ones. The nested nature of clusters means that if most solutions agree for a large cluster, at least that many solutions must agree for both of its subset clusters. As to the super-linear growth, we draw that conclusion from Figure 8b and its discussion.
+Due to the tree structure there are more small clusters than large ones. The nested nature of clusters means that if most solutions agree for a large cluster, at least that many solutions must agree for both of its subset clusters. As to the super-linear growth, we draw that conclusion from Figure 8b and its discussion. We reworded this statement slightly to be more precise.
 
 \item
 \begin{quote}
 " In total these runs took over 6 computing years to complete."
 \end{quote}
 
-The quote is correct, but being taken slightly out of context. This is the report for \textbf{all} runs. In our original submission 95\% of all computing time was used by hBOA and Parameter-less hBOA. The other 4 algorithms combined took less than 100 days to complete. After fixing our LTGA inefficiency and rerunning on uniform, modern hardware, the non hBOA algorithms took in total 31 days of computing to complete 124 trillion evaluations.
+The quote is correct, but being taken slightly out of context. This is the report for \textbf{all} runs. In our original submission 95\% of all computing time was used by hBOA and Parameter-less hBOA. The other 4 algorithms combined took less than 100 days to complete. After fixing our LTGA inefficiency and rerunning on uniform, modern hardware, the non hBOA algorithms took in total 31 days of computing to complete 124 billion evaluations.
 
-We have updated the text to distinguish the different algorithm classes.
+In rerunning our experiments we chose to ensure all experiments were performed in identical hardware. Unfortunately this means we are unable
+to complete the largest problem sizes of hBOA and Parameter-less hBOA. This section has been updated accordingly.
 
 \item
 \begin{quote}
 How can this be only a constant factor, when P3 uses a $O(L^2)$ operation each time an improved solution is found (= thousands of times) versus only a dozen $O(L^2)$ operations for LTGA ???
 \end{quote}
 
-This is covered in the original text, Section 2.4 and 2.5. However, to review, the run time bottleneck for LTGA is extracting pairwise frequency information which requires $O(mu*N^2)$ time per generation. This happens approximately once every $mu*N$ evaluations, meaning the time per evaluation is $(mu*N^2) / (N^2) = O(N)$. In P3 both entropy extraction and model rebuilding is $O(N^2)$ and must be done every $O(N)$ evaluations, meaning the time per evaluation is $N^2 / N = O(N)$. Therefore, excluding caveats mentioned in the paper, the two techniques should be within a constant factor runtime of each other. This relationship in general holds true for our updated experiments. 
+This is covered in the original text, Section 2.4 and 2.5. However, to review,
+the run time bottleneck for LTGA is extracting pairwise frequency information which
+requires $O(\mu N^2)$ time per generation. This happens approximately once every $\mu N$ evaluations,
+meaning the time per evaluation is $(\mu N^2) / (\mu N) = O(N)$.
+In P3, both entropy extraction and model rebuilding are $O(N^2)$ and must be done every $N$ evaluations,
+meaning the time per evaluation is $N^2 / N = O(N)$. Therefore, excluding caveats mentioned in the paper,
+the two techniques should be within a constant factor runtime of each other.
+This relationship in general holds true for our updated experiments.
 
 
 \item
@@ -170,7 +205,7 @@ This is covered in the original text, Section 2.4 and 2.5. However, to review, t
  "There is some evidence that even when compared on wall clock time, P3 performs at least as well as the best comparison techniques"
 \end{quote}
 
-Fixed based on the algorithmic fix. Now ``comparable'' instead of ``better''
+Fixed based on the algorithmic fix. Now ``on par'' instead of ``better.''
 
 \item
 \begin{quote}
@@ -184,7 +219,7 @@ Fixed
  Do not refer to TRs, refer to actual publications.
 \end{quote}
 
-Removed
+Replaced.
 
 \item
 \begin{quote}
@@ -202,7 +237,12 @@ Done
 My only gripe is that all algorithms are compared according to their median results and it would be nice to see at least a discussion of what this implies in terms of statistical significance.
 \end{quote}
 
-Added explanation for why medians are the correct choice here. Added statistical tests to data from Figure 6.
+Median is the non-parametric alternative to mean, which requires data to be normally distributed.
+Also, medians allow us to incorporate failures into the statistic. For example, if an algorithm fails due to
+exceeding the evaluation limit, as long as the median run is successful the median is unaffected. If mean was used
+it becomes very difficult to handle failures of that kind. We have added some short statements about this to the text.
+
+We have also added statistical tests to data from Figure 6 to Section 6.1.
 
 \item
 \begin{quote}
