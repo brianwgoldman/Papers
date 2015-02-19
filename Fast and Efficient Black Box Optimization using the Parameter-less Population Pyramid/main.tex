@@ -91,7 +91,7 @@ during search~\citep{goldman:2011:dynamic-parameters,laporte:2014:adaptivepop}.
 There have been periodic efforts to reduce or remove the need for parameter tuning.
 \cite{rechenberg:1973:es} introduced self-adaptive parameters, in which parameter values
 were included in each solution's genome and themselves underwent evolution. This allowed search
-to optimize some of its own parameters resulting in a reduced the need for expert tuning.
+to optimize some of its own parameters, resulting in a reduced need for expert tuning.
 \cite{harik:1999:parameterlessga} were able to design an entirely parameter-less GA by
 leveraging schema theory and parallel populations. Unfortunately these methods were provably less efficient
 than directly setting the parameters to optimal values~\citep{pelikan:1999:worstparameter-less}.
@@ -125,7 +125,7 @@ problem structure, designed to achieve similar goals as P3's linkage learning bu
 methods. Finally LTGA represents the current state-of-the-art in black box search and is the origin
 of P3's linkage learning and crossover methods.
 
-Finally, only hBOA and LTGA require any parameters, with each of these only requiring a population
+Only hBOA and LTGA require any parameters, with each of these only requiring a population
 size. This makes knowing the optimal behavior of these algorithms much more tractable. All of the
 algorithms are also gene order independent, fitness scale invariant, and unbiased. This means,
 for any problem, the order in which problem variables appear in the genome can be changed
@@ -183,7 +183,7 @@ no fitness improvement was made for the entire previous iteration, which contrad
 Due to its nature, this hill climber cannot escape basins of attraction. Once a solution is reached
 such that none of the single bit neighbors are fitness improvements, search stops. Thus
 this algorithm requires a restart mechanism to solve multimodal problems. We have
-chosen here to naively restart search from a random solution whenever a local optima is found. This
+chosen here to na\"{i}vely restart search from a random solution whenever a local optima is found. This
 ensures that on all landscapes there is always a non-zero probability of search finding the global optimum.
 
 \subsection{$1+(\lambda, \lambda)$}
@@ -440,7 +440,7 @@ By design, LTGA only has a single parameter: population size. LTGA uses no mutat
 in terms of the clustering algorithm. Selection between generations is fully elitist and embedded in the crossover,
 with selection of model building solutions fixed to a binary tournament. Neither \Call{Cluster-Creation}{} nor
 \Call{Cluster-Usage}{} rely on parameter values. LTGA does not provide any method for controlling or setting
-the population size, and uses a fixed user specified size for each generation.
+the population size, relying instead on a fixed user specified size.
 
 \section{Parameter-less Population Pyramid}
 \label{sec-p3}
@@ -551,8 +551,8 @@ Other algorithms have proposed using multiple concurrent populations.
 \cite{hornby:2006:alps} had a hierarchy of populations with solutions periodically advancing
 upward. This allows for continuous integration of diversity as the lowest population is reseeded
 with random solutions. However, this method resulted in increased parameterization as not only was
-a population size required, but also parameters for how frequently generations advanced between levels and
-how many total levels to have were added. \cite{harik:1999:parameterlessga} used multiple independent
+a population size required, but also new parameters for how frequently generations advanced between levels and
+how many total levels to have. \cite{harik:1999:parameterlessga} used multiple independent
 populations of different sizes as a method for removing the population size parameter, but
 doing was provably less efficient than using an optimal population size as no information is shared
 between the populations.
@@ -640,7 +640,7 @@ fitness values, were each possible combination of the $K+1$ genes is mapped to s
 point value $[0-1]$. In unrestricted NK landscapes the relationships between genes are also
 randomly chosen and as a result finding the global optimum is $NP$-Hard for $K>1$. However,
 if epistasis is set such that each gene depends on the $K$ directly following it
-in the genome the solution can be found in polynomial time~\citep{wright:2000:solvingnk}.
+in the genome, the solution can be found in polynomial time~\citep{wright:2000:solvingnk}.
 These Nearest Neighbor NK landscapes are therefore ideal for search algorithm testing.
 For all of our experiments we fixed $K=5$ to ensure highly rugged landscapes.
 
@@ -668,6 +668,19 @@ problem is challenging we chose a clause to variable ratio of $4.27$~\citep{selm
 
 \section{Comparison Algorithm Parameter Tuning}
 \label{sec-tuning}
+While four of the six algorithms in our experiments do not require any user specified parameters,
+hBOA and LTGA both use a population size parameter. To ensure these techniques are not unfairly
+handicapped, we extensively tuned each using the bisection method \citep{sastry:2001:bisection}
+to determine the optimal population size for each problem size.
+Extended by \cite{goldman:2012:ltga}, this method iteratively
+doubles the population size until some success criteria is met and then performs bisection
+between the lowest successful and highest unsuccessful sizes. In this way the minimum population size
+which meets the success criteria is found. \cite{goldman:2014:p3} proposed a success criteria
+of performing $r$ successful runs in a row, such that the expected failure rate can be bounded
+above by $\frac{3}{r+1}$~\citep{jovanovic:1997:ruleofthree}. As P3 and the other three algorithms
+do not prematurely converge, we chose $r=100$ to similarly ensure hBOA and LTGA almost never do.
+As bisection can make infinitely large population sizes, any run which had not found the global
+optimum after 100 million evaluations or 128 computing hours was considered unsuccessful.
 
 \begin{figure}[t]
   \begin{centering}
@@ -690,21 +703,6 @@ problem is challenging we chose a clause to variable ratio of $4.27$~\citep{selm
            for each problem.}
   \label{fig-pop-sizes}
 \end{figure}
-
-
-While four of the six algorithms in our experiments do not require any user specified parameters,
-hBOA and LTGA both use a population size parameter. To ensure these techniques are not unfairly
-handicapped, we extensively tuned each using the bisection method \citep{sastry:2001:bisection}
-to determine the optimal population size for each problem size.
-Extended by \cite{goldman:2012:ltga}, this method iteratively
-doubles the population size until some success criteria is met and then performs bisection
-between the lowest successful and highest unsuccessful sizes. In this way the minimum population size
-which meets the success criteria is found. \cite{goldman:2014:p3} proposed a success criteria
-of performing $r$ successful runs in a row, such that the expected failure rate can be bounded
-above by $\frac{3}{r+1}$~\citep{jovanovic:1997:ruleofthree}. As P3 and the other three algorithms
-do not prematurely converge, we chose $r=100$ to similarly ensure hBOA and LTGA almost never do.
-As bisection can make infinitely large population sizes, any run which had not found the global
-optimum after 100 million evaluations or 128 computing hours was considered unsuccessful.
 
 Figure~\ref{fig-pop-sizes} shows the results from performing bisection. In general hBOA
 required population sizes which were at least an order of magnitude larger than LTGA. Due to
@@ -746,12 +744,14 @@ configurations. hBOA, LTGA, and Parameter-less hBOA only outperform P3 on the sm
 Step Trap instances, respectively. Random Restart Hill Climbing outperforms P3 on the smallest 3 Nearest Neighbor NK instances
 and the smallest Ising Spin Glass. $1+(\lambda, \lambda)$ has the most success outperforming P3, doing so
 on the smallest 5 Deceptive Traps, 3 smallest Deceptive Step Traps, and 2 smallest Rastrigin.
+The likelihood that P3 would achieve these pairwise results assuming its median result is actually worse is $p < 10^{-15}$
+according to the binomial test.
 Pairwise comparison of LTGA and P3 on the largest problem size using the Mann-Whitney~U test results in
 $p < 10^{-5}$ for all problems.
 
 \subsection{Local Search}
 The Random Restart Hill Climber and $1+(\lambda, \lambda)$ are both relatively effective on small problem
-sizes. This is especially true for the three randomly generated problem problem classes. These problems
+sizes. This is especially true for the three randomly generated problem classes. These problems
 may contain relatively few local optima or just be exceptionally difficult for the model based algorithms.
 On Deceptive Trap and Deceptive Step Trap using 4 or less traps, $1+(\lambda, \lambda)$ performs significantly
 better than any other algorithm. We believe this is
@@ -826,8 +826,10 @@ is set to include the slowest P3 run to reach the global optimum.
 \subsection{Quantitative Comparison}
 Of 181 sample points, P3 had the highest median fitness in 121. In pairwise competition, $1+(\lambda, \lambda)$
 was the most likely to outperform P3, doing so on 50 sample points. LTGA, hBOA, and Parameter-less hBOA
-were the next best, outperforming P3 on 27, 20, and 18 sample points. Random Restart Hill Climbing almost
+were the next best, outperforming P3 on 27, 20, and 18 sample points, respectively. Random Restart Hill Climbing almost
 never outperformed P3, doing so only 9 times.
+The likelihood that P3 would achieve these pairwise results assuming its median result is actually worse is $p < 10^{-9}$
+according to the binomial test.
 
 \subsection{Local Search}
 Perhaps the most striking result is the quality of $1+(\lambda, \lambda)$. Until quite far into search this
@@ -845,6 +847,14 @@ Both hBOA and LTGA are marked by periods of little improvement followed by rapid
 In hBOA this is taken to the extreme, with all fitness
 improvement made at the very end of search. In both cases this is caused by model building. Before the model
 is accurate little improvement is made. Once it is accurate, fitness improves dramatically.
+
+At 58\% of the recording intervals hBOA has the worst fitness of any solver. Most of the exceptions
+occur when hBOA is still evaluating its initial population, allowing this random search to temporarily surpass the
+local search methods. After $N$ evaluations, however, hBOA and LTGA both fall behind until their models begin
+to improve.
+Parameter-less hBOA reaches intermediate fitnesses faster than hBOA, doing so on 62\% of intervals, as its models begin
+to optimize earlier than hBOA.  However, this trend is reversed after a sufficient number of evaluations, most clearly
+on Deceptive Step Trap and Ising Spin Glasses, as hBOA's tuned population overtakes Parameter-less hBOA's parallel populations.
 
 On every problem LTGA has five distinct periods: fitness plateau, near instantaneous improvement, fitness plateau,
 and improvement to global optimum. The early period corresponds with
@@ -1078,15 +1088,6 @@ population sizes tuned to reach the global optimum. As a result, both were excep
 at quickly reaching high quality solutions. This is because unlike P3, these methods have an explicit
 trade off between optimal performance and intermediate performance caused by their population size parameter.
 
-At 58\% of the recording intervals hBOA has the worst fitness of any solver. Most of the exceptions
-occur when hBOA is still evaluating its initial population, allowing this random search to temporarily surpass the
-local search methods. After $N$ evaluations, however, hBOA and LTGA both fall behind until their models begin
-to improve.
-Parameter-less hBOA reaches intermediate fitnesses faster than hBOA, doing so on 62\% of intervals, as its models begin
-to optimize earlier than hBOA.  However, this trend is reversed after a sufficient number of evaluations, most clearly
-on Deceptive Step Trap and Ising Spin Glasses, as hBOA's tuned population overtakes Parameter-less hBOA's parallel populations.
-
-
 \begin{figure}[t]
   \begin{centering}
     \begin{subfigure}{.5\textwidth}
@@ -1116,6 +1117,9 @@ at lower fitnesses. This caused LTGA's success rate to drop from 100 to 0 on Dec
 Neighbor NK.
 Even when using a reduced population size for LTGA, P3 still achieved a fitness at
 least as high as LTGA at 80\% of intervals.
+The likelihood that P3 would achieve these pairwise results assuming its median result is actually worse is $p < 10^{-15}$
+according to the binomial test.
+
 
 
 \begin{comment}
@@ -1289,7 +1293,7 @@ sizes tested, with the dips occurring at exactly the same level.
 This behavior is rooted in the peculiar nature
 of this landscape.
 After local search, all traps in all solutions have a total
-number of 1 bits equal to \{0, 1, 3, 5, 7\} as these correspond to the local
+number of 1 bits equal to either 0, 1, 3, 5, or 7 as these correspond to the local
 optima when using $k=7$ and $s=2$. Crossover is very likely to overcome the
 two bit plateaus, and as a result solutions in the second level generally do not
 contain the lowest fitness local optima (5 bits set) and the third
@@ -1313,7 +1317,7 @@ many synergistic features.
 
 Across a large number of problems and problem sizes P3 required less evaluations to reach the global optimum
 than optimally tuned state-of-the-art competitors. On single instance problems P3's improvement was by a
-constant factor, while for the three problem classes P3's improvement increased with problem size. This
+constant factor, while for the three randomly generated problem classes P3's improvement increased with problem size. This
 quality extends to intermediate points during evolution, with P3 generally reaching at least as high
 of fitness as the competitive techniques when using the same number of evaluations. While P3 does require
 modeling overhead, the expense of this overhead is approximately linear with respect to genome size. There

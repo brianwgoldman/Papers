@@ -7,8 +7,8 @@ We would like to first take the opportunity to thank our reviewers for their tho
 
 We believe that the comments can be broken into three classes:
 \begin{itemize}
-\item Errors in the paper that need correcting
-\item Minor fixes/modifications that we can implement.
+\item Errors in the paper that have been corrected.
+\item Minor fixes/modifications that we have addressed.
 \item Items of disagreement
 \end{itemize}
 
@@ -18,9 +18,9 @@ We believe that the comments can be broken into three classes:
 \end{quote}
 
 This was indeed an error on our part. Unfortunately the source code was not made available to us, despite a request,
-and the code was not yet released to the public until after the paper was submitted. The fix,
+and the code was not released to the public until after the paper was submitted. The fix,
 a two line modification, does not affect any of the evaluation counts but does indeed modify our
-timed comparisons (wall clock time experiments). Subsequently, after moving the entropy calculation,
+wall clock time experiments. Subsequently, after moving the entropy calculation,
 we were able to reach timing parity with Dr. Bosman's implementation. We have rerun all of our timing results
 and updated our findings accordingly. In general we find that for single instance problems,
 optimally tuned LTGA %(where we of course do not count the evaluations or timing necessary to find the optimal population size)
@@ -60,7 +60,7 @@ We agree, though our overall point is more general in that we are trying to get 
 Figure 11, and Figure 13a explicitly discuss the benefits we believe P3 achieves due
 to side stepping the fixed size generational scheme.
 We also had previously mentioned it in the third paragraph of the conclusion.
-Nonetheless, we have now added some additional references and discussion to the introduction to indicate its importance.
+Nonetheless, we have now added some additional references and discussion to the introduction to elevate its importance.
 
 \item
 \begin{quote}
@@ -68,13 +68,13 @@ Only strictly better solutions are excepted: this is a big problem for LTGA with
 \end{quote}
 
 We agree that it is important for neutral drift to occur during mixing. Our original submission included that feature,
-as stated in Figure 3 line 6 and near the end of Section 2.5. We believe the source of this confusion is that P3
+as stated in Figure 3 line 6 and near the end of Section 2.5. We believe the source of the reviewer's confusion is that P3
 requires strict fitness improvement when adding solutions to the pyramid, as stated in Figure 4 line 9 and near the beginning
 of Section 3.
 
 \item
 \begin{quote}
-The abstract states that P3 requires "less wall clock seconds" and "is more effective than existing state-of-the-art techniques".
+The abstract states that P3 requires ``less wall clock seconds'' and ``is more effective than existing state-of-the-art techniques''.
 \end{quote}
 
 The abstract no longer mentions wall clock time.
@@ -95,22 +95,29 @@ We have updated the text to clarify that we are referring to a specific RRHC and
 
 \item
 \begin{quote}
-"Doerr et al. (2013) presented the first genetic algorithm to provably show the advantage of performing crossover on simple landscapes."
+``Doerr et al. (2013) presented the first genetic algorithm to provably show the advantage of performing crossover on simple landscapes.''
 I understand some people have a very restricted view on provably showing something but this statement is arguably wrong.
 \end{quote}
 
-We did not intend to be offensive and have cleaned up that text.
+We have made the claim more precise to better reflect their actual accomplishment.
+
+\item
+\begin{quote}
+typo:  ``in a reduced the need for''
+\end{quote}
+
+Fixed
 
 \item
 \begin{quote}
 It is not updating the model, it is completely rebuilding an $O(L^2)$ linkage tree model 
 \end{quote}
 
-Replaced "updating" with "rebuilding"
+Replaced ``updating'' with ``rebuilding''
 
 \item
 \begin{quote}
-"Furthermore, unlike LTGA all solutions in the population are used to generate the model, not just the winners of a binary tournament".
+``Furthermore, unlike LTGA all solutions in the population are used to generate the model, not just the winners of a binary tournament''.
 This is not a major design choice, this only influences the selection pressure. Actually, the most recent papers report all experiments with LTGA using the entire population instead of a set of selected solutions.
 \end{quote}
 
@@ -121,7 +128,7 @@ As discussed in Section 2.5 we are aware that there are many variants of LTGA. H
 Fig. 4: ITERATE-P3, line 12: the model rebuilding should be stated here.
 \end{quote}
 
-Though we have stated previously that adding to the pyramid triggers modelbuilding, we have added text to the figure to restate it.
+Though we have stated previously that adding to the pyramid triggers model building, we have added text to the figure to restate it.
 
 \item
 \begin{quote}
@@ -132,14 +139,14 @@ Our argument is not that smallest first is the \textit{best}, only that it has d
 
 \item
 \begin{quote}
- "This function modifies the results of Equation 4 to include plateaus of size s, introducing an exponential number of local optima in each trap."
+ ``This function modifies the results of Equation 4 to include plateaus of size s, introducing an exponential number of local optima in each trap.''
 Exponential number ? Clarify with a small example of Deceptive Step Trap.
 \end{quote}
 
 We have added the following text for clarity. 
-With $k=7$ and $s=2$, as used in our experiments, all traps with 0, 1, 3, 5, and 7 bits set are local optima.
+``With $k=7$ and $s=2$, as used in our experiments, all traps with 0, 1, 3, 5, and 7 bits set are local optima.
 This means that half of all ways to set the trap are 1 bit local optima.
-More generally, the number of local optima grows at $\Theta(2^{k-1})$.
+More generally, the number of local optima grows at $\Theta(2^{k-1})$.''
 
 \item
 \begin{quote}
@@ -157,7 +164,7 @@ A= 10 (updated in paper)
 
 \item
 \begin{quote}
-"To ensure each problem is challenging we chose a clause to variable ratio of 4.27"
+``To ensure each problem is challenging we chose a clause to variable ratio of 4.27''
 Reference to support this number.
 \end{quote}
 
@@ -172,7 +179,7 @@ It is a busy figure. We have worked to clarify the text describing the figure.
 
 \item
 \begin{quote}
- "An important note is that each donation may range in size from a single bit up to N-1, with smaller donations far more likely to result in repeated attempts. As such this may cause some super-linear growth in P3, but its unlikely to be very high."
+``An important note is that each donation may range in size from a single bit up to N-1, with smaller donations far more likely to result in repeated attempts. As such this may cause some super-linear growth in P3, but its unlikely to be very high.''
 Speculative ?
 \end{quote}
 
@@ -180,7 +187,7 @@ Due to the tree structure there are more small clusters than large ones. The nes
 
 \item
 \begin{quote}
-" In total these runs took over 6 computing years to complete."
+``In total these runs took over 6 computing years to complete.''
 \end{quote}
 
 The quote is correct, but being taken slightly out of context. This is the report for \textbf{all} runs. In our original submission 95\% of all computing time was used by hBOA and Parameter-less hBOA. The other 4 algorithms combined took less than 100 days to complete. After fixing our LTGA inefficiency and rerunning on uniform, modern hardware, the non hBOA algorithms took in total 31 days of computing to complete 124 billion evaluations.
@@ -194,7 +201,7 @@ How can this be only a constant factor, when P3 uses a $O(L^2)$ operation each t
 \end{quote}
 
 This is covered in the original text, Section 2.4 and 2.5. However, to review,
-the run time bottleneck for LTGA is extracting pairwise frequency information which
+the runtime bottleneck for LTGA is extracting pairwise frequency information which
 requires $O(\mu N^2)$ time per generation. This happens approximately once every $\mu N$ evaluations,
 meaning the time per evaluation is $(\mu N^2) / (\mu N) = O(N)$.
 In P3, both entropy extraction and model rebuilding are $O(N^2)$ and must be done every $N$ evaluations,
@@ -205,14 +212,14 @@ This relationship in general holds true for our updated experiments.
 
 \item
 \begin{quote}
- "There is some evidence that even when compared on wall clock time, P3 performs at least as well as the best comparison techniques"
+``There is some evidence that even when compared on wall clock time, P3 performs at least as well as the best comparison techniques''
 \end{quote}
 
-Fixed based on the algorithmic fix. Now ``on par'' instead of ``better.''
+Fixed based on the corrected code. Now ``on par'' instead of ``better.''
 
 \item
 \begin{quote}
-"While asymptotically linear"   Linear in what ?
+``While asymptotically linear''   Linear in what ?
 \end{quote}
 
 Fixed
@@ -245,11 +252,11 @@ Also, medians allow us to incorporate failures into the statistic. For example, 
 exceeding the evaluation limit, as long as the median run is successful the median is unaffected. If mean was used
 it becomes very difficult to handle failures of that kind. We have added some short statements about this to the text.
 
-We have also added statistical tests to data from Figure 6 to Section 6.1.
+We have also added statistical tests of data from Figure 6, Figure 7, and Figure 12 to Section 6.1, Section 7.1, and Section 9.2.
 
 \item
 \begin{quote}
-Last sentence of section 1, penultimate clause doesn't have  verb in it. I suggest you rephrase as " ...; analyse the algorithm complexity; 
+Last sentence of section 1, penultimate clause doesn't have  verb in it. I suggest you rephrase as `` ...; analyse the algorithm complexity;''
 \end{quote}
 
 Fixed
@@ -263,7 +270,7 @@ Done
 
 \item
 \begin{quote}
-Section 8.2.1 uses the phrase "significantly worse".  This suggests that you have some specific confidence in the results according to some hypothesis testing method.  Please clarify or rephrase.
+Section 8.2.1 uses the phrase ``significantly worse''.  This suggests that you have some specific confidence in the results according to some hypothesis testing method.  Please clarify or rephrase.
 \end{quote}
 
 You are correct, you cannot test that statistically. Rephrased to avoid that impression.
@@ -294,6 +301,6 @@ so that we may compare on the best possible footing, giving them an advantage no
 However, adding initial local search as a tunable parameter to hboa and LTGA when partial evaluations are not available is not part
 of existing work for either method. Doing so would also provide those techniques
 with even more problem specific configuration. We welcome future work by other researchers exploring the possible effects of combining
-local search with their techniques.
+local search with their techniques in this fashion.
 
 \end{document}
