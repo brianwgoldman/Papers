@@ -453,7 +453,7 @@ The high level algorithm of P3 is presented in Figure~\ref{fig-p3}. Unlike more 
 GAs, P3 does not follow a generational model. Instead, it maintains an iteratively
 expanding pyramid of expanding populations. Each iteration, a new random solution is generated.
 This solution is brought to a local optimum using the hill climbing algorithm in Figure~\ref{fig-hc}. If that
-local optimum has not yet been added to the pyramid, the solution is added to the lowest
+local optimum has not yet been added to any level of the pyramid, the solution is added to the lowest
 population $P_0$.
 
 Next, the solution is iteratively improved by applying LTGA's crossover algorithm (Figure~\ref{fig-cluster-usage})
@@ -537,8 +537,8 @@ operation actually saves more overhead than it costs by increasing the number of
 per model rebuild.
 
 Each of the pieces of the P3 algorithm were selected not just for their stand alone efficacy,
-but for the ways in which they interact. By using the hill climber to ensure each solution
-is at a local optima, the underlying pairwise relationships in the problem are exposed. As
+but for the ways in which they interact. By using the hill climber to optimize randomly
+generated solutions, the underlying pairwise relationships in the problem are exposed. As
 a result, detecting clusters for use by crossover is much more effective. The crossover operator
 is extremely elitist, as each gene donation must result in no fitness loss, and a solution must
 strictly improve to be added to the next level of the pyramid. This is balanced by continual
