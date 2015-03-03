@@ -470,7 +470,7 @@ or populations, meaning the user does not need to specify a population size.
     \State Create random solution
     \State Apply hill climber
     \If{solution $\notin hashset$}
-      \State Add solution to $P_0$ and rebuild model
+      \State Add solution to $P_0$ and rebuild $P_0$'s model
       \State Add solution to $hashset$
     \EndIf
 
@@ -478,7 +478,7 @@ or populations, meaning the user does not need to specify a population size.
       \State Mix solution with $P_i$
       \If{solution's fitness has improved}
         \If{solution $\notin hashset$}
-          \State Add solution to $P_{i+1}$ and rebuild model
+          \State Add solution to $P_{i+1}$ and rebuild $P_{i+1}$'s model
           \State Add solution to $hashset$
         \EndIf
       \EndIf
@@ -712,6 +712,19 @@ than hBOA's as problem size increased, especially on the two Trap problems and R
 Both algorithms were very ineffective on MAX-SAT, neither able to tune to problems sizes over 60 bits.
 This is likely due to the fact that some randomly generated MAX-SAT landscapes are very flat
 and highly deceptive~\citep{rana:1998:gamaxsat}.
+
+While not currently treated as a parameter, we also performed preliminary tests of
+integrating hill climbing into LTGA and hBOA. To match P3, we applied first improvement
+hill climbing to each algorithm's initial population.
+We then performed bisection on the modified algorithms for the largest problem sizes
+where hBOA without hill climbing was effective. We found that in general both methods
+performed worse when combined with hill climbing, in some cases up to an order of
+magnitude worse. There were three exceptions: both improved on MAX-SAT and
+hBOA improved on Rastrigin. In all cases the inclusion of hill climbing did
+not result in either algorithm outperforming P3 in terms of evaluations
+required to reach the global optimum. As such, all further experiments
+use the unmodified published versions.
+
 \section{Finding the Global Optimum}
 \label{sec-optimum}
 
