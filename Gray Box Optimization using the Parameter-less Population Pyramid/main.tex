@@ -37,7 +37,7 @@ requires prior specific permission and/or a fee. Request permissions from permis
 %\subtitle{[Genetic Algorithms Track]}
 
 \numberofauthors{2} %
-\begin{comment}
+%\begin{comment}
 \author{
 % 1st. author
 \alignauthor
@@ -53,7 +53,7 @@ William F. Punch\\
        \email{punch@msu.edu}
 }
 %\end{comment}
-%\begin{comment}
+\begin{comment}
 \author{
 % 1st. author
 \alignauthor
@@ -206,7 +206,7 @@ distance moves are chosen before larger distance moves.
   \begin{algorithmic}[1]
   \Procedure{ConnectedInducedSubgraphs}{}
     \State $closed \leftarrow \emptyset$
-    \State $found \leftarrow []$
+    \State $found \leftarrow [~]$
     \ForAll{$v \in V$}
       \State $closed \leftarrow closed \cup \{v\}$
       \State $found \leftarrow found + $\Call{CISG}{$v$, $\emptyset$, $closed$, $\emptyset$}
@@ -259,7 +259,7 @@ This creates a worse case complexity for a single top level call of
 $\prod_{i}^{r} ick = r!(ck)^r$. This must be called once for each
 of the $N$ variables resulting in \BigO{r!(ck)^rN}.
 
-\section{Tournament Uniform Crossover: TUX}
+\section{Tournament Uniform\\ Crossover: TUX}
 \label{sec-tux}
 \begin{figure}
   \begin{algorithmic}[1]
@@ -319,24 +319,24 @@ requires an $r$ for the hill climber) and is relatively simple to implement. Eve
 it allows for learning from previous local optima and as Section~\ref{sec-experiments}
 will show it is quite effective at optimization.
 
-\section{Parameter-less Population Pyramid: P3}
+\section{Parameter-less Population\\ Pyramid: P3}
 \subsection{Origins}
 \begin{figure}
-  \begin{algorithmic}
+  \begin{algorithmic}[1]
   \Procedure{Iterate-P3}{}
-    \State Create random solution
+    \State Create random $solution$
     \State Apply hill climber
-    \If{solution $\notin hashset$}
-      \State Add solution to $P_0$
-      \State Add solution to $hashset$
+    \If{$solution \notin hashset$}
+      \State Add $solution$ to $P_0$
+      \State Add $solution$ to $hashset$
     \EndIf
 
     \ForAll{$P_i \in pyramid$}
-      \State Mix solution with $P_i$
-      \If{solution's fitness has improved}
-        \If{solution $\notin hashset$}
-          \State Add solution to $P_{i+1}$
-          \State Add solution to $hashset$
+      \State Mix $solution$ with $P_i$
+      \If{$solution$'s fitness has improved}
+        \If{$solution \notin hashset$}
+          \State Add $solution$ to $P_{i+1}$
+          \State Add $solution$ to $hashset$
         \EndIf
       \EndIf
     \EndFor
@@ -528,13 +528,13 @@ a minimization problem, here we present them as a maximization problem by negati
 For each problem class tested, we generated 50 instances.
 Each method was run once on each instance, and limited to 3 hours of computation and 4 GB of memory.
 Runs were performed on 2.5GHz Intel Xeon E5-2670v2 processors using the C++11 code available
-from our website.\footnote{\url{https://github.com/name_of_repository/anonymous_name_of_project}}
+from our website.\footnote{\url{https://github.com/brianwgoldman/GrayBoxOptimization}}
 Each time the run achieved a new best fitness we recorded the current amount of processing time used.
 Timing includes the discovery of subgraphs to allow for comparison between different radius values.
 When reporting the ``best'' fitness for an instance we mean the best fitness found by any method before
 the time limit is reached. On all Nearest Neighbor NKq instances the ``best'' fitness
 is also the global optimum, verified using dynamic programming. For Ising Spin Glass the ``best'' fitness
-was the global optimum 44 of 50 times.
+was the global optimum 44 out of 50 times.
 
 All figures report the median run for either percentage error or seconds to reach the best. A run's percentage error is
 equal to the difference between its fitness and the best, divided by the best. When reporting seconds
