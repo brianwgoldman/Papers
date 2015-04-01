@@ -79,15 +79,16 @@ Unlike black-box optimization problems, gray-box optimization problems have know
 limited, non-linear relationships between variables. Though more restrictive, gray-box problems include many
 real-world applications in network security, computational biology, VLSI design, and statistical physics.
 Leveraging these restrictions, the Hamming-Ball Hill Climber
-(HBHC) can efficiently find r-bit local optima. We show how
+(HBHC) can efficiently find high quality local optima. We show how
 1) a simple memetic algorithm in conjunction with HBHC can find \emph{global}
 optima for some gray-box problems and 2) a gray-box version of the Parameter-less
 Population Pyramid (P3), utilizing both the HBHC and the known
 information about variable relationships, outperforms all of the
-examined algorithms.
+examined algorithms. While HBHC's inclusion into P3 adds a parameter,
+we show experimentally it can be fixed to 1 without adversely effecting search.
 
 
-We provide experimental evidence on both NKq-Landscapes and Ising Spin Glasses
+We provide experimental evidence on NKq-Landscapes and Ising Spin Glasses
 that Gray-Box P3 is effective at finding the global optima even for problems with
 thousands of variables. This capability is complemented by its efficiency, with
 running time and memory usage decreased by up to a linear factor from Black-Box P3.
@@ -106,22 +107,22 @@ On NKq this results in a 375x speedup for problems with at least 1,000 variables
 
 \keywords{Local Search; Global Search; Parameter-less}
 
-%\newpage
+\newpage
 
 \section{Introduction}
 
 Recent work~\cite{whitley:2013:greedy,chicano:2014:ball} has shown that
 providing local search with more problem specific information than just an evaluation function can
-extraordinarily improve search power and efficiency. These improvements
+greatly improve search power and efficiency. These improvements
 require information easily derived for a broad range of interesting NP-Hard
 problems.
 
-Here we extend those benefits to global optimization by integrating
+Here we extend those benefits to global optimization on binary problems by integrating
 this local search with additional heuristics~\cite{chen:2011:memetic}.
 We introduce a novel algorithm designed to combine local
 and global search as simply as possible. To test the true power of this
 process we also extend the Parameter-less Population Pyramid (P3)~\cite{goldman:2014:p3}, the
-current state-of-the-art in black-box optimization. This ``Gray-Box P3''
+current state-of-the-art in black-box optimization~\cite{goldman:2015:fastp3}. This ``Gray-Box P3''
 utilizes both efficient local search and the additional problem information
 to drastically improve performance and reduce memory usage.
 
@@ -130,22 +131,22 @@ to drastically improve performance and reduce memory usage.
 In black-box optimization, the only information available is a specification
 for what constitutes a valid solution and a function which returns the quality
 of a given solution. While these very simple requirements allow almost any
-optimization task to fit into this domain, it may prevent additional knowledge
-about a problem from being provided to search algorithms. At the other end of
+optimization task to fit into this domain, many problems have additional knowledge
+which could be used by search algorithms. At the other end of
 the spectrum is white-box optimization, in which everything about the problem
 is known. Search techniques in this domain specialize at the cost of generality.
 Gray-box optimization exists between these two extremes, exposing additional
 information which is available for a variety of problems to be exploited by search.
 
 Here we shall consider the gray-box optimization domain with the following
-characteristics: The function which evaluates the quality of a solution is determined by the summation
+characteristics~\cite{chicano:2014:ball}: The function which evaluates the quality of a solution is determined by the summation
 of subfunctions. Each subfunction uses at most $k$ variables in the given solution,
-such that as the total number of solution variables $N$ increases, $k$ remains constant.
+such that $k$ remains constant as the number of problem variables $N$ increases.
 Each subfunction is independently evaluable and the variables each subfunction uses are known.
 
 While more restrictive than black-box optimization, this domain is still very general.
 MAX-SAT, and by extension all NP-hard problems, can be represented
-as a summation of subfunctions to evaluate each clause~\cite{whitley:2013:greedy}.
+as a summation of subfunctions which evaluate each clause~\cite{whitley:2013:greedy}.
 Previous approximation studies of Vertex Cover~\cite{oliveto:2009:vertexcover},
 Set Cover~\cite{yu:2010:setcover}, MAX-CUT~\cite{festa:2002:maxcut}, and
 Ising Spin Glasses~\cite{pelikan:2003:hboaising} all work with problems which fit
@@ -153,22 +154,25 @@ in the gray-box domain. These relate back to problems of real world interest suc
 as network security, computational biology, VLSI design, and statistical physics.
 
 In order to obtain efficiency bounds for optimization algorithms, the following
-assertions are also included: The total number of subfunctions grows no more than
+assertions are also included~\cite{chicano:2014:ball}: The total number of subfunctions grows no more than
 linearly with $N$, which holds true for randomized MAX-SAT, mesh spin glasses, and NK Landscapes.
 Furthermore, each variable participates in at most $c$ subfunctions, which holds true
 for mesh spin glasses and Nearest Neighbor NK. If violated, these assertions do not
 necessarily prevent the gray-box optimization algorithms from solving the problem, but may result
 in slower than predicted performance.
 %TODO Are these necessary?
+\begin{comment}
 We also include the trivial requirements that all problem variables must participate
 in at least one subfunction and that the problem is not separable. Any problem which
 violates these requirements can be restated either using fewer variables or as multiple separate problems.
+\end{comment}
 
 \section{Hamming-Ball Hill Climbing}
 \label{sec-hamming}
 The first algorithm to rigorously exploit the features of the gray-box domain
 described in Section~\ref{sec-gray-box} was \cite{whitley:2013:greedy}. In this study
-a hill climber was developed that found the approximate next-best move in \BigO{1} time.
+a hill climber was developed that found the approximate next-best move in \BigO{1} time given
+\BigO{N} setup.
 This is achieved by first determining the fitness effect of making each move, and then updating
 only effected moves each time a change to the solution is made. Due to the requirements of the domain,
 at most \BigO{ck} moves can be effected, with each requiring at most \BigO{1} subfunction calls
@@ -178,7 +182,9 @@ moves required to reach a local optimum. In comparison, the black-box approach f
 \BigO{IN^2}.
 
 By again leveraging the properties of this domain, the Hamming-Ball Hill Climber (HBHC)~\cite{chicano:2014:ball} extends this
-method to find $r$-bit local optima. While na\"ively this would require testing \BigO{N^r} moves, in the gray-box domain only
+method to find solutions that cannot be improved by flipping $r$
+or fewer bits called $r$-bit local optima.
+While na\"ively this would require testing \BigO{N^r} moves, in the gray-box domain only
 \BigO{(3ck)^rN} must be checked. This is due to the bounded relationships between variables.
 If $i$ and $j$ do not share a subfunction, the effect of flipping both variables
 must be equal to the sum of flipping both separately. Therefore, only variables that share
@@ -249,7 +255,7 @@ At each recursive level \Call{CISG}{} expands $open$ to include any vertices
 adjacent to $v$ in the graph. By construction this means that $open'$ contains
 all possible ways of adding a single vertex to the current $subset'$. As each $v'$
 is tested it is temporarily added to $closed$ to prevent recursive calls
-from creating duplicates.
+from adding it again to $subset'$.
 
 When applied to the sparse graphs inherent in the gray-box domain, this algorithm
 requires \BigO{r!(ck)^rN} time, which reduces to \BigO{N}. The time spent
@@ -280,7 +286,7 @@ of the $N$ variables resulting in \BigO{r!(ck)^rN}.
   \EndProcedure
 \end{algorithmic}
   \caption{One iteration of TUX optimization. $T$ is an
-           ordered list of solutions, each of which could be empty,
+           ordered list of solutions, each position of which could be empty,
            awaiting a crossover partner.}
   \label{fig-TUX}
 \end{figure}
@@ -293,14 +299,14 @@ inside the global optima's basin of attraction.
 To remedy this limitation, we set out to develop a minimally complex memetic
 algorithm to help increase this probability. Figure~\ref{fig-TUX} presents
 the Tournament Uniform Crossover (TUX) algorithm, which combines simplistic
-selection with equal probability uniform crossover to generate starting
+selection with equal probability uniform crossover, the most basic unbiased crossover, to generate starting
 solutions likely to be in the global optima's basin of attraction.
 
 Conceptually TUX iteratively builds a structure similar to a single elimination
 bracket for solutions. Each ``match'' in the tournament takes in two candidate solutions,
 produces offspring via uniform crossover, applies hill climbing to each offspring, with
 the ``winner'' being the best of all those solutions. The tournament ``bracket'' is constructed
-iteratively, storing a single list of solutions $T$, such that $|T|$ is equal to the height
+iteratively, storing an initially empty list of solutions $T$, such that $|T|$ is equal to the height
 of the tournament. Iterative construction is possible because when a sub-bracket is complete only a single solution
 emerges and solutions only need to be stored until their partner is found.
 TUX is fully elitist but does not prematurely converge. This is because search continuously
@@ -349,7 +355,7 @@ will show it is quite effective at optimization.
 \end{figure}
 
 The Parameter-less Population Pyramid (P3) is a recently introduced
-black-box optimization method which requires no problem specific configuration~\cite{goldman:2014:p3}.
+black-box optimization method which requires no problem specific configuration~\cite{goldman:2014:p3,goldman:2015:fastp3}.
 Unlike previous parameter-less methods it was shown to be more efficient than
 competing state-of-the-art algorithms across a number of problem classes.
 
@@ -400,7 +406,11 @@ memory usage.
 \end{comment}
 
 P3 represents a natural method for integrating the HBHC into
-a global optimization algorithm as P3 already utilizes local search. However, there
+a global optimization algorithm as P3 already utilizes local search.
+While HBHC's inclusion adds a parameter, Section~\ref{sec-radius} and
+Section~\ref{sec-over-time} provide evidence that $r$ can be fixed to 1, preserving
+the parameter-less nature of P3.
+Beyond using HBHC, there
 are also a number of ways in which P3 can be made more efficient by leveraging the
 additional information available in the gray-box domain.
 
@@ -434,7 +444,7 @@ Beyond efficiency, there are good reasons to believe these clusters will be usef
 for search. The closer two variables are in the dependency graph, the more likely
 they are to appear in the same cluster. All variables on average are expected to appear
 in at least one cluster, but variables which are central in the graph will appear in more
-clusters than those on the periphery. If all else is equal, the more paths of a given
+clusters than those on the periphery. The more paths of a given
 length between two variables, the higher the probability of them being in the same cluster.
 Unlike Black-Box P3, this linkage tree does not require clusters to be nested, allowing
 more diversity in the types of clusters appearing in a single tree.
@@ -447,8 +457,7 @@ By sampling from all possible large moves, we can maintain tractability while ga
 a potentially non-zero probability of improvement.
 As clusters are used to donate values between solutions, these
 moves are always in the direction of previously found high quality solutions.
-This assumes that the density of high quality solutions is higher between good solutions than
-outside of good solutions.
+This assumes that the density of high quality solutions is higher than average between good solutions.
 
 \begin{comment}
 Figure~\ref{fig-sfx-tree} provides an efficient method for creating a linkage
@@ -521,11 +530,13 @@ Ising Spin Glasses are a type of MAX-CUT problem relevant in statistical physics
 encodes spins (vertices) and their relationships (edges) with the goal of assigning each spin a direction
 which minimizes relationship energy. Just as with NKq-Landscapes, Ising Spin Glasses as a whole
 are NP-Hard, but the $2D\pm J$ subset is polynomially solvable~\cite{saul:1994:spinglass}\footnote{\url{http://www.informatik.uni-koeln.de/spinglass/}}. In this
-subset the graph is a 2D toroidal grid, with each edge's weight either -1 or 1. In gray-box terms,
-problems of this subset have $k=2$ and $c=4$ regardless of $N$. While Ising Spin Glasses are traditionally
-a minimization problem, here we present them as a maximization problem by negating the normal fitness.
+subset the graph is a 2D toroidal grid, with edge weights of $\pm 1$. In gray-box terms,
+problems of this subset have $k=2$ and $c=4$ regardless of $N$.
+%While Ising Spin Glasses are traditionally
+%a minimization problem, here we present them as a maximization problem by negating the normal fitness.
 
 For each problem class tested, we generated 50 instances.
+Extreme problem sizes were chosen to stress each algorithm.
 Each method was run once on each instance, and limited to 3 hours of computation and 4 GB of memory.
 Runs were performed on 2.5GHz Intel Xeon E5-2670v2 processors using the C++11 code available
 from our website.\footnote{\url{https://github.com/brianwgoldman/GrayBoxOptimization}}
@@ -536,7 +547,7 @@ the time limit is reached. On all Nearest Neighbor NKq instances the ``best'' fi
 is also the global optimum, verified using dynamic programming. For Ising Spin Glass the ``best'' fitness
 was the global optimum 44 out of 50 times.
 
-All figures report the median run for either percentage error or seconds to reach the best. A run's percentage error is
+All figures report the median, upper and lower quartiles for either percentage error or seconds to reach the best. A run's percentage error is
 equal to the difference between its fitness and the best, divided by the best. When reporting seconds
 to reach the best fitness, any run which did not find the best fitness is treated as slower than any run that did.
 If the median run was unsuccessful, no data point is drawn.
@@ -547,7 +558,7 @@ If the median run was unsuccessful, no data point is drawn.
   \centering
   \includegraphicswide{fitness}
   \caption{Comparison of how radius effects solution quality at termination. For NKq-Landscapes $N=6,000$ and $K=4$ and
-  for Ising Spin Glasses $N=6,084$.}
+  for Ising Spin Glasses $N=6,084$. Range of radius values limited by memory constraints.}
   \label{fig-fitness}
 \end{figure*}
 
@@ -556,7 +567,7 @@ is the radius of the hamming-ball. Therefore our first experiments are designed 
 the effect of this parameter on solution quality.
 
 Figure~\ref{fig-fitness} shows the effect on final solution fitness as $r$ increases. As expected
-from~\cite{chicano:2014:ball} the HBHC obtains higher quality as $r$ increases with the magnitude
+from~\cite{chicano:2014:ball} the HBHC obtains higher quality as $r$ increases, with the magnitude
 of the improvement decreasing. TUX has a similar relationship and
 outperforms HBHC on all three problems for all $r$ values. Regardless of $r$, Gray-Box P3 outperforms both, with almost
 all $r$ values reaching the same best fitness. For Nearest Neighbor NKq, Gray-Box P3 finds the global
@@ -565,17 +576,17 @@ optimum in every run for $r < 4$, with only a single unsuccessful run at $r=4$.
 \begin{figure}
   \centering
   \includegraphicsfit{p3-seconds}
-  \caption{Median time required for Gray-Box P3 to reach the global optimum of Nearest Neighbor NKq instances with $N=6,000$.}
+  \caption{Time required for Gray-Box P3 to reach the global optimum of Nearest Neighbor NKq instances with $N=6,000$.}
   \label{fig-p3-seconds}
 \end{figure}
 
-To further examine the effect of $r$ on Gray-Box-P3, Figure~\ref{fig-p3-seconds} shows the median number of
+To further examine the effect of $r$ on Gray-Box-P3, Figure~\ref{fig-p3-seconds} shows the number of
 seconds required to reach the global optimum. Setting $r=1$ was the most efficient configuration for all $K > 1$,
 supporting the trend that Gray-Box P3 works best with small $r$ values. With $K=1$, the landscape is smooth enough
 that with a sufficiently high $r$ the HBHC is able to find the global optimum.
 
 \subsection{Fitness Over Time}
-
+\label{sec-over-time}
 \begin{figure*}
   \centering
   \includegraphicswide{solver-over}
@@ -587,9 +598,9 @@ that with a sufficiently high $r$ the HBHC is able to find the global optimum.
 Reaching high quality solutions quickly can sometimes be more important than reaching the global optimum
 eventually. Figure~\ref{fig-solver-over} shows how solution quality progresses during
 search for each algorithm. HBHC and TUX have significant early delays caused by their high $r$ values. Larger
-$r$'s require a large amount of initial partial evaluation before performing hill climbing. Once that process
-is complete HBHC effectively stalls, with TUX improving at a faster rate. Both are eclipsed by Gray-Box P3,
-which quickly descends to the global optimum, outperforming HBHC and TUX at every point.
+$r$'s require a large amount of initial partial evaluation before performing hill climbing. After one full iteration
+HBHC effectively stalls, with TUX continuing to improve. Both are eclipsed by Gray-Box P3,
+which quickly descends to the global optimum, outperforming HBHC and TUX at every time point.
 
 Figure~\ref{fig-radius-over} further illustrates the effect of $r$ on Gray-Box P3. On Nearest Neighbor NKq
 and Ising Spin Glasses, increasing $r$ does not change the shape of the curve. Instead the quality reached is simply time shifted,
@@ -632,7 +643,7 @@ NKq and $N=2,916$ for Ising Spin Glass. This limitation is due to Black-Box P3's
   \centering
   \includegraphicsfit{length-nn}
   \caption{Comparison of how each algorithm's time required to reach the best fitness found scales with problem size
-  on Nearest Neighbor NKq with $K=4$.}
+  on Nearest Neighbor NKq with $K=4$. With $N=1000$ Gray-Box P3 is 375x faster than Black-Box P3.}
   \label{fig-length-nn}
 \end{figure}
 
@@ -640,7 +651,7 @@ NKq and $N=2,916$ for Ising Spin Glass. This limitation is due to Black-Box P3's
   \centering
   \includegraphicsfit{length-is}
   \caption{Comparison of how each algorithm's time required to find the best fitness found scales with problem size
-  on Ising Spin Glass.}
+  on Ising Spin Glass. With $N=2025$ Gray-Box P3 is 4.6x faster than Black-Box P3.}
   \label{fig-length-is}
 \end{figure}
 
@@ -650,7 +661,7 @@ two orders of magnitude. On its largest successful problem size, the mean time t
 Black-Box P3 was 375 times slower than Gray-Box P3. Using the Mann-Whitney test to compare their run times
 results in $p < 10^{-16}$. This is especially impressive considering
 previous work has shown Black-Box P3 is faster to reach the global optimum than other leading black-box
-methods. Applying regression, we estimate that Black-Box P3's time to global optimum
+methods~\cite{goldman:2015:fastp3}. Applying regression, we estimate that Black-Box P3's time to global optimum
 on Nearest Neighbor NKq is \BigO{N^{2.75}} while Gray-Box P3's is \BigO{N^{1.98}}.
 
 The results on Ising Spin Glass are similar, with a less extreme difference between
@@ -661,7 +672,7 @@ results in $p < 10^{-14}$. The regression line suggests that while
 Gray-Box P3 scales at \BigO{N^{3.35}}, Black-Box P3 scales at \BigO{N^{3.05}}.
 
 As Unrestricted NKq does not have a known global optimum, and the different algorithms
-rarely found the same best fitness, Figure~\ref{fig-length-un} compares the median error
+rarely found the same best fitness, Figure~\ref{fig-length-un} compares the error
 for each technique at termination. Gray-Box P3 in general finds the best fitness,
 with TUX occasionally performing better. When $N>2,000$, Gray-Box P3 finds better quality
 solutions that all other methods for every instance.  Using the Mann-Whitney test to compare the fitness
@@ -715,7 +726,7 @@ Somewhat surprising is the difference in behavior between the polynomially solva
 and Unrestricted NKq. While Black-Box P3 performed very well in the former, it was the least
 successful in the latter. The optimal radius for Gray-Box P3 also shifted from 1 to 2.
 A potential explanation is that in both Ising Spin Glass
-and Nearest Neighbor NKq the number of unique variables $r$ steps
+and Nearest Neighbor NKq the number of unique variables $r$
 or fewer steps away from a given variable is significantly lower than the worst case. This explains why on Unrestricted NKq
 even moderately high $r$ values hit our memory limit.
 For Black-Box P3 this may also be causing increased difficulty in linkage learning as variables
@@ -723,7 +734,7 @@ become indirectly dependent on much larger sets. Furthermore, Black-Box
 P3 may be benefiting from an increased rate of duplicate dependencies on Nearest Neighbor NKq
 not present in Unrestricted NKq.
 
-While the inclusion of HBHC into Gray-Box P3 introduces a parameter value, it requires
+While the inclusion of HBHC into Gray-Box P3 introduces a parameter, it requires
 trivial configuration. In the worst case there may be a handful of $r$ values to test.
 Furthermore, our evidence suggests setting $r=1$ is quite powerful, with higher values
 likely to be only a time shift in quality. This is in contrast to $r$'s role in HBHC,
