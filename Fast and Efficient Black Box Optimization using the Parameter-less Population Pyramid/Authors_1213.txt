@@ -1,0 +1,19 @@
+Paper ID: 1213
+Title of paper:  Fast and Efficient Black Box Optimization using the Parameter-less Population Pyramid
+
+Contact Author Name: Brian Goldman
+Contact Author Email: brianwgoldman@acm.org
+
+Surname     1st author: Goldman
+Given name  1st author: Brian
+Address     1st author: Department of Computer Science and Engineering, Michigan State University, East Lansing, 48823, United States
+Phone       1st author: (314) 313-1281
+Fax         1st author: (517) 432-1061
+Email       1st author: brianwgoldman@acm.org
+
+Surname     2nd author: Punch
+Given name  2nd author: Bill
+Address     2nd author: Department of Computer Science and Engineering, Michigan State University, East Lansing, 48823, United States
+Phone       2nd author: (517) 353-3541
+Fax         2nd author: (517) 432-1061 
+Email       2nd author: punch@cse.msu.edu
