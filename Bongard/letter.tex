@@ -1,0 +1,108 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Plain Cover Letter
+% LaTeX Template
+% Version 1.0 (28/5/13)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Rensselaer Polytechnic Institute 
+% http://www.rpi.edu/dept/arc/training/latex/resumes/
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[11pt]{letter} % Default font size of the document, change to 10pt to fit more text
+
+\usepackage{newcent} % Default font is the New Century Schoolbook PostScript font 
+%\usepackage{helvet} % Uncomment this (while commenting the above line) to use the Helvetica font
+
+% Margins
+\topmargin=-1in % Moves the top of the document 1 inch above the default
+\textheight=8.5in % Total height of the text on the page before text goes on to the next page, this can be increased in a longer letter
+\oddsidemargin=-10pt % Position of the left margin, can be negative or positive if you want more or less room
+\textwidth=6.5in % Total width of the text, increase this if the left margin was decreased and vice-versa
+
+\let\raggedleft\raggedright % Pushes the date (at the top) to the left, comment this line to have the date on the right
+
+\begin{document}
+
+%----------------------------------------------------------------------------------------
+%	ADDRESSEE SECTION
+%----------------------------------------------------------------------------------------
+
+\begin{letter}{
+Josh Bongard \\
+Morphology, Evolution \& Cognition Laboratory \\
+University of Vermont} 
+
+%----------------------------------------------------------------------------------------
+%	YOUR NAME & ADDRESS SECTION
+%----------------------------------------------------------------------------------------
+
+\begin{center}
+\large\bf Brian W. Goldman \\ % Your name
+%\vspace{20pt} \hrule height 1pt % If you would like a horizontal line separating the name from the address, uncomment the line to the left of this text
+brianwgoldman@acm.org \\ (314) 313-1281 \\ Department of Computer Science and Engineering \\ Michigan State University % Your address and phone number
+\end{center} 
+\vfill
+
+\signature{Brian W. Goldman} % Your name for the signature at the bottom
+
+%----------------------------------------------------------------------------------------
+%	LETTER CONTENT SECTION
+%----------------------------------------------------------------------------------------
+
+\opening{Dear Dr. Bongard,} 
+ 
+I am writing to apply for the Postdoctoral Associate position in your laboratory.
+I am currently an all but dissertation Ph.D. student in BEACON and the Department of Computer Science and Engineering at Michigan State University,
+and my defense is scheduled for July 1st, 2015. My primary research is in evolutionary computation,
+focusing on advanced optimization methods.
+In pursuing my research I have produced four journal articles and seven peer reviewed conference papers,
+the most recent of which winning Best Paper in the Genetic Algorithms track of GECCO 2014.
+%My publications have already received some attention from the field, with 54 citations and an h-index of 4.
+
+My work in Genetic Programming (GP) has focused on how to improve the quality of evolutionary search.
+Working with Cartesian Genetic Programming (CGP), a variant of GP which allows for
+directed acyclic graphs and multiple program outputs, I discovered flaws in how the genetic operators interacted
+with the genetic architecture. This lead me to propose modified operators which significantly improved search
+efficiency and solution compactness.
+
+An issue facing the field of GP is its reliance on simplistic and outdated benchmark problems. As part of a multi-institutional
+collaboration I helped propose new tools for comparing proposed algorithms. By testing GP methods on more challenging
+and more diverse problems we hope to direct the field toward even more success in tackling real-world applications.
+
+More recently I have worked to develop the Parameter-less Population Pyramid (P3) boolean optimization algorithm. P3
+utilizes advanced statistical modeling techniques to automatically detect epistatic relationships between the problem variables,
+allowing for highly efficient crossover. In combination with local search and a novel population layering strategy, P3 is able
+to outperform current state-of-the-art, perfectly tuned, optimization algorithms without receiving any problem specific configuration.
+This work won Best Paper in the Genetic Algorithm's track of GECCO 2014, and lead to a collaboration with NASA mechanical engineers
+to perform finite element design.
+
+Through graduate coursework I have experience with many Machine Learning tools, such as Bayesian classifiers,
+Support Vector Machines, Neural Networks, Random Forests, and Particle Swarm Optimization.
+I received perfect grades in Pattern Recognition, Data Mining, Evolutionary Computation, Computational Intelligence,
+and Artificial Intelligence.
+
+I am very interested in the opportunity to apply my knowledge to the critically important domain of climate change offered by your
+position. I believe this represents an excellent opportunity for new research
+in advanced modeling which will in turn be applicable to a broad range of applications.
+
+\closing{Thank you for your consideration,}
+
+
+%\encl{Curriculum vitae, employment form} % List your enclosed documents here, comment this out to get rid of the "encl:"
+
+%----------------------------------------------------------------------------------------
+
+\end{letter}
+
+\end{document}
