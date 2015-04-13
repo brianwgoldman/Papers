@@ -1,0 +1,214 @@
+\chapter{Proposed Research}
+The Parameter-less Population Pyramid (P3) was shown to be very effective in Chapter~\ref{chap-benchmarking}
+when applied to black box optimization. Some of this effectiveness in due to P3's integration of
+efficient local search and its ability to automatically detect and exploit variable epistasis.
+In Chapter~\ref{chap-graybox} we presented the gray box domain, which contains many interesting
+real world problems, and the improvements that can be made to local search in this domain.
+This presents the following questions:
+
+\begin{itemize}
+\item How can hamming ball local search be integrated into a global optimization method?
+\item What improvements can be made to P3's crossover operator when linkage is known?
+\item How effective is a gray box P3 algorithm in comparison with other gray box techniques?
+\end{itemize}
+
+\section{Simple Memetic Algorithm Using Efficient Search}
+%8.22154, 24.0066, 24.0077, 24.0016, 24.0108, 24.0032, 24.0095, 24.0035, 24.0102, 24.0071, 24.0078, 24.0061, 24.0023, 24.0055, 24.0016, 24.0022, 24.0094, 24.0045, 24.0064, 24.003, 24.0109, 24.0099, 24.0038, 4.78113, 5.47084, 24.0015, 24.0088, 24.0066, 24.0019, 20.6173, 24.0023, 18.9085, 24.0063, 24.0001, 24.0041, 24.0065, 24.002, 24.0017, 24.0029, 24.0096, 24.001, 24.0103, 24.0076, 24.0064, 2.73054, 24.0035, 24.0086, 24.0013, 24.0057, 24.0112
+No current published research has examined how effective hamming ball hill climbing is at reaching the global
+optimum. However, our preliminary experiments have found that even using large $r$ values when solving relatively small $N$
+problems, hamming ball hill climbing is not sufficient to find the global optimum. When applied to 50 instances
+of Nearest Neighbor NK using $N=200$, $K=5$, $r=4$, and limited to using less time than the slowest P3 run to solve that class (24 minutes),
+the hamming ball hill climber only found the global optimum 6 times.
+
+Therefore as a first step in exploring this new domain we propose to explore simple memetic algorithms~\cite{chen:2011:memetic}
+which make use of this hill climber. The goal is to determine if combination with methods like uniform crossover
+can result in improved search quality.
+
+\begin{figure}
+  \begin{algorithmic}[1]
+  \Procedure{Iterate-SUT}{}
+    \State Create random solution
+    \State Apply hamming ball hill climber to solution
+    \ForAll{$T_i \in T$}
+      \If{$T_i$ is empty}
+        \State $T_i \leftarrow$ solution
+        \State \Return
+      \EndIf
+      \State Cross solution with $T_i$ to create $2^i$ offspring
+      \State Apply hamming ball hill climber to each offspring
+      \State solution $\leftarrow$ best of offspring, solution, and $T_i$
+      \State $T_i \leftarrow$ empty
+    \EndFor
+    \State Add solution to end of $T$
+  \EndProcedure
+\end{algorithmic}
+  \caption{One iteration of SUT optimization. $T$ is an
+           ordered list of solution, each of which could be empty,
+           awaiting a crossover partner.}
+  \label{fig-sut}
+\end{figure}
+
+
+We shall tentatively refer to the first proposed algorithm of this type as the Simple Uniform crossover Tournament (SUT)
+algorithm. Conceptually, SUT is meant to be the simplest way to combine uniform crossover with hamming ball hill climbing.
+Solutions compete in an elimination tournament. Each contest in the tournament uses crossover between the solutions, with each
+offspring subsequently brought to a local optimum using hamming ball hill climbing. The best solution of the parents and offspring then
+advances up the tournament.
+
+Similar to P3, this algorithm is entirely iterative and requires no parameters. Figure~\ref{fig-sut} provides the high level algorithm
+for SUT. Each iteration starts by generating a random solution and improving it using the hamming ball hill climber. It then
+iteratively climbs the tournament $T$, competing with each $T_i$ if $T_i$ has a stored solution. If $T_i$ is empty the solution
+is stored until its competitor is found, and if the solution is not stored before reaching the top of the current bracket, a new
+level is added. Adding a new level means that a complete binary tree of crossovers has been created, allowing this algorithm
+to simulate an elimination tournament without knowing the size of the tournament beforehand. Furthermore, this algorithm should
+never need to be restarted from scratch as new diversity is added and improved before being biased by previously found solutions.
+
+When competing two solutions, crossover is used $2^i$ times, where $i$ is $[0..|T|-1]$. This means that the total number of crossovers
+performed at each level is equal. For example, to have a single competition at $T_2$ requires two competitions at $T_1$ and four
+competitions at $T_0$, with each level performing 4 crossovers.
+Each crossover produces a single offspring using uniform crossover, which is then improved using
+the hamming ball hill climber. The best of all offspring and the two parents then compete on fitness, with the best advancing
+up the tournament.
+
+\subsection{Preliminary Empirical Comparison}
+%1.30066, 0.668016, 20.0872, 24.015, 6.84026, 0.620081, 1.43271, 10.9687, 0.625069, 24.0347, 2.84006, 1.57277, 2.81627, 7.82749, 0.63878, 1.52631, 1.31218, 1.41851, 0.650093, 2.79497, 3.01983, 0.28769, 24.0449, 0.292457, 0.316901, 2.957, 1.35011, 0.636912, 2.8645, 0.578051, 1.30444, 0.274158, 3.16518, 0.141998, 1.34107, 13.8565, 0.579429, 0.345084, 0.650234, 13.4685, 3.04961, 0.670062, 1.53499, 19.3596, 2.76979, 1.50853, 1.3763, 1.4152, 12.3199, 2.13644
+When applied to the same problem and using the same $r$, SUT significantly outperforms the hamming ball hill climber.
+On Nearest Neighbor NK $N=200$, $K=5$, $r=4$, SUT was successful 47 of 50 times when limited to 24 minutes of computation.
+Its median time to success was 1.47 minutes, which is on par with P3's black box median time of 1.27 minutes.
+There is a good chance that this similarity will change on larger problems. Its possible that SUT will not
+continue to be able to find the global optimum as $N$ increases. It is also possible that P3's use of complete solution
+reevaluation and modeling may cause its runtime to grow faster than SUT. Further experimentation is required to know
+with certainty which effect will dominate search time.
+
+\section{Developing Efficient Linkage Aware Crossover}
+The reason for recording variable entropy in P3 is to detect unknown variable linage in the black box domain. However,
+the gray box domain makes high level variable linkage fully known. Therefore by leveraging this information it should
+be possible to more efficiently construct crossovers which are even more accurate than the inferred black box ones.
+
+There are a number of possible avenues for future research here. First, should the goal be to derive a single
+static linkage model for crossover or multiple random approximations? It may be possible to compute for
+a given problem the set of all useful crossovers which best balance exploitation with exploration. As
+this only needs to be done once per problem, the algorithm for creating the set can be relatively time consuming.
+The drawback of such a design is that the set may be prohibitively large, require an accurate understanding of what
+the best crossovers are, and repeated use of a static crossover set may adversely effect search.
+
+Repeatedly generating new random crossover sets overcomes many of these issues. An individual set can be relatively small
+as it does not need to contain all possibly useful crossovers. Simultaneously random generation allows the definition for
+what types of crossovers should be used to be less rigorous, favoring instead a more inclusive definition. The drawback
+is that generating random sets may be prohibitively expensive, it may unnecessarily create useless crossovers, and fail
+to create difficult to detect but important crossovers.
+
+Independent of if static or random crossovers are used, there are important research questions related to how variable epistasis
+should best be leveraged in crossover. One possibility is that crossover should aim to preserve build blocks. For instance P3's
+crossover attempts to cross entire traps on Deceptive Trap, as mixing values within a trap does not lead to the global optimum.
+Under this principle it seems reasonable to assert that crossovers which ensure variables which share a non-linear relationship
+are crossed as a group are better than those that do not. The task then is to decide how to handle subfunction overlap to allow
+for sufficient exploration.
+
+Conversely, it may be that intentionally mixing values within subfunctions leads to better exploration. When using a hamming
+ball hill climber as a repair function, taking genes from multiple solutions for a subfunction may be beneficial. Consider
+that on Deceptive Trap were $r\geq trap\_size/2$ the best crossover can be to split every trap in half. While the immediate
+offspring may have low fitness, the hill climber is then able to reach either parent's values for the trap: If the parents
+disagree for a trap, the hill climber can flip enough bits in a single move to return to either's value. Furthermore, it
+also allows the hill climber to search for new high quality ways of solving that subfunction.
+
+As an initial experiment, we have focused on recreating the P3 style of linkage tree without using entropy tables.
+Figure~\ref{fig-sfx-tree} provides an algorithm for using subfunction information to create a linkage tree.
+Initially all variables start in their own cluster. Each subfunction is then used in a random order such that
+if that subfunction overlaps multiple top level clusters it merges them to create a new cluster.
+
+\begin{figure}
+  \begin{algorithmic}[1]
+  \Procedure{SubfunctionTree}{}
+    \State $clusters \leftarrow [\{0\}, \{1\}, \{2\}, \dots, \{N-1\}]$
+    \State $cluster\_number \leftarrow [0 .. N-1]$
+    \ForAll{$subfunction \in shuffled(subfunctions)$}
+      \State $to\_merge \leftarrow \emptyset$
+      \ForAll{$b \in subfunction$}
+        \State $to\_merge \leftarrow to\_merge \cup \{cluster\_number[b]\}$
+      \EndFor
+      \If{$|to\_merge| > 0$}
+        \State $new\_cluster \leftarrow \emptyset$
+        \ForAll{$i \in to\_merge$}
+          \State $new\_cluster \leftarrow new\_cluster \cup clusters[i]$
+        \EndFor
+        \ForAll{$b \in new\_cluster$}
+          \State $cluster\_number[b] \leftarrow |clusters|$
+        \EndFor
+        \State $clusters \leftarrow clusters + new\_cluster$
+      \EndIf
+    \EndFor
+    \State Remove first $N~clusters$ and any cluster containing all variables
+  \EndProcedure
+\end{algorithmic}
+  \caption{Algorithm used to convert a list of subfunctions into linkage tree clusters.}
+  \label{fig-sfx-tree}
+\end{figure}
+
+The computational cost of this algorithm is $O(|cluster|)$ for each $cluster$ created.
+Assuming that the problem is not separable, this algorithm will create
+$\Omega(N)$ clusters. This is a safe assumption in the gray box domain as it is more
+efficient to solve each component independently.
+In order to complete,
+each bit of each subfunction must be referenced, requiring $O(Nc)$ time. As such this cost can
+be amortized over the $\Omega(N)$ clusters to become $O(1)$.
+Each time a new cluster is created
+the $cluster\_number$ of all bits in that cluster must be updated, requiring $O(|cluster|)$ time.
+Therefore using this algorithm detecting clusters is only a constant factor slower than using those clusters
+to perform donations.
+
+This methods has many desirable properties beyond efficiency. All crossovers always move at least one entire subfunction,
+and clusters always differ by at least one entire subfunction. The probability two variables are linked in a
+cluster increases as the number of subfunctions they share increases. This extends to indirect relationships, such that
+the more paths of a given length between two variables the more likely they are to be kept in the same cluster.
+Yet because this process is stochastic, any connected subset of subfunctions can be a cluster.
+
+\subsection{Preliminary Empirical Comparison}
+We tested P3 using the gray box \Call{SubfunctionTree}{} in place of the black box \Call{Cluster-Creation}{}
+and using the gray box hamming ball hill climber instead of black box hill climbing. As an added efficiency
+instead of recalculating all $delta$ values and assuming all moves are open each time a crossover donation is made,
+only $delta$s and moves effected by the donation are updated. This means that hill climbing requires $O(|cluster|+I)$
+time.
+
+%0.0939752, 0.154129, 0.392246, 0.721644, 0.110155, 0.241687, 0.321031, 0.172651, 0.567039, 0.480878, 0.109734, 0.176248, 0.343879, 0.301121, 0.202199, 0.17966, 0.0330468, 0.117303, 0.0885791, 0.0588664, 0.594459, 0.101318, 1.86743, 0.0350668, 0.598237, 0.388794, 0.208924, 0.240061, 0.103984, 0.21943, 0.238308, 1.10106, 0.142684, 0.332108, 0.336863, 0.49791, 0.119978, 0.155924, 0.243874, 0.142354, 0.371339, 0.0854216, 0.168894, 0.419617, 0.128611, 1.9637, 0.288967, 0.142157, 0.103391, 0.307311
+On Nearest Neighbor NK using
+$N=200$, $K=5$, $r=4$ this found the global optimum in all 50 runs, with a median time to success of 0.23 minutes. This makes it the
+most successful gray box tested so far, and 6 times faster than applying black box P3. Also, unlike the other
+methods decreasing $r$ actually makes it more efficient, achieving a median time to success of 0.013 minutes (0.78 seconds) with $r=1$,
+97 times faster than black box P3.
+%1.30066, 0.668016, 20.0872, 24.015, 6.84026, 0.620081, 1.43271, 10.9687, 0.625069, 24.0347, 2.84006, 1.57277, 2.81627, 7.82749, 0.63878, 1.52631, 1.31218, 1.41851, 0.650093, 2.79497, 3.01983, 0.28769, 24.0449, 0.292457, 0.316901, 2.957, 1.35011, 0.636912, 2.8645, 0.578051, 1.30444, 0.274158, 3.16518, 0.141998, 1.34107, 13.8565, 0.579429, 0.345084, 0.650234, 13.4685, 3.04961, 0.670062, 1.53499, 19.3596, 2.76979, 1.50853, 1.3763, 1.4152, 12.3199, 2.13644
+\section{Comparison of Gray Box Methods}
+
+Current research on these gray box methods have been very preliminary: a single size of a single problem class using
+a single $r$, $k$, and $c$. To fully understand how to effectively perform search in this new domain, much more extensive testing
+is necessary.
+
+Just as when testing P3 in the black box domain, an important step will be to identify a representative set
+of gray box problems. Planned test problems are NK landscapes, Ising Spin Glasses, and MAX-SAT. Beyond testing the
+problems with known global optimum, we plan to try Unrestricted NK and Ising Spin Glasses with different linkage models.
+This is critical as the behavior of many gray box algorithms depend on the nature of the epistasis graph. In these domains
+the focus will shift from finding the global optimum (which is unknown) to finding the best solution in a fixed amount of time.
+
+Beyond the randomly generated instances, we plan to seek out real world problems which can be expressed in this domain.
+This will help solidify the conclusions about the applicability of these methods outside of the optimization community.
+Similarly, we plan to compare the results of our gray box methods with algorithms specifically designed for each problem
+domain. This provides an interesting contention between the time required to develop problem specific solvers and the
+quality of using gray box methods.
+
+As the hamming ball hill climber has a user specified parameter $r$, we will need to explore this parameter space.
+Specifically we will want to ensure all comparisons use an appropriate value for $r$ which does not scale with
+$N$. This process will likely involve brute force testing all small $r$ values for moderately large problems in each class
+and then choosing the one which performs best. That $r$ value will then be used for all problem sizes for that problem class.
+
+Another area of focus will be in how $N$ effects the relative effectiveness of the methods. One of the goals of moving
+to a gray box domain is how it impacts Big-$O$ complexity. As a result we plan to empirically verify the scalability
+of each algorithm, as well as the wall clock time to find the global optimum. This is necessary as unlike the black box
+domain where evaluation is considered arbitrarily expensive, evaluation in the gray box domain is perfectly efficient.
+
+\section{Summary of Proposed Research Questions}
+\begin{itemize}
+\item How does the combination of uniform crossover with hamming ball hill climbing compare to hill climbing alone?
+\item Does preserving subfunctions intact during crossover improve search efficiency?
+\item How does black box P3 compare with gray box P3?
+\item How do the more generic gray box methods compare with problem specific methods for solving real world problems?
+\end{itemize}

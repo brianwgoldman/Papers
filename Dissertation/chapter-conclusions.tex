@@ -1,0 +1,44 @@
+\chapter{Conclusions and Future Work}
+The Parameter-less Population Pyramid (P3) is a recently introduced method for performing black box
+optimization. P3's primary innovation is the replacement of the generational model with a pyramid of populations.
+This pyramid is constructed iteratively, with both the number of levels and the number of solutions stored
+at each level growing as search progresses. P3 uses a model based crossover method
+which learns a linkage tree from gene epistasis. Combined with a simple hill climber, P3's design contains
+many synergistic features.
+
+Across a large number of problems and problem sizes P3 required less evaluations to reach the global optimum
+than optimally tuned state-of-the-art competitors. On single instance problems P3's improvement was by a
+constant factor, while for the three problem classes P3's improvement increased with problem size. This
+quality extends to intermediate points during evolution, with P3 generally reaching at least as high
+of fitness as the competitive techniques when using the same number of evaluations. While P3 does require
+modeling overhead, the expense of this overhead is approximately linear with respect to genome size. There
+is some evidence that even when compared on wall clock time, P3 performs at least as well as
+the best comparison techniques. All of these achievements are made without any problem specific parameter
+tuning, making P3 easier to apply to new domains than its two closets competitors in quality.
+
+P3's quality is due to a number of desirable traits. First, mixing local search with model based
+crossover lets search focus on properly mixing high quality solutions. Second, by adding diversity only
+as necessary P3 tends to use the minimal amount of random initialization, unlike other techniques which must
+overcompensate with larger population sizes on single instance problems and consider the worst instance
+when solving problem classes. Third, by heavily exploiting existing diversity before adding more P3 is able
+to reach high quality intermediate fitnesses quickly without prematurely converging. Fourth, the very
+nature of the pyramid's shape allows search to preserve a desirable proportion of diversity at
+each fitness level, similar to a generational model using a decreasing population size.
+
+There are a number of meaningful avenues for future P3 experimentation. Perhaps the most
+pressing for practitioner acceptance is to apply P3 to real world problems and compare
+its results with other black box or even problem specific heuristics. While parameter-less,
+P3 is currently limited to discrete, fixed length genomes evaluated using single objective
+fitness. These limitations can be relaxed with future work to make P3 more widely applicable.
+While asymptotically linear, P3's modeling techniques and local search methods are likely going
+to be prohibitively expensive for genome sizes in the hundreds of thousands or millions of genes,
+and the inability of the model to capture overlapping linkage may be hindering
+search efficiency. Overcoming these limitations by using a new modeling technique may allow
+the pyramid model even greater flexibility. Similarly, while P3 is able to overcome low
+order deception via linkage learning, the iterative improvement method by which crossovers
+are made may mislead search on landscapes with higher order deception.
+
+However, even without
+these improvements our results show P3 is highly efficient at finding
+global optima on black box problems without any problem specific tuning.
+

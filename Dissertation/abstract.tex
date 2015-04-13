@@ -1,0 +1,39 @@
+%%% Abstract:
+\thispagestyle{empty} \setcounter{page}{2}
+\begin{doublespace}
+\begin{centering}
+ABSTRACT\\ %
+Analyzing the Parameter-less Population Pyramid \\ %
+By \\ %
+Brian W. Goldman\\ %
+\ \\
+\end{centering}
+
+The Parameter-less Population Pyramid (P3) is a recently introduced method for performing
+evolutionary optimization without requiring any user specified parameters.
+P3's primary innovation is to replace the generational model with a pyramid of
+multiple populations that are iteratively created and expanded. In combination
+with local search and advanced crossover P3 scales to problem difficulty, exploiting
+previously learned information before adding more diversity.
+
+Across seven problems, each tested using on average 18 problem sizes, P3 outperformed
+all five advanced comparison algorithms. This improvement includes requiring less evaluations
+and less wall clock seconds to find the global optimum and better fitness when using
+the same number of evaluations. Using both algorithm analysis and comparison we find P3's
+effectiveness is due to its ability to properly maintain, add, and exploit diversity.
+
+Unlike the best comparison algorithms, P3 was able to achieve this quality without any
+problem specific tuning. Thus, unlike previous parameter-less methods, P3 does not
+sacrifice quality for applicability. Therefore we conclude that
+P3 is an efficient, general, parameter-less approach to black box
+optimization which is more effective than existing state-of-the-art techniques.
+
+We propose to extend this research to include the ``gray box'' problem domain, which includes many
+interesting real world problems. We plan to develop a variant of P3 which exploits
+features of this domain, such as efficient local search and known variable linkage.
+Furthermore, we want to examine how ``hamming ball search'' can be integrated into
+global optimization, both through simple crossover and as part of P3.
+Finally, we plan compare this P3 variant with state of the art black box, gray box, and
+white box methods for solving challenging real world problems.
+\end{doublespace}
+\newpage

@@ -1,0 +1,44 @@
+\chapter{Introduction}
+\label{chap-introduction}
+%TODO Explain epistasis
+A primary purpose of evolutionary optimization is to efficiently find good solutions
+to challenging real world problems with minimal prior knowledge about the problem itself.
+This driving goal has created search algorithms which can escape user bias to create
+truly novel results, sometimes publishable or patentable in their own right~\cite{kannappan:2014:humies}.
+While it is not possible for any algorithm to do better than random search across all possible
+problems~\cite{Wolpert:1997:nfl}, effectiveness can be achieved by assuming the search
+landscape has structure and then biasing the algorithm toward exploiting that structure.
+
+In evolutionary optimization, and genetic algorithms~(GAs) in particular, search is often
+biased through parameters. This can be beneficial as it allows practitioners to inject their
+knowledge about the shape of the search landscape into the algorithm.
+However, the quality of solutions found, and the speed at which they are found, is strongly tied to setting these parameters
+correctly~\cite{goldberg:1991:gasize}. As such, either expert knowledge or exceedingly
+expensive parameter tuning~\cite{grefenstette:1986:optimalga} are required to leverage
+this feature to its fullest potential. Furthermore,  parameters such as population size, mutation rate, crossover
+rate, tournament size, etc. usually have no clear relationship to the problem being solved, meaning even
+domain experts may not understand how the parameters will interact with the problem or with each other.
+
+There have been periodic efforts to reduce or remove the need for parameter tuning.
+\cite{Back:1992:selfadapt} introduced self-adaptive parameters, in which parameter values
+were included in each solution's genome and themselves underwent evolution. This allowed search
+to optimize some of its own parameters resulting in a reduced the need for expert tuning.
+\cite{harik:1999:parameterlessga} were able to design an entirely parameter-less GA by
+leveraging schema theory and parallel populations. Unfortunately these methods were provably less efficient
+than directly setting the parameters to optimal values~\cite{pelikan:1999:worstparameter-less}.
+
+One area that has been very effective at reducing the number of algorithm parameters is
+model based search. \cite{pelikan:2006:hboa}'s Hierarchical Bayesian Optimization
+Algorithm~(hBOA) and \cite{thierens:2010:ltga}'s Linkage Tree Genetic Algorithm~(LTGA)
+both require only a single parameter: population size. \cite{posik:2011:parameterless}
+leveraged model building to create a fully parameter-less algorithm, but it is restricted to
+only order-k, fully decomposable, noiseless problems.
+
+Most recently \cite{goldman:2014:p3} introduced the Parameter-less Population Pyramid~(P3).
+This method uses a pyramid structure of populations to combine model based search with local search
+to achieve parameter-less optimization. Initial results suggest that unlike
+previous parameter-less methods, P3 is actually more efficient than current state-of-the-art
+parameterized search algorithms. In this work we shall: extend these results to cover more
+comparison algorithms; compare both efficiency in reaching the global optimum and intermediate
+fitnesses; algorithm complexity analysis; and provide more in depth analysis of P3 itself.
+
