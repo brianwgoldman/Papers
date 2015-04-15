@@ -2,9 +2,40 @@
 
 %%%%%%%%%%%%% Population Sizing %%%%%%%%%%%%%
 \section{Population Sizing}
+\begin{figure}[t]
+  \begin{centering}
+    \begin{subfigure}{.5\textwidth}
+      \begin{centering}
+        \includegraphicsfit{pop-p3}
+      \end{centering}
+      \caption{As problem size increases}
+      \label{fig-pop-p3}
+    \end{subfigure}%
+    \begin{subfigure}{.5\textwidth}
+      \begin{centering}
+        \includegraphicsfit{solutions-stored}
+      \end{centering}
+      \caption{Largest problem size}
+      \label{fig-solutions-stored}
+    \end{subfigure}
+  \end{centering}
+  \caption{The total number of solutions stored by P3 when the global optimum is found.
+           In Figure~\ref{fig-solutions-stored} the red ``+'' indicates LTGA's tuned population size.}
+  \label{fig-p3-storage}
+\end{figure}
+
 A major advantage to P3 is that it does not require the user to set a population size parameter.
 Beyond making P3 easier to apply, this also conveys two additional advantages: diversity scaled
 to initialization and no need to sacrifice intermediate fitness for eventual optimality.
+
+Figure~\ref{fig-pop-p3} shows how the number of total solutions stored in the pyramid changes
+as problem size increases, similar to Figure~\ref{fig-pop-sizes} for hBOA and LTGA's tuned population sizes.
+As expected, the number of concurrently stored solutions increases as problem difficult increases, with the
+exact behavior dependent on the problem landscape. Figure~\ref{fig-solutions-stored} examines how the number
+of solutions stored is distributed on the largest problem sizes. Here we see that the behavior depends
+on the type of problem. On single instance problems P3's stored variance is relatively low, and generally
+higher than optimally tuned LTGA's population size. On randomly generated problem classes P3 has a much
+higher variance in stored solutions, but in general requires smaller sizes than LTGA.
 
 \subsection{Problem Instance versus Problem Class}
 Our procedure for tuning LTGA and hBOA outlined in Section~\ref{sec-tuning} involved finding
@@ -23,22 +54,25 @@ much larger than the best random initialization.
 
 \begin{figure}
   \begin{center}
-  \includegraphicsfit{evals-to-success-range}
+  \includegraphicsfit{evals-to-success-boxplot}
   \end{center}
-  \caption{Comparison of the upper and lower quartiles of evaluations required
-           to reach the global optimum for P3 and LTGA with respect to problem size.}
-  \label{fig-evals-to-success-range}
+  \caption{Distribution of evaluations required to reach the global optimum for
+           P3 and LTGA on the largest size of each problem.}
+  \label{fig-evals-to-success-boxplot}
 \end{figure}
 
 
-Figure~\ref{fig-evals-to-success-range}
+Figure~\ref{fig-evals-to-success-boxplot}
 highlights how this can effect the required number of evaluations to reach the global optimum, showing
-the upper and lower quartiles for P3 and LTGA. On each problem
+the distribution of results when solving the largest size of each problem. On each problem
 LTGA has a much smaller difference between its best and worst runs. This makes sense as LTGA uses the same
 population size regardless of instance and progresses search generationally. In contrast P3 has a much
-higher split, with many runs finishing very quickly. This added variability is also generally on the lower
-quartile, with P3's upper quartile only worse than LTGA's on Deceptive Step Trap and Nearest
-Neighbor NK. This supports the hypothesis that P3 is able to scale its diversity not just
+higher split, with many runs finishing very quickly.
+On all problems except Deceptive Step Trap, P3's upper quartile is lower than LTGA's lower quartile.
+Furthermore, on Deceptive Trap, HIFF, and Ising Spin Glasses, P3's worst run is better than LTGA's best run.
+For Nearest Neighbor NK, most of P3's runs finish much faster than the fastest LTGA runs. However, some
+of P3's outliers take approximately as long as LTGA's tuned performance.
+This supports the hypothesis that P3 is able to scale its diversity not just
 to the problem class, but to the problem instance or even problem initialization, something
 wholly infeasible for tuned population sizing to do.
 
@@ -54,15 +88,6 @@ In Section~\ref{sec-overtime} we examined intermediate fitness qualities of LTGA
 population sizes tuned to reach the global optimum. As a result, both were exceptionally ineffective
 at quickly reaching high quality solutions. This is because unlike P3, these methods have an explicit
 trade off between optimal performance and intermediate performance caused by their population size parameter.
-
-At 58\% of the recording intervals hBOA has the worst fitness of any solver. Most of the exceptions
-occur when hBOA is still evaluating its initial population, allowing this random search to temporarily surpass the
-local search methods. After $N$ evaluations, however, hBOA and LTGA both fall behind until their models begin
-to improve.
-Parameter-less hBOA reaches intermediate fitnesses faster than hBOA, doing so on 62\% of intervals, as its models begin
-to optimize earlier than hBOA.  However, this trend is reversed after a sufficient number of evaluations, most clearly
-on Deceptive Step Trap and Ising Spin Glasses, as hBOA's tuned population overtakes Parameter-less hBOA's parallel populations.
-
 
 \begin{figure}[t]
   \begin{centering}
@@ -86,16 +111,40 @@ on Deceptive Step Trap and Ising Spin Glasses, as hBOA's tuned population overta
   \label{fig-small-pop}
 \end{figure}
 
-Figure~\ref{fig-small-pop} examines the effect of population size on LTGA's intermediate fitness by examining the effect
-of reducing LTGA's population size to one tenth of the tuned value. The two problems shown are representative of the behavior of using
+Figure~\ref{fig-small-pop} examines the effect of population size on LTGA's intermediate fitness by
+reducing LTGA's population size to one tenth of the tuned value. The two problems shown are representative of the behavior of using
 a smaller population size on the other five problems. Reducing the population size caused LTGA to improve earlier but plateau
 at lower fitnesses. This caused LTGA's success rate to drop from 100 to 0 on Deceptive Step Trap and from 98 to 68 on Nearest
 Neighbor NK.
 Even when using a reduced population size for LTGA, P3 still achieved a fitness at
 least as high as LTGA at 80\% of intervals.
+The likelihood that P3 would achieve these pairwise results assuming its median result is actually worse is $p < 10^{-15}$
+according to the binomial test.
+
 
 %%%%%%%%%%%%%% P3 Inner Workings %%%%%%%%%%%%%%%%%%%%%%%
 \section{Inner Workings Specific to P3}
+
+\begin{comment}
+It is important to note that hBOA and LTGA were tuned specifically
+to find the global optimum and are not necessarily using the optimal population size for finding intermediate fitnesses. Consider
+that for both reducing the population size would almost certainly improve their fitness for evaluation steps less than their population
+size. To examine the effect of population size we tested LTGA using one tenth of the population size required for reliably finding the
+global optimum, with the results given in Figure~\ref{fig-small-pop}.
+Reducing the population size resulted in LTGA's initial fitness improvement
+occurring earlier, as the first generation is completed much more quickly. On Deceptive Step Trap this means that
+LTGA leaps ahead of P3 due to its ability to overcome the two bit fitness plateaus.
+%
+Across all tested problems using the smaller
+population size reduced the quality of LTGA's first fitness plateau, likely due to missing required diversity to reach higher quality.
+The second period of improvement also comes earlier and reaches a lower quality fitness. On Deceptive Step Trap 0
+runs reach the global optimum, down from 100 successful for the full population size. On Nearest Neighbor NK this drops the number
+of successful runs from 98 to 68. As a result we conclude that while reducing the population size of LTGA may improve its quality
+at early points during optimization, doing so reduces the robustness of the final solution found. This is in contrast to P3
+which balances high quality intermediate fitness without trading away eventual optimality.
+\end{comment}
+
+\section{Inner Workings}
 
 \begin{figure}[t]
   \begin{centering}
@@ -212,7 +261,7 @@ sizes tested, with the dips occurring at exactly the same level.
 This behavior is rooted in the peculiar nature
 of this landscape.
 After local search, all traps in all solutions have a total
-number of 1 bits equal to \{0, 1, 3, 5, 7\} as these correspond to the local
+number of 1 bits equal to either 0, 1, 3, 5, or 7 as these correspond to the local
 optima when using $k=7$ and $s=2$. Crossover is very likely to overcome the
 two bit plateaus, and as a result solutions in the second level generally do not
 contain the lowest fitness local optima (5 bits set) and the third

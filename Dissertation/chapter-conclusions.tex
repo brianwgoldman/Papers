@@ -8,11 +8,11 @@ many synergistic features.
 
 Across a large number of problems and problem sizes P3 required less evaluations to reach the global optimum
 than optimally tuned state-of-the-art competitors. On single instance problems P3's improvement was by a
-constant factor, while for the three problem classes P3's improvement increased with problem size. This
+constant factor, while for the three randomly generated problem classes P3's improvement increased with problem size. This
 quality extends to intermediate points during evolution, with P3 generally reaching at least as high
 of fitness as the competitive techniques when using the same number of evaluations. While P3 does require
 modeling overhead, the expense of this overhead is approximately linear with respect to genome size. There
-is some evidence that even when compared on wall clock time, P3 performs at least as well as
+is some evidence that even when compared on wall clock time, P3 performs on par with
 the best comparison techniques. All of these achievements are made without any problem specific parameter
 tuning, making P3 easier to apply to new domains than its two closets competitors in quality.
 
@@ -30,7 +30,7 @@ pressing for practitioner acceptance is to apply P3 to real world problems and c
 its results with other black box or even problem specific heuristics. While parameter-less,
 P3 is currently limited to discrete, fixed length genomes evaluated using single objective
 fitness. These limitations can be relaxed with future work to make P3 more widely applicable.
-While asymptotically linear, P3's modeling techniques and local search methods are likely going
+While asymptotically linear in problem size, P3's modeling techniques and local search methods are likely going
 to be prohibitively expensive for genome sizes in the hundreds of thousands or millions of genes,
 and the inability of the model to capture overlapping linkage may be hindering
 search efficiency. Overcoming these limitations by using a new modeling technique may allow

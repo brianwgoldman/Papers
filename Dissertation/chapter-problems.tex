@@ -35,16 +35,19 @@ optima (all 1s or all 0s), and then linkage learning can have perfect knowledge 
 In order to make the problem more difficult, the authors proposed the Deceptive
 Step Trap problem, given in Equation~\ref{eq-deceptive-step-trap}. This function modifies the results
 of Equation~\ref{eq-deceptive-trap} to include plateaus of size $s$, introducing an exponential number
-of local optima in each trap. As a result the Deceptive Step Trap is much more challenging for linkage
-learning techniques, while still being highly deceptive. We chose to use $s=2$ to create the maximum
-number of local optima.
+of local optima in each trap.
+With $k=7$ and $s=2$, as used in our experiments, all traps with 0, 1, 3, 5, and 7 bits set are local optima.
+This means that half of all ways to set the trap are 1 bit local optima.
+More generally, the number of local optima grows at $\Theta(2^{k-1})$.
+As a result, the Deceptive Step Trap is much more challenging for linkage
+learning techniques, while still being highly deceptive.
 \begin{equation}
    step\_trap(t) = \left \lfloor \frac{(k-s)\pmod{s} + trap(t)}{s} \right \rfloor
   \label{eq-deceptive-step-trap}
 \end{equation}
 
 Another challenging aspect of landscapes can be higher order relationships. The Hierarchical If
-and only If (HIFF) problem is designed to capture the difficulties of this class of problem.
+and only If (HIFF) problem~\cite{watson:1998:hiff} is designed to capture the difficulties of this class of problem.
 In HIFF the genome is broken up into a complete binary tree, such that each gene appears in exactly one
 leaf and each internal node is the subset of genes contained in its children. If all genes represented
 in a node of the tree are set to the same value, they score equal to the size of the set. In this way
@@ -58,7 +61,7 @@ optimization. This problem's landscape, determined by Equation~\ref{eq-rast}, is
 the oscillating cosine function. \cite{goldman:2014:p3} proposed the Discretized Rastrigin problem, such
 that each floating point $x_i$ in Equation~\ref{eq-rast} is encoded using a 10 bit gray code.
 \begin{equation}
-  An + \sum_{i=1}^{n}\left [ x_i^2-A\cos (2\pi x_i) \right ] \forall x\in [-5.12,5.12]
+  10n + \sum_{i=1}^{n}\left [ x_i^2-10\cos (2\pi x_i) \right ] \forall x\in [-5.12,5.12]
   \label{eq-rast}
 \end{equation}
 
@@ -79,7 +82,7 @@ fitness values, were each possible combination of the $K+1$ genes is mapped to s
 point value $[0-1]$. In unrestricted NK landscapes the relationships between genes are also
 randomly chosen and as a result finding the global optimum is $NP$-Hard for $K>1$. However,
 if epistasis is set such that each gene depends on the $K$ directly following it
-in the genome the solution can be found in polynomial time~\citep{wright:2000:solvingnk}.
+in the genome, the solution can be found in polynomial time~\citep{wright:2000:solvingnk}.
 These Nearest Neighbor NK landscapes are therefore ideal for search algorithm testing.
 For all of our experiments we fixed $K=5$ to ensure highly rugged landscapes.
 
@@ -103,5 +106,5 @@ Each term is a randomly chosen variable, which may also be negated. A clause sco
 at least one term in the clause evaluates to true. In order to make MAX-SAT instances with a known global
 optimum, \cite{goldman:2014:p3} proposed constructing clauses around a fixed solution. In this way the
 signs of the terms are set to ensure the target solution satisfies the clause. To ensure each
-problem is challenging we chose a clause to variable ratio of $4.27$.
+problem is challenging we chose a clause to variable ratio of $4.27$~\citep{selman:1996:maxsat}.
 
