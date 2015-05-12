@@ -1,9 +1,9 @@
-\chapter{New Problem Domain: Gray Box Optimization}
+\chapter{New Problem Domain: gray-box Optimization}
 \label{chap-graybox}
-All of the work presented so far has focused on the black box optimization
+All of the work presented so far has focused on the black-box optimization
 domain. These problems are characterized by a complete lack of available
 problem specific information. All the algorithm has to perform search
-is a ``black box'' which measures the quality of arbitrary proposed
+is a ``black-box'' which measures the quality of arbitrary proposed
 solutions. Optimizers which are successful in this domain are very general
 as there are minimal requirements to apply them to a new problem.
 
@@ -18,13 +18,13 @@ either cannot be applied or have no expectation of quality. As such,
 each must also be designed by hand for each new problem class, requiring
 deep understanding of the problem and the time to develop the algorithm.
 
-In between those two domains there is another: gray box optimization. In this
+In between those two domains there is another: gray-box optimization. In this
 domain some features general to multiple problem classes are exploited, beyond
 just an evaluation function. The goal is to create optimization methods which
 benefits from these features without those methods becoming specialized to
 a small set of problem classes.
 
-In addition to the black box evaluation function, we shall
+In addition to the black-box evaluation function, we shall
 add in two more exploitable features accessible to search algorithms:
 known variable epistasis and partial function evaluation.
 
@@ -108,16 +108,16 @@ provides a bound on the total number of subfunctions of $\frac{cN}{k}$.
 Section~\ref{sec-hill-climber} presented an efficient method for performing local search for the black
 box domain. Each potential bit flip, referred to here as a move, requires the entire solution to be reevaluated, which takes $\Omega(N)$ time.
 Furthermore, each time a fitness improving move is made all previously tested moves must be tested again. As a result
-improving a random solution to be a local optimum using this algorithm requires between $\Omega(N^2)$ and $O(IN^2)$, where $I$ is the number
+improving a random solution to be a local optimum using this algorithm requires between $\Omega(N^2)$ and \BigO{IN^2}, where $I$ is the number
 of improving moves. The lower bound is achieved when the while loop in Figure~\ref{fig-hc} runs a constant number of times.
 For instance on One Max, Deceptive Trap, Deceptive Step Trap, and HIFF all possible single bit improvements are found during
 the first time through the loop. The worst case is when each loop is expected to only make a single improving move, which causes
 all $N$ moves to be reevaluated once per improvement, such as on the Leading Ones problem.
 
-Local search in the gray box domain can be significantly more efficient~\cite{whitley:2013:greedy}. This is due
-to two consequences of the domain: the fitness effect of making a move can be calculated in $O(1)$ time, not $O(N)$,
-and the number of moves which must be reevaluated per improvement is $O(1)$, not $O(N)$. This results in local
-search requiring $O(N+I)$ time. If $I$ is within a constant factor of $N$, this means generating random local
+Local search in the gray-box domain can be significantly more efficient~\cite{whitley:2013:greedy}. This is due
+to two consequences of the domain: the fitness effect of making a move can be calculated in \BigO{1} time, not \BigO{N},
+and the number of moves which must be reevaluated per improvement is \BigO{1}, not \BigO{N}. This results in local
+search requiring \BigO{N+I} time. If $I$ is within a constant factor of $N$, this means generating random local
 optima is at most a constant factor slower than generating random solutions in the search space.
 
 \begin{figure}
@@ -147,7 +147,7 @@ Here, $f_s$ evaluates
 the subfunction $s$ on the given solution, and $solution \oplus m$ is the result of making move $m$ on $solution$.
 For each of the $\frac{cN}{k}$ subfunctions \Call{InitializeDelta}{} must determine the fitness of that
 subfunction before and after making each of $k$ moves which overlap that subfunction. Combined this
-results in less than $cN2b(k)$ operations, which is $O(N)$ assuming $c$ and $b(k)$ do not grow with $N$.
+results in less than $cN2b(k)$ operations, which is \BigO{N} assuming $c$ and $b(k)$ do not grow with $N$.
 Also, this procedure calls $f_s$ only $k+1$ times more than is required to find the fitness of the solution itself.
 
 When performing hill climbing, only moves $m$ such that $delta[m] > 0$ are fitness improving moves. Initially
@@ -185,37 +185,26 @@ effected by $m$. This update replaces outdated information which used the origin
 with how much the move improves over the new solution ($post\_both - just\_m$). As $delta[m']$ has updated, $m'$ could
 potentially become a fitness improving move and is therefore added into $open$. As $m$ was just flipped,
 it cannot be a fitness improvement and is therefore removed from $open$.  In total this requires less than
-$ck4b(k)$ time, which is $O(1)$ assuming $c$, $k$, and $b(k)$ do not scale with $N$.
+$ck4b(k)$ time, which is \BigO{1} assuming $c$, $k$, and $b(k)$ do not scale with $N$.
 
 Each time an improving move is found at most $ck$ additional moves are added to $open$. If $open$ ever
 becomes empty a local optimum has been reached. Therefore the number of times $delta[m]$ is checked
 is no more than $N + Ick$. As a result the total cost of improving a random solution until it reaches
-a global optimum is only $O(N+I)$.
+a global optimum is only \BigO{N+I}.
 
 As an interesting addition, this method can actually be used to efficiently perform approximate steepest ascent hill
 climbing~\cite{whitley:2013:greedy}. Instead of choosing moves from $open$ at random, the moves are binned
 using their $delta$ values. Moves are then chosen randomly from the highest quality non-empty bin, and changes
 in $delta$ can cause moves to change bins. Assuming the total number of bins does not increase with $N$, both steps
-can be done in $O(1)$ time. However, at least for MAX-SAT, there is evidence that when used in combination with subsequent
+can be done in \BigO{1} time. However, at least for MAX-SAT, there is evidence that when used in combination with subsequent
 search heuristics the less greedy first improvement algorithm was more effective.
 
-\subsection{Preliminary Empirical Comparison}
-Figure~\ref{fig-hc-time} compares the black box hill climber presented in Section~\ref{sec-hill-climber}
-with the gray box hill climber presented in Section~\ref{sec-whitley-ls}.  Each algorithm was
-used 30 times on each of 30 instances to improve random solutions until they reached a local optimum.
-Both methods use first improvement hill climbing and achieved statistically indistinguishable fitness results.
-However, the amount of time each used is drastically different. On the largest tested size of $N=8,000$ the gray box
-hill climber was 800 times faster than using the black box method. This improvement was so extreme
-that the gray box hill climber is able to find local optima on $N=8,000$ problems faster than the black box
-method can optimize $N=400$ problems.  When compared asymptotically the black box optimizer empirically requires
-$O(N^{2.14})$ time while the gray box requires $O(N)$. This matches the theoretical conclusions for both algorithms.
-
 \section{Efficient Hamming Ball Search}
-Another consequence of the gray box domain is that increasing the neighborhood of local search becomes
+Another consequence of the gray-box domain is that increasing the neighborhood of local search becomes
 more tractable~\cite{chicano:2014:ball}.  Instead of improving solutions until no single bit flip
 is a fitness improvement, this can be expanded to no flip of $r$ or less bits can improve the solution.
 
-In a black box setting, verifying that no $r$ bit flip can improve a solution requires testing all
+In a black-box setting, verifying that no $r$ bit flip can improve a solution requires testing all
 $n \choose r$ neighbors. This quickly becomes intractable as $r$ increases. However in the gray
 box domain not all combinations need to be tested. Consider that if two variables do not participate
 in the same subfunction, the relationship between their effects is by definition additive. As such

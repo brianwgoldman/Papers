@@ -60,7 +60,7 @@ further fitness improvements.
   \label{fig-hc}
 \end{figure}
 
-The hill climber requires an amortized cost of $O(1)$ operations per evaluation. In order to
+The hill climber requires an amortized cost of \BigO{1} operations per evaluation. In order to
 terminate, at least one evaluation must be performed for each of the $N$ bits in the solution.
 As such any operation that happens only once per search can be amortized over at least $N$
 evaluations, covering the initialization of $options$ on Line~\ref{fig-hc-options}.
@@ -151,7 +151,7 @@ Initially there are $\Theta(N^2)$ possible ways to split existing leaves, as eac
 trees can be split by any of the other $N-1$ genes. Each iteration a new edge is added to the decision
 forest, meaning some of the previously tested splits cannot be used. For instance, if $T_i$, which is used
 to decide the value of $x_i$, is split using the value of $x_j$, $T_j$ can no longer be split using $x_i$.
-As a split creates two new leaves, $O(N)$ new potential splits must also be tested. Equation~\ref{eq-hboa-final}
+As a split creates two new leaves, \BigO{N} new potential splits must also be tested. Equation~\ref{eq-hboa-final}
 parses all solutions which reach a leaf to count gene frequencies, requiring $\mu$ time.
 The number of total leaves created depends heavily on the problem and $\mu$.
 However, assuming no splits are accepted or that the cost of testing all future splits is less than
@@ -275,12 +275,12 @@ using only high quality solutions, even during the first generation.
 
 In order to efficiently perform clustering, a pairwise gene frequency table is constructed from the selected solutions.
 To calculate Equation~\ref{eq-distance}, Equation~\ref{eq-entropy} is called for each
-gene ($H(c_i)$) and pair of genes ($H(c_i \cup c_j)$). Extracting this information requires $O(\mu N^2)$
+gene ($H(c_i)$) and pair of genes ($H(c_i \cup c_j)$). Extracting this information requires \BigO{\mu N^2}
 time, where $\mu$ is the population size and $N$ is the genome size. The process of converting
-this pairwise frequency information into clusters can be achieved in $O(N^2)$ using the bookkeeping
+this pairwise frequency information into clusters can be achieved in \BigO{N^2} using the bookkeeping
 methods presented by \cite{gronau:2007:upgma}. This cost is performed only once per generation,
-and is then used to perform approximately $O(\mu N)$ crossover evaluations. As a result, the amortized cost of
-LTGA's model building is $O(N)$.
+and is then used to perform approximately \BigO{\mu N} crossover evaluations. As a result, the amortized cost of
+LTGA's model building is \BigO{N}.
 
 \begin{figure}
   \begin{algorithmic}[1]
@@ -320,7 +320,7 @@ copied into the next generation.
 In total each individual can cause up to $|useful|$ evaluations. If all clusters were kept, even those deemed
 unhelpful, and all donations were evaluated, even those which did not change any genes, then \Call{Cluster-Usage}{}
 would perform exactly $2N-2$ evaluations for each of the $\mu$ solutions in the population. This provides the amortizing evaluations
-required to make clustering only $O(N)$ operations per evaluation. However, by skipping some evaluations, its
+required to make clustering only \BigO{N} operations per evaluation. However, by skipping some evaluations, its
 possible that clustering may be super-linear.
 
 LTGA has no explicit form of diversity control and has no method for introducing new genetic information once

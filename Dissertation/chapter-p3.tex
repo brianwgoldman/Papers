@@ -75,20 +75,20 @@ has a least one gene different for that cluster of genes from the improving solu
 This process increases the likelihood of an evaluation being performed for every cluster,
 and helps test rare gene patterns in the population.
 
-In LTGA the cost of rebuilding the model is $O(\mu N^2)$ as it must collect pairwise
+In LTGA the cost of rebuilding the model is \BigO{\mu N^2} as it must collect pairwise
 gene frequency information for all $\mu$ solutions in the population. P3 does not store
 a single population, and it does not have a fixed $\mu$ size for any population. However,
-each time a solution is added to the population, it requires $O(N^2)$ time to update
-the table of pairwise frequencies and another $O(N^2)$ time to rebuild the linkage model.
+each time a solution is added to the population, it requires \BigO{N^2} time to update
+the table of pairwise frequencies and another \BigO{N^2} time to rebuild the linkage model.
 The model is then used immediately to perform up to one evaluation for each of the up
 to $2N-2$ clusters. Just as in LTGA, if no evaluation shortcuts were made, P3
-has an amortized cost of $O(N)$ modeling cost per evaluation. While P3 does
+has an amortized cost of \BigO{N} modeling cost per evaluation. While P3 does
 rebuild the model more frequently per solution in the population, it also performs
 a number of local search evaluations which are quite efficient, meaning theoretical
 comparisons of their speed are difficult to perform. As a final note, P3's repeated
 attempts to find a useful donation make it less likely than LTGA to skip evaluations,
 but has an added cost to find these donations. Repeated donations could require as much
-as $O(\mu)$ attempts per evaluation, but experimental evidence suggest that this
+as \BigO{\mu} attempts per evaluation, but experimental evidence suggest that this
 operation actually saves more overhead than it costs by increasing the number of evaluations
 per model rebuild.
 

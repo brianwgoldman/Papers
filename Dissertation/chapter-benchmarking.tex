@@ -226,7 +226,7 @@ is almost linear per evaluation, it can grow slowly. However, even in the worst 
 no more than twice the algorithmic cost of an evaluation even using 2048 bits.
 
 When applying a crossover subset, P3 tries random donors from the population until one is found with at least
-one bit different from the improving solution. In theory this can result in up to $O(\mu)$ operations.
+one bit different from the improving solution. In theory this can result in up to \BigO{\mu} operations.
 Figure~\ref{fig-donations} examines the observed average number of donations per evaluation performed.
 Ising Spin Glass, HIFF, and Rastrigin all achieve effectively constant behavior here, implying repeated
 donation does not impact the asymptotic runtime of P3. Both Trap functions and Nearest Neighbor NK all
@@ -266,7 +266,7 @@ These results were collected using 2.5GHz Intel Xeon E5-2670v2 processors.
 \subsubsection{Model Building}
 hBOA and Parameter-less hBOA perform much worse when using wall clock time as the unit of comparison than when using
 evaluations. This makes sense as hBOA's model building requires $\Omega(N^2)$ time per evaluation while, under reasonable
-assumptions, P3 and LTGA require $O(N)$ time per evaluation. This penalty is most clear on Ising Spin Glass where
+assumptions, P3 and LTGA require \BigO{N} time per evaluation. This penalty is most clear on Ising Spin Glass where
 hBOA goes from being slightly more efficient than LTGA in terms of evaluations to three orders of magnitude worse in terms of seconds.
 As P3 and LTGA require a similar asymptotic complexity per
 evaluation as the Hill Climber and $1+(\lambda, \lambda)$, no similar change in ordering occurs.
@@ -281,7 +281,7 @@ the factor speedup increases as problem length does. Na\"{i}vely this suggests L
 a lower order of complexity. However, for these experiments LTGA is growing at sub-linear time per
 evaluation, which is not asymptotically stable due to (at minimum) the time required to perform an evaluation.
 We suspect that the true cause is that $N$ is small enough to be overshadowed by lower order polynomial terms.
-For example, LTGA requires $O(N/\mu)$ time per evaluation to rebuild the linkage
+For example, LTGA requires \BigO{N/\mu} time per evaluation to rebuild the linkage
 model from the frequency table. As a result, for small $\mu$ model building, and not extracting pairwise
 frequency, can dominate runtime.
 
