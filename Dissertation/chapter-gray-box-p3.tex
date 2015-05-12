@@ -1,1 +1,66 @@
 \chapter{Gray-Box P3}
+P3 represents a natural method for integrating the HBHC into
+a global optimization algorithm as P3 already utilizes local search.
+While HBHC's inclusion adds a parameter, Section~\ref{sec-radius} and
+Section~\ref{sec-over-time} provide evidence that $r$ can be fixed to 1, preserving
+the parameter-less nature of P3.
+Beyond using HBHC, there
+are also a number of ways in which P3 can be made more efficient by leveraging the
+additional information available in the gray-box domain.
+
+First and foremost, linkage learning is no longer necessary. By definition
+the direct non-linear relationships between variables are known. As a result
+P3 no longer needs to store the pairwise frequency information which leads
+the black-box version to require \BigO{N^2} memory. Instead,
+we have developed a method for creating a linkage tree which learns clusters
+from the same dependency graph defined in Section~\ref{sec-hamming}. The goal is for each
+cluster to be a connected induced subgraph, with the size of clusters
+mirroring those produced by the agglomerative linkage learning process normally
+used with P3. To form a single cluster, a random graph search is performed from
+a random starting vertex until a desired number of unique vertices have been explored.
+Cluster sizes are set recursively. For each cluster of size $l>1$
+a cluster of size $a$ and a cluster of size $l-a$ are also created, with $a$ chosen uniformly
+from the range $[1..l-1]$. This recursive process begins by initializing $l=N$ and splitting
+to form the first two clusters.
+
+This linking algorithm has a number of useful properties. First, it creates exactly
+$2N-2$ clusters, distributed in size similarly to the black-box clustering algorithm.
+Performing a random graph search to find $l$ unique vertices requires \BigO{lck} time,
+meaning cluster creation is optimally efficient.
+The cluster splitting process has identical properties as random pivot quicksort,
+meaning the sum of cluster sizes is \BigO{N\log N} in the average case.
+This efficiency allows new clusters to be created before every mixing event,
+unlike Black-Box P3 where they are created only when new solutions are added to the population.
+For simplicity the clusters are shuffled after they are created, not sorted on size like in
+Black-Box P3.
+
+Beyond efficiency, there are good reasons to believe these clusters will be useful
+for search. The closer two variables are in the dependency graph, the more likely
+they are to appear in the same cluster. All variables on average are expected to appear
+in at least one cluster, but variables which are central in the graph will appear in more
+clusters than those on the periphery. The more paths of a given
+length between two variables, the higher the probability of them being in the same cluster.
+Unlike Black-Box P3, this linkage tree does not require clusters to be nested, allowing
+more diversity in the types of clusters appearing in a single tree.
+
+In effect the clusters are sampling moves which the HBHC
+would make if $r \ge l$. For any solution in the search space which is not globally optimal, there
+must exist some move which will improve its quality. However, this move may
+be arbitrarily large and it is intractable to test all possible moves of even moderate size.
+By sampling from all possible large moves, we can maintain tractability while gaining
+a potentially non-zero probability of improvement.
+As clusters are used to donate values between solutions, these
+moves are always in the direction of previously found high quality solutions.
+This assumes that the density of high quality solutions is higher than average between good solutions.
+
+Another efficiency gain possible due to the gray-box domain is that each time a
+donation is made, only the effected part of the solution's fitness needs to be
+recalculated. As a result the number of subfunction evaluations required
+to determine the change in fitness is only \BigO{l}. This also
+allows for Gray-Box P3 to efficiently reapply hill climbing after each
+donation as only effected moves need to be rechecked. As a result, a donation
+and its resulting modifications from hill climbing are kept only if the
+new local optima is at least as fit as the solution before the donation occurred.
+All combined a single donation plus returning to a local optimum requires \BigO{l + I} time,
+while just the donation in Black-Box P3 requires \BigO{N}.
+

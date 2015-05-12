@@ -1,1 +1,192 @@
 \chapter{Benchmarking Gray-Box P3}
+To compare these gray-box optimization techniques we have chosen
+NKq-Landscapes~\cite{chicano:2014:ball} and Ising Spin Glasses~\cite{saul:1994:spinglass}. NKq-Landscapes create
+a collection of randomly generated problem instances given a
+higher level problem class description. Each instance is described
+by a series of $N$ subfunctions, each corresponding to a variable
+in the solution. This subfunction uses its variable and $K$ other
+variables in the solution to calculate a fitness value. Fitness values
+are represented as a randomly generated lookup table, such that table
+entries are integers in the range $[0..q-1]$. As each subfunction reads
+$K+1$ variables, the table's size and $q$ are set to $2^{K+1}$. The quality
+of a solution is equal to the sum of the values returned by these subfunctions.
+
+In this work we shall consider two methods for choosing the $K$ variables
+each subfunction depends on: Nearest Neighbor NKq and Unrestricted NKq.
+In Nearest Neighbor NKq each variable depends on the $K$ variables which sequentially follow
+it in the solution, with dependencies wrapping around the end of the solution.
+Landscapes of this form can be solved in polynomial
+time~\cite{wright:2000:solvingnk}, allowing comparisons of how quickly each optimization
+algorithm can find the global optima. Nearest Neighbor NKq also ensures that $c=k=K+1$
+and that both $c$ and $k$ do not increase as $N$ increases, meaning the efficiency
+conclusions made in Section~\ref{sec-hamming} are applicable.
+
+Unrestricted NKq landscapes draw the $K$ dependencies at random without replacement. For $K > 1$ it is
+NP-Hard to find the global optimum of these landscapes. This also means that while
+$k$ remains fixed, the maximum number of subfunctions a variable appears in ($c$) can increase
+as $N$ increases. As a result some of the efficiency claims in Section~\ref{sec-hamming}
+may not be applicable.
+
+Ising Spin Glasses are a type of MAX-CUT problem relevant in statistical physics. Each spin glass
+encodes spins (vertices) and their relationships (edges) with the goal of assigning each spin a direction
+which minimizes relationship energy. Just as with NKq-Landscapes, Ising Spin Glasses as a whole
+are NP-Hard, but the $2D\pm J$ subset is polynomially solvable~\cite{saul:1994:spinglass}\footnote{\url{http://www.informatik.uni-koeln.de/spinglass/}}. In this
+subset the graph is a 2D toroidal grid, with edge weights of $\pm 1$. In gray-box terms,
+problems of this subset have $k=2$ and $c=4$ regardless of $N$.
+%While Ising Spin Glasses are traditionally
+%a minimization problem, here we present them as a maximization problem by negating the normal fitness.
+
+For each problem class tested, we generated 50 instances.
+Extreme problem sizes were chosen to stress each algorithm.
+Each method was run once on each instance, and limited to 3 hours of computation and 4 GB of memory.
+Runs were performed on 2.5GHz Intel Xeon E5-2670v2 processors using the C++11 code available
+from our website.\footnote{\url{https://github.com/brianwgoldman/GrayBoxOptimization/releases}}
+Each time the run achieved a new best fitness we recorded the current amount of processing time used.
+Timing includes the discovery of subgraphs to allow for comparison between different radius values.
+When reporting the ``best'' fitness for an instance we mean the best fitness found by any method before
+the time limit is reached. On all Nearest Neighbor NKq instances the ``best'' fitness
+is also the global optimum, verified using dynamic programming. For Ising Spin Glass the ``best'' fitness
+was the global optimum 44 out of 50 times.
+
+All figures report the median, upper and lower quartiles for either percentage error or seconds to reach the best. A run's percentage error is
+equal to the difference between its fitness and the best, divided by the best. When reporting seconds
+to reach the best fitness, any run which did not find the best fitness is treated as slower than any run that did.
+If the median run was unsuccessful, no data point is drawn.
+
+\section{The Effect of Radius}
+\label{sec-radius}
+\begin{figure*}
+  \centering
+  \includegraphicsfit{fitness}
+  \caption{Comparison of how radius effects solution quality at termination. For NKq-Landscapes $N=6,000$ and $K=4$ and
+  for Ising Spin Glasses $N=6,084$. Range of radius values limited by memory constraints.}
+  \label{fig-fitness}
+\end{figure*}
+
+The only algorithm parameter in the HBHC, TUX, and Gray-Box P3
+is the radius of the hamming-ball. Therefore our first experiments are designed to determine
+the effect of this parameter on solution quality.
+
+Figure~\ref{fig-fitness} shows the effect on final solution fitness as $r$ increases. As expected
+from~\cite{chicano:2014:ball} the HBHC obtains higher quality as $r$ increases, with the magnitude
+of the improvement decreasing. TUX has a similar relationship and
+outperforms HBHC on all three problems for all $r$ values. Regardless of $r$, Gray-Box P3 outperforms both, with almost
+all $r$ values reaching the same best fitness. For Nearest Neighbor NKq, Gray-Box P3 finds the global
+optimum in every run for $r < 4$, with only a single unsuccessful run at $r=4$.
+
+\begin{figure}
+  \centering
+  \includegraphicshalf{p3-seconds}
+  \caption{Time required for Gray-Box P3 to reach the global optimum of Nearest Neighbor NKq instances with $N=6,000$.}
+  \label{fig-p3-seconds}
+\end{figure}
+
+To further examine the effect of $r$ on Gray-Box-P3, Figure~\ref{fig-p3-seconds} shows the number of
+seconds required to reach the global optimum. Setting $r=1$ was the most efficient configuration for all $K > 1$,
+supporting the trend that Gray-Box P3 works best with small $r$ values. With $K=1$, the landscape is smooth enough
+that with a sufficiently high $r$ the HBHC is able to find the global optimum.
+
+\section{Fitness Over Time}
+\label{sec-over-time}
+\begin{figure*}
+  \centering
+  \includegraphicsfit{solver-over}
+  \caption{Comparison of solution quality during optimization on a log-log scale for different algorithms. For NKq-Landscapes $N=6,000$ and $K=4$ and
+  for Ising Spin Glasses $N=6,084$. Each algorithm uses its best found $r$ value.}
+  \label{fig-solver-over}
+\end{figure*}
+
+Reaching high quality solutions quickly can sometimes be more important than reaching the global optimum
+eventually. Figure~\ref{fig-solver-over} shows how solution quality progresses during
+search for each algorithm. HBHC and TUX have significant early delays caused by their high $r$ values. Larger
+$r$'s require a large amount of initial partial evaluation before performing hill climbing. After one full iteration
+HBHC effectively stalls, with TUX continuing to improve. Both are eclipsed by Gray-Box P3,
+which quickly descends to the global optimum, outperforming HBHC and TUX at every time point.
+
+Figure~\ref{fig-radius-over} further illustrates the effect of $r$ on Gray-Box P3. On Nearest Neighbor NKq
+and Ising Spin Glasses, increasing $r$ does not change the shape of the curve. Instead the quality reached is simply time shifted,
+such that given more time higher $r$ values will reach the same quality. As a result, for these problems we conclude
+that higher $r$ values simply add more expense for no overall gain.
+On Unrestricted NKq this relationship is less certain, with $r=1$ potentially having a different, and worse, shape than $r>1$.
+However, due to memory and time restrictions it is difficult to know if this trend continues.
+
+\begin{figure*}
+  \centering
+  \includegraphicsfit{radius-over}
+  \caption{Comparison of Gray-Box P3's solution quality during optimization on a log-log scale for different $r$ values.
+  For NKq-Landscapes $N=6,000$ and $K=4$ and for Ising Spin Glasses $N=6,084$.}
+  \label{fig-radius-over}
+\end{figure*}
+
+\section{Scalability}
+Perhaps the most critical test of an optimization algorithm's quality is
+how it scales as problem difficulty increases. To test this behavior,
+we ran all three algorithms using the optimal $r$ values determined experimentally in Section~\ref{sec-radius},
+varying $N$ from 200 to 10,000 for NKq and 196 to 6,084 for Ising Spin Glass.
+In these plots we also include the black-box version of P3 to show the efficiency
+gains available for using gray-box information.
+
+
+Figure~\ref{fig-length-nn} and Figure~\ref{fig-length-is} show how long each
+algorithm required to reach the best overall quality found on Nearest Neighbor NKq
+and Ising Spin Glasses, respectively. For Nearest Neighbor NKq the best found
+is the global optimum for all runs of all lengths, while for Ising Spin Glasses
+the best quality found by any method was worse than the global optimum in 7 runs of
+$N=4,096$ and 21 runs of $N=6,084$. The median run of the HBHC was unable to reach the best fitness
+for any problems tested using more than 200 bits. TUX performed somewhat better, reaching
+the best fitness more than half of the time on problem sizes up to $N=800$ and $N=625$ for Nearest Neighbor NKq and Ising
+Spin Glass, respectively. Black-Box P3, which does not utilize partial reevaluation or the HBHC,
+was able to consistently reach the best fitness until it it hit the memory limit on $N=2,000$ for
+NKq and $N=2,916$ for Ising Spin Glass. This limitation is due to Black-Box P3's
+\BigO{N^2} memory requirements.
+
+\begin{figure}
+  \centering
+  \includegraphicshalf{length-nn}
+  \caption{Comparison of how each algorithm's time required to reach the best fitness found scales with problem size
+  on Nearest Neighbor NKq with $K=4$. With $N=1000$ Gray-Box P3 is 375x faster than Black-Box P3.}
+  \label{fig-length-nn}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \includegraphicshalf{length-is}
+  \caption{Comparison of how each algorithm's time required to find the best fitness found scales with problem size
+  on Ising Spin Glass. With $N=2025$ Gray-Box P3 is 4.6x faster than Black-Box P3.}
+  \label{fig-length-is}
+\end{figure}
+
+For all sizes of both problems, Gray-Box P3 was the fastest to reach the best fitness. On
+Nearest Neighbor NKq the improvement is very significant, with no alternative finishing within
+two orders of magnitude. On its largest successful problem size, the mean time to completion for
+Black-Box P3 was 375 times slower than Gray-Box P3. Using the Mann-Whitney test to compare their run times
+results in $p < 10^{-16}$. This is especially impressive considering
+previous work has shown Black-Box P3 is faster to reach the global optimum than other leading black-box
+methods~\cite{goldman:2015:fastp3}. Applying regression, we estimate that Black-Box P3's time to global optimum
+on Nearest Neighbor NKq is \BigO{N^{2.75}} while Gray-Box P3's is \BigO{N^{1.98}}.
+
+The results on Ising Spin Glass are similar, with a less extreme difference between
+Black-Box P3 and Gray-Box P3. In general Gray-Box is the fastest technique to
+find the global optimum by an order of magnitude, with Black-Box P3's mean run finishing
+4.6 times slower than Gray-Box on $N=2,025$. Using the Mann-Whitney test to compare their run times
+results in $p < 10^{-14}$. The regression line suggests that while
+Gray-Box P3 scales at \BigO{N^{3.35}}, Black-Box P3 scales at \BigO{N^{3.05}}.
+
+As Unrestricted NKq does not have a known global optimum, and the different algorithms
+rarely found the same best fitness, Figure~\ref{fig-length-un} compares the error
+for each technique at termination. Gray-Box P3 in general finds the best fitness,
+with TUX occasionally performing better. When $N>2,000$, Gray-Box P3 finds better quality
+solutions that all other methods for every instance.  Using the Mann-Whitney test to compare the fitness
+of Gray-Box P3 and TUX when $N=10,000$ results in $p < 10^{-16}$. HBHC and Black-Box P3 only reach similar
+qualities as TUX and Gray-Box P3 when $N=200$, doing so in 4 and 7 runs, respectively. As the problem
+size increase TUX begins to fall behind Gray-Box P3, with the HBHC stabilizing at about 2.5\% worse than
+the best found. Here Black-Box P3 performs worse than the other techniques,
+falling further behind as the problem size increases.
+
+\begin{figure}
+  \centering
+  \includegraphicshalf{length-un}
+  \caption{Relative qualities of each method as problem size increases on Unrestricted NKq
+  with $K=4$.}
+  \label{fig-length-un}
+\end{figure}

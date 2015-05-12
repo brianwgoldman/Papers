@@ -1,4 +1,4 @@
-\chapter{New Problem Domain: gray-box Optimization}
+\chapter{New Problem Domain: Gray-Box Optimization}
 \label{chap-graybox}
 All of the work presented so far has focused on the black-box optimization
 domain. These problems are characterized by a complete lack of available
@@ -212,32 +212,6 @@ there is no way for flipping both together to be a fitness improvement without f
 being a fitness improvement. Therefore it is not necessary to try all possible $r$ sized subsets
 of the solution.
 
-\begin{figure}[t]
-  \begin{centering}
-    \begin{subfigure}{.5\textwidth}
-      \begin{centering}
-        \includegraphicsfit{hc-time}
-      \end{centering}
-      \caption{Seconds per local optima.}
-      \label{fig-hc-time}
-    \end{subfigure}%
-    \begin{subfigure}{.5\textwidth}
-      \begin{centering}
-        \includegraphicsfit{hc-radius}
-      \end{centering}
-      \caption{Moves in Hamming Ball}
-      \label{fig-hc-radius}
-    \end{subfigure}
-  \end{centering}
-  \caption{Comparison of performing hill climbing
-           using the black box and gray box domains on Nearest Neighbor NK with $K=5$.
-           Figure~\ref{fig-hc-time} shows the time required to bring a random
-           solution to a local optima, averaged over 900 restarts across 30 instances.
-           Figure~\ref{fig-hc-radius} shows the number of moves which must be
-           tested by hill climbing when $N=500$ as $r$ increases.}
-  \label{fig-hc-compare}
-\end{figure}
-
 Consider the 3-Equal problem.  If there are at least two loci between $x_i$ and $x_j$ they do
 not share a common subfunction. Therefore, the change in fitness resulting from flipping
 both is equal to $delta[x_i] + delta[x_j]$. As such if $delta[x_i] \leq 0$ and $delta[x_j] \leq 0$
@@ -258,78 +232,131 @@ of the subset can be tested independently.
 
 \begin{figure}
   \begin{algorithmic}[1]
-  \Procedure{ConnectedSubgraphs}{$v$, $subset$, $closed$, $open$}
-    \State $new\_subset \leftarrow subset \cup \{v\}$
-    \State $found \leftarrow [new\_subset]$
-    \If{$|new\_subset| \geq r$}
+  \Procedure{ConnectedInducedSubgraphs}{}
+    \State $closed \leftarrow \emptyset$
+    \State $found \leftarrow [~]$
+    \ForAll{$v \in V$}
+      \State $closed \leftarrow closed \cup \{v\}$
+      \State $found \leftarrow found + $\Call{CISG}{$v$, $\emptyset$, $closed$, $\emptyset$}
+    \EndFor
+    \State \Return $found$
+  \EndProcedure
+  \Procedure{CISG}{$v$, $subset$, $closed$, $open$}
+    \State $subset' \leftarrow subset \cup \{v\}$
+    \State $found \leftarrow [subset']$
+    \If{$|subset'| \geq r$}
       \Return $found$
     \EndIf
     \State $closed\_here \leftarrow \emptyset$
     \State $open' \leftarrow open \cup adjacent(v)$
-    \ForAll{$v' \in open'$}
-      \If{$v' \notin closed$}
+    \ForAll{$v' \in open'$ such that $v' \notin closed$}
         \State $closed\_here \leftarrow closed\_here \cup \{v'\}$
         \State $closed \leftarrow closed \cup \{v'\}$
-        \State $recurse \leftarrow $\Call{ConnectedSubgraphs}{$v'$, $new\_subset$, $closed$, $open'$}
+        \State $recurse \leftarrow $\Call{CISG}{$v'$, $subset'$, $closed$, $open'$}
         \State $found \leftarrow found + recurse$
-      \EndIf
     \EndFor
     \State $closed \leftarrow closed - closed\_here$
     \State \Return $found$
   \EndProcedure
 \end{algorithmic}
-  \caption{Algorithm to recursively find all connected induced subgraphs of size $r$ or less which
-           contain $subset \cup \{v\}$ and no additional vertices in $closed$.}
+  \caption{Algorithm to recursively find all connected induced subgraphs of size $r$ or fewer.}
   \label{fig-connected-subgraphs}
 \end{figure}
 
-The problem of finding which subsets must be checked is therefore equivalent to
-finding all induced subgraphs of $r$ or less vertices which are connected. For sparse
-graphs this can be efficiently calculated using \Call{ConnectedSubgraphs}{} outlined
-in Figure~\ref{fig-connected-subgraphs}. To our knowledge this is a novel algorithm
-as previous work did not specify how connected subgraphs were found.
+In order to determine which moves in the hamming-ball must be evaluated,
+we developed \Call{ConnectedInducedSubgraphs}{} given in Figure~\ref{fig-connected-subgraphs}.
+\Call{CISG}{} is a recursive helper function which finds all subgraphs
+which contain a given $subset$ and a given vertex $v$, while excluding
+any other vertices added to $closed$. To find all subgraphs, \Call{CISG}{}
+is called once for each vertex in the graph, such that $closed$ contains
+all previously searched vertices, and $subset=open=\emptyset$. In the initial
+call all desired subgraphs which contain $v$ are found, which is why $v$ remains
+in $closed$ to prevent duplicate subgraphs from being returned.
 
-$subset$ and $open$ are both empty for the first top level call of \Call{ConnectedSubgraphs}{}, and
-$closed$ contains only $v$.
-The result of that call is to find all induced connected subgraphs which contain $v$.
-Subsequent top level calls expand $closed$ to also include their $v$.
-Each recursive level explores how $new\_subset$ can be expanded by including all $v'$ which are adjacent
-to at least one vertex in $new\_subset$. Once all subsets including $new\_subset \cup v'$ have been found,
-$v'$ is closed to prevent duplicates. However, when recursion ends $closed$ is returned to its previous state.
-The maximum recursive depth for this algorithm is $r$ as each level increases $|subset|$ by 1. Each level
-makes at most $|open'|$ recursive calls, with $|open'| \leq |open| + c(k-1)$. Finally there must be a top level
-call with each of the $N$ variables. This creates a loose bound of $O(r!(c(k-1))^rN)$, which is $O(N)$ under the
-assumption that $r$ and $c$ do not increase with $N$. The bound is loose because some portion of recursions
-are prevented by $closed$ and because overlapping adjacency will reduce the rate at which $|open'|$ increases.
+At each recursive level \Call{CISG}{} expands $open$ to include any vertices
+adjacent to $v$ in the graph. By construction this means that $open'$ contains
+all possible ways of adding a single vertex to the current $subset'$. As each $v'$
+is tested it is temporarily added to $closed$ to prevent recursive calls
+from adding it again to $subset'$.
 
-As this algorithm finds all connected subsets in $O(N)$ time for a fixed $r$, the number of moves
-which must be tested to determine if a solution is an $r$-bit local optima is $O(N)$. This means that
-while on Nearest Neighbor NK with $N=8000$, $K=5$, and $r=3$ the black box method would require 85 billion
-checks, the gray box method requires only 248,000. Even when allowing connections to be completely random,
-which results in $c$ increasing with $N$, the gray box method still only requires approximately 375 million checks,
-two and a half orders of magnitude less than assuming a black box.
+When applied to the sparse graphs inherent in the gray-box domain, this algorithm
+requires \BigO{r!(ck)^rN} time, which reduces to \BigO{N}. The time spent
+in each call is dominated by the loop over $open'$. In the worst case, $open'$
+increases in size by the full adjacency of $v$, which is bounded by $ck$.
+This creates a worse case complexity for a single top level call of
+$\prod_{i}^{r} ick = r!(ck)^r$. This must be called once for each
+of the $N$ variables resulting in \BigO{r!(ck)^rN}.
+
+As this algorithm finds all connected subsets in \BigO{N} time for a fixed $r$, the number of moves
+which must be tested to determine if a solution is an $r$-bit local optima is \BigO{N}. This means that
+while on Nearest Neighbor NK with $N=8000$, $K=5$, and $r=3$ the black-box method would require 85 billion
+checks, the gray-box method requires only 248,000. Even when allowing connections to be completely random,
+which results in $c$ increasing with $N$, the gray-box method still only requires approximately 375 million checks,
+two and a half orders of magnitude less than assuming a black-box.
 
 From these conclusions it is possible to modify the hill climber presented in Section~\ref{sec-whitley-ls} to
 efficiently find $r$-bit local optima~\cite{chicano:2014:ball}. The only change is that instead of having a move
 and $delta$ for each bit, there must be a move and delta for each connected induced subgraph of $r$ or less bits.
 The efficiency analysis is unchanged with the exception that the constant increases exponentially with $r$ as
 the number of $delta$ values which must be updated each move increases. Still, with $c$, $r$, and $k$ constant
-with respect to $N$, it is possible to find $r$-bit hamming ball local optima in $O(N+I)$ time.
+with respect to $N$, it is possible to find $r$-bit hamming ball local optima in \BigO{N+I} time.
 
-\subsection{Preliminary Empirical Comparison}
-Figure~\ref{fig-hc-radius} shows how the number of moves increases as the radius of the hamming ball increases.
-Even on this relatively small problem ($N=500$) the black box method quickly becomes intractable. The gray box
-method is able to use less moves to find 4-bit local optima than the black box needs to find 2-bit local optima,
-and when solving 6-bit local optima the black box method requires 653,635 times as many moves as gray box. However,
-gray box still increases exponentially as $r$ increases, limiting how large $r$ can grow before becoming intractable.
-This relationship depends heavily on $c$ and how variables are distributed among subfunctions.
+\section{Tournament Uniform Crossover: TUX}
+\label{sec-tux}
+\begin{figure}
+  \begin{algorithmic}[1]
+  \Procedure{Iterate-TUX}{}
+    \State Create random $solution$
+    \State Hamming-Ball Hill Climb $solution$
+    \ForAll{$T_i \in T$}
+      \If{$T_i$ is empty}
+        \State $T_i \leftarrow solution$
+        \State \Return
+      \EndIf
+      \State Cross $solution$ with $T_i$ to create $2^{i+1}$ offspring
+      \State Hamming-Ball Hill Climb each offspring
+      \State $solution \leftarrow$ best of offspring, $solution$, and $T_i$
+      \State $T_i \leftarrow$ empty
+    \EndFor
+    \State Add $solution$ to end of $T$
+  \EndProcedure
+\end{algorithmic}
+  \caption{One iteration of TUX optimization. $T$ is an
+           ordered list of solutions, each position of which could be empty,
+           awaiting a crossover partner.}
+  \label{fig-TUX}
+\end{figure}
 
-\begin{comment}
-\section{Memetic Algorithms}
-~\cite{chen:2011:memetic}
+Hamming-Ball Hill Climbing is not sufficient to efficiently find the global optima
+on problems with even moderate epistasis~\cite{chicano:2014:ball}. This is because,
+like all random restart hill climbers, it relies on random initialization to fall
+inside the global optima's basin of attraction.
 
+To remedy this limitation, we set out to develop a minimally complex memetic
+algorithm to help increase this probability. Figure~\ref{fig-TUX} presents
+the Tournament Uniform Crossover (TUX) algorithm, which combines simplistic
+selection with equal probability uniform crossover, the most basic unbiased crossover, to generate starting
+solutions likely to be in the global optima's basin of attraction.
 
-Local search, even $r$-bit hamming ball search, is not sufficient to robustly find global optimums on
-highly multi-modal problems. This limitation was shown in Figure~\ref{fig-evals-to-success} with hill climbing
-unable to reach the global optima on almost any large size problem.
-\end{comment}
+Conceptually TUX iteratively builds a structure similar to a single elimination
+bracket for solutions. Each ``match'' in the tournament takes in two candidate solutions,
+produces offspring via uniform crossover, applies hill climbing to each offspring, with
+the ``winner'' being the best of all those solutions. The tournament ``bracket'' is constructed
+iteratively, storing an initially empty list of solutions $T$, such that $|T|$ is equal to the height
+of the tournament. Iterative construction is possible because when a sub-bracket is complete only a single solution
+emerges and solutions only need to be stored until their partner is found.
+TUX is fully elitist but does not prematurely converge. This is because search continuously
+integrates new randomly generated solutions through other parts of the bracket. Whenever the
+top of the current bracket is reached, TUX doubles the size of the virtual tournament.
+
+When crossing solutions at $T_i$, TUX produces $2^{i+1}$ offspring. This relationship
+ensures that in total all levels of the tournament, including random initialization,
+perform the same number of hill climbing steps. It also shifts the focus of search toward
+areas expected to be of higher fitness. The expectation is also that it becomes progressively
+harder to improve solutions the higher up the tournament you advance, so more attempts
+are necessary to create new useful solutions.
+
+The primary advantages of TUX are that it does not introduce any new parameters (though it still
+requires an $r$ for the hill climber) and is relatively simple to implement. Even so
+it allows for learning from previous local optima and as Section~\ref{sec-experiments}
+will show it is quite effective at optimization.
