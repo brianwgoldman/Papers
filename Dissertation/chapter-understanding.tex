@@ -92,15 +92,28 @@ Deceptive Trap and Deceptive Step Trap have very comprehensible landscapes. Ther
 a good place to begin understanding what ``big valley'' plots are showing. Figure~\ref{fig-valley-trap} shows
 how the local optima in each of these problems are distributed.
 
-\begin{figure*}
-  \centering
-  \includegraphicsfit{valley-trap}
-  \caption{Location and quality of local optima in comparison to the global optima for Deceptive Step Trap ($r=1$ and $r=2$)
-           and Deceptive Trap with $N=30$ and $k=5$.}
+\begin{figure}[t]
+  \begin{centering}
+    \begin{subfigure}{.44\textwidth}
+      \begin{centering}
+        \includegraphicsfit{valley-dt}
+      \end{centering}
+      \caption{Deceptive Trap}
+      \label{fig-valley-dt}
+    \end{subfigure}%
+    \begin{subfigure}{.56\textwidth}
+      \begin{centering}
+        \includegraphicsfit{valley-dst}
+      \end{centering}
+      \caption{Deceptive Step Trap}
+      \label{fig-valley-dst}
+    \end{subfigure}
+  \end{centering}
+  \caption{Location and quality of local optima in comparison to the global optima with $N=30$ and $k=5$.}
   \label{fig-valley-trap}
-\end{figure*}
+\end{figure}
 
-The Deceptive Trap problem, shown in the rightmost panel, has very few local optima, each of which actually
+The Deceptive Trap problem has very few local optima, each of which actually
 provide very little deception in terms of ``big valley'' properties. Given any two local optima, the one
 closer to the global optimum in fitness is also always closer to the global optimum in representation space.
 This makes sense as the worst local optimum contains all 0s, and each fitness improvement beyond that involves
