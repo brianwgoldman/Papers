@@ -1,4 +1,4 @@
-\chapter{Problem Understanding using Gray-Box Methods}
+\chapter{Understanding When P3 Excels}
 The ruggedness and high dimensionality of most interesting landscapes makes them very challenging
 to visualize or otherwise understand. However, doing so can be very helpful in
 understanding the difficulty of a problem, and how best to design algorithms to deal
@@ -6,13 +6,13 @@ with those difficulties. Conversely, understanding the characteristics which fav
 existing algorithms can help future researchers choose the algorithm which is
 most likely to perform well on their problem. To further this end, we shall
 explore the landscapes used in previous sections in an attempt to understand
-what about a landscape makes it a good problem for P3 to solve.
+what makes a landscape easy for P3 to solve.
 
 
 \section{Big Valley}
- In order to understand the global structure of a landscape
-\cite{boese:1994:bigvalley} examined the relationship between local optima.
-This process involved generating thousands of random solutions and then applying
+One method for understanding the global structure of a landscape
+is to examine the relationship between local optima~\cite{boese:1994:bigvalley}.
+In its original form, this process involved generating thousands of random solutions and then applying
 local search to each. To convert this information into something human interpretable,
 the authors created two dimensional plots: distance from nearest global optima and
 fitness difference from global optima.
@@ -38,10 +38,10 @@ a single bit. As a direct result, checking if each new solution is locally optim
 only \BigO{1} time and the overall enumeration process is reduced to \BigO{2^N}.
 
 Due to the limited non-linearity of the gray-box domain, its possible to exclude large
-parts of the search space without potentially missing any local optima. Consider a fitness
-improving bit flip. By definition the only way this flip can cease to be a fitness improvement
-is if one of the bits it shares a subfunction with is flipped. Therefore, all solutions which
-contain the same values for all of those bits as the current solution cannot be locally optimal.
+parts of the search space without potentially missing any local optima. Consider a bit flip $X_i$.
+For gray-box problems there are only $ck$ other bit values which are needed to determine if flipping
+$X_i$ is a fitness improvement. If a given set of values for $X_i$ and those $ck$ bits results in
+$X_i$ being a fitness improvement, then any solution which contains all of those values cannot be a local optima.
 
 This knowledge can be effectively exploited by intelligently skipping parts of the enumeration.
 Before starting search we can determine the least significant bit in the solution which effects
@@ -122,10 +122,10 @@ of elitist mixing to produce solutions which are progressively more and more sim
 it is finally found.
 
 Deceptive Step Trap's inclusion of fitness plateaus creates an enormous number of local optima. In total there are 24
-million local optima on this problem, representing 2.2\% of the entire search space. In comparison Deceptive Trap of the
+million local optima on this problem, representing 2.2\% of the entire search space. In comparison, Deceptive Trap using the
 same size has only 64 local optima. These additional local optima create a somewhat deceptive landscape, as selecting
-on fitness between two local optima can result in an increased genetic distance to the global optimum. In the middle
-panel of Figure~\ref{fig-valley-trap} we show how examining only 2-bit local optima causes Deceptive Step Trap using
+on fitness between two local optima can result in an increased genetic distance to the global optimum.
+Figure~\ref{fig-valley-dst} with $r=2$ shows how examining only 2-bit local optima causes Deceptive Step Trap using
 a step size of 2 to effectively revert to Deceptive Trap. This is because the hill climber can overcome all of the plateaus,
 leaving each trap either at the global optimum of all 1s or the local optimal value of all 0s or exactly one 1. Selection then
 becomes a near perfect predictor of distance to the global optimum.
@@ -154,8 +154,11 @@ the global optimum.
 \end{figure*}
 
 While visually somewhat similar, Unrestricted NKQ shown in Figure~\ref{fig-valley-nn} suggests selection may be misleading.
-Consider the bulge in the bottom right of $r=1$. If search finds points in that area, small modifications and elitist selection
-will not lead toward the global optimum. At higher radius values this issue becomes more apparent, with optima flattening out away
+Consider the shape of the bottom of $r=1$. At a distance of about 15 bits there is a slight hump, such that high quality solutions
+are more frequent both closer and further from the global optimum than at the same distance.
+If search finds points in the area over 15 bits away from the global optimum, small modifications and elitist selection
+are more likely to lead away from the global optimum that toward it.
+At higher radius values this issue becomes more apparent, with optima flattening out away
 from the global optima in representation space. For many of these points, the only way to improve would require flipping over 15 bits
 correctly.
 
@@ -187,7 +190,7 @@ There is almost a negative correlation between fitness difference from the globa
 global optimum. As before, this problem is not solved by increasing the radius of the local optima.
 This may explain why methods like LTGA and hBOA, which extensively rely on selection,
 scale so poorly when tested on this problem. P3's comparative success may therefore be the result of the random restart hill climber
-eventually finding a solution in the right area of the search space, with crossover finding the global optimum mostly by chance.
+eventually finding a solution in the correct area of the search space, with crossover finding the global optimum mostly by chance.
 
 \section{Pyramid Levels}
 One method for understanding how P3 performs search is to examine the types of solutions being stored at each level
@@ -238,7 +241,7 @@ Figure~\ref{fig-level-un} gives insight into how different Unrestricted NKQ is f
 Gray-Box P3, regardless of radius, appears to explore deceptive local optima which offer fitness improvements without moving
 closer to the global optima in representation space. In this problem there is a gap of over 1000 bits between the deceptive
 local optima and those likely to lead to the best found solution. An interesting behavior on this problem is that the branch
-between the two groups always seems to begin with a single solution in level 1. This suggests that the solutions found near
+between the two groups always seems to begin with a single solution in level 1. This suggests that the stored solutions near
 the best found may all be similar due to sharing a common ancestor.
 
 \begin{figure*}
