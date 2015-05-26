@@ -1,4 +1,5 @@
 \chapter{Conclusions and Future Work}
+% P3 Journal
 The Parameter-less Population Pyramid (P3) is a recently introduced method for performing black-box
 optimization. P3's primary innovation is the replacement of the generational model with a pyramid of populations.
 This pyramid is constructed iteratively, with both the number of levels and the number of solutions stored
@@ -25,71 +26,39 @@ to reach high quality intermediate fitnesses quickly without prematurely converg
 nature of the pyramid's shape allows search to preserve a desirable proportion of diversity at
 each fitness level, similar to a generational model using a decreasing population size.
 
+When leveraging features of the new domain, Gray-Box P3 can obtain substantial improvement
+over Black-Box P3. This comes from the integration of the Hamming-Ball Hill Climber (HBHC)
+and a novel method for deriving linkage clusters from the known problem epistasis,
+both of which result in a factor $N$ speedup over their black-box counterparts.
+Furthermore, Gray-Box P3
+can perform partial reevaluation and efficient hill climbing during the mixing phase
+without significant overhead. In specializing, Gray-Box P3 is able to find
+global optima orders of magnitude faster than Black-Box P3.
+
 There are a number of meaningful avenues for future P3 experimentation. Perhaps the most
 pressing for practitioner acceptance is to apply P3 to real world problems and compare
 its results with other black-box or even problem specific heuristics. While parameter-less,
 P3 is currently limited to discrete, fixed length genomes evaluated using single objective
 fitness. These limitations can be relaxed with future work to make P3 more widely applicable.
-While asymptotically linear in problem size, P3's modeling techniques and local search methods are likely going
+While asymptotically linear in problem size, Black-Box P3's modeling techniques and local search methods are likely going
 to be prohibitively expensive for genome sizes in the hundreds of thousands or millions of genes,
 and the inability of the model to capture overlapping linkage may be hindering
 search efficiency. Overcoming these limitations by using a new modeling technique may allow
 the pyramid model even greater flexibility. Similarly, while P3 is able to overcome low
 order deception via linkage learning, the iterative improvement method by which crossovers
-are made may mislead search on landscapes with higher order deception.
+are made may mislead search on landscapes with higher order deception. This appears
+to be especially important on NP-Hard problems, where high quality solutions may be
+very distant from the global optimum in representation space.
+
+While empirically effective, we believe its possible to derive theoretical foundations
+for Gray-Box P3. Specifically, this may be possible by considering the nature of crossover
+in terms similar to those use for finding $r$-bit local optima with HBHC. Consider
+that for any two parents the non-linear effects of crossover are constrained by
+where they containing different bit values. As a result, subsets of their differences
+can become linearly separable, allowing for each to be considered independently of all others.
+Furthermore, these conclusions about effective crossover in gray-box can likely be translated
+into a black-box setting to help explain the effectiveness of Black-Box P3.
 
 However, even without
 these improvements our results show P3 is highly efficient at finding
-global optima on black-box problems without any problem specific tuning.
-
-In line with previous work, we have found that HBHC cannot effectively find global optima
-on problems with even moderate epistasis. In general it also obtains almost no improvement
-in fitness after only a few restarts. We designed TUX as a simplistic way of choosing
-restart locations based on previously found local optima. Unlike HBHC alone, TUX
-was able to continue improving given more time, finding global optima on problems three
-times as large.
-
-TUX's effectiveness is likely due to the HBHC acting as a super repair operator for uniform crossover.
-Given a sufficiently large $r$ the HBHC can return sections of the crossover offspring to either
-parents' original version of a given subfunction. The HBHC is elitist meaning there is a bias toward
-returning to the better of the two parent's versions. Furthermore, by being so disruptive,
-uniform crossover potentially allows for the HBHC to also find unrelated improvements.
-
-While TUX improves over plain HBHC, Gray-Box P3 is required to perform truly successful
-global optimization. Gray-Box P3 replaces na\"{i}ve local search with the HBHC and utilizes
-known non-linear relationships instead of statistical linkage learning. On NKq-Landscapes this drastically
-improves search effectiveness. A major source of this improvement is likely how difficult it is
-for Black-Box P3 to learn linkage relationships on these landscapes. Furthermore, Gray-Box P3
-can perform partial reevaluation and efficient hill climbing during the mixing phase.
-
-Gray-Box P3's success is less dramatic on Ising Spin Glasses.
-While it still outperformed all competitors, Black-Box P3 may actually scale better to larger
-problems. One explanation for this deviation is that Ising Spin Glasses require more
-exploration of equal fitness plateaus. For instance in Figure~\ref{fig-solver-over} and Figure~\ref{fig-radius-over}
-there is a significant pause in improvement when Gray-Box P3 reaches the second best fitness in the landscape.
-Nothing in its design suggests that Gray-Box P3 should be more effective at neutral drift. Another potential
-issue is that on these landscapes the importance of each non-linear relationship may be detectably unequal.
-As a result Black-Box linkage learning may better cluster variables which having meaningful
-impact on fitness while Gray-Box assumes all are equally important. A useful direction for future work
-would be to explore methods of performing efficient learning on top of the known variable interactions.
-
-Somewhat surprising is the difference in behavior between the polynomially solvable problems
-and Unrestricted NKq. While Black-Box P3 performed very well in the former, it was the least
-successful in the latter. The optimal radius for Gray-Box P3 also shifted from 1 to 2.
-A potential explanation is that in both Ising Spin Glass
-and Nearest Neighbor NKq the number of unique variables $r$
-or fewer steps away from a given variable is significantly lower than the worst case. This explains why on Unrestricted NKq
-even moderately high $r$ values hit our memory limit.
-For Black-Box P3 this may also be causing increased difficulty in linkage learning as variables
-become indirectly dependent on much larger sets. Furthermore, Black-Box
-P3 may be benefiting from an increased rate of duplicate dependencies on Nearest Neighbor NKq
-not present in Unrestricted NKq.
-
-While the inclusion of HBHC into Gray-Box P3 introduces a parameter, it requires
-trivial configuration. In the worst case there may be a handful of $r$ values to test.
-Furthermore, our evidence suggests setting $r=1$ is quite powerful, with higher values
-likely to be only a time shift in quality. This is in contrast to $r$'s role in HBHC,
-where low $r$ values are never expected to reach the same quality has higher $r$ values.
-Therefore we conclude that Gray-Box P3 maintains the out-of-the-box quality of Black-Box
-P3, while drastically improving efficiency for this new domain of problems.
-
+global optima on both black-box and gray-box problems without any problem specific tuning.

@@ -105,8 +105,8 @@ provides a bound on the total number of subfunctions of $\frac{cN}{k}$.
 
 \section{Efficient Local Search}
 \label{sec-whitley-ls}
-Section~\ref{sec-hill-climber} presented an efficient method for performing local search for the black
-box domain. Each potential bit flip, referred to here as a move, requires the entire solution to be reevaluated, which takes $\Omega(N)$ time.
+Section~\ref{sec-hill-climber} presented an efficient method for performing local search for the black-box
+domain. Each potential bit flip, referred to here as a move, requires the entire solution to be reevaluated, which takes $\Omega(N)$ time.
 Furthermore, each time a fitness improving move is made all previously tested moves must be tested again. As a result
 improving a random solution to be a local optimum using this algorithm requires between $\Omega(N^2)$ and \BigO{IN^2}, where $I$ is the number
 of improving moves. The lower bound is achieved when the while loop in Figure~\ref{fig-hc} runs a constant number of times.
@@ -205,8 +205,8 @@ more tractable~\cite{chicano:2014:ball}.  Instead of improving solutions until n
 is a fitness improvement, this can be expanded to no flip of $r$ or less bits can improve the solution.
 
 In a black-box setting, verifying that no $r$ bit flip can improve a solution requires testing all
-$n \choose r$ neighbors. This quickly becomes intractable as $r$ increases. However in the gray
-box domain not all combinations need to be tested. Consider that if two variables do not participate
+$n \choose r$ neighbors. This quickly becomes intractable as $r$ increases. However in the gray-box
+domain not all combinations need to be tested. Consider that if two variables do not participate
 in the same subfunction, the relationship between their effects is by definition additive. As such
 there is no way for flipping both together to be a fitness improvement without flipping one of them
 being a fitness improvement. Therefore it is not necessary to try all possible $r$ sized subsets
@@ -223,7 +223,7 @@ be a fitness improvement.
 To determine which of the $n \choose r$ flips which must be checked, consider a graph where
 each vertex is a variable in the solution. An edge exists between two vertices if and only
 if the corresponding variables participate in at least one subfunction together. Restated,
-there is only an edge if the two variables have a non-linear relationship. The maximum
+there is only an edge if the two variables have a direct non-linear relationship. The maximum
 degree of a vertex in this graph is $c(k-1)$, making it sparse for sufficiently large $N$.
 If a subset of vertices is connected then it is possible that flipping all of those
 variables together will result in a fitness improvement even when flipping any subset
@@ -296,7 +296,7 @@ two and a half orders of magnitude less than assuming a black-box.
 
 From these conclusions it is possible to modify the hill climber presented in Section~\ref{sec-whitley-ls} to
 efficiently find $r$-bit local optima~\cite{chicano:2014:ball}. The only change is that instead of having a move
-and $delta$ for each bit, there must be a move and delta for each connected induced subgraph of $r$ or less bits.
+and $delta$ for each bit, there must be a move and $delta$ for each connected induced subgraph of $r$ or less bits.
 The efficiency analysis is unchanged with the exception that the constant increases exponentially with $r$ as
 the number of $delta$ values which must be updated each move increases. Still, with $c$, $r$, and $k$ constant
 with respect to $N$, it is possible to find $r$-bit hamming ball local optima in \BigO{N+I} time.
