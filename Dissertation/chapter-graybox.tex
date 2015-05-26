@@ -200,6 +200,7 @@ can be done in \BigO{1} time. However, at least for MAX-SAT, there is evidence t
 search heuristics the less greedy first improvement algorithm was more effective.
 
 \section{Efficient Hamming Ball Search}
+\label{sec-hamming}
 Another consequence of the gray-box domain is that increasing the neighborhood of local search becomes
 more tractable~\cite{chicano:2014:ball}.  Instead of improving solutions until no single bit flip
 is a fitness improvement, this can be expanded to no flip of $r$ or less bits can improve the solution.
@@ -358,5 +359,5 @@ are necessary to create new useful solutions.
 
 The primary advantages of TUX are that it does not introduce any new parameters (though it still
 requires an $r$ for the hill climber) and is relatively simple to implement. Even so
-it allows for learning from previous local optima and as Section~\ref{sec-experiments}
+it allows for learning from previous local optima and as Section~\ref{chapter-gray-box-benchmarking}
 will show it is quite effective at optimization.
