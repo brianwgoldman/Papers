@@ -25,7 +25,7 @@ There have been periodic efforts to reduce or remove the need for parameter tuni
 \cite{rechenberg:1973:es} introduced self-adaptive parameters, in which parameter values
 were included in each solution's genome and themselves underwent evolution. This allowed search
 to optimize some of its own parameters, resulting in a reduced need for expert tuning.
-\cite{harik:1999:parameterlessga} were able to design an entirely parameter-less GA by
+\cite{harik:1999:parameterlessga} was able to design an entirely parameter-less GA by
 leveraging schema theory and parallel populations. Unfortunately these methods were provably less efficient
 than directly setting the parameters to optimal values~\cite{pelikan:1999:worstparameter-less}.
 
@@ -36,7 +36,7 @@ both require only a single parameter: population size. \cite{posik:2011:paramete
 leveraged model building to create a fully parameter-less algorithm, but it is restricted to
 only order-k, fully decomposable, noiseless problems.
 
-Most recently \cite{goldman:2014:p3} introduced the Parameter-less Population Pyramid~(P3).
+Most recently we introduced the Parameter-less Population Pyramid~(P3)~\cite{goldman:2014:p3}.
 This method uses a pyramid structure of populations to combine model based search with local search
 to achieve parameter-less optimization. Initial results suggest that unlike
 previous parameter-less methods, P3 is actually more efficient than current state-of-the-art

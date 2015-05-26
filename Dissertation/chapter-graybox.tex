@@ -45,7 +45,7 @@ this has enormous implications on search efficiency.
 Every problem discussed in Chapter~\ref{chap-problems} except HIFF fit into this domain. Deceptive
 Trap and Deceptive Step Trap both can have known epistasis (which bits are in which traps) and
 partial reevaluation (score a single trap), the same as Rastrigin (separable). All NK problems
-where $K \ll N $ have a knowable epistasis table and the fitness contribution of each is subfunction
+where $K \ll N $ have a knowable epistasis table and the fitness contribution of each subfunction is
 calculable without evaluating the entire string. Similarly, MAX-SAT's clause list specifies epistasis,
 with each clause independently evaluable. Ising Spin Glasses are even simpler, with each edge in the
 graph evaluable using only two problem variables.
@@ -73,7 +73,7 @@ using each edge independently. Used in VLSI design~\cite{festa:2002:maxcut}.
 \item \textbf{Set Cover}: Given a universe of elements and a set of subsets of that universe,
 find a minimum set of subsets whose union recreates the entire universe. Each element in
 the universe is epistatically linked with subsets that contain that element (add to uncovered size)
-and with each subset also contributing directly to fitness (add to set size). Used in
+and each subset also contributes directly to fitness (add to set size). Used in
 computational biology~\cite{painsky:2014:setcover}.
 
 \item \textbf{Zero-One Linear Programming}: Given a set of constraints, maximize an
