@@ -9,7 +9,7 @@ The $1+(\lambda, \lambda)$ algorithm~\citep{doerr:2013:lambdalambda} is the curr
 and its method of crossover is in some sense a macro-mutation just as in P3. hBOA and Parameter-less
 hBOA are advanced model building search techniques which are very effective at learning complex
 problem structure, designed to achieve similar goals as P3's linkage learning but using very different
-methods. Finally LTGA represents the current state-of-the-art in black box search and is the origin
+methods. Finally LTGA represents the current state-of-the-art in black-box search and is the origin
 of P3's linkage learning and crossover methods.
 
 Only hBOA and LTGA require any parameters, with each of these only requiring a population
@@ -28,7 +28,7 @@ are available from our website.\footnote{\url{https://github.com/brianwgoldman/F
 %%%%%%%%%% HC %%%%%%%%%%%%%%%%
 \section{Random Restart Hill Climber}
 \label{sec-hill-climber}
-Perhaps the simplest black box search heuristic is stochastic local search, or hill climbing.
+Perhaps the simplest black-box search heuristic is stochastic local search, or hill climbing.
 This optimization technique focuses on improving a single solution until it reaches a local
 optimum. Here we use the first improvement hill climber defined by \cite{goldman:2014:p3}
 and given in Figure~\ref{fig-hc}. This algorithm works by flipping each bit in a random

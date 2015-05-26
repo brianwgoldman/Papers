@@ -1,15 +1,15 @@
 \chapter{Proposed Research}
 The Parameter-less Population Pyramid (P3) was shown to be very effective in Chapter~\ref{chap-benchmarking}
-when applied to black box optimization. Some of this effectiveness in due to P3's integration of
+when applied to black-box optimization. Some of this effectiveness in due to P3's integration of
 efficient local search and its ability to automatically detect and exploit variable epistasis.
-In Chapter~\ref{chap-graybox} we presented the gray box domain, which contains many interesting
+In Chapter~\ref{chap-graybox} we presented the gray-box domain, which contains many interesting
 real world problems, and the improvements that can be made to local search in this domain.
 This presents the following questions:
 
 \begin{itemize}
 \item How can hamming ball local search be integrated into a global optimization method?
 \item What improvements can be made to P3's crossover operator when linkage is known?
-\item How effective is a gray box P3 algorithm in comparison with other gray box techniques?
+\item How effective is a gray-box P3 algorithm in comparison with other gray-box techniques?
 \end{itemize}
 
 \section{Simple Memetic Algorithm Using Efficient Search}
@@ -74,16 +74,16 @@ up the tournament.
 %1.30066, 0.668016, 20.0872, 24.015, 6.84026, 0.620081, 1.43271, 10.9687, 0.625069, 24.0347, 2.84006, 1.57277, 2.81627, 7.82749, 0.63878, 1.52631, 1.31218, 1.41851, 0.650093, 2.79497, 3.01983, 0.28769, 24.0449, 0.292457, 0.316901, 2.957, 1.35011, 0.636912, 2.8645, 0.578051, 1.30444, 0.274158, 3.16518, 0.141998, 1.34107, 13.8565, 0.579429, 0.345084, 0.650234, 13.4685, 3.04961, 0.670062, 1.53499, 19.3596, 2.76979, 1.50853, 1.3763, 1.4152, 12.3199, 2.13644
 When applied to the same problem and using the same $r$, SUT significantly outperforms the hamming ball hill climber.
 On Nearest Neighbor NK $N=200$, $K=5$, $r=4$, SUT was successful 47 of 50 times when limited to 24 minutes of computation.
-Its median time to success was 1.47 minutes, which is on par with P3's black box median time of 1.27 minutes.
+Its median time to success was 1.47 minutes, which is on par with P3's black-box median time of 1.27 minutes.
 There is a good chance that this similarity will change on larger problems. Its possible that SUT will not
 continue to be able to find the global optimum as $N$ increases. It is also possible that P3's use of complete solution
 reevaluation and modeling may cause its runtime to grow faster than SUT. Further experimentation is required to know
 with certainty which effect will dominate search time.
 
 \section{Developing Efficient Linkage Aware Crossover}
-The reason for recording variable entropy in P3 is to detect unknown variable linage in the black box domain. However,
-the gray box domain makes high level variable linkage fully known. Therefore by leveraging this information it should
-be possible to more efficiently construct crossovers which are even more accurate than the inferred black box ones.
+The reason for recording variable entropy in P3 is to detect unknown variable linage in the black-box domain. However,
+the gray-box domain makes high level variable linkage fully known. Therefore by leveraging this information it should
+be possible to more efficiently construct crossovers which are even more accurate than the inferred black-box ones.
 
 There are a number of possible avenues for future research here. First, should the goal be to derive a single
 static linkage model for crossover or multiple random approximations? It may be possible to compute for
@@ -147,7 +147,7 @@ if that subfunction overlaps multiple top level clusters it merges them to creat
 
 The computational cost of this algorithm is $O(|cluster|)$ for each $cluster$ created.
 Assuming that the problem is not separable, this algorithm will create
-$\Omega(N)$ clusters. This is a safe assumption in the gray box domain as it is more
+$\Omega(N)$ clusters. This is a safe assumption in the gray-box domain as it is more
 efficient to solve each component independently.
 In order to complete,
 each bit of each subfunction must be referenced, requiring $O(Nc)$ time. As such this cost can
@@ -164,8 +164,8 @@ the more paths of a given length between two variables the more likely they are 
 Yet because this process is stochastic, any connected subset of subfunctions can be a cluster.
 
 \subsection{Preliminary Empirical Comparison}
-We tested P3 using the gray box \Call{SubfunctionTree}{} in place of the black box \Call{Cluster-Creation}{}
-and using the gray box hamming ball hill climber instead of black box hill climbing. As an added efficiency
+We tested P3 using the gray-box \Call{SubfunctionTree}{} in place of the black-box \Call{Cluster-Creation}{}
+and using the gray-box hamming ball hill climber instead of black-box hill climbing. As an added efficiency
 instead of recalculating all $delta$ values and assuming all moves are open each time a crossover donation is made,
 only $delta$s and moves effected by the donation are updated. This means that hill climbing requires $O(|cluster|+I)$
 time.
@@ -173,27 +173,27 @@ time.
 %0.0939752, 0.154129, 0.392246, 0.721644, 0.110155, 0.241687, 0.321031, 0.172651, 0.567039, 0.480878, 0.109734, 0.176248, 0.343879, 0.301121, 0.202199, 0.17966, 0.0330468, 0.117303, 0.0885791, 0.0588664, 0.594459, 0.101318, 1.86743, 0.0350668, 0.598237, 0.388794, 0.208924, 0.240061, 0.103984, 0.21943, 0.238308, 1.10106, 0.142684, 0.332108, 0.336863, 0.49791, 0.119978, 0.155924, 0.243874, 0.142354, 0.371339, 0.0854216, 0.168894, 0.419617, 0.128611, 1.9637, 0.288967, 0.142157, 0.103391, 0.307311
 On Nearest Neighbor NK using
 $N=200$, $K=5$, $r=4$ this found the global optimum in all 50 runs, with a median time to success of 0.23 minutes. This makes it the
-most successful gray box tested so far, and 6 times faster than applying black box P3. Also, unlike the other
+most successful gray-box tested so far, and 6 times faster than applying black-box P3. Also, unlike the other
 methods decreasing $r$ actually makes it more efficient, achieving a median time to success of 0.013 minutes (0.78 seconds) with $r=1$,
-97 times faster than black box P3.
+97 times faster than black-box P3.
 %1.30066, 0.668016, 20.0872, 24.015, 6.84026, 0.620081, 1.43271, 10.9687, 0.625069, 24.0347, 2.84006, 1.57277, 2.81627, 7.82749, 0.63878, 1.52631, 1.31218, 1.41851, 0.650093, 2.79497, 3.01983, 0.28769, 24.0449, 0.292457, 0.316901, 2.957, 1.35011, 0.636912, 2.8645, 0.578051, 1.30444, 0.274158, 3.16518, 0.141998, 1.34107, 13.8565, 0.579429, 0.345084, 0.650234, 13.4685, 3.04961, 0.670062, 1.53499, 19.3596, 2.76979, 1.50853, 1.3763, 1.4152, 12.3199, 2.13644
 \section{Comparison of Gray Box Methods}
 
-Current research on these gray box methods have been very preliminary: a single size of a single problem class using
+Current research on these gray-box methods have been very preliminary: a single size of a single problem class using
 a single $r$, $k$, and $c$. To fully understand how to effectively perform search in this new domain, much more extensive testing
 is necessary.
 
-Just as when testing P3 in the black box domain, an important step will be to identify a representative set
-of gray box problems. Planned test problems are NK landscapes, Ising Spin Glasses, and MAX-SAT. Beyond testing the
+Just as when testing P3 in the black-box domain, an important step will be to identify a representative set
+of gray-box problems. Planned test problems are NK landscapes, Ising Spin Glasses, and MAX-SAT. Beyond testing the
 problems with known global optimum, we plan to try Unrestricted NK and Ising Spin Glasses with different linkage models.
-This is critical as the behavior of many gray box algorithms depend on the nature of the epistasis graph. In these domains
+This is critical as the behavior of many gray-box algorithms depend on the nature of the epistasis graph. In these domains
 the focus will shift from finding the global optimum (which is unknown) to finding the best solution in a fixed amount of time.
 
 Beyond the randomly generated instances, we plan to seek out real world problems which can be expressed in this domain.
 This will help solidify the conclusions about the applicability of these methods outside of the optimization community.
-Similarly, we plan to compare the results of our gray box methods with algorithms specifically designed for each problem
+Similarly, we plan to compare the results of our gray-box methods with algorithms specifically designed for each problem
 domain. This provides an interesting contention between the time required to develop problem specific solvers and the
-quality of using gray box methods.
+quality of using gray-box methods.
 
 As the hamming ball hill climber has a user specified parameter $r$, we will need to explore this parameter space.
 Specifically we will want to ensure all comparisons use an appropriate value for $r$ which does not scale with
@@ -201,14 +201,14 @@ $N$. This process will likely involve brute force testing all small $r$ values f
 and then choosing the one which performs best. That $r$ value will then be used for all problem sizes for that problem class.
 
 Another area of focus will be in how $N$ effects the relative effectiveness of the methods. One of the goals of moving
-to a gray box domain is how it impacts Big-$O$ complexity. As a result we plan to empirically verify the scalability
-of each algorithm, as well as the wall clock time to find the global optimum. This is necessary as unlike the black box
-domain where evaluation is considered arbitrarily expensive, evaluation in the gray box domain is perfectly efficient.
+to a gray-box domain is how it impacts Big-$O$ complexity. As a result we plan to empirically verify the scalability
+of each algorithm, as well as the wall clock time to find the global optimum. This is necessary as unlike the black-box
+domain where evaluation is considered arbitrarily expensive, evaluation in the gray-box domain is perfectly efficient.
 
 \section{Summary of Proposed Research Questions}
 \begin{itemize}
 \item How does the combination of uniform crossover with hamming ball hill climbing compare to hill climbing alone?
 \item Does preserving subfunctions intact during crossover improve search efficiency?
-\item How does black box P3 compare with gray box P3?
-\item How do the more generic gray box methods compare with problem specific methods for solving real world problems?
+\item How does black-box P3 compare with gray-box P3?
+\item How do the more generic gray-box methods compare with problem specific methods for solving real world problems?
 \end{itemize}
