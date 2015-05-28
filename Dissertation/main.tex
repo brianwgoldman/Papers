@@ -18,7 +18,7 @@
 
 
 %%% Define the actual document parameters:
-\documentclass[12pt,letterpaper]{report}
+\documentclass[12pt,letterpaper,twoside]{report}
 
 
 %%%  Include packages used throughout the dissertation:
@@ -41,10 +41,128 @@
 \usepackage{url}
 \usepackage[usenames,dvipsnames]{color}
 
-\newcommand*\cut{\textcolor{red}}
-\newcommand*\add{\textcolor{ForestGreen}}
-\newcommand*\alter{\textcolor{blue}}
+%%%%%%%%%%%%%% COPIED FROM JARED
 
+\usepackage{adjustbox}
+\usepackage{afterpage}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amssymb}
+\usepackage{calc}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{comment}
+\usepackage{epsfig}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{graphics}
+\usepackage[hmarginratio=1:1,margin=1in]{geometry}
+\usepackage{indentfirst}
+\usepackage{layout}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{moreverb}
+\usepackage{pdflscape}
+\usepackage{rotating}
+\usepackage{setspace}
+\usepackage{subcaption}
+\usepackage[euler]{textgreek}
+\usepackage{tocloft}
+\usepackage{url}
+
+%%% Use the following to format your titles for the Table of Contents, List of Figures, List of Tables. 
+%\renewcommand{\cfttoctitlefont}{\normalfont\Large\bfseries\MakeUppercase}
+\setlength{\cftbeforetoctitleskip}{-0.2in}
+\setlength{\cftaftertoctitleskip}{0.1875in}
+\renewcommand{\cfttoctitlefont}{\hfill\Large\bfseries}
+\renewcommand{\cftaftertoctitle}{\hfill}
+\renewcommand{\contentsname}{\large\centering{TABLE OF CONTENTS}}
+
+% Add dot leaders to the chapter entries in the TOC
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+
+\setlength{\cftbeforeloftitleskip}{-0.17in}
+\setlength{\cftafterloftitleskip}{0.1875in}
+\renewcommand{\cftloftitlefont}{\hfill\Large\bfseries}
+\renewcommand{\cftafterloftitle}{\hfill}
+\renewcommand{\listfigurename}{\large\centering{LIST OF FIGURES}}
+
+\setlength{\cftbeforelottitleskip}{-0.33in}
+\setlength{\cftafterlottitleskip}{0.3875in}
+\renewcommand{\cftlottitlefont}{\hfill\Large\bfseries}
+\renewcommand{\cftafterlottitle}{\hfill}
+\renewcommand{\listtablename}{\large\centering{LIST OF TABLES}}
+
+%%% Bibliography setup for TOC and The Final Page %%%%
+\renewcommand{\bibname}{\vspace*{-0.95in} \large\centering{BIBLIOGRAPHY}}
+
+%%% Put colon after figure number in the list of figures %%%
+\renewcommand{\cftfigpresnum}{Figure\ }
+\renewcommand{\cftfigaftersnum}{:\ }
+
+%%% Put Table before and colon after table number in the list of tables %%%
+\renewcommand{\cfttabpresnum}{Table\ }
+\renewcommand{\cfttabaftersnum}{:\ }
+
+% Put spacing after the Table #: and Figure #: in the LOF and LOT
+\newlength{\mylenf}
+\settowidth{\mylenf}{\cftfigpresnum}
+\setlength{\cftfignumwidth}{\dimexpr\mylenf+0.35in}
+\setlength{\cfttabnumwidth}{\dimexpr\mylenf+0.35in}
+
+% Use this in conjunction with making the LOT singlespace so that long table entries are 
+% single space within entries and double space between entries
+\renewcommand\cfttabafterpnum{\vskip\baselineskip}
+
+%%% Put Chapter before number in the TOC %%%
+\renewcommand\chaptername{Chapter}
+\renewcommand\cftchappresnum{\chaptername\space}
+\setlength{\cftchapnumwidth}{\widthof{\textbf{Chapter~999~}}}
+
+\fancypagestyle{mylandscape}{%
+  \fancyhf{}% Clear header/footer
+  \fancyfoot{% Footer
+    \makebox[\textwidth][r]{% Right
+      \rlap{\hspace{-.13in}%\footskip}% Push out of margin by \footskip
+        \smash{% Remove vertical height
+          \raisebox{\dimexpr.5\baselineskip+\footskip+.66\textheight}{% Raise vertically
+            \rotatebox{90}{\thepage}}}}}}% Rotate counter-clockwise
+  \renewcommand{\headrulewidth}{0pt}% No header rule
+  \renewcommand{\footrulewidth}{0pt}% No footer rule
+}
+
+%%% Renew command for full page figures:
+\renewcommand{\topfraction}{1.0}
+
+% Blank page (if needed)
+\newcommand\blankpage{%
+    \null
+    \thispagestyle{empty}%
+    \addtocounter{page}{-1}%
+    \newpage}
+%%%  Set the margins as required by the MSU graduate school. 
+%%%  Specifically, set the margins 1 inch top bottom and right, 
+%%%  1.5 inch on left.  Now, Latex has margin origins at 1 in on the top 
+%%%  and left so for 1.5 in the margin is set at 1.5 - 1 = .5 inch
+%\setlength{\oddsidemargin}{.5in}   % This is the left margin for both
+%\setlength{\evensidemargin}{1.5in} % even and odd pages (in case you use the book format)
+\setlength{\topmargin}{0in} % Top margin (remember latex starts from 1 in)
+
+% Pagewidth(8.5in) - textwidth(6in) - leftmargins(1.5in) = 1 inch for right margin
+\setlength{\textwidth}{6.5in}
+
+% Page height (11in) - Topmargin (1in) - Textheight (1in) = 1 in for
+%                                                      bottom margin
+\setlength{\textheight}{9in} %
+\setlength{\footskip}{.5in}
+%%% Headings are not required, thus suppress:
+\setlength{\headheight}{0in} 
+\setlength{\headsep}{0in}
+
+\newsavebox{\savefig}
+
+%%%%%%%%%%%%% End of Jared Copy
+
+\begin{comment}
 %%% Use the following to format your titles for the Table of Contents, List of Figures, List of Tables. 
 \renewcommand{\contentsname}{\large\centering{Table of Contents}}
 \renewcommand{\listfigurename}{\large\centering{List of Figures}}
@@ -73,7 +191,7 @@
 %%% Headings are not required, thus suppress:
 \setlength{\headheight}{0in} 
 \setlength{\headsep}{0in}
-
+\end{comment}
 
 %%%  Include any definitions you wish to use throughout the dissertation:
 %\input{definitions}
@@ -94,7 +212,7 @@
 %%%  Begin the actual dissertation:
 \begin{document}
 \sloppy
-
+\pagenumbering{gobble}
 
 %%%  Title Page:
 \begin{titlepage}
@@ -104,20 +222,16 @@
 \begin{doublespace}
 By\\ %
 Brian W. Goldman\\[4.5 in]%[2.5 in] %
-DISSERTATION\\
-%\end{doublespace}
+A DISSERTATION\\
+\end{doublespace}
 
-%Submitted to \\ Michigan State University \\ in partial
-%fulfillment of the requirements \\ for the degree of\\
-%\begin{doublespace}
+Submitted to \\ Michigan State University \\ in partial
+fulfillment of the requirements \\ for the degree of\\
+\begin{doublespace}
 %Change the next line as needed for your degree
-%DOCTOR OF PHILOSOPHY\\
-%insert your department
-Department of Computer Science and Engineering\\
-Michigan State University\\
+Computer Science - Doctor Of Philosophy\\
 %put in the appropriate year
-2014\\
-Advisor: Dr. William F. Punch\\%
+2015\\
  \end{doublespace}
 \end{center}
 \end{titlepage}
@@ -239,7 +353,8 @@ Advisor: Dr. William F. Punch\\%
 \clearpage
 
 
-%%%  Bibliography:
+\addcontentsline{toc}{chapter}{BIBLIOGRAPHY}
+
 \newpage
 \vspace*{\fill}
 \begin{center}
@@ -247,11 +362,8 @@ BIBLIOGRAPHY
 \vspace*{\fill}
 \end{center}
 
-
 \newpage
 \begin{singlespace}
-%% Comment out the next line if you don't have any references
-\addcontentsline{toc}{chapter}{LIST OF REFERENCES}
 \bibliographystyle{plain}% your bst file here
 \bibliography{../main} %your bib file here
 \end{singlespace}
