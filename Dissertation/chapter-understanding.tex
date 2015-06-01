@@ -45,7 +45,7 @@ $X_i$ being a fitness improvement, then any solution that contains all of those 
 
 This knowledge can be effectively exploited by intelligently skipping parts of the enumeration.
 Before starting search we can determine the least significant bit in the solution that effects
-each possible fitness improving move. This is the bit that must be flipped in order to effect
+each possible fitness improving move. This is the bit that must be flipped in order to affect
 the quality of that move. As a result, when determining what solution to test next, all steps
 of the enumeration that do not result in the least significant bit of a fitness improvement being
 flipped can be skipped. Furthermore, if there are multiple fitness improving moves, all must

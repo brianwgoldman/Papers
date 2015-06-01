@@ -12,7 +12,7 @@ entries are integers in the range $[0..q-1]$. As each subfunction reads
 $K+1$ variables, the table's size and $q$ are set to $2^{K+1}$. The quality
 of a solution is equal to the sum of the values returned by these subfunctions.
 
-In this work we shall consider two methods for choosing the $K$ variables
+In this work we consider two methods for choosing the $K$ variables
 each subfunction depends on: Nearest Neighbor NKq and Unrestricted NKq.
 In Nearest Neighbor NKq each variable depends on the $K$ variables that sequentially follow
 it in the solution, with dependencies wrapping around the end of the solution.
@@ -59,7 +59,7 @@ If the median run was unsuccessful, no data point is drawn.
 \begin{figure*}
   \centering
   \includegraphicsfit{fitness}
-  \caption{Comparison of how radius effects solution quality at termination. For NKq-Landscapes $N=6,000$ and $K=4$ and
+  \caption{Comparison of how radius affects solution quality at termination. For NKq-Landscapes $N=6,000$ and $K=4$ and
   for Ising Spin Glasses $N=6,084$. Range of radius values limited by memory constraints.}
   \label{fig-fitness}
 \end{figure*}
