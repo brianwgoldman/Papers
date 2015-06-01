@@ -4,14 +4,14 @@ All of the work presented so far has focused on the black-box optimization
 domain. These problems are characterized by a complete lack of available
 problem specific information. All the algorithm has to perform search
 is a ``black-box'' which measures the quality of arbitrary proposed
-solutions. Optimizers which are successful in this domain generalize well
+solutions. Optimizers that are successful in this domain generalize well
 as there are minimal requirements to apply them to a new problem.
 
 However, for many real world applications there is potentially more information
 available. The other end of the spectrum is white box optimization, in which
 the algorithm knows the exact problem class it is trying to solve. This domain
 is dominated by problem specific search
-heuristics~\cite{een:2004:satsolver,sherrington:1975:isingsolver,wright:2000:solvingnk} which
+heuristics~\cite{een:2004:satsolver,sherrington:1975:isingsolver,wright:2000:solvingnk} that
 leverage all aspects of the problem to achieve efficiency. This makes such
 algorithms very specific, such that outside of their target domain they
 either cannot be applied or have no expectation of quality. As such,
@@ -20,7 +20,7 @@ deep understanding of the problem and the time to develop the algorithm.
 
 In between those two domains there is another: gray-box optimization. In this
 domain some features general to multiple problem classes are exploited, beyond
-just an evaluation function. The goal is to create optimization methods which
+just an evaluation function. The goal is to create optimization methods that
 benefits from these features without those methods becoming specialized to
 a small set of problem classes.
 
@@ -66,7 +66,7 @@ set such that all edges are incident on at least one vertex in the set.
 Epistasis and fitness are calculated using each vertex (add to set size)
 and each edge (add to uncovered size), independently. Used in network security~\cite{richter:2007:vertexcover}.
 
-\item \textbf{Max-Cut}: Find the set of vertices which maximize the number of edges
+\item \textbf{Max-Cut}: Find the set of vertices that maximize the number of edges
 incident on exactly one vertex in the set. Epistasis and fitness are calculated
 using each edge independently. Used in VLSI design~\cite{festa:2002:maxcut}.
 
@@ -116,7 +116,7 @@ all $N$ moves to be reevaluated once per improvement, such as on the Leading One
 
 Local search in the gray-box domain can be significantly more efficient~\cite{whitley:2013:greedy}. This is due
 to two consequences of the domain: the fitness effect of making a move can be calculated in \BigO{1} time, not \BigO{N},
-and the number of moves which must be reevaluated per improvement is \BigO{1}, not \BigO{N}. This results in local
+and the number of moves that must be reevaluated per improvement is \BigO{1}, not \BigO{N}. This results in local
 search requiring \BigO{N+I} time. If $I$ is within a constant factor of $N$, this means generating random local
 optima is at most a constant factor slower than generating random solutions in the search space.
 
@@ -146,7 +146,7 @@ calculates the $delta$ for each $m$ starting at a given solution, as well as the
 Here, $f_s$ evaluates
 the subfunction $s$ on the given solution, and $solution \oplus m$ is the result of making move $m$ on $solution$.
 For each of the $\frac{cN}{k}$ subfunctions \Call{InitializeDelta}{} must determine the fitness of that
-subfunction before and after making each of $k$ moves which overlap that subfunction. Combined this
+subfunction before and after making each of $k$ moves that overlap that subfunction. Combined this
 results in less than $cN2b(k)$ operations, which is \BigO{N} assuming $c$ and $b(k)$ do not grow with $N$.
 Also, this procedure calls $f_s$ only $k+1$ times more than is required to find the fitness of the solution itself.
 
@@ -180,8 +180,8 @@ a random move $m$ is chosen from $open$, and $delta[m]$ is checked. If $m$ is a 
 
 \Call{MakeMove}{} updates the fitness and $delta$ values to reflect the change in the solution. The fitness
 of the solution after making the move does not require any calls to $f_s$ as $delta[m]$ already stores the
-change in fitness. This process requires updating all the $delta$ values for the $k$ moves which interact with each of the $c$ subfunctions
-effected by $m$. This update replaces outdated information which used the original solution ($just\_m' - pre\_both$)
+change in fitness. This process requires updating all of the $delta$ values for the $k$ moves that interact with each of the $c$ subfunctions
+effected by $m$. This update replaces outdated information that used the original solution ($just\_m' - pre\_both$)
 with how much the move improves over the new solution ($post\_both - just\_m$). As $delta[m']$ has updated, $m'$ could
 potentially become a fitness improving move and is therefore added into $open$. As $m$ was just flipped,
 it cannot be a fitness improvement and is therefore removed from $open$.  In total this requires less than
@@ -221,7 +221,7 @@ and the second half is set to 1. Even though $c=3$ there is no way to improve th
 simultaneously flipping all 0's to 1's or vice versa. Any smaller flip will not
 be a fitness improvement.
 
-To determine which of the $n \choose r$ flips which must be checked, consider a graph where
+To determine which of the $n \choose r$ flips that must be checked, consider a graph where
 each vertex is a variable in the solution. An edge exists between two vertices if and only
 if the corresponding variables participate in at least one subfunction together. Restated,
 there is only an edge if the two variables have a direct non-linear relationship. The maximum
@@ -266,12 +266,12 @@ of the subset can be tested independently.
 
 In order to determine which moves in the hamming-ball must be evaluated,
 we developed \Call{ConnectedInducedSubgraphs}{} given in Figure~\ref{fig-connected-subgraphs}.
-\Call{CISG}{} is a recursive helper function which finds all subgraphs
-which contain a given $subset$ and a given vertex $v$, while excluding
+\Call{CISG}{} is a recursive helper function that finds all subgraphs
+that contain a given $subset$ and a given vertex $v$, while excluding
 any other vertices added to $closed$. To find all subgraphs, \Call{CISG}{}
 is called once for each vertex in the graph, such that $closed$ contains
 all previously searched vertices, and $subset=open=\emptyset$. In the initial
-call all desired subgraphs which contain $v$ are found, which is why $v$ remains
+call all desired subgraphs that contain $v$ are found, which is why $v$ remains
 in $closed$ to prevent duplicate subgraphs from being returned.
 
 At each recursive level \Call{CISG}{} expands $open$ to include any vertices
@@ -289,7 +289,7 @@ $\prod_{i}^{r} ick = r!(ck)^r$. This must be called once for each
 of the $N$ variables resulting in \BigO{r!(ck)^rN}.
 
 As this algorithm finds all connected subsets in \BigO{N} time for a fixed $r$, the number of moves
-which must be tested to determine if a solution is an $r$-bit local optima is \BigO{N}. This means that
+that must be tested to determine if a solution is an $r$-bit local optima is \BigO{N}. This means that
 while on Nearest Neighbor NK with $N=8000$, $K=5$, and $r=3$ the black-box method would require 85 billion
 checks, the gray-box method requires only 248,000. Even when allowing connections to be completely random,
 which results in $c$ increasing with $N$, the gray-box method still only requires approximately 375 million checks,
@@ -299,7 +299,7 @@ From these conclusions it is possible to modify the hill climber presented in Se
 efficiently find $r$-bit local optima~\cite{chicano:2014:ball}. The only change is that instead of having a move
 and $delta$ for each bit, there must be a move and $delta$ for each connected induced subgraph of $r$ or less bits.
 The efficiency analysis is unchanged with the exception that the constant increases exponentially with $r$ as
-the number of $delta$ values which must be updated each move increases. Still, with $c$, $r$, and $k$ constant
+the number of $delta$ values that must be updated each move increases. Still, with $c$, $r$, and $k$ constant
 with respect to $N$, it is possible to find $r$-bit hamming ball local optima in \BigO{N+I} time.
 
 \section{Tournament Uniform Crossover: TUX}

@@ -14,7 +14,7 @@ of a solution is equal to the sum of the values returned by these subfunctions.
 
 In this work we shall consider two methods for choosing the $K$ variables
 each subfunction depends on: Nearest Neighbor NKq and Unrestricted NKq.
-In Nearest Neighbor NKq each variable depends on the $K$ variables which sequentially follow
+In Nearest Neighbor NKq each variable depends on the $K$ variables that sequentially follow
 it in the solution, with dependencies wrapping around the end of the solution.
 Landscapes of this form can be solved in polynomial
 time~\cite{wright:2000:solvingnk}, allowing comparisons of how quickly each optimization
@@ -30,7 +30,7 @@ may not be applicable.
 
 Ising Spin Glasses are a type of MAX-CUT problem relevant in statistical physics. Each spin glass
 encodes spins (vertices) and their relationships (edges) with the goal of assigning each spin a direction
-which minimizes relationship energy. Just as with NKq-Landscapes, Ising Spin Glasses as a whole
+that minimizes relationship energy. Just as with NKq-Landscapes, Ising Spin Glasses as a whole
 are NP-Hard, but the $2D\pm J$ subset is polynomially solvable~\cite{saul:1994:spinglass}\footnote{\url{http://www.informatik.uni-koeln.de/spinglass/}}. In this
 subset the graph is a 2D toroidal grid, with edge weights of $\pm 1$. In gray-box terms,
 problems of this subset have $k=2$ and $c=4$ regardless of $N$.
@@ -51,7 +51,7 @@ was the global optimum 44 out of 50 times.
 
 All figures report the median, upper and lower quartiles for either percentage error or seconds to reach the best. A run's percentage error is
 equal to the difference between its fitness and the best, divided by the best. When reporting seconds
-to reach the best fitness, any run which did not find the best fitness is treated as slower than any run that did.
+to reach the best fitness, any run that did not find the best fitness is treated as slower than any run that did.
 If the median run was unsuccessful, no data point is drawn.
 
 \section{The Effect of Radius}
@@ -220,7 +220,7 @@ exploration of equal fitness plateaus. For instance in Figure~\ref{fig-solver-ov
 there is a significant pause in improvement when Gray-Box P3 reaches the second best fitness in the landscape.
 Nothing in its design suggests that Gray-Box P3 should be more effective at neutral drift. Another potential
 issue is that on these landscapes the importance of each non-linear relationship may be detectably unequal.
-As a result Black-Box linkage learning may better cluster variables which having meaningful
+As a result, Black-Box linkage learning may better cluster variables that have meaningful
 impact on fitness while Gray-Box assumes all are equally important. A useful direction for future work
 would be to explore methods of performing efficient learning on top of the known variable interactions.
 

@@ -1,7 +1,7 @@
 \chapter{Parameter-less Population Pyramid}
 \label{chap-p3}
 \cite{goldman:2014:p3} introduced the Parameter-less Population Pyramid (P3) as a method for
-performing optimization which does not require the user to provide any parameters. This is
+performing optimization that does not require the user to provide any parameters. This is
 achieved by combining efficient local search with the model building methods of LTGA using
 an iteratively constructed hierarchy of populations.
 
@@ -70,7 +70,7 @@ diversity, and therefore required smaller populations.
 
 P3 also modified Line~\ref{fig-cluster-usage-donate} in Figure~\ref{fig-cluster-usage}.
 Instead of choosing a single genetic donor for each cluster, P3 iterates over the
-population in a random order until a solution in the population is found which
+population in a random order until a solution in the population is found that
 has a least one gene different for that cluster of genes from the improving solution.
 This process increases the likelihood of an evaluation being performed for every cluster,
 and helps test rare gene patterns in the population.
@@ -84,7 +84,7 @@ The model is then used immediately to perform up to one evaluation for each of t
 to $2N-2$ clusters. Just as in LTGA, if no evaluation shortcuts were made, P3
 has an amortized cost of \BigO{N} modeling cost per evaluation. While P3 does
 rebuild the model more frequently per solution in the population, it also performs
-a number of local search evaluations which are quite efficient, meaning theoretical
+a number of local search evaluations that are quite efficient, meaning theoretical
 comparisons of their speed are difficult to perform. As a final note, P3's repeated
 attempts to find a useful donation make it less likely than LTGA to skip evaluations,
 but has an added cost to find these donations. Repeated donations could require as much

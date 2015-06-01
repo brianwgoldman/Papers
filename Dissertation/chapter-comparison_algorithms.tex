@@ -1,13 +1,13 @@
 \chapter{Comparison Optimizers}
 \label{chap-optimizers}
 
-In order to fully understand the effectiveness of P3, we compare it with five advanced algorithms which
+In order to fully understand the effectiveness of P3, we compare it with five advanced algorithms that
 have related features to P3. The Random Restart Hill Climber defined by ~\cite{goldman:2014:p3} was chosen as an efficient form of repeated
 local search. As P3 combines this hill climber with crossover,
 comparing with local search alone shows the advantages of P3's overall approach.
 The $1+(\lambda, \lambda)$ algorithm~\citep{doerr:2013:lambdalambda} is the current best theory supported simple genetic algorithm
 and its method of crossover is in some sense a macro-mutation just as in P3. hBOA and Parameter-less
-hBOA are advanced model building search techniques which are effective at learning complex
+hBOA are advanced model building search techniques that are effective at learning complex
 problem structure, designed to achieve similar goals as P3's linkage learning but using very different
 methods. Finally LTGA represents the current state-of-the-art in black-box search and is the origin
 of P3's linkage learning and crossover methods.
@@ -102,7 +102,7 @@ whichever has a larger hamming distance from the parent is retained. This encour
 The ``mod'' control strategy proposed by \cite{doerr:2013:lambdalambda} was not used as it conflicted with
 the random restart strategy.
 If a crossover individual is identical to either of its parents, it is not evaluated.
-If mutation produces an offspring which is better than the best crossover offspring, it is used to compare
+If mutation produces an offspring that is better than the best crossover offspring, it is used to compare
 against the original parent.
 
 %%%%%%%%%%%%%%%%%% HBOA %%%%%%%%%%%%%%%%%%%%
@@ -132,11 +132,11 @@ separate the solutions such that all solutions with $x_i = 0$ move to one leaf w
 $x_j = 1$ move to the other.
 
 This goal is formalized using model scoring from Bayesian statistics. In its raw form this
-almost always creates near infinitesimal results, calculating fractions which include factorials of $\mu$
+almost always creates near infinitesimal results, calculating fractions that include factorials of $\mu$
 and products over $N$. However, through algebraic manipulation discussed in Appendix~\ref{chap-appendix-hboa}, we
 derived a simplified form shown in Equation~\ref{eq-hboa-final}.
 Here $l$ is a leaf in tree $i$, with $l'$ and $l''$ the results of splitting $l$. $m_i(l)$ is the number
-of solutions which reach $l$ and $m_i(x_i, l)$ is the number of solutions which reach $l$ with the given value
+of solutions that reach $l$ and $m_i(x_i, l)$ is the number of solutions that reach $l$ with the given value
 for $x_i$.
 If no proposed split satisfies the inequality, iteration stops.
 If multiple splits do, whichever maximizes the right side is chosen.
@@ -152,7 +152,7 @@ trees can be split by any of the other $N-1$ genes. Each iteration a new edge is
 forest, meaning some of the previously tested splits cannot be used. For instance, if $T_i$, which is used
 to decide the value of $x_i$, is split using the value of $x_j$, $T_j$ can no longer be split using $x_i$.
 As a split creates two new leaves, \BigO{N} new potential splits must also be tested. Equation~\ref{eq-hboa-final}
-parses all solutions which reach a leaf to count gene frequencies, requiring $\mu$ time.
+parses all solutions that reach a leaf to count gene frequencies, requiring $\mu$ time.
 The number of total leaves created depends heavily on the problem and $\mu$.
 However, assuming no splits are accepted or that the cost of testing all future splits is less than
 the initial $\Theta(N^2)$, constructing the model requires $\Omega(\mu N^2)$ time. Each
@@ -211,7 +211,7 @@ presented by \cite{thierens:2013:ltgahiff} as our model.
 LTGA's effectiveness comes from its method of performing crossover. Instead of blindly
 mixing genes between parents, LTGA attempts to preserve important interrelationships
 between genes. Before performing any crossovers in a generation, LTGA first builds
-a set of hierarchical gene clusters which are then used to dictate how genes are mixed
+a set of hierarchical gene clusters that are then used to dictate how genes are mixed
 during crossover.
 
 \begin{figure}
@@ -241,8 +241,8 @@ during crossover.
 Figure~\ref{fig-cluster-creation} provides the agglomerative method LTGA uses to create gene clusters.
 This algorithm creates a tree of sets using pairwise gene entropy, such that the leaves of the tree contain a single gene and
 internal nodes are the union of their children's sets. These sets are then used by crossover to specify epistatic
-relationships which should be preserved.
-The process begins by creating the set of sets $unmerged$ which tracks all top level clusters. Initially
+relationships that should be preserved.
+The process begins by creating the set of sets $unmerged$ that tracks all top level clusters. Initially
 $unmerged$ contains single member sets for each gene. After each iteration the two sets with the minimum average pairwise
 distance (given in Equation~\ref{eq-distance}) are merged to create a single cluster. This process is repeated
 until only a single set remains in $unmerged$ which contains all of the genes in the genome.
@@ -257,12 +257,12 @@ until only a single set remains in $unmerged$ which contains all of the genes in
   \label{eq-entropy}
 \end{equation}
 
-Throughout this process $useful$ tracks the set of all gene clusters which should be preserved for use by crossover.
+Throughout this process $useful$ tracks the set of all gene clusters that should be preserved for use by crossover.
 This set begins with all genes in separate clusters, and each time a new cluster is created it is added to $useful$.
 However, not all clusters are necessarily worth keeping. For instance, in all versions of LTGA the cluster
 containing all genes is removed from $useful$ as preserving all genes during crossover can only create clones.
 \cite{thierens:2013:ltgahiff} extended this removal to include any unsupported subsets. If the pairwise distance
-between two clusters is 0, this means there are no individuals in the population which disrupt the relationships between the two
+between two clusters is 0, this means there are no individuals in the population that disrupt the relationships between the two
 clusters. Therefore when performing crossover there is no reason to believe a fitness improvement can be achieved
 by breaking the stored pattern. As such a cluster is only kept if its direct superset has a non-zero distance.
 As a final step Line~\ref{fig-cluster-creation-ordering} reorders $useful$ such that clusters appear in reversed
@@ -318,7 +318,7 @@ copied into the next generation.
 
 
 In total each individual can cause up to $|useful|$ evaluations. If all clusters were kept, even those deemed
-unhelpful, and all donations were evaluated, even those which did not change any genes, then \Call{Cluster-Usage}{}
+unhelpful, and all donations were evaluated, even those that did not change any genes, then \Call{Cluster-Usage}{}
 would perform exactly $2N-2$ evaluations for each of the $\mu$ solutions in the population. This provides the amortizing evaluations
 required to make clustering only \BigO{N} operations per evaluation. However, by skipping some evaluations, its
 possible that clustering may be super-linear.
@@ -366,15 +366,15 @@ to determine the optimal population size for each problem size.
 Extended by \cite{goldman:2012:ltga}, this method iteratively
 doubles the population size until some success criteria is met and then performs bisection
 between the lowest successful and highest unsuccessful sizes. In this way the minimum population size
-which meets the success criteria is found. \cite{goldman:2014:p3} proposed a success criteria
+that meets the success criteria is found. \cite{goldman:2014:p3} proposed a success criteria
 of performing $r$ successful runs in a row, such that the expected failure rate can be bounded
 above by $\frac{3}{r+1}$~\citep{jovanovic:1997:ruleofthree}. As P3 and the other three algorithms
 do not prematurely converge, we chose $r=100$ to similarly ensure hBOA and LTGA almost never do.
-As bisection can make infinitely large population sizes, any run which had not found the global
+As bisection can make infinitely large population sizes, any run that had not found the global
 optimum after 100 million evaluations or 128 computing hours was considered unsuccessful.
 
 Figure~\ref{fig-pop-sizes} shows the results from performing bisection. In general hBOA
-required population sizes which were at least an order of magnitude larger than LTGA. Due to
+required population sizes that were at least an order of magnitude larger than LTGA. Due to
 runtime and memory overhead, finding the optimal value for hBOA was much less tractable than LTGA
 for moderate to large problem sizes. LTGA's population size also grew significantly slower
 than hBOA's as problem size increased, especially on the two Trap problems and Rastrigin.

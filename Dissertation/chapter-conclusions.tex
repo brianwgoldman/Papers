@@ -4,7 +4,7 @@ The Parameter-less Population Pyramid (P3) is a recently introduced method for p
 optimization. P3's primary innovation is the replacement of the generational model with a pyramid of populations.
 This pyramid is constructed iteratively, with both the number of levels and the number of solutions stored
 at each level growing as search progresses. P3 uses a model based crossover method
-which learns a linkage tree from gene epistasis. Combined with a simple hill climber, P3's design contains
+that learns a linkage tree from gene epistasis. Combined with a simple hill climber, P3's design contains
 many synergistic features.
 
 Across a large number of problems and problem sizes P3 required less evaluations to reach the global optimum
@@ -19,7 +19,7 @@ tuning, making P3 easier to apply to new domains than its two closets competitor
 
 P3's quality is due to a number of desirable traits. First, mixing local search with model based
 crossover lets search focus on properly mixing high quality solutions. Second, by adding diversity only
-as necessary P3 tends to use the minimal amount of random initialization, unlike other techniques which must
+as necessary P3 tends to use the minimal amount of random initialization, unlike other techniques that must
 overcompensate with larger population sizes on single instance problems and consider the worst instance
 when solving problem classes. Third, by heavily exploiting existing diversity before adding more P3 is able
 to reach high quality intermediate fitnesses quickly without prematurely converging. Fourth, the

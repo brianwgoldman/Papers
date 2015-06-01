@@ -10,9 +10,9 @@ additional information available in the gray-box domain.
 
 First and foremost, linkage learning is no longer necessary. By definition
 the direct non-linear relationships between variables are known. As a result
-P3 no longer needs to store the pairwise frequency information which leads
+P3 no longer needs to store the pairwise frequency information that leads
 the black-box version to require \BigO{N^2} memory. Instead,
-we have developed a method for creating a linkage tree which learns clusters
+we have developed a method for creating a linkage tree that learns clusters
 from the same dependency graph defined in Section~\ref{sec-hamming}. The goal is for each
 cluster to be a connected induced subgraph, with the size of clusters
 mirroring those produced by the agglomerative linkage learning process normally
@@ -37,15 +37,15 @@ Black-Box P3.
 Beyond efficiency, there are good reasons to believe these clusters will be useful
 for search. The closer two variables are in the dependency graph, the more likely
 they are to appear in the same cluster. All variables on average are expected to appear
-in at least one cluster, but variables which are central in the graph will appear in more
+in at least one cluster, but variables that are central in the graph will appear in more
 clusters than those on the periphery. The more paths of a given
 length between two variables, the higher the probability of them being in the same cluster.
 Unlike Black-Box P3, this linkage tree does not require clusters to be nested, allowing
 more diversity in the types of clusters appearing in a single tree.
 
-In effect the clusters are sampling moves which the HBHC
-would make if $r \ge l$. For any solution in the search space which is not globally optimal, there
-must exist some move which will improve its quality. However, this move may
+In effect the clusters are sampling moves that the HBHC
+would make if $r \ge l$. For any solution in the search space that is not globally optimal, there
+must exist some move that will improve its quality. However, this move may
 be arbitrarily large and it is intractable to test all possible moves of even moderate size.
 By sampling from all possible large moves, we can maintain tractability while gaining
 a potentially non-zero probability of improvement.

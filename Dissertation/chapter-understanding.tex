@@ -2,8 +2,8 @@
 The ruggedness and high dimensionality of most interesting landscapes makes them challenging
 to visualize or otherwise understand. However, doing so can be helpful in
 understanding the difficulty of a problem, and how best to design algorithms to deal
-with those difficulties. Conversely, understanding the characteristics which favor
-existing algorithms can help future researchers choose the algorithm which is
+with those difficulties. Conversely, understanding the characteristics that favor
+existing algorithms can help future researchers choose which algorithm is
 most likely to perform well on their problem. To further this end, we shall
 explore the landscapes used in previous sections in an attempt to understand
 what makes a landscape easy for P3 to solve.
@@ -39,15 +39,15 @@ only \BigO{1} time and the overall enumeration process is reduced to \BigO{2^N}.
 
 Due to the limited non-linearity of the gray-box domain, its possible to exclude large
 parts of the search space without potentially missing any local optima. Consider a bit flip $X_i$.
-For gray-box problems there are only $ck$ other bit values which are needed to determine if flipping
+For gray-box problems there are only $ck$ other bit values that are needed to determine if flipping
 $X_i$ is a fitness improvement. If a given set of values for $X_i$ and those $ck$ bits results in
-$X_i$ being a fitness improvement, then any solution which contains all of those values cannot be a local optima.
+$X_i$ being a fitness improvement, then any solution that contains all of those values cannot be a local optima.
 
 This knowledge can be effectively exploited by intelligently skipping parts of the enumeration.
-Before starting search we can determine the least significant bit in the solution which effects
-each possible fitness improving move. This is the bit which must be flipped in order to effect
-the quality of that move. As a result, when determine what solution to test next, all steps
-of the enumeration which do not result in the least significant bit of a fitness improve being
+Before starting search we can determine the least significant bit in the solution that effects
+each possible fitness improving move. This is the bit that must be flipped in order to effect
+the quality of that move. As a result, when determining what solution to test next, all steps
+of the enumeration that do not result in the least significant bit of a fitness improvement being
 flipped can be skipped. Furthermore, if there are multiple fitness improving moves, all must
 have at least one dependent bit flipped, which is the same as saying the fitness improving move
 with the most-significant least-significant bit must have its least significant bit flipped.
@@ -62,13 +62,13 @@ Enumeration progresses by adding a 1 to the found position, with carry over as n
 If the carry ever exceeds the most significant bit in the solution, the entire space has been checked and iteration ends.
 
 When performing subsequent checks, not all moves needs to be retested for improvement. Instead, the highest
-bin which must be tested is the location of the most significant bit effected by the previous iteration. This is because
+bin that must be tested is the location of the most significant bit effected by the previous iteration. This is because
 the previous iteration has verified all higher moves are not fitness improving, and no action performed during
 that iteration can change that. Furthermore, no 1s can exist lower than that position, so bits
 below the least significant bit of the fitness improving move can be ignored.
 
 As a final efficiency, the order in which bits of the solution are considered can be remapped. When a flip is fitness
-improving, the amount of search space which is skipped depends on how significant its least significant bit is. Therefore,
+improving, the amount of search space that is skipped depends on how significant its least significant bit is. Therefore,
 by rearranging the order to make its least significant bit more significant, more search space can be skipped. We perform
 this remapping in a greedy fashion, such that the flip with the least unmapped dependencies has all of its remaining dependencies
 mapped to the most significant remaining positions.
@@ -82,7 +82,7 @@ with black-box.
 
 As a final note, these methods extend to finding only $r$-bit local optima for all gray-box problems. However,
 the cost trade-off of doing so is somewhat unclear. By searching only for $r$-bit local optima, it is more likely
-that a move will exist which causes part of the landscape to be skipped. Yet the increase in total number of moves
+that a move will exist that causes part of the landscape to be skipped. Yet the increase in total number of moves
 requires more updating information each time the solution is changed. The exact relationship between the two
 depends on the specific problem.
 
@@ -118,7 +118,7 @@ provide little deception in terms of ``big valley'' properties. Given any two lo
 closer to the global optimum in fitness is also always closer to the global optimum in representation space.
 This makes sense as the worst local optimum contains all 0s, and each fitness improvement beyond that involves
 converting an entire trap to 1s, with the global optimum being all 1s. As a result, we should expect P3's method
-of elitist mixing to produce solutions which are progressively more and more similar to the global optimum until
+of elitist mixing to produce solutions that are progressively more and more similar to the global optimum until
 it is finally found.
 
 Deceptive Step Trap's inclusion of fitness plateaus creates an enormous number of local optima. In total there are 24
@@ -171,10 +171,10 @@ correctly.
 \end{figure*}
 
 The Ising Spin Glass instance shown in Figure~\ref{fig-valley-nn} provide some insight into the stalled behavior of Gray-Box
-P3 when solving that problem. In this landscape there are many local optima which have the second best fitness, but are very
+P3 when solving that problem. In this landscape there are many local optima that have the second best fitness, but are very
 different from the nearest global optima. From a search perspective this means selection can only get you within a certain distance
 of a global optima, and then it becomes unhelpful. This issue is not improved by increasing the local optima radius, as even with
-$r=4$ there are hundreds of local optima with the second best fitness in the landscape which are over 10 bits different (of 36) from
+$r=4$ there are hundreds of local optima with the second best fitness that are over 10 bits different (of 36) from
 the nearest global optima.
 
 \begin{figure*}
@@ -210,7 +210,7 @@ Gray-Box P3's progression on Deceptive Step Trap, shown in Figure~\ref{fig-level
 The local optima found using only hill climbing and stored in level 0 are quite poor and far from the global optima.
 The first application of crossover dramatically improves their quality. However, this improvement is likely just overcoming
 the fitness plateaus, as solutions are actually being moved away from the global optimum. Subsequent levels store solutions
-which are generally closer to the global optimum in both fitness and representation space. This change means that at higher
+that are generally closer to the global optimum in both fitness and representation space. This change means that at higher
 levels the frequency of traps being set to the global optima increases, resulting in better model building and better donation quality.
 
 \begin{figure*}
@@ -223,7 +223,7 @@ levels the frequency of traps being set to the global optima increases, resultin
 
 Nearest Neighbor NKQ, shown in Figure~\ref{fig-level-nn}, provides a landscape almost as free of higher order deception
 as the Deceptive Step Trap problem.  Shown with a logarithmic y-axis, stored solutions exhibit a near perfect relationship
-between fitness and representational distance. Again, using only hill climbing creates local optima which are significantly
+between fitness and representational distance. Again, using only hill climbing creates local optima that are significantly
 worse and further away than even
 after a single application of crossover. While increasing the radius of the hill climber improves the quality of those initial
 solutions, even $r=3$ is only able to equal a single crossover application. As before the higher level a solution is stored,
@@ -238,7 +238,7 @@ generally the closer it is to the global optima in both fitness and representati
 \end{figure*}
 
 Figure~\ref{fig-level-un} gives insight into how different Unrestricted NKQ is from Nearest Neighbor NKQ. In this landscape
-Gray-Box P3, regardless of radius, appears to explore deceptive local optima which offer fitness improvements without moving
+Gray-Box P3, regardless of radius, appears to explore deceptive local optima that offer fitness improvements without moving
 closer to the global optima in representation space. In this problem there is a gap of over 1000 bits between the deceptive
 local optima and those likely to lead to the best found solution. An interesting behavior on this problem is that the branch
 between the two groups always seems to begin with a single solution in level 1. This suggests that the stored solutions near
@@ -272,7 +272,7 @@ appears to be deceptive local optima between 500 and 1000 bits away from the nea
 to be the ancestor of all of the solutions near the best found. This suggests that similar to Unrestricted NKQ, Gray-Box P3 will have a
 hard time finding the global optimum on MAX-SAT.
 
-In general it appears that the problems which have polynomial time solutions (Deceptive Step Trap, Nearest Neighbor NKQ, 2D Ising Spin Glass)
+In general it appears that the problems that have polynomial time solutions (Deceptive Step Trap, Nearest Neighbor NKQ, 2D Ising Spin Glass)
 share a similar behavior of selection leading to the global optimum. However, the NP-Hard problems (Unrestricted NKQ, MAX-SAT) seem to contain
 large amounts of higher order deception, making them challenging for selection based methods. This relationship warrants further investigation
 into other NP-Hard problems to determine if the repeated selection found in P3 and other evolutionary computation methods are able to overcome

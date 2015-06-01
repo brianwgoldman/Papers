@@ -21,7 +21,7 @@ of Nearest Neighbor NK using $N=200$, $K=5$, $r=4$, and limited to using less ti
 the hamming ball hill climber only found the global optimum 6 times.
 
 Therefore as a first step in exploring this new domain we propose to explore simple memetic algorithms~\cite{chen:2011:memetic}
-which make use of this hill climber. The goal is to determine if combination with methods like uniform crossover
+that make use of this hill climber. The goal is to determine if combination with methods like uniform crossover
 can result in improved search quality.
 
 \begin{figure}
@@ -83,11 +83,11 @@ with certainty which effect will dominate search time.
 \section{Developing Efficient Linkage Aware Crossover}
 The reason for recording variable entropy in P3 is to detect unknown variable linage in the black-box domain. However,
 the gray-box domain makes high level variable linkage fully known. Therefore by leveraging this information it should
-be possible to more efficiently construct crossovers which are even more accurate than the inferred black-box ones.
+be possible to more efficiently construct crossovers that are even more accurate than the inferred black-box ones.
 
 There are a number of possible avenues for future research here. First, should the goal be to derive a single
 static linkage model for crossover or multiple random approximations? It may be possible to compute for
-a given problem the set of all useful crossovers which best balance exploitation with exploration. As
+a given problem the set of all useful crossovers that best balance exploitation with exploration. As
 this only needs to be done once per problem, the algorithm for creating the set can be relatively time consuming.
 The drawback of such a design is that the set may be prohibitively large, require an accurate understanding of what
 the best crossovers are, and repeated use of a static crossover set may adversely effect search.
@@ -101,7 +101,7 @@ to create difficult to detect but important crossovers.
 Independent of if static or random crossovers are used, there are important research questions related to how variable epistasis
 should best be leveraged in crossover. One possibility is that crossover should aim to preserve build blocks. For instance P3's
 crossover attempts to cross entire traps on Deceptive Trap, as mixing values within a trap does not lead to the global optimum.
-Under this principle it seems reasonable to assert that crossovers which ensure variables which share a non-linear relationship
+Under this principle it seems reasonable to assert that crossovers that ensure variables which share a non-linear relationship
 are crossed as a group are better than those that do not. The task then is to decide how to handle subfunction overlap to allow
 for sufficient exploration.
 
@@ -189,16 +189,16 @@ problems with known global optimum, we plan to try Unrestricted NK and Ising Spi
 This is critical as the behavior of many gray-box algorithms depend on the nature of the epistasis graph. In these domains
 the focus will shift from finding the global optimum (which is unknown) to finding the best solution in a fixed amount of time.
 
-Beyond the randomly generated instances, we plan to seek out real world problems which can be expressed in this domain.
+Beyond the randomly generated instances, we plan to seek out real world problems that can be expressed in this domain.
 This will help solidify the conclusions about the applicability of these methods outside of the optimization community.
 Similarly, we plan to compare the results of our gray-box methods with algorithms specifically designed for each problem
 domain. This provides an interesting contention between the time required to develop problem specific solvers and the
 quality of using gray-box methods.
 
 As the hamming ball hill climber has a user specified parameter $r$, we will need to explore this parameter space.
-Specifically we will want to ensure all comparisons use an appropriate value for $r$ which does not scale with
+Specifically we will want to ensure all comparisons use an appropriate value for $r$ that does not scale with
 $N$. This process will likely involve brute force testing all small $r$ values for moderately large problems in each class
-and then choosing the one which performs best. That $r$ value will then be used for all problem sizes for that problem class.
+and then choosing the one that performs best. That $r$ value will then be used for all problem sizes for that problem class.
 
 Another area of focus will be in how $N$ effects the relative effectiveness of the methods. One of the goals of moving
 to a gray-box domain is how it impacts Big-$O$ complexity. As a result we plan to empirically verify the scalability
