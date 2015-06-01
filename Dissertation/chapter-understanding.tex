@@ -1,89 +1,90 @@
 \chapter{Understanding When P3 Excels}
 The ruggedness and high dimensionality of most interesting landscapes makes them challenging
-to visualize or otherwise understand. However, doing so can be helpful in
-understanding the difficulty of a problem, and how best to design algorithms to deal
-with those difficulties. Conversely, understanding the characteristics that favor
-existing algorithms can help future researchers choose which algorithm is
-most likely to perform well on their problem. To further this end, we shall
-explore the landscapes used in previous sections in an attempt to understand
-what makes a landscape easy for P3 to solve.
+to visualize or otherwise analyze. However, doing so can be helpful in
+quantifying the difficulty of a problem, and how to best design algorithms to deal
+with those difficulties. Similarly, knowing which characteristics favor
+each existing algorithm can help researchers choose the algorithm
+most likely to perform well on their problem. To further this end, we
+explore the landscapes used in previous sections to understand
+what makes a landscape suited for P3 optimization.
 
 
 \section{Big Valley}
-One method for understanding the global structure of a landscape
+One method for visualizing the global structure of a landscape
 is to examine the relationship between local optima~\cite{boese:1994:bigvalley}.
-In its original form, this process involved generating thousands of random solutions and then applying
-local search to each. To convert this information into something human interpretable,
-the authors created two dimensional plots: distance from nearest global optima and
-fitness difference from global optima.
-The authors found that for a number of interesting problems a ``Big Valley'' of
-local optima exist, such that the higher a solution's fitness the closer it is
-in representation space to the global optimum. As a result, this suggests that
-by focusing search around known high quality solutions, the likelihood of finding even
-higher quality solutions is increased. This relationship is an underlying assumption
-of all evolutionary computation based search methods, including P3.
+In its original form, this process involves generating thousands of random solutions and then applying
+local search to each. This information is then displayed in two-dimensional plots:
+distance from the nearest global optimum and fitness difference from the global optima.
+For a number of interesting problems, a ``Big Valley'' of
+local optima exist, such that the higher a solution's fitness is, the closer it is
+in representation space to the global optimum. This result suggests that
+focusing search around known high-quality solutions increases the likelihood of finding even
+higher-quality solutions. This relationship is an underlying assumption
+of all evolutionary-based search methods, including P3.
 
 We have set out to extend this method of landscape visualization by considering not
 just a sample of local optima, but all local and global optima in the landscape.
-When considered as a black-box, each solution must be enumerated and all of its
-neighbors must be checked for improvements. This enumeration is prohibitively expensive for
+When considered as a black-box, finding all local optima requires each solution to be enumerated and all of its
+neighbors to be checked for fitness improvements. This enumeration is prohibitively expensive for
 even trivial landscapes, requiring $\Omega(N2^N)$ operations.
 However, by leveraging the gray-box domain, some efficiency improvements can be made.
 
 \subsection{Quickly Finding All Local Optima}
 
-Consider that for gray-box problems, we can determine all improving moves from a given
+Consider that for gray-box problems, we can determine all fitness-improving moves from a given
 solution in \BigO{N} time and that this list can be updated in \BigO{1} time when flipping
-a single bit. As a direct result, checking if each new solution is locally optimal requires
+a single bit. Therefore, checking if each new solution is locally optimal requires
 only \BigO{1} time and the overall enumeration process is reduced to \BigO{2^N}.
 
-Due to the limited non-linearity of the gray-box domain, its possible to exclude large
+Due to the limited non-linearity of the gray-box domain, it is possible to exclude large
 parts of the search space without potentially missing any local optima. Consider a bit flip $X_i$.
 For gray-box problems there are only $ck$ other bit values that are needed to determine if flipping
-$X_i$ is a fitness improvement. If a given set of values for $X_i$ and those $ck$ bits results in
-$X_i$ being a fitness improvement, then any solution that contains all of those values cannot be a local optima.
+$X_i$ is a fitness improvement. If flipping $X_i$ in a given solution is a fitness improvement
+then any solution that contains the same values of $X_i$ and its $ck$ dependencies cannot be a local optima.
 
-This knowledge can be effectively exploited by intelligently skipping parts of the enumeration.
-Before starting search we can determine the least significant bit in the solution that effects
-each possible fitness improving move. This is the bit that must be flipped in order to affect
+This knowledge can be effectively exploited to skip parts of the enumeration.
+For each fitness-improving move, we can determine the least significant bit it depends on.
+This is the minimum bit that must be flipped in order to change
 the quality of that move. As a result, when determining what solution to test next, all steps
-of the enumeration that do not result in the least significant bit of a fitness improvement being
-flipped can be skipped. Furthermore, if there are multiple fitness improving moves, all must
-have at least one dependent bit flipped, which is the same as saying the fitness improving move
+of the enumeration that do not flip the least significant bit of a fitness-improving move
+can be skipped. Furthermore, if there are multiple fitness-improving moves, all must
+have at least one dependent bit flipped. Restated, the fitness-improving move
 with the most-significant least-significant bit must have its least significant bit flipped.
 
 
-Finding which move's least significant bit needs to be flipped can also be done efficiently via binning.
+Finding which move's least significant bit needs to be flipped can be done efficiently via binning.
 Before starting search, each move can be binned based on its least significant bit. Initially
-search must check from the most significant bin down to find the first fitness improving move.
-This is the position from which enumeration must continue. If no move is fitness improving, a local
-optima has been found, and enumeration can continue with the least significant bit in the solution.
-Enumeration progresses by adding a 1 to the found position, with carry over as needed.
-If the carry ever exceeds the most significant bit in the solution, the entire space has been checked and iteration ends.
+search examines bins from the most significant to the least significant to find the first fitness-improving move.
+This is the position from which enumeration must continue. If no move is fitness-improving, a local
+optimum has been found, and enumeration can continue with the least significant bit in the solution.
+Enumeration progresses by adding a 1 to the found position, with carry as needed.
+If the carry exceeds the most significant bit in the solution, the entire space has been checked and iteration ends.
 
-When performing subsequent checks, not all moves needs to be retested for improvement. Instead, the highest
-bin that must be tested is the location of the most significant bit effected by the previous iteration. This is because
-the previous iteration has verified all higher moves are not fitness improving, and no action performed during
-that iteration can change that. Furthermore, no 1s can exist lower than that position, so bits
-below the least significant bit of the fitness improving move can be ignored.
+When performing subsequent checks, not all moves need to be retested for improvement. Instead, the most significant
+bin that must be tested is the location of the most significant bit flipped by the previous iteration. This
+simplification is possible because
+the previous iteration has verified that all moves in more significant bins are not fitness-improving, and no action performed during
+that iteration can make them fitness-improving. Furthermore, no 1s exist in less significant positions, meaning
+iteration can continue immediately from the found position.
 
-As a final efficiency, the order in which bits of the solution are considered can be remapped. When a flip is fitness
-improving, the amount of search space that is skipped depends on how significant its least significant bit is. Therefore,
+As a final efficiency, the order in which bits of the solution are considered can be remapped. When a move is fitness-improving,
+the amount of search space that is skipped depends on how significant its least significant bit is. Therefore,
 by rearranging the order to make its least significant bit more significant, more search space can be skipped. We perform
-this remapping in a greedy fashion, such that the flip with the least unmapped dependencies has all of its remaining dependencies
+this remapping in a greedy fashion, such that the move with the least-unmapped dependencies has all of its remaining dependencies
 mapped to the most significant remaining positions.
 
-All together, this can result in significant efficiency improvements for some landscapes. For instance, when applied to
+All together, these optimization result in substantial efficiency improvements for some landscapes. For example, when applied to
 the OneMax problem (each bit scores one if set to 1, zero otherwise) this method finds all local optima in \BigO{N} time.
 Deceptive Trap, regardless of how the bits are arranged, requires \BigO{2^k2^{N/k}} time to find all $2^{N/k}$ local optima.
-As an example, this means a 60 bit
+This means a 60 bit
 Deceptive Trap problem with trap size of 4 requires 524,288 operations when using gray-box, but 1,152,921,504,606,846,976
 with black-box.
 
 As a final note, these methods extend to finding only $r$-bit local optima for all gray-box problems. However,
-the cost trade-off of doing so is somewhat unclear. By searching only for $r$-bit local optima, it is more likely
-that a move will exist that causes part of the landscape to be skipped. Yet the increase in total number of moves
-requires more updating information each time the solution is changed. The exact relationship between the two
+the cost trade-off of doing so is unclear. By searching for only $r$-bit local optima, it is more likely
+that a fitness-improving move will exist, allowing more of the landscape to be skipped.
+Yet the increase in total number of moves
+means each time a bit is flipped more computation must be performed. Therefore, the runtime effect of increasing $r$
 depends on the specific problem.
 
 \subsection{Looking at Problems}
