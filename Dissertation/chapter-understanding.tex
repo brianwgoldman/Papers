@@ -1,6 +1,6 @@
 \chapter{Understanding When P3 Excels}
-The ruggedness and high dimensionality of most interesting landscapes makes them very challenging
-to visualize or otherwise understand. However, doing so can be very helpful in
+The ruggedness and high dimensionality of most interesting landscapes makes them challenging
+to visualize or otherwise understand. However, doing so can be helpful in
 understanding the difficulty of a problem, and how best to design algorithms to deal
 with those difficulties. Conversely, understanding the characteristics which favor
 existing algorithms can help future researchers choose the algorithm which is
@@ -88,7 +88,7 @@ depends on the specific problem.
 
 \subsection{Looking at Problems}
 In comparison to the randomly generated problem instances of Nearest Neighbor NKQ and Ising Spin Glass,
-Deceptive Trap and Deceptive Step Trap have very comprehensible landscapes. Therefore, these problems represent
+Deceptive Trap and Deceptive Step Trap have comprehensible landscapes. Therefore, these problems represent
 a good place to begin understanding what ``big valley'' plots are showing. Figure~\ref{fig-valley-trap} shows
 how the local optima in each of these problems are distributed.
 
@@ -113,8 +113,8 @@ how the local optima in each of these problems are distributed.
   \label{fig-valley-trap}
 \end{figure}
 
-The Deceptive Trap problem has very few local optima, each of which actually
-provide very little deception in terms of ``big valley'' properties. Given any two local optima, the one
+The Deceptive Trap problem has few local optima, each of which actually
+provide little deception in terms of ``big valley'' properties. Given any two local optima, the one
 closer to the global optimum in fitness is also always closer to the global optimum in representation space.
 This makes sense as the worst local optimum contains all 0s, and each fitness improvement beyond that involves
 converting an entire trap to 1s, with the global optimum being all 1s. As a result, we should expect P3's method
@@ -139,7 +139,7 @@ becomes a near perfect predictor of distance to the global optimum.
 \end{figure*}
 
 Figure~\ref{fig-valley-nn} shows how the local optima are distributed for Nearest Neighbor NKQ. Unlike the trap problems,
-Nearest Neighbor NKQ exhibits a very traditional big valley shape. Increasing the radius of the local optima significantly
+Nearest Neighbor NKQ exhibits a traditional big valley shape. Increasing the radius of the local optima significantly
 reduces the total number of local optima, with those optima generally more similar to the global optima in both representation
 space and quality. Together this suggests that Nearest Neighbor NKQ is a good candidate for selection based methods like P3. Also,
 due to the general regularity and frequency of local optima, it may not be necessary to increase the radius in order to quickly find
@@ -185,7 +185,7 @@ the nearest global optima.
   \label{fig-valley-sat}
 \end{figure*}
 
-Similar to Unrestricted NKQ, the MAXSAT instance shown in Figure~\ref{fig-valley-sat} suggests selection can be very misleading.
+Similar to Unrestricted NKQ, the MAXSAT instance shown in Figure~\ref{fig-valley-sat} suggests selection can be misleading.
 There is almost a negative correlation between fitness difference from the global optimum and representation distance from the
 global optimum. As before, this problem is not solved by increasing the radius of the local optima.
 This may explain why methods like LTGA and hBOA, which extensively rely on selection,
@@ -207,7 +207,7 @@ This also provides a look at how the different levels of the pyramid focus searc
 \end{figure*}
 
 Gray-Box P3's progression on Deceptive Step Trap, shown in Figure~\ref{fig-level-dst}, follows directly from our expectations.
-The local optima found using only hill climbing and stored in level 0 are quite poor and very far from the global optima.
+The local optima found using only hill climbing and stored in level 0 are quite poor and far from the global optima.
 The first application of crossover dramatically improves their quality. However, this improvement is likely just overcoming
 the fitness plateaus, as solutions are actually being moved away from the global optimum. Subsequent levels store solutions
 which are generally closer to the global optimum in both fitness and representation space. This change means that at higher
@@ -255,7 +255,7 @@ the best found may all be similar due to sharing a common ancestor.
 Gray-Box P3's progression on Ising Spin Glass, shown in Figure~\ref{fig-level-is}, is much more well behaved than on Unrestricted
 NKQ. As has been typical, each application of crossover results in improved fitness, with the largest gains between the first few levels.
 When approaching higher qualities these improvements also begin to translate into increased representational similarity to the global optimum.
-However, as discussed previously for this problem, we again see evidence for a large number of very diverse solutions with the second best
+However, as discussed previously for this problem, we again see evidence for a large number of diverse solutions with the second best
 fitness. These solutions can be over 1000 bits different from the eventual best found solution. Increasing the radius of the hill climber
 does not seem to significantly overcome this issue.
 
@@ -270,11 +270,11 @@ does not seem to significantly overcome this issue.
 Figure~\ref{fig-level-sat} shows that Gray-Box P3 acts more similarly on MAX-SAT to Unrestricted NKQ than any of the other problems. Again there
 appears to be deceptive local optima between 500 and 1000 bits away from the nearest improving solution. Again a single solution appears
 to be the ancestor of all of the solutions near the best found. This suggests that similar to Unrestricted NKQ, Gray-Box P3 will have a
-very hard time finding the global optimum on MAX-SAT.
+hard time finding the global optimum on MAX-SAT.
 
 In general it appears that the problems which have polynomial time solutions (Deceptive Step Trap, Nearest Neighbor NKQ, 2D Ising Spin Glass)
 share a similar behavior of selection leading to the global optimum. However, the NP-Hard problems (Unrestricted NKQ, MAX-SAT) seem to contain
-very large amounts of higher order deception, making them challenging for selection based methods. This relationship warrants further investigation
+large amounts of higher order deception, making them challenging for selection based methods. This relationship warrants further investigation
 into other NP-Hard problems to determine if the repeated selection found in P3 and other evolutionary computation methods are able to overcome
 this deception. One potential avenue for improvement to P3 may also be a method for dealing with this issue. For instance, it may be beneficial to
 explicitly partition solutions when this deceptive behavior is observed.

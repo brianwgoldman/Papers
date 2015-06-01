@@ -167,7 +167,7 @@ which balances high quality intermediate fitness without trading away eventual o
            and Figure~\ref{fig-cross-success} shows the percentage of fitness improving crossover evaluations.}
 \end{figure}
 
-While analysis of optimization speed is useful from a practitioner standpoint, doing so provides very
+While analysis of optimization speed is useful from a practitioner standpoint, doing so provides
 little insight into algorithm behavior. To better understand how P3 works in detail we present here
 a look at some internal features specific to P3.
 
@@ -262,14 +262,14 @@ This behavior is rooted in the peculiar nature
 of this landscape.
 After local search, all traps in all solutions have a total
 number of 1 bits equal to either 0, 1, 3, 5, or 7 as these correspond to the local
-optima when using $k=7$ and $s=2$. Crossover is very likely to overcome the
+optima when using $k=7$ and $s=2$. Crossover easily overcomes the
 two bit plateaus, and as a result solutions in the second level generally do not
 contain the lowest fitness local optima (5 bits set) and the third
-level has very few traps set to the next worst local optima (3 bits set). As a result,
+level has few traps set to the next worst local optima (3 bits set). As a result,
 solutions which reach the third level can only be improved by replacing the deceptive
 local optima (0 and 1 bits set) with the global optimum (7 bits set).
-The global optimum is very rare in the population, and with 8 ways to represent local optima
-linkage learning is inaccurate. Therefore it is very unlikely for crossover to be successful,
+The global optimum is rare in the population, and with 8 ways to represent local optima
+linkage learning is inaccurate. Therefore it is unlikely for crossover to be successful,
 meaning few solutions will be added to the fourth level. Solutions that do improve by
 definition must have a higher frequency of optimal trap settings, meaning level four's model
 will be more accurate and donations are more likely to contain optimal trap values.

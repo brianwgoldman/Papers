@@ -4,7 +4,7 @@ All of the work presented so far has focused on the black-box optimization
 domain. These problems are characterized by a complete lack of available
 problem specific information. All the algorithm has to perform search
 is a ``black-box'' which measures the quality of arbitrary proposed
-solutions. Optimizers which are successful in this domain are very general
+solutions. Optimizers which are successful in this domain generalize well
 as there are minimal requirements to apply them to a new problem.
 
 However, for many real world applications there is potentially more information
@@ -30,7 +30,7 @@ known variable epistasis and partial function evaluation.
 
 \section{Problems in this domain}
 To understand the types of problems in this domain, lets first examine
-a very simple artificial problem we'll call 3-Equal. The quality
+a simple artificial problem we'll call 3-Equal. The quality
 of a solution is determined by how often three consecutive bits are set
 to the same value. As a result the maximum fitness is $N$ (all zero or all one) and the minimum fitness
 is 0.
