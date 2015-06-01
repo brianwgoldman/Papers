@@ -107,7 +107,7 @@ provides a bound on the total number of subfunctions of $\frac{cN}{k}$.
 \label{sec-whitley-ls}
 Section~\ref{sec-hill-climber} presented an efficient method for performing local search for the black-box
 domain. Each potential bit flip, referred to here as a move, requires the entire solution to be reevaluated, which takes $\Omega(N)$ time.
-Furthermore, each time a fitness improving move is made all previously tested moves must be tested again. As a result
+Furthermore, each time a fitness-improving move is made all previously tested moves must be tested again. As a result
 improving a random solution to be a local optimum using this algorithm requires between $\Omega(N^2)$ and \BigO{IN^2}, where $I$ is the number
 of improving moves. The lower bound is achieved when the while loop in Figure~\ref{fig-hc} runs a constant number of times.
 For instance on One Max, Deceptive Trap, Deceptive Step Trap, and HIFF all possible single bit improvements are found during
@@ -150,9 +150,9 @@ subfunction before and after making each of $k$ moves that overlap that subfunct
 results in less than $cN2b(k)$ operations, which is \BigO{N} assuming $c$ and $b(k)$ do not grow with $N$.
 Also, this procedure calls $f_s$ only $k+1$ times more than is required to find the fitness of the solution itself.
 
-When performing hill climbing, only moves $m$ such that $delta[m] > 0$ are fitness improving moves. Initially
+When performing hill climbing, only moves $m$ such that $delta[m] > 0$ are fitness-improving moves. Initially
 all moves are considered $open$, meaning that they could potentially be fitness improvements. Each iteration
-a random move $m$ is chosen from $open$, and $delta[m]$ is checked. If $m$ is a fitness improving move,
+a random move $m$ is chosen from $open$, and $delta[m]$ is checked. If $m$ is a fitness-improving move,
 \Call{MakeMove}{$m$}, shown in Figure~\ref{fig-make-move}, is called.
 
 \begin{figure}
@@ -183,7 +183,7 @@ of the solution after making the move does not require any calls to $f_s$ as $de
 change in fitness. This process requires updating all of the $delta$ values for the $k$ moves that interact with each of the $c$ subfunctions
 effected by $m$. This update replaces outdated information that used the original solution ($just\_m' - pre\_both$)
 with how much the move improves over the new solution ($post\_both - just\_m$). As $delta[m']$ has updated, $m'$ could
-potentially become a fitness improving move and is therefore added into $open$. As $m$ was just flipped,
+potentially become a fitness-improving move and is therefore added into $open$. As $m$ was just flipped,
 it cannot be a fitness improvement and is therefore removed from $open$.  In total this requires less than
 $ck4b(k)$ time, which is \BigO{1} assuming $c$, $k$, and $b(k)$ do not scale with $N$.
 
