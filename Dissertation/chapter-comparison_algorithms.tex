@@ -28,7 +28,11 @@ are available from our website.\footnote{\url{https://github.com/brianwgoldman/F
 %%%%%%%%%% HC %%%%%%%%%%%%%%%%
 \section{Random Restart Hill Climber}
 \label{sec-hill-climber}
-Perhaps the simplest black-box search heuristic is stochastic local search, or hill climbing.
+Perhaps the simplest black-box search heuristic is stochastic local
+search, 
+% wfp or
+also know as %wfp
+hill climbing.
 This optimization technique focuses on improving a single solution until it reaches a local
 optimum. Here we use the first improvement hill climber defined by \cite{goldman:2014:p3}
 and given in Figure~\ref{fig-hc}. This algorithm works by flipping each bit in a random
@@ -78,7 +82,11 @@ ensures that on all landscapes there is always a non-zero probability of search 
 %%%%%%%%%%%% Lambda Lambda %%%%%%%%%%%%%%%%
 \section{$1+(\lambda, \lambda)$}
 \cite{doerr:2013:lambdalambda} presented the first genetic algorithm to provably show
-the advantages of performing crossover on One Max. This comparatively simple
+the advantages of performing crossover on 
+the problem known as % wfp
+One Max. 
+% wfp could use a reference for OneMax
+This comparatively simple
 algorithm maintains only a single individual and a self-controlled parameter $\lambda$.
 
 Each iteration, the number of bits to flip is chosen from the binomial distribution $b\sim B(N, \frac{\lambda}{N})$,
@@ -122,7 +130,9 @@ be represented using a directed acyclic decision forest, with each tree in the f
 in the solution. In the decision tree $T_i$, which is used to set the value of gene $x_i$,
 each internal node represents previous decisions on how to set
 some other gene $x_j$, with the children of that node representing how the decision was made. The
-leaves of each tree give the probability that $x_i$ should be set to each possible value.
+leaves of each tree give the probability that $x_i$ should be set to 
+% wfp each possible value.
+one of the possible gene values.
 
 The forest is constructed iteratively, with each tree initially containing a single leaf
 and with each leaf storing a pointer for each selected solution. Each iteration the algorithm considers
@@ -159,7 +169,10 @@ the initial $\Theta(N^2)$, constructing the model requires $\Omega(\mu N^2)$ tim
 model is used to generate $\mu$ solutions, leading to a cost per evaluation of $\Omega(N^2)$.
 
 To generate a solution, the value of each gene $x_i$ is set using its corresponding decision tree $T_i$. Because
-the forest is directed acyclic, there must be an ordering of $T_i$ such that before $T_i$ is executed all
+the forest is directed acyclic, there must be an ordering of $T_i$
+such that, %wfp comma
+before $T_i$ is executed, %wfp comma
+all
 $x_j$ it uses to make decisions have already been set. As such, previous decisions made by other trees
 are used to follow each $T_i$ until a leaf is reached. The value of $x_i$ is then set based on the
 probability that other solutions reached that leaf with each value of $x_i$.
@@ -169,7 +182,8 @@ and evaluated, a set of $w$ solutions are chosen at random from the population, 
 From this set the solution which is most genetically similar to the offspring is chosen. If the offspring
 is at least as fit as the chosen solution, it replaces the chosen solution in the population. Otherwise the
 offspring is discarded. This method is designed to preserve genetic diversity as only genetically similar
-solutions must compete on fitness.
+solutions % wfp must 
+compete on fitness.
 
 hBOA is designed to work with large population sizes, resulting in a large number of
 evaluations per generation. As hBOA utilizes explicit diversity maintenance, standard methods for determining
@@ -263,9 +277,12 @@ However, not all clusters are necessarily worth keeping. For instance, in all ve
 containing all genes is removed from $useful$ as preserving all genes during crossover can only create clones.
 \cite{thierens:2013:ltgahiff} extended this removal to include any unsupported subsets. If the pairwise distance
 between two clusters is 0, this means there are no individuals in the population that disrupt the relationships between the two
-clusters. Therefore when performing crossover there is no reason to believe a fitness improvement can be achieved
+clusters. Therefore, %wfp comma
+when performing crossover, %wfp comma
+there is no reason to believe a fitness improvement can be achieved
 by breaking the stored pattern. As such a cluster is only kept if its direct superset has a non-zero distance.
-As a final step Line~\ref{fig-cluster-creation-ordering} reorders $useful$ such that clusters appear in reversed
+As a final step, %wfp comma
+Line~\ref{fig-cluster-creation-ordering} reorders $useful$ such that clusters appear in reversed
 order from which they were added to $useful$. Thus the most linked clusters and those containing single genes
 appear at the end of the returned list.
 
@@ -308,11 +325,15 @@ gene linkage while still exploring the search space. Unlike more traditional cro
 crosses each individual with the entire population. Also, to produce a single offspring, multiple evaluations
 of the fitness function are performed.
 
-Each generation, each individual in the population undergoes crossover. In a single crossover event, each
+During each % wfp
+generation, 
+%wfp each 
+every individual in the population undergoes crossover. In a single crossover event, each
 cluster of genes $C_i$ in $useful$ is applied as a crossover mask. A random donor $d$
 is chosen from the entire population (not just the model selected population), and $d$'s gene's for $C_i$ are copied
 into the working solution. If a modification is made, an evaluation is then performed. If the crossover
-resulted in no worse fitness then the changes are kept. This allows for neutral drift across plateaus.
+resulted in no worse fitness then the changes are kept, %wfp comma
+allowing for neutral drift across plateaus.
 The resulting solution, which must be at least as fit as its parent, is then
 copied into the next generation.
 
@@ -324,8 +345,10 @@ required to make clustering only \BigO{N} operations per evaluation. However, by
 possible that clustering may be super-linear.
 
 LTGA has no explicit form of diversity control and has no method for introducing new genetic information once
-the population has converged. Therefore an LTGA run is considered converged once two consecutive populations
-contain the same unique solutions.
+the population has converged. Therefore an LTGA run is considered
+converged
+%wfp once 
+when two consecutive populations contain the same unique solutions.
 
 By design, LTGA only has a single parameter: population size. LTGA uses no mutation, and crossover is defined
 in terms of the clustering algorithm. Selection between generations is fully elitist and embedded in the crossover,
@@ -365,7 +388,11 @@ handicapped, we extensively tuned each using the bisection method \citep{sastry:
 to determine the optimal population size for each problem size.
 Extended by \cite{goldman:2012:ltga}, this method iteratively
 doubles the population size until some success criteria is met and then performs bisection
-between the lowest successful and highest unsuccessful sizes. In this way the minimum population size
+between the 
+% wfp lowest 
+smallest successful and 
+% wfp highest 
+largest unsuccessful sizes. In this way the minimum population size
 that meets the success criteria is found. \cite{goldman:2014:p3} proposed a success criteria
 of performing $r$ successful runs in a row, such that the expected failure rate can be bounded
 above by $\frac{3}{r+1}$~\citep{jovanovic:1997:ruleofthree}. As P3 and the other three algorithms
@@ -373,17 +400,26 @@ do not prematurely converge, we chose $r=100$ to similarly ensure hBOA and LTGA 
 As bisection can make infinitely large population sizes, any run that had not found the global
 optimum after 100 million evaluations or 128 computing hours was considered unsuccessful.
 
-Figure~\ref{fig-pop-sizes} shows the results from performing bisection. In general hBOA
+Figure~\ref{fig-pop-sizes} shows the results from performing bisection
+on a number of problems to be used as comparison benchmarks in
+Chapter~\ref{chap-problems}. % wfp
+In general hBOA
 required population sizes that were at least an order of magnitude larger than LTGA. Due to
-runtime and memory overhead, finding the optimal value for hBOA was much less tractable than LTGA
-for moderate to large problem sizes. LTGA's population size also grew significantly slower
+runtime and memory overhead, finding the optimal value for hBOA was
+much less tractable than 
+for %wfp
+LTGA
+% wfp for 
+on moderate to large problem sizes. LTGA's population size also grew significantly slower
 than hBOA's as problem size increased, especially on the two Trap problems and Rastrigin.
 Both algorithms were ineffective on MAX-SAT, with neither able to tune to problems sizes over 60 bits.
 This is likely due to the fact that some randomly generated MAX-SAT landscapes are quite flat
 and highly deceptive~\citep{rana:1998:gamaxsat}.
 
 While not currently treated as a parameter, we also performed preliminary tests of
-integrating hill climbing into LTGA and hBOA. To match P3, we applied first improvement
+integrating hill climbing into LTGA and hBOA
+as this is the procedure used in P3. %wfp
+To match P3, we applied first improvement
 hill climbing to each algorithm's initial population.
 We then performed bisection on the modified algorithms for the largest problem sizes
 where hBOA without hill climbing was effective. We found that in general both methods
@@ -392,4 +428,5 @@ magnitude worse. There were three exceptions: both improved on MAX-SAT and
 hBOA improved on Rastrigin. In all cases the inclusion of hill climbing did
 not result in either algorithm outperforming P3 in terms of evaluations
 required to reach the global optimum. As such, all further experiments
-use the unmodified published versions.
+use the unmodified, %wfp comma
+published versions.

@@ -23,9 +23,21 @@ are treated as requiring more evaluations than any successful run. If the median
 no point is shown.
 Medians are used as the data is not normally distributed, and because it allows for more meaningful comparison
 between techniques with different success rates.
-The maximum problem size used for each problem was set to be the largest size we could
-feasibly determine LTGA's optimal population size. For many larger problems results are not shown
-for hBOA due to the extreme computational cost required to optimally set the population size.
+% wfp
+For LTGA, the
+% The 
+maximum problem size used for each problem was set to be the largest, %wfp 
+% wfp
+optimal problem
+size we could
+feasibly determine.
+% wfp LTGA's optimal population size. 
+%wfp
+For HBOA,
+many larger problems results are not shown due to the extreme
+computational cost required to optimally 
+% wfp set 
+determine the population size. 
 
 \subsection{Quantitative Comparison}
 Of the 130 tested configurations, P3 found the global optimum using the least median evaluations on 114.
@@ -101,8 +113,14 @@ In comparison P3 is only a slight improvement on Deceptive Step Trap, which is l
 
 For some applications, finding the global optimum is less important than finding good solutions quickly. Therefore
 we examine this behavior in Figure~\ref{fig-fitness-over-time}. At regular intervals during optimization
-Figure~\ref{fig-fitness-over-time} shows the median of the best fitnesses found at that point of search across
-100 runs. For each problem we show the largest problem size for which we were able to successfully gather results
+Figure~\ref{fig-fitness-over-time} shows the median of the best
+fitnesses found at that
+%wfp
+time 
+point of search across
+100 runs. 
+%wfp For each problem we 
+Figure~\ref{fig-fitness-over-time} shows the largest problem size for which we were able to successfully gather results
 for all six algorithms, but the trends shown are representative of all larger problem sizes. The maximum reporting interval
 is set to include the slowest P3 run to reach the global optimum.
 

@@ -2,8 +2,14 @@
 The ruggedness and high dimensionality of most interesting landscapes makes them challenging
 to visualize or otherwise analyze. However, doing so can be helpful in
 quantifying the difficulty of a problem, and how to best design algorithms to deal
-with those difficulties. Similarly, knowing which characteristics favor
-each existing algorithm can help researchers choose the algorithm
+with those difficulties. 
+%wfp Similarly, knowing which characteristics favor
+%wfp
+Conversely, knowing which problem characteristics favor
+% wfp each existing 
+%wfp 
+a particular
+algorithm can help researchers choose the algorithm
 most likely to perform well on their problem. To further this end, we
 explore the landscapes used in previous sections to understand
 what makes a landscape suited for P3 optimization.
@@ -14,7 +20,11 @@ One method for visualizing the global structure of a landscape
 is to examine the relationship between local optima~\cite{boese:1994:bigvalley}.
 In its original form, this process involves generating thousands of random solutions and then applying
 local search to each. This information is then displayed in two-dimensional plots:
-distance from the nearest global optimum and fitness difference from the global optima.
+distance from the nearest
+%wfp global , did you mean global here or is local, below, correct?
+%wfp
+local
+optimum and fitness difference from the global optima.
 For a number of interesting problems, a ``Big Valley'' of
 local optima exist, such that the higher a solution's fitness is, the closer it is
 in representation space to the global optimum. This result suggests that
@@ -38,12 +48,22 @@ only \BigO{1} time and the overall enumeration process is reduced to \BigO{2^N}.
 
 Due to the limited non-linearity of the gray-box domain, it is possible to exclude large
 parts of the search space without potentially missing any local optima. Consider a bit flip $X_i$.
-For gray-box problems there are only $ck$ other bit values that are needed to determine if flipping
+For gray-box problems there are only $ck$ other bit values that 
+%wfp
+need to be checked to determine if
+% wfp are needed to determine if flipping
 $X_i$ is a fitness improvement. If flipping $X_i$ in a given solution is a fitness improvement
-then any solution that contains the same values of $X_i$ and its $ck$ dependencies cannot be a local optima.
+then any solution that contains the 
+%wfp same 
+%wfp
+original
+values of $X_i$ and its $ck$ dependencies cannot be a local optima.
 
 This knowledge can be effectively exploited to skip parts of the enumeration.
-For each fitness-improving move, we can determine the least significant bit it depends on.
+For each fitness-improving move, we can determine the least
+significant bit it depends on.
+%wfp comment. What does "minimum" mean here. Is it literally the least
+%significant bit of a subfunction?
 This is the minimum bit that must be flipped in order to change
 the quality of that move. As a result, when determining what solution to test next, all steps
 of the enumeration that do not flip the least significant bit of a fitness-improving move
@@ -196,7 +216,10 @@ eventually finding a solution in the correct area of the search space, with cros
 \section{Pyramid Levels}
 One method for understanding how P3 performs search is to examine the types of solutions being stored at each level
 of the pyramid. By comparing each solution with the nearest best found solution, we can create plots similar to the ``big valley''
-ones in the previous section, even for problems too large and complex to find all possible global optima. 
+%wfp ones 
+%wfp
+plots 
+in the previous section, even for problems too large and complex to find all possible global optima. 
 This also provides a look at how the different levels of the pyramid focus search on different areas of the landscape.
 
 \begin{figure*}

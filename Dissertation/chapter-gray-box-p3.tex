@@ -1,4 +1,5 @@
 \chapter{Gray-Box P3}
+%wfp comment. First use of acronym HBHC. introduce it.
 P3 represents a natural method for integrating the HBHC into
 a global optimization algorithm as P3 already utilizes local search.
 While HBHC's inclusion adds a parameter, Section~\ref{sec-radius} and
@@ -9,9 +10,14 @@ are also a number of ways in which P3 can be made more efficient by leveraging t
 additional information available in the gray-box domain.
 
 First and foremost, linkage learning is no longer necessary. By definition
-the direct non-linear relationships between variables are known. As a result
-P3 no longer needs to store the pairwise frequency information that leads
-the black-box version to require \BigO{N^2} memory. Instead,
+the direct non-linear relationships between variables are known. As a
+result, %wfp comma
+%wfp 
+Black-box 
+P3 no longer needs to store the pairwise frequency information 
+% wfp that leadsthe black-box version to require 
+%wfp
+requiring \BigO{N^2} memory. Instead,
 we have developed a method for creating a linkage tree that learns clusters
 from the same dependency graph defined in Section~\ref{sec-hamming}. The goal is for each
 cluster to be a connected induced subgraph, with the size of clusters
@@ -27,7 +33,11 @@ This linking algorithm has a number of useful properties. First, it creates exac
 $2N-2$ clusters, distributed in size similarly to the black-box clustering algorithm.
 Performing a random graph search to find $l$ unique vertices requires \BigO{lck} time,
 meaning cluster creation is optimally efficient.
-The cluster splitting process has identical properties as random pivot quicksort,
+The cluster splitting process has identical properties 
+% wfp as 
+%wfp
+to 
+random pivot quicksort,
 meaning the sum of cluster sizes is \BigO{N\log N} in the average case.
 This efficiency allows new clusters to be created before every mixing event,
 unlike Black-Box P3 where they are created only when new solutions are added to the population.
@@ -53,9 +63,11 @@ As clusters are used to donate values between solutions, these
 moves are always in the direction of previously found high quality solutions.
 This assumes that the density of high quality solutions is higher than average between good solutions.
 
-Another efficiency gain possible due to the gray-box domain is that each time a
-donation is made, only the effected part of the solution's fitness needs to be
-recalculated. As a result the number of subfunction evaluations required
+Another efficiency gain 
+% wfp possible due to the gray-box domain 
+is that each time a donation is made, only the effected part of the solution's fitness needs to be
+recalculated. As a result, %wfp comma
+the number of subfunction evaluations required
 to determine the change in fitness is only \BigO{l}. This also
 allows for Gray-Box P3 to efficiently reapply hill climbing after each
 donation as only effected moves need to be rechecked. As a result, a donation
