@@ -47,12 +47,12 @@ based on the problem instance without needing to solve that instance repeatedly.
 
 To achieve high success rates on randomly generated problem classes,
 LTGA and hBOA must use a population 
-%wfp
-which was optimally sized
+% bwg: Went back to "large" as the key here is that hard instances cause bigger populations.
+which is large enough
+% which was optimally sized
 % large enough 
 to solve the hardest instances in that class. Therefore these methods will have
 population sizes larger than necessary to solve 
-% wfp the easiest 
 easier instances in the class. Even
 on single instance problems, both methods will require population sizes large enough to
 ensure the worst random initialization is diverse enough to solve the problem, which may be
@@ -70,15 +70,11 @@ much larger than the best random initialization.
 
 Figure~\ref{fig-evals-to-success-boxplot}
 highlights how this can effect the required number of evaluations to reach the global optimum, showing
-the distribution of results when solving the largest size of each
-problem. On each problem
-% wfp
+the distribution of results when solving the largest size of each problem. On each problem
 except Ising Spin Glass and MAX-SAT, 
 LTGA has a much smaller difference between its best and worst runs. This makes sense as LTGA uses the same
 population size regardless of instance and 
-% wfp
 because its search progresses 
-%wfp search 
 generationally. In contrast P3 has a much
 higher split, with many runs finishing very quickly.
 On all problems except Deceptive Step Trap, P3's upper quartile is lower than LTGA's lower quartile.
@@ -193,9 +189,7 @@ for each is clearly problem dependent and generally asymptoticly stable as probl
 When solving problems where epistasis can be effectively detected and represented by a linkage tree, P3 tends to spend
 less evaluations performing crossover and each crossover is more likely to be successful.
 Deceptive Trap and Rastrigin are the easiest problems to
-% wfp
 capture
-% wfp  model 
 epistasis, with local search quickly
 reducing pairwise entropy in each. These are also the problems where P3 uses the least evaluations
 on crossover and has the highest success rates for crossover. At the other extreme are Nearest Neighbor
@@ -204,10 +198,11 @@ These problems have the highest crossover usage and lowest crossover success of 
 Step Trap.  While Deceptive Step Trap's epistasis can be accurately modeled by a linkage tree, the
 exponential number of plateaus makes detecting gene linkage very challenging.
 
-When compared with LTGA, P3's crossover success rates are lower but 
-% wfp
-show the same problem ordering, from least to most effective.
-% wfp similar in problem ordering.
+% bwg: Reworked this sentence
+P3's crossover success rates are lower than LTGA, but
+both produce the same ordering of the problems when using crossover success
+such that Nearest Neighbor NK is the least successful and Deceptive Trap is the most
+successful problem.
 Counterintuitively, the use of hill climbing on the initial population reduces
 P3's crossover success, not because it reduces model quality or the donation pool, but because it is much more challenging to improve
 locally optimal solutions than randomly generated ones. LTGA's crossover benefits from application to unoptimized solutions, which
@@ -216,9 +211,7 @@ makes its aggregate crossover success incomparable to P3's.
 Even when crossover success rates are quite low, such as Nearest Neighbor NK's 0.007\% success,
 the results from Section~\ref{sec-optimum} and
 Section~\ref{sec-overtime} show 
-% wfp
 how critical this small percentage is to optimization.
-% wfp it's still critical to optimization. 
 Without
 crossover, P3's performance would be identical to the Random Restart Hill Climber, which was unable to solve even moderately sized problems
 and quickly fell behind P3 in intermediate fitness quality. Therefore even infrequently successful crossover donations are
@@ -263,9 +256,8 @@ and \cite{goldman:2011:dynamic-parameters} found empirical evidence that the opt
 population size decreases each generation of traditional evolutionary search.
 By decreasing in size, P3 implicitly stores more diversity in low levels and focuses
 search 
-%wfp on 
-%wfp
-for
+% bwg: Search is focusing search in the area around high quality solutions, not "for" high quality solutions.
+around
 high quality solutions at higher levels. In comparison,
 LTGA and hBOA suboptimally use a fixed population size at each generation.
 

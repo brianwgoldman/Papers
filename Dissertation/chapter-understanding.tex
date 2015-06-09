@@ -3,11 +3,9 @@ The ruggedness and high dimensionality of most interesting landscapes makes them
 to visualize or otherwise analyze. However, doing so can be helpful in
 quantifying the difficulty of a problem, and how to best design algorithms to deal
 with those difficulties. 
-%wfp Similarly, knowing which characteristics favor
-%wfp
-Conversely, knowing which problem characteristics favor
-% wfp each existing 
-%wfp 
+% bwg: This isn't really in opposition to the previous statement, so I think "similarly" is better than "conversely"
+Similarly, knowing which characteristics favor
+%Conversely, knowing which problem characteristics favor
 a particular
 algorithm can help researchers choose the algorithm
 most likely to perform well on their problem. To further this end, we
@@ -22,8 +20,10 @@ In its original form, this process involves generating thousands of random solut
 local search to each. This information is then displayed in two-dimensional plots:
 distance from the nearest
 %wfp global , did you mean global here or is local, below, correct?
-%wfp
-local
+%local
+% bwg: The plot is taking a local optima, finding the representation distance
+% to the nearest global optimum (axis one) and the fitness different from the best possible fitness (axis two).
+global
 optimum and fitness difference from the global optima.
 For a number of interesting problems, a ``Big Valley'' of
 local optima exist, such that the higher a solution's fitness is, the closer it is
@@ -49,13 +49,10 @@ only \BigO{1} time and the overall enumeration process is reduced to \BigO{2^N}.
 Due to the limited non-linearity of the gray-box domain, it is possible to exclude large
 parts of the search space without potentially missing any local optima. Consider a bit flip $X_i$.
 For gray-box problems there are only $ck$ other bit values that 
-%wfp
 need to be checked to determine if
-% wfp are needed to determine if flipping
-$X_i$ is a fitness improvement. If flipping $X_i$ in a given solution is a fitness improvement
-then any solution that contains the 
-%wfp same 
-%wfp
+% bwg: put "flipping" back in as X_i itself is just a bit, not a flip.
+flipping $X_i$ is a fitness improvement. If flipping $X_i$ in a given solution is a fitness improvement
+then any solution that contains the
 original
 values of $X_i$ and its $ck$ dependencies cannot be a local optima.
 
@@ -216,8 +213,6 @@ eventually finding a solution in the correct area of the search space, with cros
 \section{Pyramid Levels}
 One method for understanding how P3 performs search is to examine the types of solutions being stored at each level
 of the pyramid. By comparing each solution with the nearest best found solution, we can create plots similar to the ``big valley''
-%wfp ones 
-%wfp
 plots 
 in the previous section, even for problems too large and complex to find all possible global optima. 
 This also provides a look at how the different levels of the pyramid focus search on different areas of the landscape.

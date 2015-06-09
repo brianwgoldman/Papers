@@ -8,11 +8,10 @@ algorithm understanding is to perform search on well defined, well understood
 landscapes. To be of interest these landscapes need to represent interesting
 and important aspects of real world problems.
 
-% wfp Perhaps the most common 
-One %wfp 
+One
 such landscape is the Deceptive Trap problem \citep{goldberg:1991:gasize}.
 In this landscape the genome is broken up into $k$ bit non-overlapping subproblems referred
-to as \textit{traps}. %wfp emphasis
+to as \textit{traps}.
 Each subproblem is scored using Equation~\ref{eq-deceptive-trap}, where $t$ is the number of
 bits in the trap set to 1. The global optimum in each trap is a string of all 1s, while all
 other solutions lead to a local optima of all 0s. This problem tests an algorithm's
@@ -34,8 +33,7 @@ we chose $k=7$ to ensure highly deceptive traps.
 \cite{goldman:2012:ltga} found that mixing local search with linkage learning rendered the Deceptive
 Trap problem trivial. This is because local search is able to optimize each trap to one of the two
 optima (all 1s or all 0s), 
-% wfp and then 
-providing linkage learning % wfp can have 
+providing linkage learning
 with perfect knowledge of gene interactions.
 In order to make the problem more difficult, the authors proposed the Deceptive
 Step Trap problem, given in Equation~\ref{eq-deceptive-step-trap}. This function modifies the results
@@ -90,7 +88,6 @@ if epistasis is set such that each gene depends on the $K$ directly following it
 in the genome, the solution can be found in polynomial time~\citep{wright:2000:solvingnk}.
 These Nearest Neighbor NK landscapes are therefore ideal for search algorithm testing.
 For all of our experiments
-%wfp
 using Nearest Neighbor NK
 we fixed $K=5$ to ensure highly rugged landscapes.
 
@@ -111,7 +108,8 @@ to either -1 or 1, and vertex values must be -1 or 1.
 As our final class of randomly generated problems we chose the Maximum Satisfiability (MAX-SAT) problem.
 Related to the more common 3-SAT problem, a MAX-SAT instance is
 defined by a set of 
-three--term %wfp dash
+% bwg: Why -- (two hypens) and not - (one hypen)?
+three--term
 clauses.
 Each term is a randomly chosen variable, which may also be negated. A clause scores if an and only if
 at least one term in the clause evaluates to true. In order to make MAX-SAT instances with a known global

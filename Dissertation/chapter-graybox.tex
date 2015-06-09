@@ -3,12 +3,8 @@
 All of the work presented so far has focused on the black-box optimization
 domain. These problems are characterized by a complete lack of available
 problem specific information. 
-%wfp
 A black-box algorithm can only propose a solution and measure the
 quality of that solution, using only that information to inform its search.
-% wfp All the algorithm has to perform search
-% is a ``black-box'' which measures the quality of arbitrary proposed
-% solutions. 
 Optimizers that are successful in this domain generalize well
 as there are minimal requirements to apply them to a new problem.
 
@@ -19,18 +15,13 @@ is dominated by problem specific search
 heuristics~\cite{een:2004:satsolver,sherrington:1975:isingsolver,wright:2000:solvingnk} that
 leverage all aspects of the problem to achieve efficiency. This makes such
 algorithms very specific, such that outside of their target domain they
-either cannot be applied or 
-%wfp
+either cannot be applied or
 their application has no guarantee of search quality.
-% wfp have no expectation of quality. 
 As such,
 each must also be designed by hand for each new problem class, requiring
 deep understanding of the problem and the time to develop the algorithm.
 
-In between those two domains there is another
-%wfp
-domain
-: gray-box optimization. In this
+In between those two domains there is another domain: gray-box optimization. In this
 domain some features general to multiple problem classes are exploited, beyond
 just an evaluation function. The goal is to create optimization methods that
 benefits from these features without those methods becoming specialized to
@@ -44,7 +35,7 @@ known variable epistasis and partial function evaluation.
 To understand the types of problems in this domain, lets first examine
 a simple artificial problem we'll call 3-Equal. The quality
 of a solution is determined by how often three consecutive bits are set
-to the same value. As a result, %wfp comma
+to the same value. As a result,
 the maximum fitness is $N$ (all zero or all one) and the minimum fitness
 is 0.
 
@@ -99,21 +90,18 @@ is a linear combination of variables allowing for partial evaluation. Used in po
 In order to draw conclusions about search efficiency, it is necessary to make the features
 of the target problem domain more explicit.
 
-% wfp comment. Somewhere you should define subfunction. It could be
-% the elements of an NK but you really mean it more broadly than
-% that. For example, you refer to "clause" on MAX-SAT, subfunction on
-% NK, but then only continue to talk about subfunction.
-
 The overall quality of a solution must be equal to the sum of applying all subfunctions to that
-solution. As a consequence each subfunction must be independently evaluable.
+solution,
+% bwg: added definition of subfunction
+where a subfunction can be any mapping from a subset of problem variables
+to a measure of quality.
+%
+As a consequence each subfunction must be independently evaluable.
 The mapping of variables to subfunctions (epistasis) must also be known, and
 the maximum number of variables participating in each subfunction 
-%wfp 
-known,
-%wfp 
-% is $k$.
-%wfp 
-represented by the variable $k$.
+% bwg: slightly different than your change
+is represented by the variable $k$.
+%
 To achieve maximum efficiency $k$ should be constant in regards to problem size. The cost
 of evaluating a subfunction should also be bounded by some function $b(k)$. For example, on MAX-SAT
 $k$ is the clause size, with $b(k)$ linear in clause size, and the fitness equal to the sum of
@@ -121,39 +109,32 @@ all clause terms. On NK, $k=K+1$ as each subfunction in NK depends on a variable
 
 As the mapping of variables to subfunctions is known, it is also possible to calculate $c$, which
 is the maximum number of subfunctions any variable participates in. 
-%wfp
-Algorithms can most efficiently utilize $c$ when it is constant with
+% bwg: Tried to clarify that algorithms don't "use" c, but work best when it is a constant
+Algorithms are most efficient when $c$ is constant with
 respect to
-%wfp For best efficiency $c$ should
-% be constant in regards to 
 problem size. For example for all Nearest Neighbor NK landscapes all variables
 participate in exactly $c=k=K+1$ subfunctions. Randomly generated MAX-SAT instances have no guarantee
-that $c$ is constant, but in general the expected number of
-subfunctions in which a variable appears is set to 12.81. %wfp where does this come from?
+% bwg: Filled in where the number comes from.
+that $c$ is constant, but the expected number of
+subfunctions in which a variable appears is equal to the clause to variable ratio times the clause size, or 12.81.
 Assuming that all subfunctions use $k$ variables and each variable appears in $c$ subfunctions
-provides a bound on the total number of subfunctions %wfp of
+provides a bound on the total number of subfunctions
 $\frac{cN}{k}$.
 
 \section{Efficient Local Search}
 \label{sec-whitley-ls}
 Section~\ref{sec-hill-climber} presented an efficient method for performing local search for the black-box
 domain. Each potential bit flip, referred to here as a 
-%wfp emphasis
 \textit{move}, requires the entire solution to be reevaluated
-%wfp , which takes
-%wfp 
 taking  
 $\Omega(N)$ time.
 Furthermore, each time a fitness-improving move is made all previously
-tested moves must be tested again. As a result, %wfp comma
+tested moves must be tested again. As a result,
 improving a random solution to be a local optimum using this algorithm requires between $\Omega(N^2)$ and \BigO{IN^2}, where $I$ is the number
 of improving moves. The lower bound is achieved when the while loop in Figure~\ref{fig-hc} runs a constant number of times.
-For instance, %wfp comman
+For instance,
 on One Max, Deceptive Trap, Deceptive Step Trap, and HIFF all possible single bit improvements are found during
-the first 
-% wfp time
-%wfp 
-pass
+the first pass
 through the loop. The worst case is when each loop is expected to only make a single improving move, which causes
 all $N$ moves to be reevaluated once per improvement, such as on the Leading Ones problem.
 
@@ -192,7 +173,7 @@ subfunction $s$ on the given solution, and $solution \oplus m$ is the
 result of making move $m$ on $solution$.  For each of the
 $\frac{cN}{k}$ subfunctions \Call{InitializeDelta}{} must determine
 the fitness of that subfunction before and after making each of $k$
-moves that overlap that subfunction. Combined, %wfp comma
+moves that overlap that subfunction. Combined,
 this results in less than $cN2b(k)$ operations, which is \BigO{N}
 assuming $c$ and $b(k)$ do not grow with $N$.  Also, this procedure
 calls $f_s$ only $k+1$ times more than is required to find the fitness
@@ -202,8 +183,6 @@ When performing hill climbing, only moves $m$ such that $delta[m] > 0$
 are fitness-improving moves. Initially all moves are considered
 $open$, meaning that they could potentially be fitness
 improvements. 
-% wfp Each 
-% wfp
 During each iteration a random move $m$ is chosen from $open$,
 and $delta[m]$ is checked. If $m$ is a fitness-improving move,
 \Call{MakeMove}{$m$}, shown in Figure~\ref{fig-make-move}, is called.
@@ -250,22 +229,28 @@ climbing~\cite{whitley:2013:greedy}. Instead of choosing moves from $open$ at ra
 using their $delta$ values. Moves are then chosen randomly from the highest quality non-empty bin, and changes
 in $delta$ can cause moves to change bins. Assuming the total number of bins does not increase with $N$, both steps
 can be done in \BigO{1} time. However, at least for MAX-SAT, there is evidence that when used in combination with subsequent
-search heuristics the less greedy, %wfp commad
+search heuristics the less greedy,
 first improvement algorithm was more effective.
 
 \section{Efficient Hamming Ball Search}
 \label{sec-hamming}
-Another consequence of the gray-box domain is that increasing the neighborhood of local search becomes
-more tractable~\cite{chicano:2014:ball}.  Instead of improving solutions until no single bit flip
-is a fitness improvement, this can be expanded to no flip of $r$ or less bits can improve the solution.
+Another consequence of the gray-box domain is that increasing the hamming-ball radius of local search becomes
+more tractable~\cite{chicano:2014:ball}.
+% Added sentence here describing what a hamming-ball is.
+A hamming-ball is the collection of all solutions
+within a given hamming distance, or radius, from a given solution.
+Instead of improving solutions until no single bit flip
+% bwg: Introduced HBHC acronym here, reworked sentence a little
+is a fitness improvement, the Hamming-Ball Hill Climber (HBHC) finds solutions which
+cannot be improved by flipping $r$ or fewer bits.
 
 In a black-box setting, verifying that no $r$ bit flip can improve a solution requires testing all
 $n \choose r$ neighbors. This quickly becomes intractable as $r$
-increases. However, %wfp commad
+increases. However,
 in the gray-box
 domain not all combinations need to be tested. Consider that if two variables do not participate
-in the same subfunction, the relationship between their effects is, % wfp comma
-by definition,  % wfp comma
+in the same subfunction, the relationship between their effects is,
+by definition,
 additive. As such
 there is no way for flipping both together to be a fitness improvement without flipping one of them
 being a fitness improvement. Therefore it is not necessary to try all possible $r$ sized subsets
@@ -273,12 +258,10 @@ of the solution.
 
 Consider the 3-Equal problem.  If there are at least two loci between
 $x_i$ and $x_j$ 
-%wfp 
-then 
+then
 they do
 not share a common subfunction. Therefore, the change in fitness resulting from flipping
 both is equal to $delta[x_i] + delta[x_j]$. 
-%wfp As such
 If $delta[x_i] \leq 0$ and $delta[x_j] \leq 0$
 then $delta[x_i,x_j] \leq 0$. Now consider a solution such that the first half is set to 0
 and the second half is set to 1. Even though $c=3$ there is no way to improve this solution without
@@ -288,7 +271,7 @@ be a fitness improvement.
 To determine which of the $n \choose r$ flips that must be checked, consider a graph where
 each vertex is a variable in the solution. An edge exists between two vertices if and only
 if the corresponding variables participate in at least one subfunction together. Restated,
-there is only an edge if the two variables have a direct, %wfp comma
+there is only an edge if the two variables have a direct,
 non-linear relationship. The maximum
 degree of a vertex in this graph is $c(k-1)$, making it sparse for sufficiently large $N$.
 If a subset of vertices is connected then it is possible that flipping all of those
@@ -329,8 +312,6 @@ of the subset can be tested independently.
   \label{fig-connected-subgraphs}
 \end{figure}
 
-%wfp comment. Hamming ball, first use here. Should be defined (or
-%somehow described, referenced, something.
 In order to determine which moves in the hamming-ball must be evaluated,
 we developed \Call{ConnectedInducedSubgraphs}{} given in Figure~\ref{fig-connected-subgraphs}.
 \Call{CISG}{} is a recursive helper function that finds all subgraphs
@@ -411,8 +392,8 @@ bracket for solutions. Each ``match'' in the tournament takes in two candidate s
 produces offspring via uniform crossover, applies hill climbing to each offspring, with
 the ``winner'' being the best of all those solutions. The tournament ``bracket'' is constructed
 iteratively, storing an initially empty list of solutions $T$, such that $|T|$ is equal to the height
-of the tournament. Iterative construction is possible because, %wfp comma
-when a sub-bracket is complete, %wfp comma
+of the tournament. Iterative construction is possible because,
+when a sub-bracket is complete,
 only a single solution
 emerges and solutions only need to be stored until their partner is found.
 TUX is fully elitist but does not prematurely converge. This is because search continuously
@@ -428,6 +409,6 @@ are necessary to create new useful solutions.
 
 The primary advantages of TUX are that it does not introduce any new parameters (though it still
 requires an $r$ for the hill climber) and is relatively simple to implement. Even so
-it allows for learning from previous local optima and, %wfp comma
-as Section~\ref{chapter-gray-box-benchmarking} will show, %wfp comma
+it allows for learning from previous local optima and,
+as Section~\ref{chapter-gray-box-benchmarking} will show,
 it is quite effective at optimization.

@@ -25,7 +25,7 @@ conclusions made in Section~\ref{sec-hamming} are applicable.
 Unrestricted NKq landscapes draw the $K$ dependencies at random without replacement. For $K > 1$ it is
 NP-Hard to find the global optimum of these landscapes. This also means that while
 $k$ remains fixed, the maximum number of subfunctions a variable appears in ($c$) can increase
-as $N$ increases. As a result, %wfp comma
+as $N$ increases. As a result,
 some of the efficiency claims in Section~\ref{sec-hamming}
 may not be applicable.
 
@@ -70,7 +70,7 @@ is the radius of the hamming-ball. Therefore our first experiments are designed 
 the effect of this parameter on solution quality.
 
 Figure~\ref{fig-fitness} shows the effect on final solution fitness as $r$ increases. As expected
-from~\cite{chicano:2014:ball}, %wfp comma
+from~\cite{chicano:2014:ball},
 the HBHC obtains higher quality as $r$ increases, with the magnitude
 of the improvement decreasing. TUX has a similar relationship and
 outperforms HBHC on all three problems for all $r$ values. Regardless of $r$, Gray-Box P3 outperforms both, with almost
@@ -102,7 +102,6 @@ that with a sufficiently high $r$ the HBHC is able to find the global optimum.
 Reaching high quality solutions quickly can sometimes be more important than reaching the global optimum
 eventually. Figure~\ref{fig-solver-over} shows how solution quality
 progresses 
-% wfp during search 
 for each algorithm. HBHC and TUX have significant early delays caused by their high $r$ values. Larger
 $r$'s require a large amount of initial partial evaluation before performing hill climbing. After one full iteration
 HBHC effectively stalls, with TUX continuing to improve. Both are eclipsed by Gray-Box P3,
@@ -110,11 +109,10 @@ which quickly descends to the global optimum, outperforming HBHC and TUX at ever
 
 Figure~\ref{fig-radius-over} further illustrates the effect of $r$ on
 Gray-Box P3. On 
-%wfp
 both
 Nearest Neighbor NKq
 and Ising Spin Glasses, increasing $r$ does not change the shape of
-the curve. Instead, %wfp comma
+the curve. Instead,
 the quality reached is simply time shifted,
 such that given more time higher $r$ values will reach the same quality. As a result, for these problems we conclude
 that higher $r$ values simply add more expense for no overall gain.
@@ -151,14 +149,14 @@ was able to consistently reach the best fitness until it it hit the memory limit
 NKq and $N=2,916$ for Ising Spin Glass. This limitation is due to Black-Box P3's
 \BigO{N^2} memory requirements.
 
-%wfp comment. In both these figures it is hard to pick out
-%HBHC. Perhaps a comment in the caption would help?
+% bwg: Added HBHC comment to captions
 
 \begin{figure}
   \centering
   \includegraphicshalf{length-nn}
   \caption{Comparison of how each algorithm's time required to reach the best fitness found scales with problem size
-  on Nearest Neighbor NKq with $K=4$. With $N=1000$ Gray-Box P3 is 375x faster than Black-Box P3.}
+  on Nearest Neighbor NKq with $K=4$. With $N=1000$ Gray-Box P3 is 375x faster than Black-Box P3.
+  HBHC was only successful on the smallest problem size.}
   \label{fig-length-nn}
 \end{figure}
 
@@ -166,7 +164,8 @@ NKq and $N=2,916$ for Ising Spin Glass. This limitation is due to Black-Box P3's
   \centering
   \includegraphicshalf{length-is}
   \caption{Comparison of how each algorithm's time required to find the best fitness found scales with problem size
-  on Ising Spin Glass. With $N=2025$ Gray-Box P3 is 4.6x faster than Black-Box P3.}
+  on Ising Spin Glass. With $N=2025$ Gray-Box P3 is 4.6x faster than Black-Box P3.
+  HBHC was only successful on the smallest problem size.}
   \label{fig-length-is}
 \end{figure}
 
@@ -180,7 +179,7 @@ methods~\cite{goldman:2015:fastp3}. Applying regression, we estimate that Black-
 on Nearest Neighbor NKq is \BigO{N^{2.75}} while Gray-Box P3's is \BigO{N^{1.98}}.
 
 The results on Ising Spin Glass are similar, with a less extreme difference between
-Black-Box P3 and Gray-Box P3. In general, %wfp comma
+Black-Box P3 and Gray-Box P3. In general,
 Gray-Box is the fastest technique to
 find the global optimum by an order of magnitude, with Black-Box P3's mean run finishing
 4.6 times slower than Gray-Box on $N=2,025$. Using the Mann-Whitney test to compare their run times
@@ -191,11 +190,7 @@ As Unrestricted NKq does not have a known global optimum, and the different algo
 rarely found the same best fitness, Figure~\ref{fig-length-un} compares the error
 for each technique at termination. Gray-Box P3 in general finds the best fitness,
 with TUX occasionally performing better. When $N>2,000$, Gray-Box P3 finds better quality
-solutions 
-%wfp that 
-%wfp
-than
-all other methods for every instance.  Using the Mann-Whitney test to compare the fitness
+solutions than all other methods for every instance.  Using the Mann-Whitney test to compare the fitness
 of Gray-Box P3 and TUX when $N=10,000$ results in $p < 10^{-16}$. HBHC and Black-Box P3 only reach similar
 qualities as TUX and Gray-Box P3 when $N=200$, doing so in 4 and 7 runs, respectively. As the problem
 size increase TUX begins to fall behind Gray-Box P3, with the HBHC stabilizing at about 2.5\% worse than
@@ -212,8 +207,7 @@ falling further behind as the problem size increases.
 
 \section{Discussion}
 In line with previous work, we have found that HBHC cannot effectively find global optima
-on problems with even moderate epistasis. In general, %wfp comma
-it also obtains almost no improvement
+on problems with even moderate epistasis. In general, it also obtains almost no improvement
 in fitness after only a few restarts. We designed TUX as a simplistic way of choosing
 restart locations based on previously found local optima. Unlike HBHC alone, TUX
 was able to continue improving given more time, finding global optima on problems three
@@ -235,7 +229,7 @@ can perform partial reevaluation and efficient hill climbing during the mixing p
 Gray-Box P3's success is less dramatic on Ising Spin Glasses.
 While it still outperformed all competitors, Black-Box P3 may actually scale better to larger
 problems. One explanation for this deviation is that Ising Spin Glasses require more
-exploration of equal fitness plateaus. For instance, %wfp comma
+exploration of equal fitness plateaus. For instance,
 in Figure~\ref{fig-solver-over} and Figure~\ref{fig-radius-over}
 there is a significant pause in improvement when Gray-Box P3 reaches the second best fitness in the landscape.
 Nothing in its design suggests that Gray-Box P3 should be more effective at neutral drift. Another potential
@@ -249,12 +243,11 @@ and Unrestricted NKq. While Black-Box P3 performed well in the former, it was th
 successful in the latter. The optimal radius for Gray-Box P3 also shifted from 1 to 2.
 A potential explanation is that in both Ising Spin Glass
 and Nearest Neighbor NKq 
-
-%wfp comment, following doesn't make sense to me.
-the number of unique variables $r$
-or fewer steps away from a given variable is significantly lower than
-the worst case. 
-
+% bwg: Attempted to clarify this section
+the number of unique variables within a given radius
+from a given variable is significantly lower than
+the worst case.
+%
 This explains why on Unrestricted NKq
 even moderately high $r$ values hit our memory limit.
 For Black-Box P3 this may also be causing increased difficulty in linkage learning as variables

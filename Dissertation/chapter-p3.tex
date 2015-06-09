@@ -15,7 +15,6 @@ population $P_0$.
 Next, the solution is iteratively improved by applying LTGA's crossover algorithm (Figure~\ref{fig-cluster-usage})
 with each population $P_i$ in the pyramid. If this process results in a strict fitness improvement and has
 created a solution not yet stored in the pyramid, 
-% wfp it 
 that new solution is added to the next highest pyramid level $P_{i+1}$.
 If $P_{i+1}$ does not yet exist, it is created. In this way populations in the pyramid expand over time,
 and the number of populations stored increases over time. Initially the pyramid contains no solutions
@@ -57,7 +56,6 @@ time a solution is added to a population. Furthermore, unlike
 our chosen variant of LTGA, all solutions in the population are used to generate the model, not just the
 winners of a binary tournament. We can do this because even the
 worst solutions in the pyramid are already high quality due to 
-%wfp
 the previous application of
 local search.
 Using local search in LTGA was examined by \cite{bosman:2011:lsbbo} and found
@@ -104,9 +102,8 @@ a result, detecting clusters for use by crossover is much more effective. The cr
 is extremely elitist, as each gene donation must result in no fitness loss, and a solution must
 strictly improve to be added to the next level of the pyramid. This is balanced by continual
 integration of new 
-%wfp 
-% random solutions.
-randomly generated, then locally optimized via hill climbing,
+% bwg: Removed "via hill climbing" as this sentence is already quite compound.
+randomly generated, then locally optimized,
 solutions.
 Furthermore, each random restart decreases the probability
 of spurious linkages caused by shared ancestry. This diversity is further preserved by applying
