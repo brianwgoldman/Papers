@@ -12,7 +12,6 @@ most likely to perform well on their problem. To further this end, we
 explore the landscapes used in previous sections to understand
 what makes a landscape suited for P3 optimization.
 
-
 \section{Big Valley}
 One method for visualizing the global structure of a landscape
 is to examine the relationship between local optima~\cite{boese:1994:bigvalley}.
@@ -45,6 +44,44 @@ Consider that for gray-box problems, we can determine all fitness-improving move
 solution in \BigO{N} time and that this list can be updated in \BigO{1} time when flipping
 a single bit. Therefore, checking if each new solution is locally optimal requires
 only \BigO{1} time and the overall enumeration process is reduced to \BigO{2^N}.
+
+\begin{figure}
+  \begin{algorithmic}[1]
+  \Procedure{AllLocalOptima}{}
+    \State $solution \leftarrow \{0\}^N$
+    \State $found \leftarrow [~]$
+    \State $i \leftarrow N-1$
+    \While{$i < N$}
+      \State $i \leftarrow $\Call{FindNextIndex}{$i$}
+      \If{$i = -1$}
+        \State $found \leftarrow found + [solution]$
+        \State $i \leftarrow 0$
+      \EndIf
+      \While{$i < N$ \textbf{and} $solution[i] = 1$}
+        \State \Call{MakeMove}{$i$}
+        \State $i \leftarrow i + 1$
+      \EndWhile
+      \If{$i < N$}
+        \State \Call{MakeMove}{$i$}
+      \EndIf
+    \EndWhile
+    \State \Return $found$
+  \EndProcedure
+  \Procedure{FindNextIndex}{$i$}
+    \While{$i \ge 0$}
+      \ForAll{$m \in move\_bin[i]$}
+        \If{$delta[m] \ge 0$}
+          \Return $i$
+        \EndIf
+      \EndFor
+      \State $i \leftarrow i-1$
+    \EndWhile
+    \State \Return $-1$
+  \EndProcedure
+  \end{algorithmic}
+  \caption{Algorithm to find all local optima of a given gray-box problem.}
+  \label{fig-enumerate}
+\end{figure}
 
 Due to the limited non-linearity of the gray-box domain, it is possible to exclude large
 parts of the search space without potentially missing any local optima. Consider a bit flip $X_i$.
