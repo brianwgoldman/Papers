@@ -45,6 +45,16 @@ solution in \BigO{N} time and that this list can be updated in \BigO{1} time whe
 a single bit. Therefore, checking if each new solution is locally optimal requires
 only \BigO{1} time and the overall enumeration process is reduced to \BigO{2^N}.
 
+\begin{figure*}
+  \centering
+  \includegraphicsfit{Enumerate}
+  \caption{Terminology diagram for finding all local optima. $X_i$ is a bit flip
+           with dependencies on $index$ 2, 4, 5, and 7, giving it a minimum dependency
+           of 2. After reordering, its minimum dependency becomes 4.}
+  \label{fig-enumerate}
+\end{figure*}
+
+
 \begin{figure}
   \begin{algorithmic}[1]
   \Procedure{AllLocalOptima}{}
