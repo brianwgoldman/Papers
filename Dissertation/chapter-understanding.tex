@@ -49,92 +49,100 @@ only \BigO{1} time and the overall enumeration process is reduced to \BigO{2^N}.
   \centering
   \includegraphicsfit{Enumerate}
   \caption{Example change of enumeration ordering. The gray loci represent all dependencies
-           for some move $X_i$. By reordering, $X_i$'s lowest $index$ dependency improves from 2 to 4.}
+           for some move $m_i$. By reordering, $m_i$'s lowest $index$ dependency improves from 2 to 4.}
   \label{fig-enumerate}
 \end{figure*}
 
+Due to the limited non-linearity of the gray-box domain, it is possible to exclude large
+parts of the search space without missing any local optima.
+Consider the representation presented in the top of Figure~\ref{fig-enumerate}. In a black-box
+domain, enumeration would progress as a binary counter, treating $index$ zero (symbol $A$ in the genome) as
+the least significant bit. This ensures that before changing $index$ $i$, all possible settings of $index$
+0 through $i-1$ have been tested. The gray-box domain makes it possible to skip combinations
+which cannot be local optima. In this example there exists a move $m_i$ which is a fitness improvement
+when enumeration starts (all variables set to 0). Due to the known relationships between variables
+we know that the quality of $m_i$ only depends on variables $C$, $E$, $F$, and $H$.
+Therefore, until one of those four variables are modified, the solution cannot be a local optima.
+As a result, solutions 00000000, 10000000, 01000000, and 11000000 cannot be local optima and can
+therefore be skipped during enumeration. More generally, if at any point during enumeration
+there exists a fitness-improving move, no local optima can exist until at least one
+dependency of that move is modified.
 
 \begin{figure}
   \begin{algorithmic}[1]
   \Procedure{AllLocalOptima}{}
     \State $solution \leftarrow \{0\}^N$
     \State $found \leftarrow [~]$
-    \State $i \leftarrow N-1$
-    \While{$i < N$}
-      \State $i \leftarrow $\Call{FindNextIndex}{$i$}
-      \If{$i = -1$}
+    \State $index \leftarrow N-1$
+    \While{$index < N$}
+      \State $index \leftarrow $\Call{FindNextIndex}{$index$}
+      \If{$index = -1$}
         \State $found \leftarrow found + [solution]$
-        \State $i \leftarrow 0$
+        \State $index \leftarrow 0$
       \EndIf
-      \While{$i < N$ \textbf{and} $solution[i] = 1$}
-        \State \Call{MakeMove}{$i$}
-        \State $i \leftarrow i + 1$
+      \While{$index < N$ \textbf{and} $solution[index] = 1$}\label{fig-enumeration-algorithm-counter}
+        \State \Call{MakeMove}{$index$}
+        \State $index \leftarrow index + 1$
       \EndWhile
-      \If{$i < N$}
-        \State \Call{MakeMove}{$i$}
+      \If{$index < N$}
+        \State \Call{MakeMove}{$index$}\label{fig-enumeration-algorithm-insert}
       \EndIf
     \EndWhile
     \State \Return $found$
   \EndProcedure
-  \Procedure{FindNextIndex}{$i$}
-    \While{$i \ge 0$}
-      \ForAll{$m \in move\_bin[i]$}
+
+  \Procedure{FindNextIndex}{$index$}
+    \While{$index \ge 0$}
+      \ForAll{$m \in move\_bin[index]$}
         \If{$delta[m] \ge 0$}
-          \Return $i$
+          \Return $index$
         \EndIf
       \EndFor
-      \State $i \leftarrow i-1$
+      \State $index \leftarrow index-1$
     \EndWhile
     \State \Return $-1$
   \EndProcedure
   \end{algorithmic}
-  \caption{Algorithm to find all local optima of a given gray-box problem.}
-  \label{fig-enumerate}
+  \caption{Algorithm to find all local optima of a given gray-box problem.
+           \textproc{MakeMove}, described in Figure~\ref{fig-make-move}, flips bit $index$
+           and updates the fitness effect $deta$ of making all moves dependent on $index$.
+           $move\_bin$ stores moves based on their lowest $index$ dependency.}
+  \label{fig-enumerate-algorithm}
 \end{figure}
 
-Due to the limited non-linearity of the gray-box domain, it is possible to exclude large
-parts of the search space without potentially missing any local optima. Consider a bit flip $X_i$.
-For gray-box problems there are only $ck$ other bit values that 
-need to be checked to determine if
-% bwg: put "flipping" back in as X_i itself is just a bit, not a flip.
-flipping $X_i$ is a fitness improvement. If flipping $X_i$ in a given solution is a fitness improvement
-then any solution that contains the
-original
-values of $X_i$ and its $ck$ dependencies cannot be a local optima.
+This knowledge can be effectively exploited to skip parts of the enumeration,
+as shown in Figure~\ref{fig-enumerate-algorithm}.
+Before starting, each move is put into a table $move\_bin$
+based on that move's dependency with the minimum $index$ value. This is the first $index$ which
+can be modified by enumeration to change the fitness effect of making that move.
+In order to determine how much of the enumeration can be skipped, we must find
+the highest $index$ in $move\_bin$ which contains a fitness-improving move,
+as done by \Call{FindNextIndex}{}. If no move is fitness-improving,
+then a local optima has been found.
 
-This knowledge can be effectively exploited to skip parts of the enumeration.
-For each fitness-improving move, we can determine the least
-significant bit it depends on.
-%wfp comment. What does "minimum" mean here. Is it literally the least
-%significant bit of a subfunction?
-This is the minimum bit that must be flipped in order to change
-the quality of that move. As a result, when determining what solution to test next, all steps
-of the enumeration that do not flip the least significant bit of a fitness-improving move
-can be skipped. Furthermore, if there are multiple fitness-improving moves, all must
-have at least one dependent bit flipped. Restated, the fitness-improving move
-with the most-significant least-significant bit must have its least significant bit flipped.
+The \Call{AllLocalOptima}{} algorithm in Figure~\ref{fig-enumerate-algorithm} at a high level
+works by repeatedly calling \Call{FindNextIndex}{} and adding 1 to the resulting $index$ position's value.
+Initially \Call{AllLocalOptima}{} uses \Call{FindNextIndex}{} to check all moves (initializes $index$
+to $N-1$). If at any point \Call{FindNextIndex}{} returns -1 then no move is fitness-improving and
+the current solution is added to the list of local optima $found$. \Call{AllLocalOptima}{} then
+adds a 1 to the $index$ returned by \Call{FindNextIndex}{} using the loop on Line~\ref{fig-enumeration-algorithm-counter}
+to perform carry operations and Line~\ref{fig-enumeration-algorithm-insert} to create the new 1 value.
+Iteration stops when the carry exceeds the solution length.
 
-
-Finding which move's least significant bit needs to be flipped can be done efficiently via binning.
-Before starting search, each move can be binned based on its least significant bit. Initially
-search examines bins from the most significant to the least significant to find the first fitness-improving move.
-This is the position from which enumeration must continue. If no move is fitness-improving, a local
-optimum has been found, and enumeration can continue with the least significant bit in the solution.
-Enumeration progresses by adding a 1 to the found position, with carry as needed.
-If the carry exceeds the most significant bit in the solution, the entire space has been checked and iteration ends.
-
-When performing subsequent checks, not all moves need to be retested for improvement. Instead, the most significant
-bin that must be tested is the location of the most significant bit flipped by the previous iteration. This
+When performing subsequent checks, not all moves need to be retested for improvement. Instead, the highest $index$
+bin that must be tested is the highest $index$ flipped by the previous iteration. This
 simplification is possible because
-the previous iteration has verified that all moves in more significant bins are not fitness-improving, and no action performed during
-that iteration can make them fitness-improving. Furthermore, no 1s exist in less significant positions, meaning
-iteration can continue immediately from the found position.
+the previous iteration has verified that all moves in higher $index$ bins are not fitness-improving, and no action performed during
+that iteration can make them fitness-improving. Furthermore, no 1s can exist in lower $index$ positions, meaning
+iteration can continue immediately from the found $index$.
 
-As a final efficiency, the order in which bits of the solution are considered can be remapped. When a move is fitness-improving,
-the amount of search space that is skipped depends on how significant its least significant bit is. Therefore,
-by rearranging the order to make its least significant bit more significant, more search space can be skipped. We perform
+As a final efficiency, the order in which variables in the solution are $index$ed can be remapped. When a move is fitness-improving,
+the amount of search space that is skipped depends on how high its lowest $index$ dependency is. Therefore,
+by rearranging the order to make its lowest $index$ dependency higher, more search space can be skipped. We perform
 this remapping in a greedy fashion, such that the move with the least-unmapped dependencies has all of its remaining dependencies
-mapped to the most significant remaining positions.
+mapped to the most significant remaining positions. Figure~\ref{fig-enumerate} shows how changing the $index$ order of variables
+improves $m_i$'s lowest $index$ dependency from 2 to 4. Now whenever $m_i$ is a fitness improvement, \Call{FindNextIndex}{}
+skips 4 times as much search space.
 
 All together, these optimization result in substantial efficiency improvements for some landscapes. For example, when applied to
 the OneMax problem (each bit scores one if set to 1, zero otherwise) this method finds all local optima in \BigO{N} time.
