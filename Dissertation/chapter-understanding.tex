@@ -144,7 +144,7 @@ mapped to the most significant remaining positions. Figure~\ref{fig-enumerate} s
 improves $m_i$'s lowest $index$ dependency from 2 to 4. Now whenever $m_i$ is a fitness improvement, \Call{FindNextIndex}{}
 skips 4 times as much search space.
 
-All together, these optimization result in substantial efficiency improvements for some landscapes. For example, when applied to
+All together, these optimizations result in substantial efficiency improvements for some landscapes. For example, when applied to
 the OneMax problem (each bit scores one if set to 1, zero otherwise) this method finds all local optima in \BigO{N} time.
 Deceptive Trap, regardless of how the bits are arranged, requires \BigO{2^k2^{N/k}} time to find all $2^{N/k}$ local optima.
 This means a 60 bit
