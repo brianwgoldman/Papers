@@ -40,10 +40,10 @@ However, by leveraging the gray-box domain, some efficiency improvements can be 
 
 \subsection{Quickly Finding All Local Optima}
 
-Consider that for gray-box problems, we can determine all fitness-improving moves from a given
-solution in \BigO{N} time and that this list can be updated in \BigO{1} time when flipping
+For gray-box problems, we can determine the set of all fitness-improving moves from a given
+solution in \BigO{N} time and this set can be updated in \BigO{1} time when flipping
 a single bit. Therefore, checking if each new solution is locally optimal requires
-only \BigO{1} time and the overall enumeration process is reduced to \BigO{2^N}.
+\BigO{1} time and the overall enumeration process requires \BigO{2^N}.
 
 \begin{figure*}
   \centering
@@ -59,8 +59,8 @@ Consider the representation presented in the top of Figure~\ref{fig-enumerate}. 
 domain, enumeration would progress as a binary counter, treating $index$ zero (symbol $A$ in the genome) as
 the least significant bit. This ensures that before changing $index$ $i$, all possible settings of $index$
 0 through $i-1$ have been tested. The gray-box domain makes it possible to skip combinations
-which cannot be local optima. In this example there exists a move $m_i$ which is a fitness improvement
-when enumeration starts (all variables set to 0). Due to the known relationships between variables
+which cannot be local optima. In Figure~\ref{fig-enumerate} there exists a move $m_i$ which is a fitness improvement
+when enumeration starts (all variables set to 0). Due to the known relationships between variables,
 we know that the quality of $m_i$ only depends on variables $C$, $E$, $F$, and $H$.
 Therefore, until one of those four variables are modified, the solution cannot be a local optima.
 As a result, solutions 00000000, 10000000, 01000000, and 11000000 cannot be local optima and can
@@ -113,14 +113,14 @@ dependency of that move is modified.
 This knowledge can be effectively exploited to skip parts of the enumeration,
 as shown in Figure~\ref{fig-enumerate-algorithm}.
 Before starting, each move is put into a table $move\_bin$
-based on that move's dependency with the minimum $index$ value. This is the first $index$ which
+based on that move's lowest $index$ dependency. This is the first $index$ which
 can be modified by enumeration to change the fitness effect of making that move.
 In order to determine how much of the enumeration can be skipped, we must find
 the highest $index$ in $move\_bin$ which contains a fitness-improving move,
 as done by \Call{FindNextIndex}{}. If no move is fitness-improving,
 then a local optima has been found.
 
-The \Call{AllLocalOptima}{} algorithm in Figure~\ref{fig-enumerate-algorithm} at a high level
+The \Call{AllLocalOptima}{} algorithm in Figure~\ref{fig-enumerate-algorithm}
 works by repeatedly calling \Call{FindNextIndex}{} and adding 1 to the resulting $index$ position's value.
 Initially \Call{AllLocalOptima}{} uses \Call{FindNextIndex}{} to check all moves (initializes $index$
 to $N-1$). If at any point \Call{FindNextIndex}{} returns -1 then no move is fitness-improving and
