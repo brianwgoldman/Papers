@@ -6,11 +6,12 @@ Understanding how a stochastic search algorithm will behave on arbitrary and com
 search landscapes can be exceedingly difficult. Therefore a common practice for
 algorithm understanding is to perform search on well defined, well understood
 landscapes. To be of interest these landscapes need to represent interesting
-and important aspects of real world problems.
+and important aspects of real-world problems.
 
-Perhaps the most common such landscape is the Deceptive Trap problem \citep{goldberg:1991:gasize}.
+One
+such landscape is the Deceptive Trap problem \citep{goldberg:1991:gasize}.
 In this landscape the genome is broken up into $k$ bit non-overlapping subproblems referred
-to as traps.
+to as \textit{traps}.
 Each subproblem is scored using Equation~\ref{eq-deceptive-trap}, where $t$ is the number of
 bits in the trap set to 1. The global optimum in each trap is a string of all 1s, while all
 other solutions lead to a local optima of all 0s. This problem tests an algorithm's
@@ -31,7 +32,9 @@ we chose $k=7$ to ensure highly deceptive traps.
 
 \cite{goldman:2012:ltga} found that mixing local search with linkage learning rendered the Deceptive
 Trap problem trivial. This is because local search is able to optimize each trap to one of the two
-optima (all 1s or all 0s), and then linkage learning can have perfect knowledge of gene interactions.
+optima (all 1s or all 0s), 
+providing linkage learning
+with perfect knowledge of gene interactions.
 In order to make the problem more difficult, the authors proposed the Deceptive
 Step Trap problem, given in Equation~\ref{eq-deceptive-step-trap}. This function modifies the results
 of Equation~\ref{eq-deceptive-trap} to include plateaus of size $s$, introducing an exponential number
@@ -46,13 +49,13 @@ learning techniques, while still being highly deceptive.
   \label{eq-deceptive-step-trap}
 \end{equation}
 
-Another challenging aspect of landscapes can be higher order relationships. The Hierarchical If
+Another challenging aspect of landscapes can be higher-order relationships. The Hierarchical If
 and only If (HIFF) problem~\cite{watson:1998:hiff} is designed to capture the difficulties of this class of problem.
 In HIFF the genome is broken up into a complete binary tree, such that each gene appears in exactly one
 leaf and each internal node is the subset of genes contained in its children. If all genes represented
 in a node of the tree are set to the same value, they score equal to the size of the set. In this way
 small subsets lead toward solutions to larger subsets. However, a node can score if all genes are either
-all 1s or all 0s, meaning that to solve higher order subproblems it is necessary to perform crossovers
+all 1s or all 0s, meaning that to solve higher-order subproblems it is necessary to perform crossovers
 that preserve lower order solutions. This problem is a natural fit for LTGA as the linkage tree can
 perfectly duplicate the problem's true relationships \citep{thierens:2013:ltgahiff}.
 
@@ -72,7 +75,7 @@ their static nature can be misleading. Specifically, algorithm quality might
 be so fragile that it is only effective at searching well behaved landscapes. A more realistic
 test of an algorithm's black-box effectiveness is to work with randomly generated instances
 drawn from a problem class. When tested over a sufficiently large sample it is then possible
-to draw more general conclusions about the algorithms effectiveness. The challenge with these
+to draw more general conclusions about an algorithm's effectiveness. The challenge with these
 landscapes is determining the global optimum to gauge if an algorithm was successful.
 
 Perhaps the most common model for generating random rugged landscapes is the NK model. An
@@ -84,7 +87,9 @@ randomly chosen and as a result finding the global optimum is $NP$-Hard for $K>1
 if epistasis is set such that each gene depends on the $K$ directly following it
 in the genome, the solution can be found in polynomial time~\citep{wright:2000:solvingnk}.
 These Nearest Neighbor NK landscapes are therefore ideal for search algorithm testing.
-For all of our experiments we fixed $K=5$ to ensure highly rugged landscapes.
+For all of our experiments
+using Nearest Neighbor NK
+we fixed $K=5$ to ensure highly rugged landscapes.
 
 \cite{saul:1994:spinglass} presents a combinatorial benchmark problem derived from physics:
 Ising Spin Glasses. A spin glass is defined by a weighted graph of interaction terms between vertices.
@@ -97,14 +102,18 @@ $x_i$ and $x_j$ are the gene values for vertex $i$ and $j$. Optimal fitness is w
 \end{equation}
 Similar to NK Landscapes, the general class is $NP$-Hard to optimize, but the $2D\pm J$ subset of
 Ising Spin Glasses can be polynomially solved.\footnote{\url{http://www.informatik.uni-koeln.de/spinglass/}}
-In this subset the graph is restricted to be a two dimensional torus, edge weights are randomly set
+In this subset the graph is restricted to be a two-dimensional torus, edge weights are randomly set
 to either -1 or 1, and vertex values must be -1 or 1.
 
 As our final class of randomly generated problems we chose the Maximum Satisfiability (MAX-SAT) problem.
-Related to the more common 3-SAT problem, a MAX-SAT instance is defined by a set of three term clauses.
+Related to the more common 3-SAT problem, a MAX-SAT instance is
+defined by a set of 
+% bwg: Why -- (two hypens) and not - (one hypen)?
+three--term
+clauses.
 Each term is a randomly chosen variable, which may also be negated. A clause scores if an and only if
 at least one term in the clause evaluates to true. In order to make MAX-SAT instances with a known global
 optimum, \cite{goldman:2014:p3} proposed constructing clauses around a fixed solution. In this way the
 signs of the terms are set to ensure the target solution satisfies the clause. To ensure each
-problem is challenging we chose a clause to variable ratio of $4.27$~\citep{selman:1996:maxsat}.
+problem is challenging we chose a clause-to-variable ratio of $4.27$~\citep{selman:1996:maxsat}.
 

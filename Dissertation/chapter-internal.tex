@@ -33,22 +33,28 @@ as problem size increases, similar to Figure~\ref{fig-pop-sizes} for hBOA and LT
 As expected, the number of concurrently stored solutions increases as problem difficult increases, with the
 exact behavior dependent on the problem landscape. Figure~\ref{fig-solutions-stored} examines how the number
 of solutions stored is distributed on the largest problem sizes. Here we see that the behavior depends
-on the type of problem. On single instance problems P3's stored variance is relatively low, and generally
+on the type of problem. On single-instance problems P3's stored variance is relatively low, and generally
 higher than optimally tuned LTGA's population size. On randomly generated problem classes P3 has a much
 higher variance in stored solutions, but in general requires smaller sizes than LTGA.
 
 \subsection{Problem Instance versus Problem Class}
 Our procedure for tuning LTGA and hBOA outlined in Section~\ref{sec-tuning} involved finding
-the optimal population size for each class of problem. For real world black-box optimization this is
+the optimal population size for each class of problem. For real-world black-box optimization this is
 realistically the best either algorithm could hope for as tuning to a problem
 instance or population initialization involves repeatedly solving the problem being tuned.
 This limitation does not exist in parameter-less methods, which scale their diversity
 based on the problem instance without needing to solve that instance repeatedly.
 
-To achieve high success rates on randomly generated problem classes, LTGA and hBOA must use a population size
-large enough to solve the hardest instances in that class. Therefore these methods will have
-population sizes larger than necessary to solve the easiest instances in the class. Even
-on single instance problems, both methods will require population sizes large enough to
+To achieve high success rates on randomly generated problem classes,
+LTGA and hBOA must use a population 
+% bwg: Went back to "large" as the key here is that hard instances cause bigger populations.
+which is large enough
+% which was optimally sized
+% large enough 
+to solve the hardest instances in that class. Therefore these methods will have
+population sizes larger than necessary to solve 
+easier instances in the class. Even
+on single-instance problems, both methods will require population sizes large enough to
 ensure the worst random initialization is diverse enough to solve the problem, which may be
 much larger than the best random initialization.
 
@@ -65,8 +71,11 @@ much larger than the best random initialization.
 Figure~\ref{fig-evals-to-success-boxplot}
 highlights how this can effect the required number of evaluations to reach the global optimum, showing
 the distribution of results when solving the largest size of each problem. On each problem
+except Ising Spin Glass and MAX-SAT, 
 LTGA has a much smaller difference between its best and worst runs. This makes sense as LTGA uses the same
-population size regardless of instance and progresses search generationally. In contrast P3 has a much
+population size regardless of instance and 
+because its search progresses 
+generationally. In contrast P3 has a much
 higher split, with many runs finishing very quickly.
 On all problems except Deceptive Step Trap, P3's upper quartile is lower than LTGA's lower quartile.
 Furthermore, on Deceptive Trap, HIFF, and Ising Spin Glasses, P3's worst run is better than LTGA's best run.
@@ -86,7 +95,7 @@ likely due to its ability to scale diversity to the problem instance instead of 
 
 In Section~\ref{sec-overtime} we examined intermediate fitness qualities of LTGA and hBOA when using
 population sizes tuned to reach the global optimum. As a result, both were exceptionally ineffective
-at quickly reaching high quality solutions. This is because unlike P3, these methods have an explicit
+at quickly reaching high-quality solutions. This is because unlike P3, these methods have an explicit
 trade off between optimal performance and intermediate performance caused by their population size parameter.
 
 \begin{figure}[t]
@@ -141,7 +150,7 @@ The second period of improvement also comes earlier and reaches a lower quality 
 runs reach the global optimum, down from 100 successful for the full population size. On Nearest Neighbor NK this drops the number
 of successful runs from 98 to 68. As a result we conclude that while reducing the population size of LTGA may improve its quality
 at early points during optimization, doing so reduces the robustness of the final solution found. This is in contrast to P3
-which balances high quality intermediate fitness without trading away eventual optimality.
+which balances high-quality intermediate fitness without trading away eventual optimality.
 \end{comment}
 
 \section{Inner Workings}
@@ -175,11 +184,13 @@ a look at some internal features specific to P3.
 Figure~\ref{fig-cross} shows the proportion of evaluations P3 spends on crossover, as opposed to hill climbing,
 and Figure~\ref{fig-cross-success} shows what percentage of crossover evaluations resulted in a fitness improvement.
 Together these figures provide some insight into the role of crossover within P3. The behavior
-for each is clearly problem dependent and generally asymptoticly stable as problem size increases.
+for each is clearly problem dependent and generally asymptotically stable as problem size increases.
 
 When solving problems where epistasis can be effectively detected and represented by a linkage tree, P3 tends to spend
-less evaluations performing crossover and each crossover is more likely to be successful.
-Deceptive Trap and Rastrigin are the easiest problems to model epistasis, with local search quickly
+fewer evaluations performing crossover and each crossover is more likely to be successful.
+Deceptive Trap and Rastrigin are the easiest problems to
+capture
+epistasis, with local search quickly
 reducing pairwise entropy in each. These are also the problems where P3 uses the least evaluations
 on crossover and has the highest success rates for crossover. At the other extreme are Nearest Neighbor
 NK and Ising Spin Glasses, which both have overlapping linkage not representable by a linkage tree.
@@ -187,15 +198,22 @@ These problems have the highest crossover usage and lowest crossover success of 
 Step Trap.  While Deceptive Step Trap's epistasis can be accurately modeled by a linkage tree, the
 exponential number of plateaus makes detecting gene linkage very challenging.
 
-When compared with LTGA, P3's crossover success rates are lower but similar in problem ordering.
+% bwg: Reworked this sentence
+P3's crossover success rates are lower than LTGA's, but
+both produce the same ordering of the problems when using crossover success
+such that Nearest Neighbor NK is the least successful and Deceptive Trap is the most
+successful problem.
 Counterintuitively, the use of hill climbing on the initial population reduces
 P3's crossover success, not because it reduces model quality or the donation pool, but because it is much more challenging to improve
 locally optimal solutions than randomly generated ones. LTGA's crossover benefits from application to unoptimized solutions, which
 makes its aggregate crossover success incomparable to P3's.
 
 Even when crossover success rates are quite low, such as Nearest Neighbor NK's 0.007\% success,
-the results from Section~\ref{sec-optimum} and Section~\ref{sec-overtime} show it's still critical to optimization. Without
-crossover, P3's performance would be identical to the Random Restart Hill Climber, which was unable to solve even moderately sized problems
+the results from Section~\ref{sec-optimum} and
+Section~\ref{sec-overtime} show 
+how critical this small percentage is to optimization.
+Without
+crossover, P3's performance would be identical to the Random Restart Hill Climber, which was unable to solve even moderately-sized problems
 and quickly fell behind P3 in intermediate fitness quality. Therefore even infrequently successful crossover donations are
 critical to success. This does, however, suggest a potential avenue for future improvement by using more successful
 modeling and donation algorithms.
@@ -237,14 +255,17 @@ each time the solution improves. \cite{lobo:2011:dynamicpop} found theoretical e
 and \cite{goldman:2011:dynamic-parameters} found empirical evidence that the optimal
 population size decreases each generation of traditional evolutionary search.
 By decreasing in size, P3 implicitly stores more diversity in low levels and focuses
-search on high quality solutions at higher levels. In comparison,
+search 
+% bwg: Search is focusing search in the area around high-quality solutions, not "for" high-quality solutions.
+around
+high-quality solutions at higher levels. In comparison,
 LTGA and hBOA suboptimally use a fixed population size at each generation.
 
 Figure~\ref{fig-level-success} examines how crossover success changes at different
 levels of the pyramid. At low levels, success gets progressively lower
 as solution quality increases faster than the model's ability to improve solutions.
 At higher levels modeling becomes more accurate and donations contain higher frequencies
-of high quality building blocks, resulting in increased crossover success. The
+of high-quality building blocks, resulting in increased crossover success. The
 highest level of most problems has a low crossover success rate, as solutions
 crossing with that level have already been improved by previous operations to
 the point where the only improvement would be to create the global optimum, which can
@@ -263,7 +284,7 @@ of this landscape.
 After local search, all traps in all solutions have a total
 number of 1 bits equal to either 0, 1, 3, 5, or 7 as these correspond to the local
 optima when using $k=7$ and $s=2$. Crossover easily overcomes the
-two bit plateaus, and as a result solutions in the second level generally do not
+two-bit plateaus, and as a result solutions in the second level generally do not
 contain the lowest fitness local optima (5 bits set) and the third
 level has few traps set to the next worst local optima (3 bits set). As a result,
 solutions that reach the third level can only be improved by replacing the deceptive

@@ -9,27 +9,31 @@ Brian W. Goldman\\ %
 \end{centering}
 
 The Parameter-less Population Pyramid (P3) is a recently introduced method for performing
-evolutionary optimization without requiring any user specified parameters.
+evolutionary optimization without requiring any user-specified parameters.
 P3's primary innovation is to replace the generational model with a pyramid of
 multiple populations that are iteratively created and expanded. In combination
-with local search and advanced crossover P3 scales to problem difficulty, exploiting
+with local search and advanced crossover,
+P3 scales to problem difficulty, exploiting
 previously learned information before adding more diversity.
 
 Across seven problems, each tested using on average 18 problem sizes, P3 outperformed
-all five advanced comparison algorithms. This improvement includes requiring less evaluations
-and less wall clock seconds to find the global optimum and better fitness when using
-the same number of evaluations. Using both algorithm analysis and comparison we find P3's
+all five advanced comparison algorithms. This improvement includes requiring fewer evaluations
+to find the global optimum and better fitness when using
+the same number of evaluations. Using both algorithm analysis and comparison we show P3's
 effectiveness is due to its ability to properly maintain, add, and exploit diversity.
 
-Unlike the best comparison algorithms, P3 was able to achieve this quality without any
-problem specific tuning. Thus, unlike previous parameter-less methods, P3 does not
+Unlike the best comparison algorithms, P3 was able to achieve this quality
+\textit{without any
+problem-specific tuning}. Thus, unlike previous parameter-less methods, P3 does not
 sacrifice quality for applicability. Therefore we conclude that
 P3 is an efficient, general, parameter-less approach to black-box
 optimization that is more effective than existing state-of-the-art techniques.
 
-P3 can be further improved by specializing to the gray-box domain, which includes
-partial solution evaluation and known, limited, non-linear relationships between variables.
-This Gray-Box P3 leverages the Hamming-Ball Hill Climber, an exceptionally efficient
+% bwg: Slightly different from your version
+Furthermore, P3 can be specialized for gray-box problems, which have
+known, limited, non-linear relationships
+between variables.
+Gray-Box P3 leverages the Hamming-Ball Hill Climber, an exceptionally efficient
 form of local search, as well as a novel method for performing crossover using the
 known variable interactions. In doing so Gray-Box P3 is able to find the global
 optimum of large problems in seconds, improving over Black-Box P3 by up to

@@ -14,7 +14,8 @@ population $P_0$.
 
 Next, the solution is iteratively improved by applying LTGA's crossover algorithm (Figure~\ref{fig-cluster-usage})
 with each population $P_i$ in the pyramid. If this process results in a strict fitness improvement and has
-created a solution not yet stored in the pyramid, it is added to the next highest pyramid level $P_{i+1}$.
+created a solution not yet stored in the pyramid, 
+that new solution is added to the next highest pyramid level $P_{i+1}$.
 If $P_{i+1}$ does not yet exist, it is created. In this way populations in the pyramid expand over time,
 and the number of populations stored increases over time. Initially the pyramid contains no solutions
 or populations, meaning the user does not need to specify a population size.
@@ -54,7 +55,9 @@ generations, P3 instead rebuilds the model each
 time a solution is added to a population. Furthermore, unlike
 our chosen variant of LTGA, all solutions in the population are used to generate the model, not just the
 winners of a binary tournament. We can do this because even the
-worst solutions in the pyramid are already high quality due to local search.
+worst solutions in the pyramid are already high quality due to 
+the previous application of
+local search.
 Using local search in LTGA was examined by \cite{bosman:2011:lsbbo} and found
 to provide no significant improvement. A likely cause was that that study applied
 local search to every solution, not just the initial population, resulting in significant overhead.
@@ -92,13 +95,17 @@ as \BigO{\mu} attempts per evaluation, but experimental evidence suggest that th
 operation actually saves more overhead than it costs by increasing the number of evaluations
 per model rebuild.
 
-Each of the pieces of the P3 algorithm were selected not just for their stand alone efficacy,
+Each of the pieces of the P3 algorithm were selected not just for their standalone efficacy,
 but for the ways in which they interact. By using the hill climber to optimize randomly
 generated solutions, the underlying pairwise relationships in the problem are exposed. As
 a result, detecting clusters for use by crossover is much more effective. The crossover operator
 is extremely elitist, as each gene donation must result in no fitness loss, and a solution must
 strictly improve to be added to the next level of the pyramid. This is balanced by continual
-integration of new random solutions. Furthermore, each random restart decreases the probability
+integration of new 
+% bwg: Removed "via hill climbing" as this sentence is already quite compound.
+randomly generated, then locally optimized,
+solutions.
+Furthermore, each random restart decreases the probability
 of spurious linkages caused by shared ancestry. This diversity is further preserved by applying
 gene clusters in smallest first order during crossover as this reduces the probability of genetic
 hitchhikers.

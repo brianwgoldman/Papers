@@ -9,9 +9,11 @@ are also a number of ways in which P3 can be made more efficient by leveraging t
 additional information available in the gray-box domain.
 
 First and foremost, linkage learning is no longer necessary. By definition
-the direct non-linear relationships between variables are known. As a result
-P3 no longer needs to store the pairwise frequency information that leads
-the black-box version to require \BigO{N^2} memory. Instead,
+the direct non-linear relationships between variables are known. As a result,
+% bwg: Your suggestion for this section changed the meaning. I worked to clarify it
+Gray-Box P3 does not need to store the pairwise frequency information,
+reducing its required memory from \BigO{N^2} to \BigO{N}. Instead,
+%
 we have developed a method for creating a linkage tree that learns clusters
 from the same dependency graph defined in Section~\ref{sec-hamming}. The goal is for each
 cluster to be a connected induced subgraph, with the size of clusters
@@ -27,7 +29,7 @@ This linking algorithm has a number of useful properties. First, it creates exac
 $2N-2$ clusters, distributed in size similarly to the black-box clustering algorithm.
 Performing a random graph search to find $l$ unique vertices requires \BigO{lck} time,
 meaning cluster creation is optimally efficient.
-The cluster splitting process has identical properties as random pivot quicksort,
+The cluster splitting process has identical properties to random pivot quicksort,
 meaning the sum of cluster sizes is \BigO{N\log N} in the average case.
 This efficiency allows new clusters to be created before every mixing event,
 unlike Black-Box P3 where they are created only when new solutions are added to the population.
@@ -50,17 +52,17 @@ be arbitrarily large and it is intractable to test all possible moves of even mo
 By sampling from all possible large moves, we can maintain tractability while gaining
 a potentially non-zero probability of improvement.
 As clusters are used to donate values between solutions, these
-moves are always in the direction of previously found high quality solutions.
-This assumes that the density of high quality solutions is higher than average between good solutions.
+moves are always in the direction of previously found high-quality solutions.
+This assumes that the density of high-quality solutions is higher than average between good solutions.
 
-Another efficiency gain possible due to the gray-box domain is that each time a
-donation is made, only the effected part of the solution's fitness needs to be
-recalculated. As a result the number of subfunction evaluations required
+Another efficiency gain is that each time a
+donation is made, only the affected part of the solution's fitness needs to be
+recalculated. As a result, the number of subfunction evaluations required
 to determine the change in fitness is only \BigO{l}. This also
 allows for Gray-Box P3 to efficiently reapply hill climbing after each
-donation as only effected moves need to be rechecked. As a result, a donation
+donation as only affected moves need to be rechecked. As a result, a donation
 and its resulting modifications from hill climbing are kept only if the
-new local optima is at least as fit as the solution before the donation occurred.
-All combined a single donation plus returning to a local optimum requires \BigO{l + I} time,
+new local optimum is at least as fit as the solution before the donation occurred.
+All combined, a single donation plus returning to a local optimum requires \BigO{l + I} time,
 while just the donation in Black-Box P3 requires \BigO{N}.
 

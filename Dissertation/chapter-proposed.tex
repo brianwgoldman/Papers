@@ -3,7 +3,7 @@ The Parameter-less Population Pyramid (P3) was shown to be effective in Chapter~
 when applied to black-box optimization. Some of this effectiveness in due to P3's integration of
 efficient local search and its ability to automatically detect and exploit variable epistasis.
 In Chapter~\ref{chap-graybox} we presented the gray-box domain, which contains many interesting
-real world problems, and the improvements that can be made to local search in this domain.
+real-world problems, and the improvements that can be made to local search in this domain.
 This presents the following questions:
 
 \begin{itemize}
@@ -115,7 +115,7 @@ also allows the hill climber to search for new high quality ways of solving that
 As an initial experiment, we have focused on recreating the P3 style of linkage tree without using entropy tables.
 Figure~\ref{fig-sfx-tree} provides an algorithm for using subfunction information to create a linkage tree.
 Initially all variables start in their own cluster. Each subfunction is then used in a random order such that
-if that subfunction overlaps multiple top level clusters it merges them to create a new cluster.
+if that subfunction overlaps multiple top-level clusters it merges them to create a new cluster.
 
 \begin{figure}
   \begin{algorithmic}[1]
@@ -167,7 +167,7 @@ Yet because this process is stochastic, any connected subset of subfunctions can
 We tested P3 using the gray-box \Call{SubfunctionTree}{} in place of the black-box \Call{Cluster-Creation}{}
 and using the gray-box hamming ball hill climber instead of black-box hill climbing. As an added efficiency
 instead of recalculating all $delta$ values and assuming all moves are open each time a crossover donation is made,
-only $delta$s and moves effected by the donation are updated. This means that hill climbing requires $O(|cluster|+I)$
+only $delta$s and moves affected by the donation are updated. This means that hill climbing requires $O(|cluster|+I)$
 time.
 
 %0.0939752, 0.154129, 0.392246, 0.721644, 0.110155, 0.241687, 0.321031, 0.172651, 0.567039, 0.480878, 0.109734, 0.176248, 0.343879, 0.301121, 0.202199, 0.17966, 0.0330468, 0.117303, 0.0885791, 0.0588664, 0.594459, 0.101318, 1.86743, 0.0350668, 0.598237, 0.388794, 0.208924, 0.240061, 0.103984, 0.21943, 0.238308, 1.10106, 0.142684, 0.332108, 0.336863, 0.49791, 0.119978, 0.155924, 0.243874, 0.142354, 0.371339, 0.0854216, 0.168894, 0.419617, 0.128611, 1.9637, 0.288967, 0.142157, 0.103391, 0.307311
@@ -189,13 +189,13 @@ problems with known global optimum, we plan to try Unrestricted NK and Ising Spi
 This is critical as the behavior of many gray-box algorithms depend on the nature of the epistasis graph. In these domains
 the focus will shift from finding the global optimum (which is unknown) to finding the best solution in a fixed amount of time.
 
-Beyond the randomly generated instances, we plan to seek out real world problems that can be expressed in this domain.
+Beyond the randomly generated instances, we plan to seek out real-world problems that can be expressed in this domain.
 This will help solidify the conclusions about the applicability of these methods outside of the optimization community.
 Similarly, we plan to compare the results of our gray-box methods with algorithms specifically designed for each problem
-domain. This provides an interesting contention between the time required to develop problem specific solvers and the
+domain. This provides an interesting contention between the time required to develop problem-specific solvers and the
 quality of using gray-box methods.
 
-As the hamming ball hill climber has a user specified parameter $r$, we will need to explore this parameter space.
+As the hamming ball hill climber has a user-specified parameter $r$, we will need to explore this parameter space.
 Specifically we will want to ensure all comparisons use an appropriate value for $r$ that does not scale with
 $N$. This process will likely involve brute force testing all small $r$ values for moderately large problems in each class
 and then choosing the one that performs best. That $r$ value will then be used for all problem sizes for that problem class.
@@ -210,5 +210,5 @@ domain where evaluation is considered arbitrarily expensive, evaluation in the g
 \item How does the combination of uniform crossover with hamming ball hill climbing compare to hill climbing alone?
 \item Does preserving subfunctions intact during crossover improve search efficiency?
 \item How does black-box P3 compare with gray-box P3?
-\item How do the more generic gray-box methods compare with problem specific methods for solving real world problems?
+\item How do the more generic gray-box methods compare with problem-specific methods for solving real-world problems?
 \end{itemize}
