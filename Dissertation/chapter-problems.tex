@@ -6,7 +6,7 @@ Understanding how a stochastic search algorithm will behave on arbitrary and com
 search landscapes can be exceedingly difficult. Therefore a common practice for
 algorithm understanding is to perform search on well defined, well understood
 landscapes. To be of interest these landscapes need to represent interesting
-and important aspects of real world problems.
+and important aspects of real-world problems.
 
 One
 such landscape is the Deceptive Trap problem \citep{goldberg:1991:gasize}.
@@ -49,13 +49,13 @@ learning techniques, while still being highly deceptive.
   \label{eq-deceptive-step-trap}
 \end{equation}
 
-Another challenging aspect of landscapes can be higher order relationships. The Hierarchical If
+Another challenging aspect of landscapes can be higher-order relationships. The Hierarchical If
 and only If (HIFF) problem~\cite{watson:1998:hiff} is designed to capture the difficulties of this class of problem.
 In HIFF the genome is broken up into a complete binary tree, such that each gene appears in exactly one
 leaf and each internal node is the subset of genes contained in its children. If all genes represented
 in a node of the tree are set to the same value, they score equal to the size of the set. In this way
 small subsets lead toward solutions to larger subsets. However, a node can score if all genes are either
-all 1s or all 0s, meaning that to solve higher order subproblems it is necessary to perform crossovers
+all 1s or all 0s, meaning that to solve higher-order subproblems it is necessary to perform crossovers
 that preserve lower order solutions. This problem is a natural fit for LTGA as the linkage tree can
 perfectly duplicate the problem's true relationships \citep{thierens:2013:ltgahiff}.
 
@@ -75,7 +75,7 @@ their static nature can be misleading. Specifically, algorithm quality might
 be so fragile that it is only effective at searching well behaved landscapes. A more realistic
 test of an algorithm's black-box effectiveness is to work with randomly generated instances
 drawn from a problem class. When tested over a sufficiently large sample it is then possible
-to draw more general conclusions about the algorithms effectiveness. The challenge with these
+to draw more general conclusions about an algorithm's effectiveness. The challenge with these
 landscapes is determining the global optimum to gauge if an algorithm was successful.
 
 Perhaps the most common model for generating random rugged landscapes is the NK model. An
@@ -102,7 +102,7 @@ $x_i$ and $x_j$ are the gene values for vertex $i$ and $j$. Optimal fitness is w
 \end{equation}
 Similar to NK Landscapes, the general class is $NP$-Hard to optimize, but the $2D\pm J$ subset of
 Ising Spin Glasses can be polynomially solved.\footnote{\url{http://www.informatik.uni-koeln.de/spinglass/}}
-In this subset the graph is restricted to be a two dimensional torus, edge weights are randomly set
+In this subset the graph is restricted to be a two-dimensional torus, edge weights are randomly set
 to either -1 or 1, and vertex values must be -1 or 1.
 
 As our final class of randomly generated problems we chose the Maximum Satisfiability (MAX-SAT) problem.
@@ -115,5 +115,5 @@ Each term is a randomly chosen variable, which may also be negated. A clause sco
 at least one term in the clause evaluates to true. In order to make MAX-SAT instances with a known global
 optimum, \cite{goldman:2014:p3} proposed constructing clauses around a fixed solution. In this way the
 signs of the terms are set to ensure the target solution satisfies the clause. To ensure each
-problem is challenging we chose a clause to variable ratio of $4.27$~\citep{selman:1996:maxsat}.
+problem is challenging we chose a clause-to-variable ratio of $4.27$~\citep{selman:1996:maxsat}.
 

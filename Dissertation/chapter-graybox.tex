@@ -2,16 +2,16 @@
 \label{chap-graybox}
 All of the work presented so far has focused on the black-box optimization
 domain. These problems are characterized by a complete lack of available
-problem specific information. 
+problem-specific information.
 A black-box algorithm can only propose a solution and measure the
 quality of that solution, using only that information to inform its search.
 Optimizers that are successful in this domain generalize well
 as there are minimal requirements to apply them to a new problem.
 
-However, for many real world applications there is potentially more information
-available. The other end of the spectrum is white box optimization, in which
+However, for many real-world applications there is potentially more information
+available. The other end of the spectrum is white-box optimization, in which
 the algorithm knows the exact problem class it is trying to solve. This domain
-is dominated by problem specific search
+is dominated by problem-specific search
 heuristics~\cite{een:2004:satsolver,sherrington:1975:isingsolver,wright:2000:solvingnk} that
 leverage all aspects of the problem to achieve efficiency. This makes such
 algorithms very specific, such that outside of their target domain they
@@ -24,7 +24,7 @@ deep understanding of the problem and the time to develop the algorithm.
 In between those two domains there is another domain: gray-box optimization. In this
 domain some features general to multiple problem classes are exploited, beyond
 just an evaluation function. The goal is to create optimization methods that
-benefits from these features without those methods becoming specialized to
+benefit from these features without those methods becoming specialized to
 a small set of problem classes.
 
 In addition to the black-box evaluation function, we
@@ -32,7 +32,7 @@ add in two more exploitable features accessible to search algorithms:
 known variable epistasis and partial function evaluation.
 
 \section{Problems in this domain}
-To understand the types of problems in this domain, lets first examine
+To understand the types of problems in this domain, let us first examine
 a simple artificial problem we'll call 3-Equal. The quality
 of a solution is determined by how often three consecutive bits are set
 to the same value. As a result,
@@ -46,7 +46,7 @@ it is possible to evaluate the fitness contribution of that bit only knowing the
 most four others, regardless of the size of $N$. As we'll discuss in Section~\ref{sec-whitley-ls}
 this has enormous implications on search efficiency.
 
-Every problem discussed in Chapter~\ref{chap-problems} except HIFF fit into this domain. Deceptive
+Every problem discussed in Chapter~\ref{chap-problems} except HIFF fits into this domain. Deceptive
 Trap and Deceptive Step Trap both can have known epistasis (which bits are in which traps) and
 partial reevaluation (score a single trap), the same as Rastrigin (separable). All NK problems
 where $K \ll N $ have a knowable epistasis table and the fitness contribution of each subfunction is
@@ -54,8 +54,8 @@ calculable without evaluating the entire string. Similarly, MAX-SAT's clause lis
 with each clause independently evaluable. Ising Spin Glasses are even simpler, with each edge in the
 graph evaluable using only two problem variables.
 
-Beyond MAX-SAT and Ising Spin Glasses, which are interesting real world problems unto themselves,
-many $NP$-Hard real world problems can be expressed in these two requirements. This is especially true
+Beyond MAX-SAT and Ising Spin Glasses, which are interesting real-world problems unto themselves,
+many $NP$-Hard real-world problems can be expressed in these two requirements. This is especially true
 of graph problems.
 
 \begin{itemize}
@@ -116,7 +116,7 @@ problem size. For example for all Nearest Neighbor NK landscapes all variables
 participate in exactly $c=k=K+1$ subfunctions. Randomly generated MAX-SAT instances have no guarantee
 % bwg: Filled in where the number comes from.
 that $c$ is constant, but the expected number of
-subfunctions in which a variable appears is equal to the clause to variable ratio times the clause size, or 12.81.
+subfunctions in which a variable appears is equal to the clause-to-variable ratio times the clause size, or 12.81.
 Assuming that all subfunctions use $k$ variables and each variable appears in $c$ subfunctions
 provides a bound on the total number of subfunctions
 $\frac{cN}{k}$.
@@ -152,7 +152,7 @@ optima is at most a constant factor slower than generating random solutions in t
     \ForAll{$s \in subfunctions$}
       \State $pre\_move \leftarrow f_s(solution)$
       \State $fitness \leftarrow fitness + pre\_move$
-      \ForAll{$m \in effected\_moves(s)$}
+      \ForAll{$m \in affected\_moves(s)$}
         \State $post\_move \leftarrow f_s(solution \oplus m)$
         \State $delta[m] \leftarrow delta[m] + (post\_move - pre\_move)$
       \EndFor
@@ -191,10 +191,10 @@ and $delta[m]$ is checked. If $m$ is a fitness-improving move,
   \begin{algorithmic}[1]
   \Procedure{MakeMove}{$m$}
     \State $fitness \leftarrow fitness + delta[m]$
-    \ForAll{$s \in effected\_subfunctions(m)$}
+    \ForAll{$s \in affected\_subfunctions(m)$}
       \State $pre\_both \leftarrow f_s(solution)$
       \State $just\_m \leftarrow f_s(solution \oplus m)$
-      \ForAll{$m' \in effected\_moves(s)$}
+      \ForAll{$m' \in affected\_moves(s)$}
         \State $just\_m' \leftarrow f_s(solution \oplus m')$
         \State $post\_both \leftarrow f_s(solution \oplus m \oplus m')$
         \State $delta[m'] \leftarrow delta[m'] - (just\_m' - pre\_both) + (post\_both - just\_m)$
@@ -213,7 +213,7 @@ and $delta[m]$ is checked. If $m$ is a fitness-improving move,
 \Call{MakeMove}{} updates the fitness and $delta$ values to reflect the change in the solution. The fitness
 of the solution after making the move does not require any calls to $f_s$ as $delta[m]$ already stores the
 change in fitness. This process requires updating all of the $delta$ values for the $k$ moves that interact with each of the $c$ subfunctions
-effected by $m$. This update replaces outdated information that used the original solution ($just\_m' - pre\_both$)
+affected by $m$. This update replaces outdated information that used the original solution ($just\_m' - pre\_both$)
 with how much the move improves over the new solution ($post\_both - just\_m$). As $delta[m']$ has updated, $m'$ could
 potentially become a fitness-improving move and is therefore added into $open$. As $m$ was just flipped,
 it cannot be a fitness improvement and is therefore removed from $open$.  In total this requires less than
@@ -230,21 +230,21 @@ using their $delta$ values. Moves are then chosen randomly from the highest qual
 in $delta$ can cause moves to change bins. Assuming the total number of bins does not increase with $N$, both steps
 can be done in \BigO{1} time. However, at least for MAX-SAT, there is evidence that when used in combination with subsequent
 search heuristics the less greedy,
-first improvement algorithm was more effective.
+first-improvement algorithm was more effective.
 
 \section{Efficient Hamming Ball Search}
 \label{sec-hamming}
 Another consequence of the gray-box domain is that increasing the hamming-ball radius of local search becomes
 more tractable~\cite{chicano:2014:ball}.
 % Added sentence here describing what a hamming-ball is.
-A hamming-ball is the collection of all solutions
+A hamming ball is the collection of all solutions
 within a given hamming distance, or radius, from a given solution.
 Instead of improving solutions until no single bit flip
 % bwg: Introduced HBHC acronym here, reworked sentence a little
 is a fitness improvement, the Hamming-Ball Hill Climber (HBHC) finds solutions which
 cannot be improved by flipping $r$ or fewer bits.
 
-In a black-box setting, verifying that no $r$ bit flip can improve a solution requires testing all
+In a black-box setting, verifying that no $r$-bit flip can improve a solution requires testing all
 $n \choose r$ neighbors. This quickly becomes intractable as $r$
 increases. However,
 in the gray-box
@@ -253,7 +253,7 @@ in the same subfunction, the relationship between their effects is,
 by definition,
 additive. As such
 there is no way for flipping both together to be a fitness improvement without flipping one of them
-being a fitness improvement. Therefore it is not necessary to try all possible $r$ sized subsets
+being a fitness improvement. Therefore it is not necessary to try all possible $r$-sized subsets
 of the solution.
 
 Consider the 3-Equal problem.  If there are at least two loci between
@@ -312,7 +312,7 @@ of the subset can be tested independently.
   \label{fig-connected-subgraphs}
 \end{figure}
 
-In order to determine which moves in the hamming-ball must be evaluated,
+In order to determine which moves in the hamming ball must be evaluated,
 we developed \Call{ConnectedInducedSubgraphs}{} given in Figure~\ref{fig-connected-subgraphs}.
 \Call{CISG}{} is a recursive helper function that finds all subgraphs
 that contain a given $subset$ and a given vertex $v$, while excluding
@@ -332,20 +332,20 @@ When applied to the sparse graphs inherent in the gray-box domain, this algorith
 requires \BigO{r!(ck)^rN} time, which reduces to \BigO{N}. The time spent
 in each call is dominated by the loop over $open'$. In the worst case, $open'$
 increases in size by the full adjacency of $v$, which is bounded by $ck$.
-This creates a worse case complexity for a single top level call of
+This creates a worse-case complexity for a single top-level call of
 $\prod_{i}^{r} ick = r!(ck)^r$. This must be called once for each
 of the $N$ variables resulting in \BigO{r!(ck)^rN}.
 
 As this algorithm finds all connected subsets in \BigO{N} time for a fixed $r$, the number of moves
-that must be tested to determine if a solution is an $r$-bit local optima is \BigO{N}. This means that
+that must be tested to determine if a solution is an $r$-bit local optimum is \BigO{N}. This means that
 while on Nearest Neighbor NK with $N=8000$, $K=5$, and $r=3$ the black-box method would require 85 billion
 checks, the gray-box method requires only 248,000. Even when allowing connections to be completely random,
 which results in $c$ increasing with $N$, the gray-box method still only requires approximately 375 million checks,
-two and a half orders of magnitude less than assuming a black-box.
+two-and-a-half orders of magnitude less than assuming a black-box.
 
 From these conclusions it is possible to modify the hill climber presented in Section~\ref{sec-whitley-ls} to
 efficiently find $r$-bit local optima~\cite{chicano:2014:ball}. The only change is that instead of having a move
-and $delta$ for each bit, there must be a move and $delta$ for each connected induced subgraph of $r$ or less bits.
+and $delta$ for each bit, there must be a move and $delta$ for each connected induced subgraph of $r$ or fewer bits.
 The efficiency analysis is unchanged with the exception that the constant increases exponentially with $r$ as
 the number of $delta$ values that must be updated each move increases. Still, with $c$, $r$, and $k$ constant
 with respect to $N$, it is possible to find $r$-bit hamming ball local optima in \BigO{N+I} time.
@@ -376,10 +376,10 @@ with respect to $N$, it is possible to find $r$-bit hamming ball local optima in
   \label{fig-TUX}
 \end{figure}
 
-Hamming-Ball Hill Climbing is not sufficient to efficiently find the global optima
+Hamming-Ball Hill Climbing is not sufficient to efficiently find the global optimum
 on problems with even moderate epistasis~\cite{chicano:2014:ball}. This is because,
 like all random restart hill climbers, it relies on random initialization to fall
-inside the global optima's basin of attraction.
+inside the global optimum's basin of attraction.
 
 To remedy this limitation, we set out to develop a minimally complex memetic
 algorithm to help increase this probability. Figure~\ref{fig-TUX} presents
@@ -387,7 +387,7 @@ the Tournament Uniform Crossover (TUX) algorithm, which combines simplistic
 selection with equal probability uniform crossover, the most basic unbiased crossover, to generate starting
 solutions likely to be in the global optima's basin of attraction.
 
-Conceptually TUX iteratively builds a structure similar to a single elimination
+Conceptually TUX iteratively builds a structure similar to a single-elimination
 bracket for solutions. Each ``match'' in the tournament takes in two candidate solutions,
 produces offspring via uniform crossover, applies hill climbing to each offspring, with
 the ``winner'' being the best of all those solutions. The tournament ``bracket'' is constructed

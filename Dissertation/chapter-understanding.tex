@@ -25,7 +25,7 @@ distance from the nearest
 global
 optimum and fitness difference from the global optima.
 For a number of interesting problems, a ``Big Valley'' of
-local optima exist, such that the higher a solution's fitness is, the closer it is
+local optima exists, such that the higher a solution's fitness is, the closer it is
 in representation space to the global optimum. This result suggests that
 focusing search around known high-quality solutions increases the likelihood of finding even
 higher-quality solutions. This relationship is an underlying assumption
@@ -62,7 +62,7 @@ the least significant bit. This ensures that before changing $index$ $i$, all po
 which cannot be local optima. In Figure~\ref{fig-enumerate} there exists a move $m_i$ which is a fitness improvement
 when enumeration starts (all variables set to 0). Due to the known relationships between variables,
 we know that the quality of $m_i$ only depends on variables $C$, $E$, $F$, and $H$.
-Therefore, until one of those four variables are modified, the solution cannot be a local optima.
+Therefore, until one of those four variables are modified, the solution cannot be a local optimum.
 As a result, solutions 00000000, 10000000, 01000000, and 11000000 cannot be local optima and can
 therefore be skipped during enumeration. More generally, if at any point during enumeration
 there exists a fitness-improving move, no local optima can exist until at least one
@@ -105,7 +105,7 @@ dependency of that move is modified.
   \end{algorithmic}
   \caption{Algorithm to find all local optima of a given gray-box problem.
            \textproc{MakeMove}, described in Figure~\ref{fig-make-move}, flips bit $index$
-           and updates the fitness effect $deta$ of making all moves dependent on $index$.
+           and updates the fitness effect $delta$ of making all moves dependent on $index$.
            $move\_bin$ stores moves based on their lowest $index$ dependency.}
   \label{fig-enumerate-algorithm}
 \end{figure}
@@ -118,7 +118,7 @@ can be modified by enumeration to change the fitness effect of making that move.
 In order to determine how much of the enumeration can be skipped, we must find
 the highest $index$ in $move\_bin$ which contains a fitness-improving move,
 as done by \Call{FindNextIndex}{}. If no move is fitness-improving,
-then a local optima has been found.
+then a local optimum has been found.
 
 The \Call{AllLocalOptima}{} algorithm in Figure~\ref{fig-enumerate-algorithm}
 works by repeatedly calling \Call{FindNextIndex}{} and adding 1 to the resulting $index$ position's value.
@@ -147,7 +147,7 @@ skips 4 times as much search space.
 All together, these optimizations result in substantial efficiency improvements for some landscapes. For example, when applied to
 the OneMax problem (each bit scores one if set to 1, zero otherwise) this method finds all local optima in \BigO{N} time.
 Deceptive Trap, regardless of how the bits are arranged, requires \BigO{2^k2^{N/k}} time to find all $2^{N/k}$ local optima.
-This means a 60 bit
+This means a 60-bit
 Deceptive Trap problem with trap size of 4 requires 524,288 operations when using gray-box, but 1,152,921,504,606,846,976
 with black-box.
 
@@ -159,7 +159,7 @@ means each time a bit is flipped more computation must be performed. Therefore, 
 depends on the specific problem.
 
 \subsection{Looking at Problems}
-In comparison to the randomly generated problem instances of Nearest Neighbor NKQ and Ising Spin Glass,
+In comparison to the randomly generated problem instances of Nearest Neighbor NKq and Ising Spin Glass,
 Deceptive Trap and Deceptive Step Trap have comprehensible landscapes. Therefore, these problems represent
 a good place to begin understanding what ``big valley'' plots are showing. Figure~\ref{fig-valley-trap} shows
 how the local optima in each of these problems are distributed.
@@ -181,12 +181,12 @@ how the local optima in each of these problems are distributed.
       \label{fig-valley-dst}
     \end{subfigure}
   \end{centering}
-  \caption{Location and quality of local optima in comparison to the global optima with $N=30$ and $k=5$.}
+  \caption{Location and quality of local optima in comparison to the global optimum with $N=30$ and $k=5$.}
   \label{fig-valley-trap}
 \end{figure}
 
 The Deceptive Trap problem has few local optima, each of which actually
-provide little deception in terms of ``big valley'' properties. Given any two local optima, the one
+provides little deception in terms of ``big valley'' properties. Given any two local optima, the one
 closer to the global optimum in fitness is also always closer to the global optimum in representation space.
 This makes sense as the worst local optimum contains all 0s, and each fitness improvement beyond that involves
 converting an entire trap to 1s, with the global optimum being all 1s. As a result, we should expect P3's method
@@ -200,36 +200,36 @@ on fitness between two local optima can result in an increased genetic distance 
 Figure~\ref{fig-valley-dst} with $r=2$ shows how examining only 2-bit local optima causes Deceptive Step Trap using
 a step size of 2 to effectively revert to Deceptive Trap. This is because the hill climber can overcome all of the plateaus,
 leaving each trap either at the global optimum of all 1s or the local optimal value of all 0s or exactly one 1. Selection then
-becomes a near perfect predictor of distance to the global optimum.
+becomes a nearly perfect predictor of distance to the global optimum.
 
 \begin{figure*}
   \centering
   \includegraphicsfit{valley-nn}
-  \caption{Location and quality of local optima in comparison to the global optima for a representative Nearest Neighbor NKQ problem
+  \caption{Location and quality of local optima in comparison to the global optima for a representative Nearest Neighbor NKq problem
            with $N=60$ and $k=2$.}
   \label{fig-valley-nn}
 \end{figure*}
 
-Figure~\ref{fig-valley-nn} shows how the local optima are distributed for Nearest Neighbor NKQ. Unlike the trap problems,
-Nearest Neighbor NKQ exhibits a traditional big valley shape. Increasing the radius of the local optima significantly
+Figure~\ref{fig-valley-nn} shows how the local optima are distributed for Nearest Neighbor NKq. Unlike the trap problems,
+Nearest Neighbor NKq exhibits a traditional big valley shape. Increasing the radius of the local optima significantly
 reduces the total number of local optima, with those optima generally more similar to the global optima in both representation
-space and quality. Together this suggests that Nearest Neighbor NKQ is a good candidate for selection based methods like P3. Also,
+space and quality. Together this suggests that Nearest Neighbor NKq is a good candidate for selection-based methods like P3. Also,
 due to the general regularity and frequency of local optima, it may not be necessary to increase the radius in order to quickly find
 the global optimum.
 
 \begin{figure*}
   \centering
   \includegraphicsfit{valley-un}
-  \caption{Location and quality of local optima in comparison to the global optima for a representative Unrestricted NKQ problem
+  \caption{Location and quality of local optima in comparison to the global optima for a representative Unrestricted NKq problem
            with $N=60$ and $k=2$.}
   \label{fig-valley-un}
 \end{figure*}
 
-While visually somewhat similar, Unrestricted NKQ shown in Figure~\ref{fig-valley-nn} suggests selection may be misleading.
-Consider the shape of the bottom of $r=1$. At a distance of about 15 bits there is a slight hump, such that high quality solutions
+While visually somewhat similar, Unrestricted NKq shown in Figure~\ref{fig-valley-nn} suggests selection may be misleading.
+Consider the shape of the bottom of $r=1$. At a distance of about 15 bits there is a slight hump, such that high-quality solutions
 are more frequent both closer and further from the global optimum than at the same distance.
 If search finds points in the area over 15 bits away from the global optimum, small modifications and elitist selection
-are more likely to lead away from the global optimum that toward it.
+are more likely to lead away from the global optimum than toward it.
 At higher radius values this issue becomes more apparent, with optima flattening out away
 from the global optima in representation space. For many of these points, the only way to improve would require flipping over 15 bits
 correctly.
@@ -257,7 +257,7 @@ the nearest global optima.
   \label{fig-valley-sat}
 \end{figure*}
 
-Similar to Unrestricted NKQ, the MAXSAT instance shown in Figure~\ref{fig-valley-sat} suggests selection can be misleading.
+Similar to Unrestricted NKq, the MAXSAT instance shown in Figure~\ref{fig-valley-sat} suggests selection can be misleading.
 There is almost a negative correlation between fitness difference from the global optimum and representation distance from the
 global optimum. As before, this problem is not solved by increasing the radius of the local optima.
 This may explain why methods like LTGA and hBOA, which extensively rely on selection,
@@ -266,7 +266,7 @@ eventually finding a solution in the correct area of the search space, with cros
 
 \section{Pyramid Levels}
 One method for understanding how P3 performs search is to examine the types of solutions being stored at each level
-of the pyramid. By comparing each solution with the nearest best found solution, we can create plots similar to the ``big valley''
+of the pyramid. By comparing each solution with the nearest best-found solution, we can create plots similar to the ``big valley''
 plots 
 in the previous section, even for problems too large and complex to find all possible global optima. 
 This also provides a look at how the different levels of the pyramid focus search on different areas of the landscape.
@@ -280,40 +280,40 @@ This also provides a look at how the different levels of the pyramid focus searc
 \end{figure*}
 
 Gray-Box P3's progression on Deceptive Step Trap, shown in Figure~\ref{fig-level-dst}, follows directly from our expectations.
-The local optima found using only hill climbing and stored in level 0 are quite poor and far from the global optima.
+The local optima found using only hill climbing and stored in level 0 are quite poor and far from the global optimum.
 The first application of crossover dramatically improves their quality. However, this improvement is likely just overcoming
 the fitness plateaus, as solutions are actually being moved away from the global optimum. Subsequent levels store solutions
 that are generally closer to the global optimum in both fitness and representation space. This change means that at higher
-levels the frequency of traps being set to the global optima increases, resulting in better model building and better donation quality.
+levels the frequency of traps being set to their values in the global optimum increases, resulting in better model building and better donation quality.
 
 \begin{figure*}
   \centering
   \includegraphicsfit{level-nn}
   \caption{Distribution of local optima stored at each level of Gray-Box P3 in relation to the best found by the run on
-           a Nearest Neighbor NKQ problem $N=6000$ and $K=4$.}
+           a Nearest Neighbor NKq problem $N=6000$ and $K=4$.}
   \label{fig-level-nn}
 \end{figure*}
 
-Nearest Neighbor NKQ, shown in Figure~\ref{fig-level-nn}, provides a landscape almost as free of higher order deception
-as the Deceptive Step Trap problem.  Shown with a logarithmic y-axis, stored solutions exhibit a near perfect relationship
+Nearest Neighbor NKq, shown in Figure~\ref{fig-level-nn}, provides a landscape almost as free of higher-order deception
+as the Deceptive Step Trap problem.  Shown with a logarithmic y-axis, stored solutions exhibit a near-perfect relationship
 between fitness and representational distance. Again, using only hill climbing creates local optima that are significantly
 worse and further away than even
 after a single application of crossover. While increasing the radius of the hill climber improves the quality of those initial
 solutions, even $r=3$ is only able to equal a single crossover application. As before the higher level a solution is stored,
-generally the closer it is to the global optima in both fitness and representational distance.
+generally the closer it is to a global optima in both fitness and representational distance.
 
 \begin{figure*}
   \centering
   \includegraphicsfit{level-un}
   \caption{Distribution of local optima stored at each level of Gray-Box P3 in relation to the best found by the run on
-           an Unrestricted NKQ problem $N=6000$ and $K=4$.}
+           an Unrestricted NKq problem $N=6000$ and $K=4$.}
   \label{fig-level-un}
 \end{figure*}
 
-Figure~\ref{fig-level-un} gives insight into how different Unrestricted NKQ is from Nearest Neighbor NKQ. In this landscape
+Figure~\ref{fig-level-un} gives insight into how different Unrestricted NKq is from Nearest Neighbor NKq. In this landscape
 Gray-Box P3, regardless of radius, appears to explore deceptive local optima that offer fitness improvements without moving
-closer to the global optima in representation space. In this problem there is a gap of over 1000 bits between the deceptive
-local optima and those likely to lead to the best found solution. An interesting behavior on this problem is that the branch
+closer to a global optima in representation space. In this problem there is a gap of over 1000 bits between the deceptive
+local optima and those likely to lead to the best-found solution. An interesting behavior on this problem is that the branch
 between the two groups always seems to begin with a single solution in level 1. This suggests that the stored solutions near
 the best found may all be similar due to sharing a common ancestor.
 
@@ -326,10 +326,10 @@ the best found may all be similar due to sharing a common ancestor.
 \end{figure*}
 
 Gray-Box P3's progression on Ising Spin Glass, shown in Figure~\ref{fig-level-is}, is much more well behaved than on Unrestricted
-NKQ. As has been typical, each application of crossover results in improved fitness, with the largest gains between the first few levels.
+NKq. As has been typical, each application of crossover results in improved fitness, with the largest gains between the first few levels.
 When approaching higher qualities these improvements also begin to translate into increased representational similarity to the global optimum.
 However, as discussed previously for this problem, we again see evidence for a large number of diverse solutions with the second best
-fitness. These solutions can be over 1000 bits different from the eventual best found solution. Increasing the radius of the hill climber
+fitness. These solutions can be over 1000 bits different from the eventual best-found solution. Increasing the radius of the hill climber
 does not seem to significantly overcome this issue.
 
 \begin{figure*}
@@ -340,14 +340,15 @@ does not seem to significantly overcome this issue.
   \label{fig-level-sat}
 \end{figure*}
 
-Figure~\ref{fig-level-sat} shows that Gray-Box P3 acts more similarly on MAX-SAT to Unrestricted NKQ than any of the other problems. Again there
-appears to be deceptive local optima between 500 and 1000 bits away from the nearest improving solution. Again a single solution appears
-to be the ancestor of all of the solutions near the best found. This suggests that similar to Unrestricted NKQ, Gray-Box P3 will have a
+Figure~\ref{fig-level-sat} shows that Gray-Box P3 acts more similarly on MAX-SAT to Unrestricted NKq than on any of the other problems. Again there
+appear to be deceptive local optima between 500 and 1000 bits away from the nearest improving solution. Again a single solution appears
+to be the ancestor of all of the solutions near the best found. This suggests that
+similar to its performance on Unrestricted NKq, Gray-Box P3 will have a
 hard time finding the global optimum on MAX-SAT.
 
-In general it appears that the problems that have polynomial time solutions (Deceptive Step Trap, Nearest Neighbor NKQ, 2D Ising Spin Glass)
-share a similar behavior of selection leading to the global optimum. However, the NP-Hard problems (Unrestricted NKQ, MAX-SAT) seem to contain
-large amounts of higher order deception, making them challenging for selection based methods. This relationship warrants further investigation
+In general it appears that the problems that have polynomial-time solutions (Deceptive Step Trap, Nearest Neighbor NKq, 2D Ising Spin Glass)
+share a similar behavior of selection leading to the global optimum. However, the NP-Hard problems (Unrestricted NKq, MAX-SAT) seem to contain
+large amounts of higher-order deception, making them challenging for selection-based methods. This relationship warrants further investigation
 into other NP-Hard problems to determine if the repeated selection found in P3 and other evolutionary computation methods are able to overcome
 this deception. One potential avenue for improvement to P3 may also be a method for dealing with this issue. For instance, it may be beneficial to
 explicitly partition solutions when this deceptive behavior is observed.

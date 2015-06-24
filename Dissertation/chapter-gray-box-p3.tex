@@ -52,17 +52,17 @@ be arbitrarily large and it is intractable to test all possible moves of even mo
 By sampling from all possible large moves, we can maintain tractability while gaining
 a potentially non-zero probability of improvement.
 As clusters are used to donate values between solutions, these
-moves are always in the direction of previously found high quality solutions.
-This assumes that the density of high quality solutions is higher than average between good solutions.
+moves are always in the direction of previously found high-quality solutions.
+This assumes that the density of high-quality solutions is higher than average between good solutions.
 
 Another efficiency gain is that each time a
-donation is made, only the effected part of the solution's fitness needs to be
+donation is made, only the affected part of the solution's fitness needs to be
 recalculated. As a result, the number of subfunction evaluations required
 to determine the change in fitness is only \BigO{l}. This also
 allows for Gray-Box P3 to efficiently reapply hill climbing after each
-donation as only effected moves need to be rechecked. As a result, a donation
+donation as only affected moves need to be rechecked. As a result, a donation
 and its resulting modifications from hill climbing are kept only if the
-new local optima is at least as fit as the solution before the donation occurred.
-All combined a single donation plus returning to a local optimum requires \BigO{l + I} time,
+new local optimum is at least as fit as the solution before the donation occurred.
+All combined, a single donation plus returning to a local optimum requires \BigO{l + I} time,
 while just the donation in Black-Box P3 requires \BigO{N}.
 
