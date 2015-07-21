@@ -20,29 +20,8 @@
 %%% Define the actual document parameters:
 \documentclass[12pt,letterpaper,twoside]{report}
 
-
-%%%  Include packages used throughout the dissertation:
-\usepackage{algorithm}
-\usepackage[noend]{algpseudocode}
-\usepackage[euler]{textgreek}
-\usepackage{graphicx}
-\usepackage{graphics}
-\usepackage{setspace}
-\usepackage{indentfirst}
-\usepackage{rotating}
-\usepackage{multirow}
-\usepackage{amssymb}
-\usepackage{comment}
-\usepackage{epsfig}
-\usepackage{moreverb}
-\usepackage{subcaption}
-\usepackage{setspace}
-\usepackage{listings}
-\usepackage{url}
-\usepackage[usenames,dvipsnames]{color}
-
 %%%%%%%%%%%%%% COPIED FROM JARED
-
+%%%  Include packages used throughout the dissertation:
 \usepackage{adjustbox}
 \usepackage{afterpage}
 \usepackage{algorithm}
@@ -69,13 +48,15 @@
 \usepackage{tocloft}
 \usepackage{url}
 
+
+
 %%% Use the following to format your titles for the Table of Contents, List of Figures, List of Tables. 
 %\renewcommand{\cfttoctitlefont}{\normalfont\Large\bfseries\MakeUppercase}
 \setlength{\cftbeforetoctitleskip}{-0.2in}
 \setlength{\cftaftertoctitleskip}{0.1875in}
 \renewcommand{\cfttoctitlefont}{\hfill\Large\bfseries}
 \renewcommand{\cftaftertoctitle}{\hfill}
-\renewcommand{\contentsname}{\large\centering{TABLE OF CONTENTS}}
+\renewcommand{\contentsname}{\large\hfill{TABLE OF CONTENTS}\hfill}
 
 % Add dot leaders to the chapter entries in the TOC
 \renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
@@ -161,37 +142,6 @@
 \newsavebox{\savefig}
 
 %%%%%%%%%%%%% End of Jared Copy
-
-\begin{comment}
-%%% Use the following to format your titles for the Table of Contents, List of Figures, List of Tables. 
-\renewcommand{\contentsname}{\large\centering{Table of Contents}}
-\renewcommand{\listfigurename}{\large\centering{List of Figures}}
-\renewcommand{\listtablename}{\large\centering{List of Tables}}
-\renewcommand{\bibname}{\large\centering{Bibliography}}
-
-%%% Renew command for full page figures:
-\renewcommand{\topfraction}{1.0}
-
-
-%%%  Set the margins as required by the MSU graduate school. 
-%%%  Specifically, set the margins 1 inch top bottom and right, 
-%%%  1.5 inch on left.  Now, Latex has margin origins at 1 in on the top 
-%%%  and left so for 1.5 in the margin is set at 1.5 - 1 = .5 inch
-\setlength{\oddsidemargin}{.5in}   % This is the left margin for both
-\setlength{\evensidemargin}{1.5in} % even and odd pages (in case you use the book format)
-\setlength{\topmargin}{0in} % Top margin (remember latex starts from 1 in)
-
-% Pagewidth(8.5in) - textwidth(6in) - leftmargins(1.5in) = 1 inch for right margin
-\setlength{\textwidth}{6in}
-
-% Page height (11in) - Topmargin (1in) - Textheight (1in) = 1 in for
-%                                                      bottom margin
-\setlength{\textheight}{9in} %
-\setlength{\footskip}{.5in}
-%%% Headings are not required, thus suppress:
-\setlength{\headheight}{0in} 
-\setlength{\headsep}{0in}
-\end{comment}
 
 %%%  Include any definitions you wish to use throughout the dissertation:
 %\input{definitions}
@@ -356,6 +306,7 @@ Computer Science - Doctor Of Philosophy\\
 \addcontentsline{toc}{chapter}{BIBLIOGRAPHY}
 
 \newpage
+\topskip1pt
 \vspace*{\fill}
 \begin{center}
 BIBLIOGRAPHY
