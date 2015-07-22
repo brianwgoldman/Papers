@@ -159,6 +159,30 @@
 
 \newcommand{\BigO}[1]{$\mathcal{O}{(#1)}$}
 
+% Cause subsubsections to be numbered
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{5}
+
+% Fix large chapter numbers running into their captions in the TOC
+\makeatletter
+\renewcommand{\numberline}[1]{%
+  \@cftbsnum #1\@cftasnum~\@cftasnumb%
+}
+\makeatother
+
+% Fix LOF extra space between chapters
+\usepackage{etoolbox}% http://ctan.org/pkg/etoolbox
+\makeatletter
+% \patchcmd{<cmd>}{<search>}{<replace>}{<succes>}{<failure>}
+\patchcmd{\@chapter}{\addtocontents{lof}{\protect\addvspace{10\p@}}}{}{}{}% LoF
+\patchcmd{\@chapter}{\addtocontents{lot}{\protect\addvspace{10\p@}}}{}{}{}% LoT
+\makeatother
+
+% Fix LOF spacing problems between numbering and caption
+\makeatletter
+\renewcommand{\@tocrmarg}{2.55em plus1fil}
+\makeatother
+
 %%%  Begin the actual dissertation:
 \begin{document}
 \sloppy
