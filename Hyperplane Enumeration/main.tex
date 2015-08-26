@@ -33,7 +33,7 @@
 \mainmatter  % start of an individual contribution
 
 % first the title is needed
-\title{Hyperplane Elimination for Quickly Enumerating MK Landscapes}
+\title{Hyperplane Elimination for Quickly Enumerating Local Optima}
 
 % a short form should be given in case it is too long for the running head
 %\titlerunning{Lecture Notes in Computer Science: Authors' Instructions}
@@ -76,27 +76,118 @@ TODO
 %The abstract should summarize the contents of the paper and should
 %contain at least 70 and at most 150 words. It should be written using the
 %\emph{abstract} environment.
-\keywords{Landscape Understanding, Gray-Box}
+\keywords{Landscape Understanding, Gray-Box, MK Landscapes}
 \end{abstract}
 
 
 \section{Introduction}
-TODO Motivate using network stuff.
+The ruggedness and high dimensionality of most interesting landscapes makes them challenging
+to visualize or otherwise analyze. However, doing so can be helpful in
+quantifying the difficulty of a problem, and how to best design algorithms to deal
+with those difficulties. 
+Similarly, knowing which characteristics favor
+a particular
+algorithm can help researchers choose the algorithm
+most likely to perform well on their problem.
 
-\section{MK Landscapes and Gray-Box Optimization}
+One avenue for performing this problem understanding is to
+examine the frequency and distribution of local optima~\cite{boese:1994:bigvalley},
+and how operators allow search to transition between these
+optima~\cite{tomassini:2008:nknetworks,verel:2011:nknetworks,ochoa:2015:crossovernetworks}.
+However, finding all of the local optima is prohibitively time consuming
+for even small problems, with many studies limited to 18-bit
+problems~\cite{tomassini:2008:nknetworks,verel:2011:nknetworks}.
+By leveraging recent advancements in Gray-Box optimization which allow for
+constant time local search~\cite{chicano:2014:ball}, this limit was raised
+to 30-bit problems~\cite{ochoa:2015:crossovernetworks}.
+
+Here we will introduce a method for finding all local optima of problems
+with up to 80 bits. The cornerstone of this method is the identification
+of hyperplanes which cannot contain any local optima, allowing large
+portions of the search space to be skipped during enumeration.
+
+
+
+\section{Mk Landscapes and Gray-Box Optimization}
+An Mk Landscape is any function which can be expressed in the following form:
+\begin{equation}
+  f(x) = \sum_{i=1}^{M} f_i(mask(x, s_i))
+  \label{eq-mk}
+\end{equation}
+In this equation there are $M=$\BigO{N} subfunctions $f_i$, which act
+on some subset $s_i$ of variables in $x$. Each subfunction performs the mapping
+$f_i : \mathbb{B}^{k_i}\rightarrow \mathbb{R}$ where $k_i \leq k$ and $k$ is
+a constant with respect to $N$. The $mask$ function returns the values of $x$ for
+the variables in $s_i$.
+
+A critical aspect of this problem class is that it can be optimized using Gray-Box
+techniques, which can allow for highly efficient local~\cite{whitley:2013:greedy}
+and global~\cite{goldman:2015:GBO,tintos:2015:partitioncross} search. These algorithms
+exploit the known and limited non-linearity between variables expressed by all $s_i$,
+as well as perform partial solution evaluation using all $f_i$.
+
+This formulation can represent many problems of real-world interest, as well as
+the most commonly used combinatorial benchmark problems. In this work we shall
+examine 5 problems in particular: Concatenated Traps, Adjacent and Random NKq Landscapes,
+Ising Spin Glasses, and MAX-kSAT.
+
+The Concatenated Trap problem~\cite{deb:1992:trap} is a composition of $k$-order deceptive
+separable subfunctions. In Mk Landscape terms, $M=N/k$ such that $\forall_i |s_i| = k$ and
+$\forall_{i \neq j} s_i \cap s_j = \emptyset$. Each $f_i$ applies an identical function based
+on the number of variables set to 1:
+\begin{equation}
+   trap(t) = \left\{
+     \begin{array}{rl}
+       k-1-t, &  t<k\\
+       k,   &  t = k
+     \end{array}
+   \right.
+  \label{eq-trap}
+\end{equation}
+While this problem is still in common use~\cite{hsu:2015:dsmgaII,inoue:2015:adaptivep3},
+most advanced methods can solve it trivially~\cite{goldman:2012:ltga} and when expressed
+as an Mk Landscape can be solved exactly in \BigO{N} time~\cite{whitley:2015:mk}. However,
+we include it here as its simple structure allows for straight forward algorithm analysis.
+
 TODO Explain all problems here
 
 TODO Explain increased radius size~\cite{chicano:2014:ball}
 
 \section{Gray-Box Enumeration}
 TODO Explain how gray-box properties and gray coding can be used to
-enumerate in \BigO{2^N} time.
+enumerate in \BigO{2^N} time.~\cite{ochoa:2015:crossovernetworks}
 
 \section{Hyperplane Elimination}
 
 \section{Improved Enumeration Ordering}
 
+% Proof sketch
+Moves can have their dependencies fixed in some permutation $O$ of all possible moves,
+such that $O_0$ is the first move to have its dependencies fixed.
+$D_O(i, m)$ is a function which returns how many unfixed dependencies move $m$ has after all
+$i$ moves in $O$ before $i$ have been fixed. A greedy solution to this problem works such
+that $O_i$ is set to be the move which minimizes $D_O(i, m)$.
+
+All non-greedy solutions must have some $i$ such that $D_O(i, O_i) > D_O(i, O_{i+1})$.
+This is because $D_O(i, m)$ can only decrease as $i$ increases, meaning that if some $m$
+has a lower value at $i$ than $O_i$, some index between $i$ and when $m$ appears in $O$
+this property must hold. Finally, all non-greedy solutions must have some $\hat{i}$
+which is the maximum $i$ value for which $D_O(i, O_i) > D_O(i, O_{i+1})$ is true. 
+
+Consider the optimal ordering $O^\star$ which is not greedy.
+These criteria mean that $D_{O^\star}(\hat{i}, O_{\hat{i}}) > D_{O^\star}(\hat{i}, O_{\hat{i}+1})$.
+Swapping $O_{\hat{i}}$ and $O_{\hat{i}+1}$ cannot change the minimum dependency of any other moves.
+Performing the swap will improve the minimum dependency of $O_{\hat{i}+1}$ more than it hurts
+$O_{\hat{i}}$. Therefore, performing this swap will make $O^\star$ even better, implying it was
+not optimal before. Therefore there cannot exist an optimal ordering which is not greedy.
+
+\section{Complexity Classes for Simple Landscapes}
+
 \section{Timing Comparisons}
+\subsection{Increasing problem size}
+Consider including boxplots of largest size all are successful.
+
+\subsection{The Effect of Radius}
 
 \section{Examining Local Optima}
 
