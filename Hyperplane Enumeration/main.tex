@@ -121,7 +121,7 @@ a constant with respect to $N$. The $mask$ function returns the values of $x$ fo
 the variables in $s_i$.
 
 A critical aspect of this problem class is that it can be optimized using Gray-Box
-techniques, which can allow for highly efficient local~\cite{whitley:2013:greedy}
+techniques, which can allow for highly efficient local~\cite{whitley:2012:constant}
 and global~\cite{goldman:2015:GBO,tintos:2015:partitioncross} search. These algorithms
 exploit the known and limited non-linearity between variables expressed by all $s_i$,
 as well as perform partial solution evaluation using all $f_i$.
@@ -149,13 +149,75 @@ most advanced methods can solve it trivially~\cite{goldman:2012:ltga} and when e
 as an Mk Landscape can be solved exactly in \BigO{N} time~\cite{whitley:2015:mk}. However,
 we include it here as its simple structure allows for straight forward algorithm analysis.
 
-TODO Explain all problems here
+NKq landscapes specify a class of randomly generated problem instances using 3 paramters:
+(1) the number of problem variables $N$ (2) the amount of variable epistasis $K$ where $K=k-1$
+and (3) the number of unique fitness values $q$. From these parameters a landscape is generated
+by creating $M=N$ subfunctions $f_i$, where $f_i$ uses variable $i$ and $K$ others to look up
+a fitness value in the range $[0..q-1]$ from a randomly generated table. This structure
+makes NKq landscapes a natural fit for Mk landscapes (sum of bounded subfunctions)
+and are the most studied problem class for Gray-Box
+optimization~\cite{whitley:2012:constant,goldman:2015:GBO,tintos:2015:partitioncross,ochoa:2015:crossovernetworks,whitley:2015:mk}.
+Here we choose $k=3$ with $q=2^{K+1}=2^{k}=8$.
+
+We use two common variants of NKq in our experiments which specify how the $K$ additional
+variables in each subfunction are chosen: Adjacent and Random. In Adjacent NKq, $f_i$ depends
+on variables $[i..(i+k)\%N]$. In Random NKq, $f_i$ depends on variables $i$ and a random
+set of $K$ unique variables which does not include $i$. While Random NKq is NP-Hard,
+the structure of Adjacent NKq allows for a polynomial time dynamic programming solution~\cite{wright:2000:solvingnk}.
+Adjacent NKq is therefore often used to understand a search algorithm's ability to reach the known global
+optimum.
+
+Ising Spin Glasses are a type of MAX-CUT problem derived from statistical physics.
+Each atom in the glass (vertex) can be assigned a spin, with the goal being to
+find the set of assignments which minimize the energy between nearby atoms (edges).
+Similar to Adjacent NKq, the $2D\pm J$ subset of Ising Spin Glasses can be polynomially
+solved~\cite{saul:1994:spinglass}\footnote{\url{http://www.informatik.uni-koeln.de/spinglass/}}.
+In this subset, the graph is defined as a square two-dimensional torus with each edge
+weight chosen from ${-1, 1}$. Each vertex is assigned a spin from ${-1, 1}$ with
+the energy in the glass equal to
+\begin{equation}
+\sum_{e_{ij} \in E} x_ie_{ij}x_j
+  \label{eq-ising}
+\end{equation}
+where $e_{ij}$ is the edge connecting vertex $i$ to vertex $j$. In Mk landscape terms
+this type of spin glass has $M=2N$ and $k=2$.
+
+Our final examined problem is randomly generated maximum satisfiability or MAX-kSAT.
+This version of the canonical NP-Complete boolean satisfiability problem is formulated
+as the maximization of $M=4.27N$ clauses, each containing exactly $k=3$ unique literals.
+A clause is satisfied if any of its literals match how a solution's variables are set.
+
+\section{Gray-Box Enumeration}
+When considered as a black box, the process of finding all local optima
+in a landscape requires \BigO{N2^N} time. This is because evaluating
+a solution requires $N$ time, and all $2^N$ solutions in the landscape
+must be evaluated once. Finding the local
+optima then requires each solution to compare its fitness with each
+of its neighbors, which when properly cached takes \BigO{N} per solution.
+Extending this method to look for solutions which cannot be improved by
+flipping $r$ or less bits requires \BigO{N^r2^N} time. However,
+by exploiting Gray-Box optimization methods previous work~\cite{ochoa:2015:crossovernetworks}
+was able to find all $r$-bit local optima of Mk Landscapes in \BigO{2^N} for any small,
+fixed value of $r$.
+
+The first major result in Gray-Box optimization was the proof that the list
+of fitness improving moves during local search can be kept updated in \BigO{1}
+time~\cite{whitley:2012:constant}. Each time a modification is made to a solution
+only modifications which share a non-linear relationship with the changes can
+go from non-improving to improving and vice versa. In Gray-Box optimization
+the non-linearity between variables is known. Furthermore the number of
+non-linear relationships is bounded above by \BigO{Mk} as each of the $M$
+subfunctions can cause a non-linear relationship between each of its $k$
+variables. As $M=$\BigO{N} and $k$ is constant, the amortized number of affected
+flips per variable is \BigO{1}.
+
+This limited and known non-linearity can be used to allow search to find only $r$-bit
+local optima. Consider a variable interaction graph, such that each variable maps
+to a vertex in the graph and each edge represents a non-linear relationship between
+variables. TODO
 
 TODO Explain increased radius size~\cite{chicano:2014:ball}
 
-\section{Gray-Box Enumeration}
-TODO Explain how gray-box properties and gray coding can be used to
-enumerate in \BigO{2^N} time.~\cite{ochoa:2015:crossovernetworks}
 
 \section{Hyperplane Elimination}
 
@@ -183,6 +245,27 @@ not optimal before. Therefore there cannot exist an optimal ordering which is no
 
 \section{Complexity Classes for Simple Landscapes}
 
+\subsection{OneMax}
+In OneMax, each bin contains exactly 1 move. All variables in the current solution
+which disagree with the global optimum will be fitness improving moves.
+Initially $index$ is set to $N-1$ and is decreased by at most 1 in any step.
+Before finding the global optimum no carry operations can occur, meaning the
+cost of each iteration is equal to the amount by which $index$ is decreased.
+Therefore, Algorithm~\ref{alg-enumerate} requires \BigO{N} time to reach
+the global optimum.
+
+After finding the global optimum of OneMax, $index$ is set to 0. One iteration
+is then spent adding a 1 to $index$ 0, which in the worst case requires \BigO{N}
+carry operations. For all future iterations $index$ is a fitness improving move
+and is currently set to 1. In these iterations at least 1 carry operation must
+occur, and $index$ cannot be decreased. Iteration ends when $index$ exceeds $N$
+which requires at most $N$ carry operations. Therefore, Algorithm~\ref{alg-enumerate}
+requires \BigO{N} time to reach termination after finding the global optimum. Combined
+with initialization and the time to find the global optimum, the total complexity is \BigO{N}.
+
+\subsection{Concatenated Traps}
+TODO
+
 \section{Timing Comparisons}
 \subsection{Increasing problem size}
 Consider including boxplots of largest size all are successful.
@@ -190,6 +273,8 @@ Consider including boxplots of largest size all are successful.
 \subsection{The Effect of Radius}
 
 \section{Examining Local Optima}
+
+TODO Consider discussing neutral networks
 
 \section{Conclusions}
 
