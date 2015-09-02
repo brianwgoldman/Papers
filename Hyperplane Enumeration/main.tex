@@ -195,7 +195,7 @@ must be evaluated once. Finding the local
 optima then requires each solution to compare its fitness with each
 of its neighbors, which when properly cached takes \BigO{N} per solution.
 Extending this method to look for solutions which cannot be improved by
-flipping $r$ or less bits requires \BigO{N^r2^N} time. However,
+flipping $r$ or fewer bits requires \BigO{N^r2^N} time. However,
 by exploiting Gray-Box optimization methods previous work~\cite{ochoa:2015:crossovernetworks}
 was able to find all $r$-bit local optima of Mk Landscapes in \BigO{2^N} for any small,
 fixed value of $r$.
@@ -263,8 +263,40 @@ which requires at most $N$ carry operations. Therefore, Algorithm~\ref{alg-enume
 requires \BigO{N} time to reach termination after finding the global optimum. Combined
 with initialization and the time to find the global optimum, the total complexity is \BigO{N}.
 
-\subsection{Concatenated Traps}
-TODO
+\subsection{$k$-Bound Separable Problem}
+Consider any problem which is composed of non-overlapping
+subfunctions, each using using $k$ or fewer bits. Regardless
+of how they are initially ordered, reordering will ensure that
+variables of a function are always consecutively placed in enumeration.
+Consider a numbering of $f_i$ such that if $i < j$ then all of $f_i$'s
+variables appear before $f_j$'s in enumeration ordering.
+
+While any $f_i$ contains a fitness improving move, Algorithm~\ref{alg-enumerate}
+will find the one with the highest $i$ and enumerate it until it no longer
+contains an improving move. In total this enumeration requires less than $2^k$
+steps. Each $f_i$ is considered sequentially, meaning the first local optimum
+will be found in $2^kN/k$ time.
+
+Once the first local optimum is found, Algorithm~\ref{alg-enumerate} proceeds
+by finding all local optimum in larger and larger hyperplanes. Initially $f_0$
+is enumerated to find all local optima in the hyperplane with all $f_i, i>0$
+fixed. This process ends when a carry operation modifies a bit of $f_1$. At
+this point $f_1$ is enumerated, such that each time $f_1$ contains no improving moves
+$f_0$ is enumerated again. This finds all local optima in the hyperplane with $f_i, i>1$
+fixed. We represent the time required to find all local optima in the hyperplane
+with $f_j, j>i$ as $T(i)$. $T(0)=2^k$ as all values of $f_0$ must be enumerated.
+$T(i) = |l_i|*T(i-1)+2^k$ where $|l|$ is the number of ways $f_i$ can be set such
+that it contains no fitness improving moves. Each $l_i$ exposes a new hyperplane
+which can contain local optima, which causes the recursive call to $T(i-1)$.
+Assuming for simplicity that all subfunctions use exactly $k$ bits,
+the time required to find all local optima is $T(N/k-1)$.
+Assuming that $\forall_i |l_i|=c$, $T(N/k-1)=\sum_0^{N/k-1}2^kc^i<2^kc^{N/k}$.
+The number of local optima in the landscape is $c^{N/k}$ meaning that Algorithm~\ref{alg-enumerate}
+is within a constant factor of $2^k$ of optimal.
+
+Concatenated Traps is a commonly used $k$-bound separable problem
+with $c=2$.  Algorithm~\ref{alg-enumerate} requires $2^k2^{N/k}$ time
+to find all $2^{N/k}$ local optima in this problem.
 
 \section{Timing Comparisons}
 \subsection{Increasing problem size}
