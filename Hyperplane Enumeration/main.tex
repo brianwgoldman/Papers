@@ -467,7 +467,10 @@ in the degenerate case of $k=1$, a $k$-bound separable problem
 is a linear function. As such, when $k=1$ and $c=1$,
 \BigO{2^kN/k} = \BigO{N}.
 
-\section{Finding Local Optima}
+\section{Experiments}
+TODO Explain experimental setup details here.
+
+\subsection{Finding Local Optima}
 TODO Concatenated Traps using $N>40$ has slope of 2.
 \begin{figure*}
   \centering
@@ -504,9 +507,27 @@ TODO Concatenated Traps using $N>40$ has slope of 2.
 \end{figure*}
 
 
-\section{Finding $r$-Bit Local Optima}
+\subsection{Finding $r$-Bit Local Optima}
 
-\section{Examining Local Optima}
+\begin{figure*}
+  \centering
+  \includegraphicsfit{slope-method}
+  \caption{Estimated slope with 95\% confidence intervals for each method to find $r$-bit local optima. Slope is $m$ in the model $y = 2^c2^{mN}$
+           where $y$ is number of seconds required to
+	         find all local optima of a problem using $N$ bits.}
+  \label{fig-boxplot-method}
+\end{figure*}
+
+
+\subsection{Examining Local Optima}
+
+\begin{figure*}
+  \centering
+  \includegraphicsfit{length-radius}
+  \caption{Number of $r$-bit local optima as $N$ increases for each problem.}
+  \label{fig-boxplot-method}
+\end{figure*}
+
 
 TODO Consider discussing neutral networks
 
