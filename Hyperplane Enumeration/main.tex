@@ -467,11 +467,44 @@ in the degenerate case of $k=1$, a $k$-bound separable problem
 is a linear function. As such, when $k=1$ and $c=1$,
 \BigO{2^kN/k} = \BigO{N}.
 
-\section{Timing Comparisons}
-\subsection{Increasing problem size}
-Consider including boxplots of largest size all are successful.
+\section{Finding Local Optima}
+TODO Concatenated Traps using $N>40$ has slope of 2.
+\begin{figure*}
+  \centering
+  \includegraphicsfit{length-method}
+  \caption{Comparison of how each method scales with problem size on log-linear scales. Each point is the mean
+           runtime over 30 instances and each line the linear model. All confidence intervals too tight to see.}
+  \label{fig-length-method}
+\end{figure*}
 
-\subsection{The Effect of Radius}
+\begin{table}
+	\centering
+	\caption{Value of $m$ when fitting a model to $y = 2^c2^{mN}$ where $y$ is number of seconds required to
+	         find all local optima of a problem using $N$ bits. Optimal refers to the same model where
+	         $y$ is the number of local optima.}
+	\begin{tabular}{|r|c|c|c|c|}
+	  \hline
+	    & \textbf{Gray-Box} & \textbf{Hyper} & \textbf{Hyper-Reorder} & \textbf{Optimal} \\ \hline
+	  Concatenated Traps & 0.9809 & 0.5765 & 0.1601 & 0.2000 \\ \hline
+    Adjacent NKq & 0.9922 & 0.5972 & 0.3411 & 0.3603 \\ \hline
+    Random NKq & 0.9920 & 0.6202 & 0.3984 & 0.3531 \\ \hline
+    Ising Spin Glass & 0.9821 & 0.6576 & 0.5909 & 0.6015 \\ \hline
+    MAX-kSAT & 0.9949 & 0.8893 & 0.7735 & 0.5393 \\ \hline
+  \end{tabular}
+  \label{table-results}
+\end{table}
+
+
+\begin{figure*}
+  \centering
+  \includegraphicsfit{boxplot-method}
+  \caption{Comparison of completion time variance for the largest size of each problem
+           where all three methods were fully successful.}
+  \label{fig-boxplot-method}
+\end{figure*}
+
+
+\section{Finding $r$-Bit Local Optima}
 
 \section{Examining Local Optima}
 
