@@ -121,6 +121,7 @@ which contains many real world and benchmark combinatorial problems.
 
 
 \section{Mk Landscapes as a tool for Problem Generalization}
+\label{sec-mk}
 An Mk Landscape~\cite{whitley:2015:mk} is any function
 who's value is equal to the sum of a set of subfunctions.
 Each subfunction uses a small subset of variables from the original function's input.
@@ -337,6 +338,7 @@ also increases. Therefore, the runtime effect of increasing $r$
 depends on the specific problem.
 
 \section{Improved Enumeration Ordering}
+\label{sec-reorder}
 As a final efficiency, the order in which variables in $solution$ are $index$ed can be reordered.
 When a move is fitness-improving,
 the amount of search space that is skipped depends on how high its lowest $index$ dependency is. Therefore,
@@ -468,14 +470,72 @@ is a linear function. As such, when $k=1$ and $c=1$,
 \BigO{2^kN/k} = \BigO{N}.
 
 \section{Experiments}
-TODO Explain experimental setup details here.
+We compare three methods for finding all local optima: Gray-Box, Hyper, and Hyper-Reorder.
+The Gray-Box method refers to previous work~\cite{ochoa:2015:crossovernetworks} which does
+not perform hyperplane elimination, with Hyper and Hyper-Reorder being hyperplane elimination
+without and with the enumeration order improvements discussed in Section~\ref{sec-reorder}.
+
+For each of the five types of Mk Landscape outlined in Section~\ref{sec-mk}, we tested all
+algorithms for all $N$ in $[15..100]$ and $r$ in $[1..4]$. For each problem size we generated
+30 problem instances, with each $r$ of each algorithm run once per instance. Variables were randomly
+ordered in the genome for problems with natural structure. For example, variables in the same $s_i$
+of an Adjacent NKq instance are not likely to be consecutive in the genome. However, $s_i$ still overlaps
+$s_{i+1}$ in all but 1 variable.
+
+Each algorithm was given a maximum of four hours on a 2.5GHz Intel Xeon E5-2670v2 processor to find
+all $r$-bit local optima. Any run which failed was rerun once to prevent cluster issues from introducing
+noise. For the same reason any run which was over ten times slower than the next slowest run of the
+same configuration with a different seed was rerun. This resulted in 33 out of 36,000 runs being rerun.
+If the algorithm failed to complete in the alloted time for an instance,
+we declared it unsuccessful for that combination of $r$ and $N$ of that problem. All results
+we report are for successful combinations. For timing purposes local optima were counted but not
+recorded.
 
 \subsection{Finding Local Optima}
-TODO Concatenated Traps using $N>40$ has slope of 2.
+Our first experiment is to determine the empirical complexity of each method with respect to problem size.
+Of the 681 configurations where at least one method was successful, Hyper-Reorder had the lowest
+mean time to find all local optima all but 2 times. In both cases Hyper-Reorder was within a tenth of a second
+of the best method.
+Figure~\ref{fig-boxplot-method} shows the variance in runtime for the largest problem size all three methods
+were successful. In all cases it is clear that Hyper-Reorder outperforms the other methods.
+
+\begin{figure*}
+  \centering
+  \includegraphicsfit{boxplot-method}
+  \caption{Comparison of completion time variance for the largest size of each problem
+           where all three methods were successful at finding all 1-bit local optima.}
+  \label{fig-boxplot-method}
+\end{figure*}
+
+More critically, Figure~\ref{fig-length-method} shows how each method scales with problem size.
+Not only is Hyper-Reorder out performing the alternatives on all sizes, the rate at which it
+scales to problem complexity is better. Table~\ref{table-scaling} shows the model fit for each
+method on each problem. This value is the slope of each line shown in Figure~\ref{fig-length-method}.
+As expected Gray-Box scales at almost exactly $2^N$. Using Hyperplane elimination without
+reordering reduces this complexity, with reordering making further improvements. In the final
+column we should the growth rate of the number of local optima. It is impossible for any method
+which enumerates all local optima to grow slower than this rate. On Concatenated Traps, Adjacent
+NKq, and Ising Spin Glass, Hyper-Reorder has an estimated slope better than optimal. This is
+due to lower order terms dominating runtime for small problem sizes, as can be see in
+Figure~\ref{fig-length-method}. For instance, fitting
+the curve only to problems where $N>60$ makes Hyper-Reorder have $m=0.199$ on Concatenated Traps and
+$m=0.358$ on Adjacent NKq.
+
+With the exception of MAX-kSAT, Hyper-Reorder's time required to find all local optima
+appears to be growing at the same rate as the total number of local optima. We suspect
+some of this deficiency on MAX-kSAT is due to its significantly higher number of non-linear
+interactions. Concatenated Traps, Adjacent NKq, and Ising Spin Glass all have exactly 4
+non-linear relationships per variable. Random NKq and MAX-kSAT both increase with problem
+size, with Random NKq ranging between 5 and 6. With $N=15$, MAX-kSAT has on average nearly
+12 non-linear relationships per variable. By $N=30$ that grows to just over 17. Having each
+variable depend on over half the genome significantly limits the size of hyperplanes which
+can be eliminated.
+
 \begin{figure*}
   \centering
   \includegraphicsfit{length-method}
-  \caption{Comparison of how each method scales with problem size on log-linear scales. Each point is the mean
+  \caption{Comparison of how each method scales with problem size when finding 1-bit local optima
+           on log-linear scales. Each point is the mean
            runtime over 30 instances and each line the linear model. All confidence intervals too tight to see.}
   \label{fig-length-method}
 \end{figure*}
@@ -483,28 +543,19 @@ TODO Concatenated Traps using $N>40$ has slope of 2.
 \begin{table}
 	\centering
 	\caption{Value of $m$ when fitting a model to $y = 2^c2^{mN}$ where $y$ is number of seconds required to
-	         find all local optima of a problem using $N$ bits. Optimal refers to the same model where
+	         find all 1-bit local optima of a problem using $N$ bits. Optimal refers to the same model where
 	         $y$ is the number of local optima.}
 	\begin{tabular}{|r|c|c|c|c|}
 	  \hline
 	    & \textbf{Gray-Box} & \textbf{Hyper} & \textbf{Hyper-Reorder} & \textbf{Optimal} \\ \hline
-	  Concatenated Traps & 0.9809 & 0.5765 & 0.1601 & 0.2000 \\ \hline
-    Adjacent NKq & 0.9922 & 0.5972 & 0.3411 & 0.3603 \\ \hline
-    Random NKq & 0.9920 & 0.6202 & 0.3984 & 0.3531 \\ \hline
-    Ising Spin Glass & 0.9821 & 0.6576 & 0.5909 & 0.6015 \\ \hline
-    MAX-kSAT & 0.9949 & 0.8893 & 0.7735 & 0.5393 \\ \hline
+    Concatenated Traps & 0.9809 & 0.5831 & 0.1620 & 0.2000 \\ \hline
+    Adjacent NKq & 0.9922 & 0.5972 & 0.3419 & 0.3603 \\ \hline
+    Random NKq & 0.9920 & 0.6229 & 0.3989 & 0.3531 \\ \hline
+    Ising Spin Glass & 0.9821 & 0.6722 & 0.5976 & 0.6015 \\ \hline
+    MAX-kSAT & 0.9949 & 0.8922 & 0.7737 & 0.5393 \\ \hline
   \end{tabular}
-  \label{table-results}
+  \label{table-scaling}
 \end{table}
-
-
-\begin{figure*}
-  \centering
-  \includegraphicsfit{boxplot-method}
-  \caption{Comparison of completion time variance for the largest size of each problem
-           where all three methods were fully successful.}
-  \label{fig-boxplot-method}
-\end{figure*}
 
 
 \subsection{Finding $r$-Bit Local Optima}
@@ -515,7 +566,7 @@ TODO Concatenated Traps using $N>40$ has slope of 2.
   \caption{Estimated slope with 95\% confidence intervals for each method to find $r$-bit local optima. Slope is $m$ in the model $y = 2^c2^{mN}$
            where $y$ is number of seconds required to
 	         find all local optima of a problem using $N$ bits.}
-  \label{fig-boxplot-method}
+  \label{fig-slope-method}
 \end{figure*}
 
 
@@ -525,7 +576,7 @@ TODO Concatenated Traps using $N>40$ has slope of 2.
   \centering
   \includegraphicsfit{length-radius}
   \caption{Number of $r$-bit local optima as $N$ increases for each problem.}
-  \label{fig-boxplot-method}
+  \label{fig-length-radius}
 \end{figure*}
 
 
