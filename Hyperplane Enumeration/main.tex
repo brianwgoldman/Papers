@@ -78,7 +78,25 @@
 
 
 \begin{abstract}
-TODO
+A common tool for understanding combinatorial problem landscapes
+is to examine the properties of its local optima. Unfortunately,
+exhaustive methods for finding local optima are exceptionally time
+consuming and are therefore limited to very small problem sizes.
+We propose a method for exploiting generalized problem structure
+to significantly speed up this process by skipping hyperplanes
+which cannot contain local optima. In most of our experiments
+this hyperplane elimination allows enumeration time to scale with
+the total number of local optima instead of the total landscape size.
+We prove optimality for linear and $k$-bounded problems, and provide
+empirical evidence of optimality on NKq Landscapes and Ising Spin Glasses.
+Furthermore, we are able to extend this method to finding only solutions
+which cannot be improving by flipping $r$ or fewer bits. In some cases
+increasing $r$ actually reduces total runtime by drastically reducing the
+number of local optima. While previous methods were limited to
+problems with at most 18 or 30 bits, hyperplane elimination can enumerate the same problems with
+75 bits. When using higher $r$ values this bound can be pushed to 200 bit problems
+on average enumerated in under 6 minutes.
+
 
 %The abstract should summarize the contents of the paper and should
 %contain at least 70 and at most 150 words. It should be written using the
@@ -111,8 +129,8 @@ methods can approximate some of these statistics for much larger
 landscapes~\cite{iclanzan:2014:somnetworks}, they do not provide enough
 detail necessary for some metrics~\cite{ochoa:2015:crossovernetworks}.
 
-Here we introduce a method for finding all local optima of problems
-with up to 80 bits. The cornerstone of this method is the identification
+Here we introduce a method for finding all local optima for the same problems using
+up to 75 bits. The cornerstone of this method is the identification
 of hyperplanes that cannot contain any local optima, allowing large
 portions of the search space to be skipped during enumeration.
 The techniques used apply to the generalized problem class of Mk Landscapes,
@@ -494,7 +512,7 @@ recorded.
 \subsection{Finding Local Optima}
 Our first experiment is to determine the empirical complexity of each method with respect to problem size.
 Of the 681 configurations where at least one method was successful, Hyper-Reorder had the lowest
-mean time to find all local optima all but 2 times. In both cases Hyper-Reorder was within a tenth of a second
+mean time to find all local optima all but 2 times. In both of those cases Hyper-Reorder was within a tenth of a second
 of the best method.
 Figure~\ref{fig-boxplot-method} shows the variance in runtime for the largest problem size all three methods
 were successful. In all cases it is clear that Hyper-Reorder outperforms the other methods.
@@ -513,23 +531,23 @@ scales to problem complexity is better. Table~\ref{table-scaling} shows the mode
 method on each problem. This value is the slope of each line shown in Figure~\ref{fig-length-method}.
 As expected Gray-Box scales at almost exactly $2^N$. Using Hyperplane elimination without
 reordering reduces this complexity, with reordering making further improvements. In the final
-column we should the growth rate of the number of local optima. It is impossible for any method
+column we show the growth rate of the number of local optima. It is impossible for any method
 which enumerates all local optima to grow slower than this rate. On Concatenated Traps, Adjacent
 NKq, and Ising Spin Glass, Hyper-Reorder has an estimated slope better than optimal. This is
 due to lower order terms dominating runtime for small problem sizes, as can be see in
 Figure~\ref{fig-length-method}. For instance, fitting
 the curve only to problems where $N>60$ makes Hyper-Reorder have $m=0.199$ on Concatenated Traps and
-$m=0.358$ on Adjacent NKq.
+$m=0.358$ on Adjacent NKq. For Concatenated Traps this matches our theoretical predictions that
+Hyper-Reorder scales at $2^k2^{N/k}$ as $\frac{1}{k}=0.2$.
 
-With the exception of MAX-kSAT, Hyper-Reorder's time required to find all local optima
-appears to be growing at the same rate as the total number of local optima. We suspect
-some of this deficiency on MAX-kSAT is due to its significantly higher number of non-linear
-interactions. Concatenated Traps, Adjacent NKq, and Ising Spin Glass all have exactly 4
-non-linear relationships per variable. Random NKq and MAX-kSAT both increase with problem
-size, with Random NKq ranging between 5 and 6. With $N=15$, MAX-kSAT has on average nearly
-12 non-linear relationships per variable. By $N=30$ that grows to just over 17. Having each
-variable depend on over half the genome significantly limits the size of hyperplanes which
-can be eliminated.
+This reduction in growth complexity translates into a significant increase in the size of problems
+which can be enumerated. For instance, using the previous best enumeration methods~\cite{ochoa:2015:crossovernetworks}
+the largest Adjacent NKq problem size which can be enumerated in 4 hours is 34 bits. Given the same time
+Hyper-Reorder can enumerate problems with 75 bits. Using the regression model, we estimate solving
+a 75 bit problem using Gray-Box would require 230 million years. Similarly, Hyper-Reorder's largest
+Random NKq size of 69 bits would require Gray-Box 3 million years. These larger sizes make for
+much better approximations of landscapes interesting to search methods.
+
 
 \begin{figure*}
   \centering
@@ -558,7 +576,35 @@ can be eliminated.
 \end{table}
 
 
+With the exception of MAX-kSAT, Hyper-Reorder's time required to find all local optima
+appears to be growing at the same rate as the total number of local optima. We suspect
+some of this deficiency on MAX-kSAT is due to its significantly higher number of non-linear
+interactions. Concatenated Traps, Adjacent NKq, and Ising Spin Glass all have exactly 4
+non-linear relationships per variable. For small problem sizes
+Random NKq and MAX-kSAT both increase with problem
+size. Random NKq's average ranges between 5 and 6 on problems we tested.
+With $N=15$, MAX-kSAT has on average nearly
+12 non-linear relationships per variable. By $N=30$ that grows to just over 17. Having each
+variable depend on over half the genome significantly limits the size of hyperplanes which
+can be eliminated. While the number of non-linear relationships per variable
+is asymptotically constant, this growth on small problems is likely affecting runtime.
+
+
 \subsection{Finding $r$-Bit Local Optima}
+A major advantage of Gray-Box enumeration is that it can find $r$-bit local optima
+without exponentially increasing runtime complexity. Figure~\ref{fig-slope-method}
+shows the estimated growth rate for each method as $r$ is increased. On Concatenated Traps,
+Adjacent NKq, Ising Spin Glass, and to a lesser extent Random NKq, none of our enumeration
+methods see an increase in growth complexity with increasing $r$. In all cases using Hyper-Reorder
+has a lower growth rate than the other two methods using the same $r$. On every problem
+except MAX-kSAT, Hyper-Reorder's slowest $r$ is faster than the fastest $r$
+of any other configuration.
+
+Perhaps most striking in Figure~\ref{fig-slope-method} is that on Adjacent NKq, Random NKq,
+and Ising Spin Glass, increasing $r$ \emph{reduces} Hyper-Reorder's growth complexity.
+
+TODO Mention bigger problem sizes.
+
 
 \begin{figure*}
   \centering
