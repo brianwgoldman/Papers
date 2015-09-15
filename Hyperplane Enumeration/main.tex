@@ -376,6 +376,8 @@ most significant remaining positions. With proper bookkeeping, this algorithm re
 during enumeration, we argue below that the optimal bit ordering for skipping solutions is a greedy
 ordering.
 
+\subsection{All Optimal Orderings are Greedy}
+
 First we show that all optimal orderings of bits are optimal orderings of packed moves.
 Consider that lowering a bit in enumeration order can only decrease the number of skipped
 solutions if doing so decreases the minimum dependency of a move. However, doing so may
@@ -439,19 +441,19 @@ requires \BigO{N} time to reach termination after finding the global optimum. Co
 with initialization and the time to find the global optimum, the total complexity is \BigO{N},
 which is optimal.
 
-\subsection{$k$-Bound Separable Problem}
-A $k$-bound separable problem any problem that is composed of non-overlapping
+\subsection{$k$-Bound Separable Problems}
+A $k$-bound separable problem is any problem that is composed of non-overlapping
 subfunctions, each using using $k$ or fewer bits. Formally this means
 $\forall_i |s_i| \leq k$ and $\forall_{i \neq j} s_i \cap s_j = \emptyset$.
-Regardless
-of how they are initially ordered, reordering ensures that
-all variables which appear in the same $s_i$ are consecutively placed in enumeration.
-Consider a numbering of $f_i$ such that if $i < j$ then all of $s_i$'s
+While there is no restriction on how variables are ordered in the problem,
+performing reordering will ensure that
+all variables which appear in the same $s_i$ are consecutively placed during enumeration.
+As such it is possible to create a numbering of $f_i$ such that if $i < j$ then all of $s_i$'s
 variables appear before $s_j$'s in enumeration ordering.
 
 Algorithm~\ref{alg-enumerate} finds the $f_i$ with the highest $i$ which contains a
 fitness-improving move and enumerates its variables until it no longer
-contains an improving move. In total, enumerating $f_i$ requires less than $2^k$
+contains an improving move. In total, enumerating $f_i$ requires $2^k$
 steps. Each $f_i$ is considered sequentially until none contains an improving move,
 meaning the first local optimum is found in \BigO{2^kN/k} time.
 
@@ -464,11 +466,14 @@ $f_0$ is enumerated again. This finds all local optima in the hyperplane with $f
 fixed. We represent the time required to find all local optima in the hyperplane
 with $f_j, j>i$ fixed as $T(i)$. $T(0)=2^k$ as all values of $f_0$ must be enumerated.
 $T(i) = |l_i|*T(i-1)+2^k$ where $|l_i|$ is the number of ways $f_i$ can be set such
-that it contains no fitness-improving moves. Each $l_i$ exposes a new hyperplane
+that it contains no fitness-improving moves.
+Each setting in $l_i$ exposes a new hyperplane
 that can contain local optima, which causes the recursive call to $T(i-1)$.
+As all $|s_i| \leq k$ and $k$ is a
+constant, $\forall_i |l_i| \leq c \leq 2^k$ meaning that $c$ is a constant.
 Assuming for simplicity that all subfunctions use exactly $k$ bits,
-the time required to find all local optima is $T(N/k-1)$.
-Assuming that $\forall_i |l_i|=c$, $T(N/k-1)=\sum_0^{N/k-1}2^kc^i<2^kc^{N/k}$.
+the time required to find all local optima is
+$T(N/k-1)\leq \sum_0^{N/k-1}2^kc^i<2^kc^{N/k}$.
 The number of local optima in the landscape is $c^{N/k}$ meaning that Algorithm~\ref{alg-enumerate}
 is within a constant factor ($2^k$) of optimal.
 
@@ -490,6 +495,20 @@ to find all $2^{N/k}$ local optima in this problem. Note also that
 in the degenerate case of $k=1$, a $k$-bound separable problem
 is a linear function. As such, when $k=1$, $c=1$ and
 \BigO{2^kN/k} = \BigO{N}.
+
+\subsubsection{Importance of Reordering}
+The order in which variables are enumerated for $k$-bound separable problems
+has a significant impact on Algorithm~\ref{alg-enumerate}'s complexity.
+Instead of using the normal reordering procedure, consider an ordering
+such that if $i < j$, all variables in $s_i$ appear before the second variable
+in $s_j$ and after the first variable in $s_j$.
+
+Each time the second variable in $s_i$ is flipped, all of $s_{i-1}$ must be enumerated.
+This is because only carry operations can result in $index$ being set to the second
+variable in $s_i$. Each time $f_i$ contains a fitness improving move, $index$ is set
+to the first variable in $s_i$, which comes before all variables in $s_{i-1}$.
+As a result the time to solve this ordering becomes $T(i) = 2^{k-1}*T(i-1)+2^k$.
+Therefore, if $c < 2^{k-1}$ this ordering performs much worse than optimal.
 
 \section{Experiments}
 We compare three methods for finding all local optima: Gray-Box, Hyper, and Hyper-Reorder.
@@ -567,7 +586,8 @@ much better approximations of landscapes interesting to search methods.
 	\centering
 	\caption{Value of $m$ when fitting a model to $y = 2^c2^{mN}$ where $y$ is number of seconds required to
 	         find all 1-bit local optima of a problem using $N$ bits. Optimal refers to the same model where
-	         $y$ is the number of local optima.}
+	         $y$ is the number of local optima. All $R^2$ values over 0.95 except Hyper on Concatenated Traps
+	         which has 0.898.}
 	\begin{tabular}{|r|c|c|c|c|}
 	  \hline
 	    & \textbf{Gray-Box} & \textbf{Hyper} & \textbf{Hyper-Reorder} & \textbf{Optimal} \\ \hline
@@ -586,6 +606,7 @@ appears to be growing at the same rate as the total number of local optima. We s
 some of this deficiency on MAX-kSAT is due to its significantly higher number of non-linear
 interactions. Concatenated Traps, Adjacent NKq, and Ising Spin Glass all have exactly 4
 non-linear relationships per variable. For small problem sizes
+the number of non-linear relationships per variable in
 Random NKq and MAX-kSAT both increase with problem
 size. Random NKq's average ranges between 5 and 6 on problems we tested.
 With $N=15$, MAX-kSAT has on average nearly
@@ -597,8 +618,8 @@ is asymptotically constant, this growth on small problems is likely affecting ru
 
 \subsection{Finding $r$-Bit Local Optima}
 A major advantage of Gray-Box enumeration is that it can find $r$-bit local optima
-without exponentially increasing runtime complexity. Figure~\ref{fig-slope-method}
-shows the estimated growth rate for each method as $r$ is increased. On Concatenated Traps,
+with only a constant increase in runtime. Figure~\ref{fig-slope-method}
+shows the estimated growth rate for each method as $r$ increases. On Concatenated Traps,
 Adjacent NKq, Ising Spin Glass, and to a lesser extent Random NKq, none of our enumeration
 methods see an increase in growth complexity with increasing $r$. In all cases using Hyper-Reorder
 has a lower growth rate than the other two methods using the same $r$. On every problem
@@ -635,19 +656,21 @@ cannot change and once $r \ge k$ there is exactly 1 local optima.
 Previous work~\cite{ochoa:2015:crossovernetworks} noted that counter-intuitively Adjacent
 NKq has more local optima than Random NKq for $r=1$ and $N=20$, even though the former is generally
 easier to solve. However, many of these optima are ``weak'' in the sense that they are not also
-2-bit local optima. Here we extend those conclusions for up to $N=59$ and up to $r=4$. Adjacent
-NKq tend to have more 1-bit local optima than Random NKq, most of which disappear as $r$
+2-bit local optima. Here we extend those observations for up to $N=59$ and up to $r=4$. Adjacent
+NKq tends to have more 1-bit local optima than Random NKq, most of which disappear as $r$
 increases. Furthermore, the growth rate of local optima between the two landscapes diverges
 as $r$ increases.
 
 MAX-kSAT and Ising Spin Glasses generally appear to contain far more local optima than
 any of the other problems we enumerated. With just $N=49$, Ising Spin Glasses average
 nearly 800 million local optima. For comparison, Adjacent NKq with $N=49$ averages fewer than 300 thousand,
-and with $N=78$ Adjacent NKq still only has fewer than 500 million.
+and with $N=77$ Adjacent NKq still only has fewer than 500 million.
 As with NKq, the polynomially solvable Ising Spin
 Glass problem had more 1-bit local optima than the NP-Hard MAX-kSAT. Unlike with NKq, this
-relationship generally does not change as $r$ increases. Even for $r=4$ the general
-number and growth rate of local optima appears to stay the same for both problems.
+relationship generally does not change as $r$ increases. However, both do still
+see large decreases in the number and growth rate of local optima. With $N=49$
+the number of 4-bit local optima Ising Spin Glass is on average under 70 thousand,
+a reduction of four orders of magnitude.
 
 
 \begin{figure*}
@@ -659,16 +682,16 @@ number and growth rate of local optima appears to stay the same for both problem
 \end{figure*}
 
 
-In our original experiment we tested problems up to size $N=100$, which was sufficient to
+In our original experiments we tested problems up to size $N=100$, which was sufficient to
 cause all three methods using $r=1$ to fail all problems except for Hyper-Reorder on Concatenated
 Traps. However, using higher $r$ values, Hyper-Reorder is able to significantly extend its range.
 On Random NKq, Hyper-Reorder was successful at finding 2-bit local optima for $N=73$. On Adjacent
 NKq using all $r$ tested except 1 were successful on $N=100$. To push Algorithm~\ref{alg-enumerate}
 to the extreme we tested Adjacent NKq with $N=200$ and $r=4$, with all 30 runs successful. On
 average these runs required 5.6 minutes to complete. However, there was significant variance
-in both the runtime and number of local optima. 18 of 30 runs completed in under 1 minute,
-while the slowest run took 1.5 hours. 7 had less than one thousand 4-bit local optima, while 5
-had over one hundred thousand.
+in both the runtime and number of local optima. Eighteen runs completed in under 1 minute,
+while the slowest run took 1.5 hours. Three had fewer than 50 4-bit local optima, while five
+had over 100,000.
 
 
 \section{Conclusions}
