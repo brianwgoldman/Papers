@@ -623,20 +623,56 @@ Section~\ref{sec-1-bit-optima}.
   \label{fig-slope-method}
 \end{figure*}
 
+Increasing $r$ also results is a substantial reduction in the
+total number of local optima, as shown in Figure~\ref{fig-length-radius}.
+For every problem except Concatenated Traps, increasing $r$ not only reduces the
+number of local optima, it decreases the growth rate with respect to $N$. As there
+are fewer local optima to enumerate, Algorithm~\ref{alg-enumerate} requires less
+time to enumerate them all. In Concatenated Traps each trap requires exactly $k$ flips in
+order to move between local optima. Therefore, while $r < k$ the number of local optima
+cannot change and once $r \ge k$ there is exactly 1 local optima.
 
-\subsection{Examining Local Optima}
+Previous work~\cite{ochoa:2015:crossovernetworks} noted that counter-intuitively Adjacent
+NKq has more local optima than Random NKq for $r=1$ and $N=20$, even though the former is generally
+easier to solve. However, many of these optima are ``weak'' in the sense that they are not also
+2-bit local optima. Here we extend those conclusions for up to $N=59$ and up to $r=4$. Adjacent
+NKq tend to have more 1-bit local optima than Random NKq, most of which disappear as $r$
+increases. Furthermore, the growth rate of local optima between the two landscapes diverges
+as $r$ increases.
+
+MAX-kSAT and Ising Spin Glasses generally appear to contain far more local optima than
+any of the other problems we enumerated. With just $N=49$, Ising Spin Glasses average
+nearly 800 million local optima. For comparison, Adjacent NKq with $N=49$ averages fewer than 300 thousand,
+and with $N=78$ Adjacent NKq still only has fewer than 500 million.
+As with NKq, the polynomially solvable Ising Spin
+Glass problem had more 1-bit local optima than the NP-Hard MAX-kSAT. Unlike with NKq, this
+relationship generally does not change as $r$ increases. Even for $r=4$ the general
+number and growth rate of local optima appears to stay the same for both problems.
+
 
 \begin{figure*}
   \centering
   \includegraphicsfit{length-radius}
-  \caption{Number of $r$-bit local optima as $N$ increases for each problem.}
+  \caption{Number of $r$-bit local optima for each size of each problem. Note that
+           the number of local optima in Concatenated Traps does not change while $r<k$.}
   \label{fig-length-radius}
 \end{figure*}
 
 
-TODO Consider discussing neutral networks
+In our original experiment we tested problems up to size $N=100$, which was sufficient to
+cause all three methods using $r=1$ to fail all problems except for Hyper-Reorder on Concatenated
+Traps. However, using higher $r$ values, Hyper-Reorder is able to significantly extend its range.
+On Random NKq, Hyper-Reorder was successful at finding 2-bit local optima for $N=73$. On Adjacent
+NKq using all $r$ tested except 1 were successful on $N=100$. To push Algorithm~\ref{alg-enumerate}
+to the extreme we tested Adjacent NKq with $N=200$ and $r=4$, with all 30 runs successful. On
+average these runs required 5.6 minutes to complete. However, there was significant variance
+in both the runtime and number of local optima. 18 of 30 runs completed in under 1 minute,
+while the slowest run took 1.5 hours. 7 had less than one thousand 4-bit local optima, while 5
+had over one hundred thousand.
+
 
 \section{Conclusions}
+TODO Consider discussing neutral networks
 
 \subsubsection*{Acknowledgments.} TODO Acknowledge BEACON.
 
