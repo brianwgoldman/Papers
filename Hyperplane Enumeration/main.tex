@@ -94,7 +94,7 @@ which cannot be improving by flipping $r$ or fewer bits. In some cases
 increasing $r$ actually reduces total runtime by drastically reducing the
 number of local optima. While previous methods were limited to
 problems with at most 18 or 30 bits, hyperplane elimination can enumerate the same problems with
-75 bits. When using higher $r$ values this bound can be pushed to 200 bit problems
+77 bits. When using higher $r$ values this bound can be pushed to 200 bit problems
 on average enumerated in under 6 minutes.
 
 
@@ -131,7 +131,7 @@ landscapes~\cite{iclanzan:2014:somnetworks}, they do not provide enough
 detail necessary for some metrics~\cite{ochoa:2015:crossovernetworks}.
 
 Here we introduce a method for finding all local optima for the same problems using
-up to 75 bits. The cornerstone of this method is the identification
+up to 77 bits. The cornerstone of this method is the identification
 of hyperplanes that cannot contain any local optima, allowing large
 portions of the search space to be skipped during enumeration.
 The techniques developed here can be applied to the generalized problem class of Mk Landscapes,
@@ -548,8 +548,8 @@ Hyper-Reorder scales at $2^k2^{N/k}$ as $\frac{1}{k}=0.2$.
 This reduction in growth complexity translates into a significant increase in the size of problems
 which can be enumerated. For instance, using the previous best enumeration methods~\cite{ochoa:2015:crossovernetworks}
 the largest Adjacent NKq problem size which can be enumerated in 4 hours is 34 bits. Given the same time
-Hyper-Reorder can enumerate problems with 75 bits. Using the regression model, we estimate solving
-a 75 bit problem using Gray-Box would require 230 million years. Similarly, Hyper-Reorder's largest
+Hyper-Reorder can enumerate problems with 77 bits. Using the regression model, we estimate solving
+a 77 bit problem using Gray-Box would require 900 million years. Similarly, Hyper-Reorder's largest
 Random NKq size of 69 bits would require Gray-Box 3 million years. These larger sizes make for
 much better approximations of landscapes interesting to search methods.
 
