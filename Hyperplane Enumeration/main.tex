@@ -106,22 +106,23 @@ on average enumerated in under 6 minutes.
 
 
 \section{Introduction}
-The ruggedness and high dimensionality of most problem landscapes makes them challenging
+The ruggedness and high dimensionality of most problem landscapes makes them challenging to
 analyze and understand. However, doing so can be helpful in
-quantifying the difficulty of a problem, and how to design algorithms to deal
+quantifying the difficulty of a problem. Furthermore,
+this information can be useful to design search algorithms that specifically deal
 with those difficulties. 
-Similarly, knowing which characteristics favor
+Similarly, knowing problem characteristics that favor
 a particular
 algorithm can help researchers choose the algorithm
 most likely to perform well on their problem.
 
 A common way of analyzing landscapes is to
-examine the frequency and distribution of local optima~\cite{boese:1994:bigvalley},
-and how operators allow search to transition between these
+examine both the frequency and distribution of local optima~\cite{boese:1994:bigvalley},
+as well as how different search operators transition between these
 optima~\cite{tomassini:2008:nknetworks,verel:2011:nknetworks,ochoa:2015:crossovernetworks}.
-However, finding all of the local optima is prohibitively time consuming
-even for small problems, with many studies limited to 18-bit
-problems~\cite{tomassini:2008:nknetworks,verel:2011:nknetworks}.
+However, finding all of the local optima of a complex problem is prohibitively time consuming
+even for small problems. Many studies are limited to 18-bit
+problems~\cite{tomassini:2008:nknetworks,verel:2011:nknetworks} due to this time constraint.
 By leveraging recent advancements in Gray-Box optimization that allow for
 constant time local search~\cite{chicano:2014:ball}, this limit was raised
 to 30-bit problems~\cite{ochoa:2015:crossovernetworks}. While sampling
@@ -133,7 +134,7 @@ Here we introduce a method for finding all local optima for the same problems us
 up to 75 bits. The cornerstone of this method is the identification
 of hyperplanes that cannot contain any local optima, allowing large
 portions of the search space to be skipped during enumeration.
-The techniques used apply to the generalized problem class of Mk Landscapes,
+The techniques developed here can be applied to the generalized problem class of Mk Landscapes,
 which contains many real world and benchmark combinatorial problems.
 
 
@@ -144,8 +145,8 @@ An Mk Landscape~\cite{whitley:2015:mk} is any function
 who's value is equal to the sum of a set of subfunctions.
 Each subfunction uses a small subset of variables from the original function's input.
 Combined with limitations on the number of subfunctions and the size of each subfunction's
-subset, Mk Landscapes allow for highly efficient local~\cite{whitley:2012:constant,chicano:2014:ball}
-and global~\cite{goldman:2015:GBO,tintos:2015:partitioncross} search.
+subset, Mk Landscapes can be efficiently searched for both local~\cite{whitley:2012:constant,chicano:2014:ball}
+and global~\cite{goldman:2015:GBO,tintos:2015:partitioncross} optima.
 
 Formally, an Mk Landscape is any function $f : \mathbb{B}^{N}\rightarrow \mathbb{R}$
 that can be expressed in the following form:
@@ -165,9 +166,9 @@ the most commonly used combinatorial benchmark problems. In this work we
 examine 5 problems in particular: Concatenated Traps, Adjacent and Random NKq Landscapes,
 Ising Spin Glasses, and MAX-kSAT.
 
-The Concatenated Trap problem~\cite{deb:1992:trap} is a composition of $k$-order deceptive
+The Concatenated Trap problem~\cite{deb:1992:trap} is a composition of $k$-order deceptive,
 separable subfunctions. In Mk Landscape terms, $M=N/k$ such that $\forall_i |s_i| = k$ and
-$\forall_{i \neq j} s_i \cap s_j = \emptyset$. Each $f_i$ applies an identical function based
+$\forall_{i \neq j} s_i \cap s_j = \emptyset$. Each $f_i$ applies an identical subfunction based
 on the number of variables set to 1:
 \begin{equation}
    trap(t) = \left\{
@@ -206,8 +207,8 @@ Ising Spin Glasses are a type of MAX-CUT problem derived from statistical physic
 Each atom in the glass (vertex) can be assigned a spin, with the goal being to
 find the set of assignments that minimize the energy between nearby atoms (edges).
 Similar to Adjacent NKq, the $2D\pm J$ subset of Ising Spin Glasses can be polynomially
-solved~\cite{saul:1994:spinglass}\footnote{\url{http://www.informatik.uni-koeln.de/spinglass/}}.
-In this subset, the graph is defined as a square two-dimensional torus with each edge
+solved~\cite{saul:1994:spinglass}.
+In this subset, the graph is defined as a square two-dimensional toroidal grid with each edge
 weight chosen from $\{-1, 1\}$. Each vertex is assigned a spin from $\{-1, 1\}$ with
 the energy in the glass equal to
 \begin{equation}
@@ -227,7 +228,7 @@ When considered as a black box, the process of finding all local optima
 in a landscape requires \BigO{N2^N} time. This is because evaluating
 a solution requires $N$ time, and all $2^N$ solutions in the landscape
 must be evaluated once. Finding the local
-optima then requires each solution to compare its fitness with each
+optima then requires comparing each solution's fitness with each
 of its neighbors, which when properly cached takes \BigO{N} per solution.
 Extending this method to look for solutions that cannot be improved by
 flipping $r$ or fewer bits requires \BigO{N^r2^N} time. However,
@@ -236,23 +237,24 @@ was able to find all $r$-bit local optima of Mk Landscapes in \BigO{2^N} for any
 fixed value of $r$.
 
 The first major result in Gray-Box optimization was the proof that the list
-of fitness-improving moves can be updated after each flip in local search in \BigO{1}
-time per bit flip~\cite{whitley:2012:constant}. In an Mk Landscape variables
+of fitness-improving moves from a solution can be updated after a bit flip in \BigO{1}
+time~\cite{whitley:2012:constant}. In an Mk Landscape, variables
 can only have a non-linear relationship if they appear together in at least one $s_i$.
-The fitness effect of flipping a bit can therefore only change when it has a non-linear
-relationship with the bit modified by local search. By definition the number of non-linear
+Therefore, the fitness effect of flipping $x_j$ can only change when flipping $x_i$ if
+there is a non-linear relationship between $x_i$ and $x_j$.
+By definition the total number of non-linear
 relationships in an Mk Landscape is linear with $N$, meaning on average the amortized
-number of updates is \BigO{1}.
+number of non-linear relationships per variable is \BigO{1}.
 
 This result was extended by~\cite{chicano:2014:ball} to include local search for local
 optima that cannot be improved using $r$ or fewer bits with no increase in asymptotic costs.
 Consider two variables $x_i$ and $x_j$ that do not appear in the same $s_i$.
 By definition the fitness effect of flipping both $x_i$ and $x_j$ is equal to the sum
-of flipping each independently. As a result if neither individual flip is fitness improving,
+of flipping each independently. As a result, if neither individual flip is fitness improving,
 flipping both together cannot be fitness improving. By examining the graph of non-linear
-interactions between variables this principle can be extended to any collection of $r$
+interactions between variables, this principle can be extended to any collection of $r$
 variables, with the number of useful collections growing at \BigO{N} when $r$ is a small constant.
-As a result the time to update the list of improving moves after a modification is still \BigO{1}.
+As a result, the time to update the list of improving moves after up to $r$ bit-flips is still \BigO{1}.
 
 These advances can be applied directly to the task of finding all local optima in a
 landscape~\cite{ochoa:2015:crossovernetworks}.
@@ -268,7 +270,7 @@ Therefore Gray-Box enumeration is able to find all local optima in \BigO{2^N} ti
   \centering
   \includegraphicsfit{Enumerate}
   \caption{Example change of enumeration ordering. The gray variables represent all dependencies
-           for some move $m_i$. By reordering, $m_i$'s lowest $index$ dependency improves from 2 to 4.}
+           for move $m_i$ which flips variable $F$. By reordering, $m_i$'s lowest $index$ dependency improves from 2 to 4.}
   \label{fig-enumerate}
 \end{figure*}
 
@@ -276,10 +278,10 @@ Due to the limited non-linearity of the Gray-Box domain, it is possible to exclu
 parts of the search space without missing any local optima.
 Consider the representation presented in the top of Figure~\ref{fig-enumerate}. In a Black-Box
 domain, enumeration would progress as a binary counter, treating $index$ zero (symbol $A$ in the solution) as
-the least significant bit. This ensures that before changing $index$ $i$, all possible settings of $index$
-0 through $i-1$ have been tested. This corresponds to examining the hyperplane with the lowest $i-1$ positions
-variable and all other positions fixed. The Gray-Box domain makes it possible to skip hyperplanes
-that cannot be local optima. In Figure~\ref{fig-enumerate} there exists a move $m_i$ that is a fitness improvement
+the least significant bit. This enumeration ordering ensures that before changing $index$ $i$, all possible settings of $index$
+0 through $i-1$ have been tested. This corresponds to examining the hyperplane where the lowest $i-1$ positions
+can vary and all other positions remain fixed. The Gray-Box domain makes it possible to skip hyperplanes
+that cannot contain local optima. In Figure~\ref{fig-enumerate}, move $m_i$ which flips variable $F$ is a fitness improvement
 when enumeration starts (all variables set to 0). Due to the known relationships between variables,
 we know that the quality of $m_i$ only depends on variables $C$, $E$, $F$, and $H$.
 Therefore, until one of those four variables are modified, the solution cannot be a local optimum.
@@ -323,7 +325,7 @@ This knowledge can be exploited to skip parts of the enumeration,
 as shown in Algorithm~\ref{alg-enumerate}.
 Before starting, each fitness-improving move is put into a table $move\_bin$
 based on that move's lowest $index$ dependency. This is the first $index$ that
-can be modified by enumeration to change the fitness effect of making that move.
+can be modified by enumeration that can potentially change the fitness effect of making that move.
 In order to determine how much of the enumeration can be skipped, we must find
 the highest $index$ in $move\_bin$ that contains a fitness-improving move,
 as done by Line~\ref{alg-enumerate-bincheck}. If no move is fitness-improving,
@@ -341,12 +343,12 @@ Iteration stops when the carry exceeds the solution length.
 When performing subsequent iterations, not all bins need to be checked. Instead, the highest $index$
 bin that must be tested is the highest $index$ flipped by the previous iteration. This
 simplification is possible because
-the previous iteration has verified that all moves in higher $index$ bins are not fitness improving, and no action performed during
+the previous iterations have verified that all moves in higher $index$ bins are not fitness improving, and no action performed during
 that iteration can make them fitness improving.
 Furthermore, $index$ is always the location of the least significant 1 in $solution$, meaning
-iteration can continue immediately from the found $index$. This is true by construction
-as initially $solution$ contains all 0s. 1s are always inserted at the value of $index$
-with $index$ only increasing due to carry operations which clear all 1s lower than $index$.
+iteration can continue immediately from the found $index$. This is true by construction.
+Initially $solution$ contains all 0s. Each time a 1 is inserted its position is equal to $index$ and
+$index$ is only increased by carry operations which reset a position to 0 before increasing $index$.
 
 This hyperplane skipping extends to finding only $r$-bit local optima for all Mk landscapes.
 By increasing the number of potential fitness-improving moves, the number of hyperplanes that
@@ -363,13 +365,13 @@ the amount of search space that is skipped depends on how high its lowest $index
 by rearranging the order to make its lowest $index$ dependency higher, more search space can be skipped. 
 Figure~\ref{fig-enumerate} shows how changing the $index$ order of variables
 improves $m_i$'s lowest $index$ dependency from 2 to 4. Consider that before reordering $m_i$ allows the hyperplane
-**000000 to be skipped by Algorithm~\ref{alg-enumerate}, while after reordering that becomes ****0000.
-Now whenever $m_i$ is a fitness improvement, Line~\ref{alg-enumerate-bincheck} in Algorithm~\ref{alg-enumerate}
+**000000 to be skipped by Algorithm~\ref{alg-enumerate}, while after reordering the hyperplane that can be skipped is ****0000.
+Now, whenever $m_i$ is a fitness improvement, Line~\ref{alg-enumerate-bincheck} in Algorithm~\ref{alg-enumerate}
 skips 4 times as many solutions.
 
 We perform this reordering in a greedy fashion, such that the move with the
 least-unmapped dependencies has all of its remaining dependencies mapped to the
-most significant remaining positions. With proper bookkeeping this algorithm requires
+most significant remaining positions. With proper bookkeeping, this algorithm requires
 \BigO{N} time. Assuming that all moves are equally likely to be fitness improving
 during enumeration, we argue below that the optimal bit ordering for skipping solutions is a greedy
 ordering.
@@ -397,7 +399,7 @@ that is the maximum $i$ value for which $D_O(i, O_i) > D_O(i, O_{i+1})$ is true.
 Consider an optimal ordering $O^\star$ that is not greedy.
 These criteria mean that $D_{O^\star}(\hat{i}, O_{\hat{i}}) > D_{O^\star}(\hat{i}, O_{\hat{i}+1})$.
 Swapping $O_{\hat{i}}$ and $O_{\hat{i}+1}$ cannot change the minimum dependency of any other moves.
-Performing the swap improves the minimum dependency of $O_{\hat{i}+1}$ more than it hurts
+Performing the swap improves the minimum dependency of $O_{\hat{i}+1}$ more than it worsens
 $O_{\hat{i}}$. Therefore, performing this swap makes $O^\star$ skip even more solutions,
 contradicting the assertion that it was optimal. Therefore there cannot exist an optimal ordering that is not greedy.
 
@@ -438,18 +440,20 @@ with initialization and the time to find the global optimum, the total complexit
 which is optimal.
 
 \subsection{$k$-Bound Separable Problem}
-Consider any problem that is composed of non-overlapping
-subfunctions, each using using $k$ or fewer bits. Regardless
+A $k$-bound separable problem any problem that is composed of non-overlapping
+subfunctions, each using using $k$ or fewer bits. Formally this means
+$\forall_i |s_i| \leq k$ and $\forall_{i \neq j} s_i \cap s_j = \emptyset$.
+Regardless
 of how they are initially ordered, reordering ensures that
-variables of a function are always consecutively placed in enumeration.
-Consider a numbering of $f_i$ such that if $i < j$ then all of $f_i$'s
-variables appear before $f_j$'s in enumeration ordering.
+all variables which appear in the same $s_i$ are consecutively placed in enumeration.
+Consider a numbering of $f_i$ such that if $i < j$ then all of $s_i$'s
+variables appear before $s_j$'s in enumeration ordering.
 
-While any $f_i$ contains a fitness-improving move, Algorithm~\ref{alg-enumerate}
-finds the one with the highest $i$ and enumerates its variables until it no longer
-contains an improving move. In total this enumeration requires less than $2^k$
-steps. Each $f_i$ is considered sequentially, meaning the first local optimum
-is found in \BigO{2^kN/k} time.
+Algorithm~\ref{alg-enumerate} finds the $f_i$ with the highest $i$ which contains a
+fitness-improving move and enumerates its variables until it no longer
+contains an improving move. In total, enumerating $f_i$ requires less than $2^k$
+steps. Each $f_i$ is considered sequentially until none contains an improving move,
+meaning the first local optimum is found in \BigO{2^kN/k} time.
 
 Once the first local optimum is found, Algorithm~\ref{alg-enumerate} proceeds
 by finding all local optimum in larger and larger hyperplanes. Initially $f_0$
@@ -484,7 +488,7 @@ Concatenated Traps is a commonly used $k$-bound separable problem
 with $c=2$.  Algorithm~\ref{alg-enumerate} requires $2^k2^{N/k}$ time
 to find all $2^{N/k}$ local optima in this problem. Note also that
 in the degenerate case of $k=1$, a $k$-bound separable problem
-is a linear function. As such, when $k=1$ and $c=1$,
+is a linear function. As such, when $k=1$, $c=1$ and
 \BigO{2^kN/k} = \BigO{N}.
 
 \section{Experiments}
@@ -510,6 +514,7 @@ we report are for successful combinations. For timing purposes local optima were
 recorded.
 
 \subsection{Finding Local Optima}
+\label{sec-1-bit-optima}
 Our first experiment is to determine the empirical complexity of each method with respect to problem size.
 Of the 681 configurations where at least one method was successful, Hyper-Reorder had the lowest
 mean time to find all local optima all but 2 times. In both of those cases Hyper-Reorder was within a tenth of a second
@@ -602,9 +607,12 @@ of any other configuration.
 
 Perhaps most striking in Figure~\ref{fig-slope-method} is that on Adjacent NKq, Random NKq,
 and Ising Spin Glass, increasing $r$ \emph{reduces} Hyper-Reorder's growth complexity.
-
-TODO Mention bigger problem sizes.
-
+Increasing $r$ creates more moves which can be fitness improving. As a result there
+are more hyperplanes which can potentially be detected and eliminated.
+On Concatenated Traps no flip using $1 < r < k$ bits can be fitness improving
+without a 1-bit flip being fitness improving, meaning no additional hyperplanes can be skipped.
+For MAX-kSAT, increasing $r$ likely compounds the high dependency problems discussed in
+Section~\ref{sec-1-bit-optima}.
 
 \begin{figure*}
   \centering
