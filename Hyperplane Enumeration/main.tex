@@ -35,6 +35,11 @@
 
 \newcommand{\BigO}[1]{$\mathcal{O}{(#1)}$}
 
+% Fancy proofs
+\let\proof\relax
+\let\endproof\relax
+\usepackage{amsthm}
+
 \begin{document}
 
 \mainmatter  % start of an individual contribution
@@ -208,8 +213,9 @@ Each atom in the glass (vertex) can be assigned a spin, with the goal being to
 find the set of assignments that minimize the energy between nearby atoms (edges).
 Similar to Adjacent NKq, the $2D\pm J$ subset of Ising Spin Glasses can be polynomially
 solved~\cite{saul:1994:spinglass}.
-In this subset, the graph is defined as a square two-dimensional toroidal grid with each edge
-weight chosen from $\{-1, 1\}$. Each vertex is assigned a spin from $\{-1, 1\}$ with
+In this subset, the graph is defined as a square two-dimensional grid with
+periodic boundaries such that each edge
+weight is chosen from $\{-1, 1\}$. Each vertex is assigned a spin from $\{-1, 1\}$ with
 the energy in the glass equal to
 \begin{equation}
 \sum_{e_{ij} \in E} x_ie_{ij}x_j
@@ -377,20 +383,41 @@ during enumeration, we argue below that the optimal bit ordering for skipping so
 ordering.
 
 \subsection{All Optimal Orderings are Greedy}
+The quality of an enumeration ordering is determined by how many solutions
+in the space can be skipped by Algorithm~\ref{alg-enumerate} using that ordering.
+Each time the loop on Line~\ref{alg-enumerate-bincheck} stops with $index>0$,
+$2^{index}$ solutions have been skipped. For practical purposes we will
+assume that all moves are equally likely to be fitness improving.
 
-First we show that all optimal orderings of bits are optimal orderings of packed moves.
-Consider that lowering a bit in enumeration order can only decrease the number of skipped
-solutions if doing so decreases the minimum dependency of a move. However, doing so may
-allow the minimum dependency of some unrelated move to increase. Therefore when ordering
-bits, all that matters is the order in which the last bit of each move is assigned.
 
-% Proof
-Moves can have their dependencies fixed in some permutation $O$ of all possible moves,
-such that $O_0$ is the first move to have its dependencies fixed.
-$D_O(i, m)$ is a function that returns how many unfixed dependencies move $m$ has after all
-moves in $O$ before $i$ have been fixed. A greedy solution to this problem is one such
+\begin{lemma}
+There exists an ordering of moves such that assigning all dependencies of
+each move sequentially to the highest remaining positions in the enumeration ordering
+will result in an optimal enumeration ordering.
+\end{lemma}
+
+\begin{proof}
+The number of solutions skipped each time a move is fitness improving depends
+on where it is placed in $move\_bin$. This position is determined by its
+minimum dependency. Therefore, the placement of variables which are not
+the minimum dependency of at least one move cannot affect the number of
+skipped solutions. Consider an ordering of moves which is determined by
+the minimum dependencies of each move in some enumeration ordering. This
+ordering of moves can then be used to create an enumeration ordering which
+skips the same number of solutions as the original enumeration ordering.
+\end{proof}
+
+Moves can have their dependencies assigned in some permutation $O$ of all possible moves,
+such that $O_0$ is the first move to have its dependencies assigned.
+$D_O(i, m)$ is a function that returns how many unassigned dependencies move $m$ has after all
+moves in $O$ before $i$ have been assigned. A greedy solution to this problem is one such
 that $O_i$ is set to be the move that minimizes $D_O(i, m)$.
 
+\begin{theorem}
+All optimal enumeration orderings are greedy orderings of moves.
+\end{theorem}
+
+\begin{proof}
 All non-greedy solutions must have some $i$ such that $D_O(i, O_i) > D_O(i, O_{i+1})$.
 This is because $D_O(i, m)$ can only decrease as $i$ increases, meaning that if some $m$
 has a lower value at $i$ than $O_i$, this property must hold for
@@ -398,12 +425,30 @@ some index between $i$ and when $m$ appears in $O$.
 Finally, all non-greedy solutions must have some $\hat{i}$
 that is the maximum $i$ value for which $D_O(i, O_i) > D_O(i, O_{i+1})$ is true. 
 
-Consider an optimal ordering $O^\star$ that is not greedy.
-These criteria mean that $D_{O^\star}(\hat{i}, O_{\hat{i}}) > D_{O^\star}(\hat{i}, O_{\hat{i}+1})$.
-Swapping $O_{\hat{i}}$ and $O_{\hat{i}+1}$ cannot change the minimum dependency of any other moves.
-Performing the swap improves the minimum dependency of $O_{\hat{i}+1}$ more than it worsens
-$O_{\hat{i}}$. Therefore, performing this swap makes $O^\star$ skip even more solutions,
-contradicting the assertion that it was optimal. Therefore there cannot exist an optimal ordering that is not greedy.
+Consider the optimal ordering $O^\star$ that is not greedy and that has the minimum value for $\hat{i}$.
+Swapping $O_{\hat{i}}^\star$ and $O_{\hat{i}+1}^\star$ cannot change the minimum dependency of any other moves.
+Performing the swap causes $O_{\hat{i}}^\star$ to have the minimum dependency $O_{\hat{i}+1}^\star$ had before
+the swap, while $O_{\hat{i}+1}^\star$'s minimum dependency is raised by at least
+$D_{O^\star}(\hat{i}, O_{\hat{i}}^\star) - D_{O^\star}(\hat{i}, O_{\hat{i}+1}^\star)$. This value
+cannot be negative meaning that we have now constructed a solution which either skips more
+solutions than $O^\star$ or has a lower $\hat{i}$ than $O^\star$, contradicting our assertions.
+Therefore there cannot exist an optimal ordering that is not greedy.
+\end{proof}
+
+
+\begin{theorem}
+Not all greedy orderings are optimal enumeration orderings.
+\end{theorem}
+
+\begin{proof}
+Consider a problem with move dependencies $m_0 = \{A, B\}$, $m_1 = \{C, D\}$, and $m_2 = \{C, D, E\}$.
+There are two greedy orderings, $[m_0, m_1, m_2]$ and $[s_1, s_2, s_0]$. The former
+skips $2^3+2^1$ solutions, while the latter skips $2^3+2^2$. This is because $m_1$ and
+$m_2$ overlap. As a result, even though both a greedy, only the second is optimal.
+\end{proof}
+
+We have not been able to determine a method for finding the optimal move ordering efficiently.
+Therefore we will use the greedy method as it is probabilistically optimal.
 
 \section{Complexity Classes for Simple Landscapes}
 Understanding the runtime complexity of Algorithm~\ref{alg-enumerate} requires
@@ -421,30 +466,44 @@ no non-linear terms between variables. These functions are of the form:
 In MK Landscape terms, $M=N$ and $k=1$. The most well known linear function is OneMax,
 in which $w_i=1$ for all $i$.
 
+\begin{theorem}
+Algorithm~\ref{alg-enumerate} finds all local optima of any linear function
+in \BigO{N} time.
+\end{theorem}
+
+\begin{proof}
 When Algorithm~\ref{alg-enumerate} is applied to a linear
 function, each index of $move\_bin$ can contain at most 1
 move, and a move is fitness improving whenever it disagrees with the global optimum.
 Initially $index$ is set to $N-1$ and is decreased by at least 1 in any step after the first.
+Each step will flip a bit which disagreed with the global optimum.
 Before finding the global optimum no carry operations can occur, meaning the
 cost of each iteration is equal to the amount by which $index$ is decreased.
-Each step will flip a bit which disagreed with the global optimum.
 Therefore, Algorithm~\ref{alg-enumerate} requires \BigO{N} time to reach
 the global optimum.
 
 After finding the global optimum, $index$ is set to 0. One iteration
 is then spent adding a 1 to $index$ 0, which in the worst case requires \BigO{N}
-carry operations. For all future iterations $index$ is a fitness-improving move
-and is currently set to 1. In these iterations at least 1 carry operation must
+carry operations. For all future iterations $index$ is the position of the highest fitness-improving move
+which is currently set to 1. In these iterations at least 1 carry operation must
 occur, and $index$ cannot be decreased. Iteration ends when $index$ exceeds $N$
 which requires at most $N$ carry operations. Therefore, Algorithm~\ref{alg-enumerate}
 requires \BigO{N} time to reach termination after finding the global optimum. Combined
 with initialization and the time to find the global optimum, the total complexity is \BigO{N},
 which is optimal.
+\end{proof}
 
 \subsection{$k$-Bound Separable Problems}
 A $k$-bound separable problem is any problem that is composed of non-overlapping
 subfunctions, each using using $k$ or fewer bits. Formally this means
 $\forall_i |s_i| \leq k$ and $\forall_{i \neq j} s_i \cap s_j = \emptyset$.
+
+\begin{theorem}
+Algorithm~\ref{alg-enumerate} finds all \BigO{c^{M}} local optima of any $k$-bound separable function
+in \BigO{2^kc^{M}} time.
+\end{theorem}
+
+\begin{proof}
 While there is no restriction on how variables are ordered in the problem,
 performing reordering will ensure that
 all variables which appear in the same $s_i$ are consecutively placed during enumeration.
@@ -455,10 +514,10 @@ Algorithm~\ref{alg-enumerate} finds the $f_i$ with the highest $i$ which contain
 fitness-improving move and enumerates its variables until it no longer
 contains an improving move. In total, enumerating $f_i$ requires $2^k$
 steps. Each $f_i$ is considered sequentially until none contains an improving move,
-meaning the first local optimum is found in \BigO{2^kN/k} time.
+meaning the first local optimum is found in \BigO{2^kM} time.
 
 Once the first local optimum is found, Algorithm~\ref{alg-enumerate} proceeds
-by finding all local optimum in larger and larger hyperplanes. Initially $f_0$
+by finding all local optima in larger and larger hyperplanes. Initially $f_0$
 is enumerated to find all local optima in the hyperplane with all $f_i, i>0$
 fixed. This process ends when a carry operation modifies a bit of $f_1$. At
 this point $f_1$ is enumerated, such that each time $f_1$ contains no improving moves
@@ -471,11 +530,11 @@ Each setting in $l_i$ exposes a new hyperplane
 that can contain local optima, which causes the recursive call to $T(i-1)$.
 As all $|s_i| \leq k$ and $k$ is a
 constant, $\forall_i |l_i| \leq c \leq 2^k$ meaning that $c$ is a constant.
-Assuming for simplicity that all subfunctions use exactly $k$ bits,
-the time required to find all local optima is
-$T(N/k-1)\leq \sum_0^{N/k-1}2^kc^i<2^kc^{N/k}$.
-The number of local optima in the landscape is $c^{N/k}$ meaning that Algorithm~\ref{alg-enumerate}
+The time required to find all local optima is therefore
+$T(M-1)\leq \sum_0^{M-1}2^kc^i<2^kc^{M}$.
+The number of local optima in the landscape is \BigO{c^{M}} meaning that Algorithm~\ref{alg-enumerate}
 is within a constant factor ($2^k$) of optimal.
+\end{proof}
 
 When looking for only $r$-bit local optima of $k$-bound separable problems,
 Algorithm~\ref{alg-enumerate} continues to be within a constant of optimal.
@@ -486,15 +545,15 @@ only non-linearly related subsets of variables must be checked
 for fitness improvements, no subsets can be added that are larger than $k$.
 Therefore even if $r=N-1$, the number of subsets only grows at \BigO{N}.
 As $c=1$ in this case, the cost of finding the single global optimum
-only requires the \BigO{2^kN/k} time to find the first local optimum, which is
+only requires the \BigO{2^kM} time to find the first local optimum, which is
 optimal.
 
 Concatenated Traps is a commonly used $k$-bound separable problem
-with $c=2$.  Algorithm~\ref{alg-enumerate} requires $2^k2^{N/k}$ time
+with $c=2$ and $M=N/k$.  Algorithm~\ref{alg-enumerate} requires $2^k2^{N/k}$ time
 to find all $2^{N/k}$ local optima in this problem. Note also that
 in the degenerate case of $k=1$, a $k$-bound separable problem
 is a linear function. As such, when $k=1$, $c=1$ and
-\BigO{2^kN/k} = \BigO{N}.
+\BigO{2^kM}~=~\BigO{N}.
 
 \subsubsection{Importance of Reordering}
 The order in which variables are enumerated for $k$-bound separable problems
