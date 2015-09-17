@@ -589,7 +589,8 @@ same configuration with a different seed was rerun. This resulted in 33 out of 3
 If the algorithm failed to complete in the alloted time for an instance,
 we declared it unsuccessful for that combination of $r$ and $N$ of that problem. All results
 we report are for successful combinations. For timing purposes local optima were counted but not
-recorded.
+recorded. All of our code, data, and statistical analysis can be downloaded from our
+website.~\footnote{\url{https://name.of.site/removed/to/be/anonymous/}}
 
 \subsection{Finding Local Optima}
 \label{sec-1-bit-optima}
@@ -753,10 +754,41 @@ while the slowest run took 1.5 hours. Three had fewer than 50 4-bit local optima
 had over 100,000.
 
 
-\section{Conclusions}
-TODO Consider discussing neutral networks
+\section{Conclusions and Future Work}
+By expressing a function as an Mk Landscapes, we have developed a method to find all
+local optima of that function very efficiently. The structure imposed by
+an Mk Landscape allows for the identification of hyperplanes in the search space
+which cannot contain any local optima. Combined with a greedy method for
+changing the order of how the space is enumerated, we were able to prove
+this method's runtime complexity scales with the number of local optima, unlike
+previous methods which scale with the number of possible solutions.
+When applied to NKq Landscapes and Ising Spin Glasses this allowed for a dramatic
+increase in the size of problems which can be enumerated. We believe that
+these larger problem sizes will be more representative of the types
+of search spaces where optimization is performed.
 
-\subsubsection*{Acknowledgments.} TODO Acknowledge BEACON.
+We show how this hyperplane elimination can be extended to find only solutions
+which cannot be improved by flipping $r$ or fewer bits. For some problems
+this counterintuitively reduces search times, and on Adjacent NKq allowed
+us to find all 4-bit local optima of a 200 bit problem.
+
+The obvious next step is to use the results of hyperplane elimination
+in conjunction with landscape analysis
+techniques~\cite{tomassini:2008:nknetworks,verel:2011:nknetworks,ochoa:2015:crossovernetworks}.
+We are especially interested to see how landscape properties change for larger $N$
+and $r$. As to the algorithm itself, we suspect there may be room for improvement
+in enumeration ordering. While we are able to prove that all optimal orderings
+are greedy, the reverse is not true due to how ties are broken. Therefore more
+gains may be possible by improving this ordering. Furthermore, we assumed
+that all moves are equally likely to be fitness improving. It is likely possible
+to determine the true probability of a move being fitness improving, resulting
+in potentially better ordering.
+
+\subsubsection*{Acknowledgments.}
+This material is based in part upon work supported by the National Science Foundation
+under Cooperative Agreement No. DBI-0939454. Any opinions, findings, and conclusions
+or recommendations expressed in this material are those of the author(s) and do not
+necessarily reflect the views of the National Science Foundation.
 
 \bibliographystyle{splncs03}
 \bibliography{../main}
