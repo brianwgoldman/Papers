@@ -272,13 +272,13 @@ takes \BigO{1} time. That property holds even when looking for $r$-bit fitness-i
 Therefore Gray-Box enumeration is able to find all local optima in \BigO{2^N} time.
 
 \section{Hyperplane Elimination}
-\begin{figure*}
+\begin{figure}
   \centering
   \includegraphicsfit{Enumerate}
   \caption{Example change of enumeration ordering. The gray variables represent all dependencies
            for move $m_i$ which flips variable $F$. By reordering, $m_i$'s lowest $index$ dependency improves from 2 to 4.}
   \label{fig-enumerate}
-\end{figure*}
+\end{figure}
 
 Due to the limited non-linearity of the Gray-Box domain, it is possible to exclude large
 parts of the search space without missing any local optima.
@@ -600,13 +600,13 @@ of the best method.
 Figure~\ref{fig-boxplot-method} shows the variance in runtime for the largest problem size all three methods
 were successful. In all cases it is clear that Hyper-Reorder outperforms the other methods.
 
-\begin{figure*}
+\begin{figure}
   \centering
   \includegraphicsfit{boxplot-method}
   \caption{Comparison of completion time variance for the largest size of each problem
            where all three methods were successful at finding all 1-bit local optima.}
   \label{fig-boxplot-method}
-\end{figure*}
+\end{figure}
 
 More critically, Figure~\ref{fig-length-method} shows how each method scales with problem size.
 Not only is Hyper-Reorder out performing the alternatives on all sizes, the rate at which it
@@ -632,14 +632,14 @@ Random NKq size of 69 bits would require Gray-Box 3 million years. These larger 
 much better approximations of landscapes interesting to search methods.
 
 
-\begin{figure*}
+\begin{figure}
   \centering
   \includegraphicsfit{length-method}
   \caption{Comparison of how each method scales with problem size when finding 1-bit local optima
            on log-linear scales. Each point is the mean
            runtime over 30 instances and each line the linear model. All confidence intervals too tight to see.}
   \label{fig-length-method}
-\end{figure*}
+\end{figure}
 
 \begin{table}
 	\centering
@@ -694,14 +694,14 @@ without a 1-bit flip being fitness improving, meaning no additional hyperplanes 
 For MAX-kSAT, increasing $r$ likely compounds the high dependency problems discussed in
 Section~\ref{sec-1-bit-optima}.
 
-\begin{figure*}
+\begin{figure}
   \centering
   \includegraphicsfit{slope-method}
   \caption{Estimated slope with 95\% confidence intervals for each method to find $r$-bit local optima. Slope is $m$ in the model $y = 2^c2^{mN}$
            where $y$ is number of seconds required to
 	         find all local optima of a problem using $N$ bits.}
   \label{fig-slope-method}
-\end{figure*}
+\end{figure}
 
 Increasing $r$ also results is a substantial reduction in the
 total number of local optima, as shown in Figure~\ref{fig-length-radius}.
@@ -732,13 +732,13 @@ the number of 4-bit local optima Ising Spin Glass is on average under 70 thousan
 a reduction of four orders of magnitude.
 
 
-\begin{figure*}
+\begin{figure}
   \centering
   \includegraphicsfit{length-radius}
   \caption{Number of $r$-bit local optima for each size of each problem. Note that
            the number of local optima in Concatenated Traps does not change while $r<k$.}
   \label{fig-length-radius}
-\end{figure*}
+\end{figure}
 
 
 In our original experiments we tested problems up to size $N=100$, which was sufficient to
