@@ -95,7 +95,7 @@ the total number of local optima instead of the total landscape size.
 We prove optimality for linear and $k$-bounded problems, and provide
 empirical evidence of optimality on NKq Landscapes and Ising Spin Glasses.
 Furthermore, we are able to extend this method to finding only solutions
-which cannot be improving by flipping $r$ or fewer bits. In some cases
+which cannot be improved by flipping $r$ or fewer bits. In some cases
 increasing $r$ actually reduces total runtime by drastically reducing the
 number of local optima. While previous methods were limited to
 problems with at most 18 or 30 bits, hyperplane elimination can enumerate the same problems with
@@ -114,7 +114,7 @@ on average enumerated in under 6 minutes.
 The ruggedness and high dimensionality of most problem landscapes makes them challenging to
 analyze and understand. However, doing so can be helpful in
 quantifying the difficulty of a problem. Furthermore,
-this information can be useful to design search algorithms that specifically deal
+this information can be used to design search algorithms that specifically deal
 with those difficulties. 
 Similarly, knowing problem characteristics that favor
 a particular
@@ -126,7 +126,7 @@ examine both the frequency and distribution of local optima~\cite{boese:1994:big
 as well as how different search operators transition between these
 optima~\cite{tomassini:2008:nknetworks,verel:2011:nknetworks,ochoa:2015:crossovernetworks}.
 However, finding all of the local optima of a complex problem is prohibitively time consuming
-even for small problems. Many studies are limited to 18-bit
+even for small problems. Many studies have been limited to 18-bit
 problems~\cite{tomassini:2008:nknetworks,verel:2011:nknetworks} due to this time constraint.
 By leveraging recent advancements in Gray-Box optimization that allow for
 constant time local search~\cite{chicano:2014:ball}, this limit was raised
@@ -164,7 +164,7 @@ Each $s_i$ is a set of variables in $x$, such that $|s_i| \leq k$.
 The $mask$ function
 returns the values in $x$ associated with each variable in $s_i$.
 The total number of subfunctions $M$ is constrained to grow at \BigO{N}, and $k$
-is constant with repect to $N$.
+is constant with respect to $N$.
 
 This formulation can represent many problems of real-world interest, as well as
 the most commonly used combinatorial benchmark problems. In this work we
@@ -191,7 +191,7 @@ We therefore include it only because its structure allows for straight forward a
 Here we set $k=5$.
 
 NKq landscapes specify a class of randomly generated problem instances using 3 paramters:
-(1) the number of problem variables $N$ (2) the amount of variable epistasis $K$ where $K=k-1$
+(1) the number of problem variables $N$ (2) the amount of variable epistasis $K$ where $k=K+1$
 and (3) the number of unique fitness values $q$. From these parameters a landscape is generated
 by creating $M=N$ subfunctions $f_i$, where $f_i$ uses variable $x_i$ and $K$ others to look up
 a fitness value in the range $[0..q-1]$ from a randomly generated table. This structure
@@ -221,7 +221,7 @@ the energy in the glass equal to
 \sum_{e_{ij} \in E} x_ie_{ij}x_j
   \label{eq-ising}
 \end{equation}
-where $e_{ij}$ is the weight of the edge vertex $i$ to vertex $j$. In Mk landscape terms
+where $e_{ij}$ is the weight of the edge connecting vertex $i$ to vertex $j$. In Mk landscape terms
 this type of spin glass has $M=2N$ and $k=2$.
 
 Our final examined problem is randomly generated maximum satisfiability or MAX-kSAT.
@@ -230,25 +230,24 @@ as the maximization of $M=4.27N$ clauses, each containing exactly $k=3$ unique l
 A clause is satisfied if any of its literals match how a solution's variables are set.
 
 \section{Gray-Box Enumeration of Mk Landscapes}
+\label{sec-gray-box}
 When considered as a black box, the process of finding all local optima
-in a landscape requires \BigO{N2^N} time. This is because evaluating
-a solution requires $N$ time, and all $2^N$ solutions in the landscape
-must be evaluated once. Finding the local
-optima then requires comparing each solution's fitness with each
-of its neighbors, which when properly cached takes \BigO{N} per solution.
+in a landscape requires $\Omega(N2^N)$ time. This is because each
+of the $2^N$ solutions must be compared with each of its $N$ neighbors.
 Extending this method to look for solutions that cannot be improved by
-flipping $r$ or fewer bits requires \BigO{N^r2^N} time. However,
+flipping $r$ or fewer bits requires $\Omega(N^r2^N)$ time. However,
 by exploiting Gray-Box optimization methods, previous work~\cite{ochoa:2015:crossovernetworks}
 was able to find all $r$-bit local optima of Mk Landscapes in \BigO{2^N} for any small,
 fixed value of $r$.
 
 The first major result in Gray-Box optimization was the proof that the list
 of fitness-improving moves from a solution can be updated after a bit flip in \BigO{1}
-time~\cite{whitley:2012:constant}. In an Mk Landscape, variables
-can only have a non-linear relationship if they appear together in at least one $s_i$.
-Therefore, the fitness effect of flipping $x_j$ can only change when flipping $x_i$ if
+time~\cite{whitley:2012:constant}.
+The fitness effect of flipping $x_j$ changes after flipping $x_i$ only if
 there is a non-linear relationship between $x_i$ and $x_j$.
-By definition the total number of non-linear
+In an Mk Landscape, variables
+can only have a non-linear relationship if they appear together in at least one $s_i$.
+Therefore by definition the total number of non-linear
 relationships in an Mk Landscape is linear with $N$, meaning on average the amortized
 number of non-linear relationships per variable is \BigO{1}.
 
@@ -356,12 +355,12 @@ iteration can continue immediately from the found $index$. This is true by const
 Initially $solution$ contains all 0s. Each time a 1 is inserted its position is equal to $index$ and
 $index$ is only increased by carry operations which reset a position to 0 before increasing $index$.
 
-This hyperplane skipping extends to finding only $r$-bit local optima for all Mk landscapes.
-By increasing the number of potential fitness-improving moves, the number of hyperplanes that
-can be eliminated increases. However, the cost trade-off of increasing $r$ is unclear.
-While more solutions can be skipped, the time required to update $move\_bin$ each iteration
-also increases. Therefore, the runtime effect of increasing $r$
-depends on the specific problem.
+Extending Algorithm~\ref{alg-enumerate} to search for $r$-bit optima only requires adding the
+necessary $r$-bit moves to $move\_bin$. As discussed in Section~\ref{sec-gray-box}, we know the number of these moves
+is \BigO{N} an can be kept updated in \BigO{1} time per flip. Therefore, for small $r$, the cost
+of finding $r$-bit local optima is no more than a constant slower than finding 1-bit local optima.
+In fact, we will provide evidence in Section~\ref{sec-r-bit} that increasing $r$ can actually
+decrease runtime.
 
 \section{Improved Enumeration Ordering}
 \label{sec-reorder}
@@ -384,27 +383,25 @@ ordering.
 
 \subsection{All Optimal Orderings are Greedy}
 The quality of an enumeration ordering is determined by how many solutions
-in the space can be skipped by Algorithm~\ref{alg-enumerate} using that ordering.
+Algorithm~\ref{alg-enumerate} can skip when using that ordering.
 Each time the loop on Line~\ref{alg-enumerate-bincheck} stops with $index>0$,
 $2^{index}$ solutions have been skipped. For practical purposes we will
 assume that all moves are equally likely to be fitness improving.
 
-
 \begin{lemma}
-There exists an ordering of moves such that assigning all dependencies of
-each move sequentially to the highest remaining positions in the enumeration ordering
-will result in an optimal enumeration ordering.
+All optimal enumeration orderings are orderings of moves, such that
+all remaining dependencies of each move are sequentially assigned the
+highest remaining position in the enumeration ordering.
 \end{lemma}
 
 \begin{proof}
-The number of solutions skipped each time a move is fitness improving depends
-on where it is placed in $move\_bin$. This position is determined by its
-minimum dependency. Therefore, the placement of variables which are not
-the minimum dependency of at least one move cannot affect the number of
-skipped solutions. Consider an ordering of moves which is determined by
-the minimum dependencies of each move in some enumeration ordering. This
-ordering of moves can then be used to create an enumeration ordering which
-skips the same number of solutions as the original enumeration ordering.
+Any enumeration ordering which cannot be described by an ordering of moves
+must contain the following property. There must exist a position $j$
+such that $x_j$ is not a dependency of any move with
+a minimum dependency of $i$ or higher where $i$ is also the minimum dependency of a move $m$.
+In this situation swapping $x_i$ and $x_j$ in enumeration ordering will raise $m$'s
+minimum dependency by at least one, but it will not lower the minimum dependency of any
+move. Therefore any ordering which contains this property cannot be optimal.
 \end{proof}
 
 Moves can have their dependencies assigned in some permutation $O$ of all possible moves,
@@ -442,7 +439,7 @@ Not all greedy orderings are optimal enumeration orderings.
 
 \begin{proof}
 Consider a problem with move dependencies $m_0 = \{A, B\}$, $m_1 = \{C, D\}$, and $m_2 = \{C, D, E\}$.
-There are two greedy orderings, $[m_0, m_1, m_2]$ and $[s_1, s_2, s_0]$. The former
+There are two greedy orderings, $[m_0, m_1, m_2]$ and $[m_1, m_2, m_0]$. The former
 skips $2^3+2^1$ solutions, while the latter skips $2^3+2^2$. This is because $m_1$ and
 $m_2$ overlap. As a result, even though both a greedy, only the second is optimal.
 \end{proof}
@@ -562,7 +559,7 @@ Instead of using the normal reordering procedure, consider an ordering
 such that if $i < j$, all variables in $s_i$ appear before the second variable
 in $s_j$ and after the first variable in $s_j$.
 
-Each time the second variable in $s_i$ is flipped, all of $s_{i-1}$ must be enumerated.
+In order to flip the second variable in $s_i$, all of $s_{i-1}$ must be enumerated.
 This is because only carry operations can result in $index$ being set to the second
 variable in $s_i$. Each time $f_i$ contains a fitness improving move, $index$ is set
 to the first variable in $s_i$, which comes before all variables in $s_{i-1}$.
@@ -590,7 +587,7 @@ If the algorithm failed to complete in the alloted time for an instance,
 we declared it unsuccessful for that combination of $r$ and $N$ of that problem. All results
 we report are for successful combinations. For timing purposes local optima were counted but not
 recorded. All of our code, data, and statistical analysis can be downloaded from our
-website.~\footnote{\url{https://name.of.site/removed/to/be/anonymous/}}
+website.\footnote{\url{https://name.of.site/removed/to/be/anonymous/}}
 
 \subsection{Finding Local Optima}
 \label{sec-1-bit-optima}
@@ -613,7 +610,7 @@ More critically, Figure~\ref{fig-length-method} shows how each method scales wit
 Not only is Hyper-Reorder out performing the alternatives on all sizes, the rate at which it
 scales to problem complexity is better. Table~\ref{table-scaling} shows the model fit for each
 method on each problem. This value is the slope of each line shown in Figure~\ref{fig-length-method}.
-As expected Gray-Box scales at almost exactly $2^N$. Using Hyperplane elimination without
+As expected Gray-Box scales at almost exactly $2^N$. Using hyperplane elimination without
 reordering reduces this complexity, with reordering making further improvements. In the final
 column we show the growth rate of the number of local optima. It is impossible for any method
 which enumerates all local optima to grow slower than this rate. On Concatenated Traps, Adjacent
@@ -628,8 +625,8 @@ This reduction in growth complexity translates into a significant increase in th
 which can be enumerated. For instance, using the previous best enumeration methods~\cite{ochoa:2015:crossovernetworks}
 the largest Adjacent NKq problem size which can be enumerated in 4 hours is 34 bits. Given the same time
 Hyper-Reorder can enumerate problems with 77 bits. Using the regression model, we estimate solving
-a 77 bit problem using Gray-Box would require 900 million years. Similarly, Hyper-Reorder's largest
-Random NKq size of 69 bits would require Gray-Box 3 million years. These larger sizes make for
+a 77 bit problem using Gray-Box would require 900~million years. Similarly, Hyper-Reorder's largest
+Random NKq size of 69 bits would require Gray-Box 3~million years. These larger sizes make for
 much better approximations of landscapes interesting to search methods.
 
 
@@ -677,6 +674,7 @@ is asymptotically constant, this growth on small problems is likely affecting ru
 
 
 \subsection{Finding $r$-Bit Local Optima}
+\label{sec-r-bit}
 A major advantage of Gray-Box enumeration is that it can find $r$-bit local optima
 with only a constant increase in runtime. Figure~\ref{fig-slope-method}
 shows the estimated growth rate for each method as $r$ increases. On Concatenated Traps,
@@ -704,7 +702,7 @@ Section~\ref{sec-1-bit-optima}.
   \label{fig-slope-method}
 \end{figure}
 
-Increasing $r$ also results is a substantial reduction in the
+Increasing $r$ also results in a substantial reduction in the
 total number of local optima, as shown in Figure~\ref{fig-length-radius}.
 For every problem except Concatenated Traps, increasing $r$ not only reduces the
 number of local optima, it decreases the growth rate with respect to $N$. As there
@@ -759,7 +757,7 @@ By expressing a function as an Mk Landscapes, we have developed a method to find
 local optima of that function very efficiently. The structure imposed by
 an Mk Landscape allows for the identification of hyperplanes in the search space
 which cannot contain any local optima. Combined with a greedy method for
-changing the order of how the space is enumerated, we were able to prove
+changing the order of how the space is enumerated, we were able to show
 this method's runtime complexity scales with the number of local optima, unlike
 previous methods which scale with the number of possible solutions.
 When applied to NKq Landscapes and Ising Spin Glasses this allowed for a dramatic
@@ -770,7 +768,7 @@ of search spaces where optimization is performed.
 We show how this hyperplane elimination can be extended to find only solutions
 which cannot be improved by flipping $r$ or fewer bits. For some problems
 this counterintuitively reduces search times, and on Adjacent NKq allowed
-us to find all 4-bit local optima of a 200 bit problem.
+us to find all 4-bit local optima of 200 bit problems.
 
 The obvious next step is to use the results of hyperplane elimination
 in conjunction with landscape analysis
