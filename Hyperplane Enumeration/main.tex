@@ -83,24 +83,25 @@
 
 
 \begin{abstract}
-A common tool for understanding combinatorial problem landscapes
-is to examine the properties of its local optima. Unfortunately,
-exhaustive methods for finding local optima are exceptionally time
-consuming and are therefore limited to very small problem sizes.
+Examining the properties of local optima is a common method for understanding
+combinatorial-problem landscapes.
+Unfortunately,
+exhaustive methods for finding local optima are limited to very small problem sizes.
 We propose a method for exploiting generalized problem structure
-to significantly speed up this process by skipping hyperplanes
-which cannot contain local optima. In most of our experiments
+to skip hyperplanes
+that cannot contain local optima. In most of our experiments,
 this hyperplane elimination allows enumeration time to scale with
 the total number of local optima instead of the total landscape size.
-We prove optimality for linear and $k$-bounded problems, and provide
+We prove optimality for linear and $k$-bounded problems, and we provide
 empirical evidence of optimality on NKq Landscapes and Ising Spin Glasses.
-Furthermore, we are able to extend this method to finding only solutions
-which cannot be improved by flipping $r$ or fewer bits. In some cases
-increasing $r$ actually reduces total runtime by drastically reducing the
+Furthermore, we are able to refine this method to find only solutions
+that cannot be improved by flipping $r$ or fewer bits. Counterintuitively,
+increasing $r$ can reduce total runtime by drastically reducing the
 number of local optima. While previous methods were limited to
-problems with at most 18 or 30 bits, hyperplane elimination can enumerate the same problems with
-77 bits. When using higher $r$ values this bound can be pushed to 200 bit problems
-on average enumerated in under 6 minutes.
+landscapes with at most $2^{30}$ binary strings, hyperplane elimination can enumerate the same problems with
+$2^{77}$ binary strings, and find all 4-bit local optima to problems with $2^{200}$ binary strings.
+We believe this increase in size will help further our understanding of complex real-world landscapes.
+
 
 
 %The abstract should summarize the contents of the paper and should
