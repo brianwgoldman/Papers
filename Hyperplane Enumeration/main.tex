@@ -98,7 +98,7 @@ that cannot be improved by flipping $r$ or fewer bits, which counterintuitively
 can reduce total runtime. While previous methods were limited to
 landscapes with at most $2^{34}$ binary strings, hyperplane elimination can enumerate the same problems with
 $2^{77}$ binary strings, and find all 4-bit local optima to problems with $2^{200}$ binary strings.
-We believe this increase in size will help further our understanding of complex real-world landscapes.
+%We believe this increase in size will help further our understanding of complex real-world landscapes.
 
 
 
@@ -303,7 +303,7 @@ move's dependencies fixed cannot contain any local optima.
   \label{alg-enumerate}
   \begin{algorithmic}[1]
     \Require $solution \leftarrow \{0\}^N$
-    \Require $move\_bin$ (How many improving moves have each minimum dependency)
+    \Require $move\_bin$ (Count of improving moves at each minimum dependency)
     \Require \textproc{MakeMove} (Function that flips $index$ in $solution$ and updates $move\_bin$)
     \Ensure $found$ (list of all local optima)
     \State $found \leftarrow [~]$
