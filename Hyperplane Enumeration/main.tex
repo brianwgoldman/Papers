@@ -305,7 +305,7 @@ move's dependencies fixed cannot contain any local optima.
   \begin{algorithmic}[1]
     \Require $solution \leftarrow \{0\}^N$
     \Require $move\_bin$ (Count of improving moves at each minimum dependency)
-    \Require \textproc{MakeMove} (Function that flips $index$ in $solution$ and updates $move\_bin$)
+    \Require \textproc{FlipBit} (Function that flips $index$ in $solution$ and updates $move\_bin$)
     \Ensure $found$ (list of all local optima)
     \State $found \leftarrow [~]$
     \State $index \leftarrow N-1$
@@ -318,11 +318,11 @@ move's dependencies fixed cannot contain any local optima.
         \State $index \leftarrow 0$
       \EndIf
       \While{$index < N$ \textbf{and} $solution[index] = 1$}\label{alg-enumerate-counter}
-        \State \Call{MakeMove}{$index$}
+        \State \Call{FlipBit}{$index$}
         \State $index \leftarrow index + 1$
       \EndWhile
       \If{$index < N$}
-        \State \Call{MakeMove}{$index$}\label{alg-enumerate-insert}
+        \State \Call{FlipBit}{$index$}\label{alg-enumerate-insert}
       \EndIf
     \EndWhile
   \end{algorithmic}
