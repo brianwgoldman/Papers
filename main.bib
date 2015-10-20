@@ -1,3 +1,144 @@
+@InProceedings{goldman:2011:scx,
+  author =	"Brian W. Goldman and Daniel R. Tauritz",
+  title =	"Self-configuring crossover",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference Companion",
+  year = 	"2011",
+  ISBN = 	"978-1-4503-0690-4",
+  keywords =	"genetic algorithms, genetic programming",
+  pages =	"575--582",
+  month =	"12-16 " # jul,
+  organisation = "SIGEVO",
+  address =	"Dublin, Ireland",
+  publisher =	"ACM",
+  publisher_address = "New York, NY, USA",
+  abstract =	"Crossover is a core genetic operator in many
+		 evolutionary algorithms (EAs). The performance of such
+		 EAs on a given problem is dependent on properly
+		 configuring crossover. A small set of common crossover
+		 operators is used in the vast majority of EAs,
+		 typically fixed for the entire evolutionary run.
+		 Selecting which crossover operator to use and tuning
+		 its associated parameters to obtain acceptable
+		 performance on a specific problem often is a time
+		 consuming manual process. Even then a custom crossover
+		 operator may be required to achieve optimal
+		 performance. Finally, the best crossover configuration
+		 may be dependent on the state of the evolutionary run.
+		 This paper introduces the Self-Configuring Crossover
+		 operator encoded with linear genetic programming which
+		 addresses these shortcomings while relieving the user
+		 from the burden of crossover configuration. To
+		 demonstrate its general applicability, the novel
+		 crossover operator was applied without any problem
+		 specific tuning. Results are presented showing it to
+		 outperform the traditional crossover operators
+		 arithmetic crossover, uniform crossover, and n-point
+		 crossover on the Rosenbrock, Rastrigin, Offset
+		 Rastrigin, DTrap, and NK Landscapes benchmark
+		 problems.",
+}
+
+@article{lehmann:2013:mimics,
+  title={From cues to signals: evolution of interspecific communication via aposematism and mimicry in a predator-prey system},
+  author={Lehmann, K and Goldman, Brian W and Dworkin, Ian and Bryson, David M and Wagner, Aaron P},
+  journal={PloS one},
+  volume={9},
+  pages={e91783},
+  year={2013}
+}
+
+@Article{goldman:2015:cgpanalysis,
+  title =	"Analysis of Cartesian Genetic Programming's
+		 Evolutionary Mechanisms",
+  author =	"Brian W. Goldman and William F. Punch",
+  journal =	"IEEE Trans. Evolutionary Computation",
+  year = 	"2015",
+  number =	"3",
+  volume =	"19",
+  bibdate =	"2015-06-08",
+  pages =	"359--373",
+}
+
+@InProceedings{kamrath:2013:supportivescx,
+  author =	"Nathaniel R. Kamrath and Brian W. Goldman and Daniel
+		 R. Tauritz",
+  title =	"Using supportive coevolution to evolve
+		 self-configuring crossover",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference Companion",
+  year = 	"2013",
+  ISBN = 	"978-1-4503-1964-5",
+  pages =	"1489--1496",
+  month =	"6-10 " # jul,
+  organisation = "SIGEVO",
+  address =	"Amsterdam, The Netherlands",
+  doi =  	"doi:10.1145/2464576.2482727",
+  publisher =	"ACM",
+  publisher_address = "New York, NY, USA",
+  abstract =	"Creating an Evolutionary Algorithm (EA) which is
+		 capable of automatically configuring itself and
+		 dynamically controlling its parameters is a challenging
+		 problem. However, solving this problem can reduce the
+		 amount of manual configuration required to implement an
+		 EA, allow the EA to be more adaptable, and produce
+		 better results on a range of problems without requiring
+		 problem specific tuning. Using Supportive Coevolution
+		 (SuCo) to evolve Self-Configuring Crossover (SCX)
+		 combines the automatic configuration technique of
+		 multiple populations from SuCo with the dynamic
+		 crossover operator creation and evolution of SCX. This
+		 paper reports an empirical comparison and analysis of
+		 several different combinations of mutation and
+		 crossover techniques including SuCo and SCX. The
+		 Rosenbrock, Rastrigin, and Offset Rastrigin benchmark
+		 problems were selected for testing purposes. The
+		 benefits and drawbacks of self-adaptation and evolution
+		 of SCX are also discussed. SuCo of mutation step sizes
+		 and SCX operators produced results that were at least
+		 as good as previous work, and some experiments produced
+		 results that were significantly better.",
+}
+
+@InProceedings{goldman:2012:supportive,
+  author =	"Brian W. Goldman and Daniel R. Tauritz",
+  title =	"Supportive coevolution",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference Companion",
+  year = 	"2012",
+  ISBN = 	"978-1-4503-1178-6",
+  pages =	"59--66",
+  month =	"7-11 " # jul,
+  organisation = "SIGEVO",
+  address =	"Philadelphia, Pennsylvania, USA",
+  doi =  	"doi:10.1145/2330784.2330795",
+  publisher =	"ACM",
+  publisher_address = "New York, NY, USA",
+  abstract =	"Automatically configuring and dynamically controlling
+		 an Evolutionary Algorithm's (EA's) parameters is a
+		 complex task, yet doing so allows EAs to become more
+		 powerful and require less problem specific tuning to
+		 become effective. Supportive Coevolution is a new form
+		 of Evolutionary Algorithm (EA) that uses multiple
+		 populations to overcome the limitations of other
+		 automatic configuration techniques like
+		 self-adaptation, giving it the potential to
+		 concurrently evolve all of the parameters and operators
+		 in an EA. As a proof of concept experimentation
+		 comparing self-adaptation of n uncorrelated mutation
+		 step sizes with Supportive Coevolution for mutation
+		 step sizes was performed on the Rastrigin and Shifted
+		 Rastrigin benchmark functions. Statistical analysis
+		 showed Supportive Coevolution outperforming
+		 self-adaptation on all but one of the problem instances
+		 tested. Furthermore, analysis of instantaneous mutation
+		 success rate showed that this new technique is better
+		 able to adapt to the changes in the population fitness.
+		 Further study using multiple evolving parameters is
+		 needed to fully test Supportive Coevolution, but the
+		 results presented here show a promising outlook.",
+}
+
 @ARTICLE{Wolpert:1997:nfl,
     author = {David H. Wolpert and William G. Macready},
     title = {No free lunch theorems for optimization},
@@ -11,7 +152,7 @@
 @INPROCEEDINGS{Back:1992:selfadapt,
     author = {Thomas B\"ack},
     title = {Self-Adaptation in Genetic Algorithms},
-    booktitle = {Proceedings of the First European Conference on Artificial Life},
+    booktitle = {European Conference on Artificial Life},
     year = {1992},
     pages = {263--271},
     publisher = {MIT Press}
@@ -80,8 +221,8 @@
   title =	"An Analysis of {Koza}'s Computational Effort Statistic
 		 for Genetic Programming",
   author =	"Steffen Christensen and Franz Oppacher",
-  booktitle =	"Genetic Programming, Proceedings of the 5th European
-		 Conference, EuroGP 2002",
+  booktitle =	"European Conference on Genetic
+		 Programming",
   volume =	"2278",
   series =	"LNCS",
   pages =	"182--191",
@@ -110,7 +251,6 @@
 		 at higher resolution. Additional analysis shows that
 		 this statistic also under reports the generation at
 		 which optimal results are achieved.",
-  notes =	"EuroGP'2002, part of \cite{lutton:2002:GP}",
 }
 
 @InProceedings{clegg:2007:crossover,
@@ -118,8 +258,8 @@
 		 Miller",
   title =	"A new crossover technique for Cartesian genetic
 		 programming",
-  booktitle =	"GECCO '07: Proceedings of the 9th annual conference on
-		 Genetic and evolutionary computation",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   year = 	"2007",
   volume =	"2",
   isbn13 =	"978-1-59593-697-4",
@@ -150,17 +290,14 @@
 		 that by implementing the new crossover technique,
 		 convergence is faster than that of using mutation only
 		 in the Cartesian Genetic Programming method.",
-  notes =	"GECCO-2007 A joint meeting of the sixteenth
-		 international conference on genetic algorithms
-		 (ICGA-2007) and the twelfth annual genetic programming
-		 conference (GP-2007). ACM Order Number 910071",
 }
 
 @InProceedings{yu:2001:neutrality,
   author =	"Tina Yu and Julian Miller",
   title =	"Neutrality and the Evolvability of {Boolean} Function
 		 Landscape",
-  booktitle =	"Genetic Programming, Proceedings of EuroGP'2001",
+  booktitle =	"European Conference on Genetic
+		 Programming",
   year = 	"2001",
   volume =	"2038",
   series =	"LNCS",
@@ -189,15 +326,14 @@
 		 high evolvability. They may be the ingredients in
 		 designing effective Evolutionary Computation systems
 		 for the Boolean class problem.",
-  notes =	"EuroGP'2001, part of \cite{miller:2001:gp}",
 }
 
 @InProceedings{vasicek:2012:efficient,
   author =	"Zdenek Vasicek and Karel Slany",
   title =	"Efficient Phenotype Evaluation in Cartesian Genetic
 		 Programming",
-  booktitle =	"Proceedings of the 15th European Conference on Genetic
-		 Programming, EuroGP 2012",
+  booktitle =	"European Conference on Genetic
+		 Programming",
   year = 	"2012",
   month =	"11-13 " # apr,
   series =	"LNCS",
@@ -227,9 +363,6 @@
 		 version of CGP implementation accompanied with
 		 performance analysis is available for free download
 		 from http://www.fit.vutbr.cz/~vasicek/cgp",
-  notes =	"Part of \cite{Moraglio:2012:GP} EuroGP'2012 held in
-		 conjunction with EvoCOP2012 EvoBIO2012, EvoMusArt2012
-		 and EvoApplications2012",
 }
 
 @Article{miller:2006:redundancy,
@@ -265,8 +398,8 @@
 @InProceedings{sikulova:2012:coevolution,
   author =	"Michaela Sikulova and Lukas Sekanina",
   title =	"Coevolution in Cartesian Genetic Programming",
-  booktitle =	"Proceedings of the 15th European Conference on Genetic
-		 Programming, EuroGP 2012",
+  booktitle =	"European Conference on Genetic
+		 Programming",
   year = 	"2012",
   month =	"11-13 " # apr,
   series =	"LNCS",
@@ -289,11 +422,6 @@
 		 symbolic regression problems that the (median)
 		 execution time can be reduced 2--5 times in comparison
 		 with the standard CGP.",
-  notes =	"1+lambda hill climber with point mutation on CGP
-		 representation with restart. 1pt crossover? Part of
-		 \cite{Moraglio:2012:GP} EuroGP'2012 held in conjunction
-		 with EvoCOP2012 EvoBIO2012, EvoMusArt2012 and
-		 EvoApplications2012",
 }
 
 @InProceedings{mcdermott:2012:benchmarks,
@@ -302,9 +430,8 @@
 		 and Wojciech Jaskowski and Krzysztof Krawiec and Robin
 		 Harper and Kenneth {De Jong} and Una-May O'Reilly",
   title =	"Genetic programming needs better benchmarks",
-  booktitle =	"GECCO '12: Proceedings of the fourteenth international
-		 conference on Genetic and Evolutionary computation
-		 conference",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   year = 	"2012",
   isbn13 =	"978-1-4503-1177-9",
   pages =	"791--798",
@@ -333,10 +460,6 @@
 		 implementations; and we set out a concrete plan for
 		 gathering feedback from the GP community that would, if
 		 adopted, lead to a standard set of benchmarks.",
-  notes =	"Also known as \cite{2330273} GECCO-2012 A joint
-		 meeting of the twenty first international conference on
-		 genetic algorithms (ICGA-2012) and the seventeenth
-		 annual genetic programming conference (GP-2012)",
 }
 
 @InProceedings{johnson:2000:guide,
@@ -399,8 +522,8 @@
   author =	"Tom Seaton and Julian F. Miller and Tim Clarke",
   title =	"An Ecological Approach to Measuring Locality in Linear
 		 Genotype to Phenotype Maps",
-  booktitle =	"Proceedings of the 15th European Conference on Genetic
-		 Programming, EuroGP 2012",
+  booktitle =	"European Conference on Genetic
+		 Programming",
   year = 	"2012",
   month =	"11-13 " # apr,
   series =	"LNCS",
@@ -428,9 +551,6 @@
 		 poorer performance on the problem set and discuss
 		 implications in the context of existing models of GP
 		 genotype-phenotype maps.",
-  notes =	"Part of \cite{Moraglio:2012:GP} EuroGP'2012 held in
-		 conjunction with EvoCOP2012 EvoBIO2012, EvoMusArt2012
-		 and EvoApplications2012",
 }
 
 @Article{collins:2006:haystacks,
@@ -443,7 +563,6 @@
   number =	"2",
   pages =	"131--144",
   month =	aug,
-  note = 	"Special Issue: Best of GECCO 2005",
   keywords =	"genetic algorithms, genetic programming, Cartesian
 		 genetic programming, random sampling, solution
 		 density",
@@ -468,9 +587,8 @@
   author =	"Simon Harding and Vincent Graziano and Juergen Leitner
 		 and Juergen Schmidhuber",
   title =	"{MT}-{CGP}: mixed type cartesian genetic programming",
-  booktitle =	"GECCO '12: Proceedings of the fourteenth international
-		 conference on Genetic and evolutionary computation
-		 conference",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   year = 	"2012",
   isbn13 =	"978-1-4503-1177-9",
   pages =	"751--758",
@@ -491,18 +609,14 @@
 		 data types. We demonstrate that this allows evolution
 		 to quickly find competitive, compact, and human
 		 readable solutions on multiple classification tasks.",
-  notes =	"Also known as \cite{2330268} GECCO-2012 A joint
-		 meeting of the twenty first international conference on
-		 genetic algorithms (ICGA-2012) and the seventeenth
-		 annual genetic programming conference (GP-2012)",
 }
 
 @InProceedings{harding:2009:smcgp,
   author =	"Simon Harding and Julian Miller and Wolfgang Banzhaf",
   title =	"Self Modifying Cartesian Genetic Programming:
 		 Fibonacci, Squares, Regression and Summing",
-  booktitle =	"Proceedings of the 12th European Conference on Genetic
-		 Programming, EuroGP 2009",
+  booktitle =	"European Conference on Genetic
+		 Programming",
   year = 	"2009",
   volume =	"5481",
   series =	"LNCS",
@@ -522,9 +636,6 @@
 		 modification operators in the function set. Here we
 		 present the use of the technique on several different
 		 sequence generation and regression problems.",
-  notes =	"Part of \cite{conf/eurogp/2009} EuroGP'2009 held in
-		 conjunction with EvoCOP2009, EvoBIO2009 and
-		 EvoWorkshops2009",
 }
 
 @Article{walker:2008:cgpmodules,
@@ -574,8 +685,8 @@
 		 Adamatzky",
   title =	"Cartesian Genetic Programming for Memristive Logic
 		 Circuits",
-  booktitle =	"Proceedings of the 15th European Conference on Genetic
-		 Programming, EuroGP 2012",
+  booktitle =	"European Conference on Genetic
+		 Programming",
   year = 	"2012",
   month =	"11-13 " # apr,
   series =	"LNCS",
@@ -599,16 +710,14 @@
 		 are easier to evolve, IMP graphs carry benefits in
 		 terms of (i) numbers of memristors required (ii) the
 		 time required to process the graphs.",
-  notes =	"Part of \cite{Moraglio:2012:GP} EuroGP'2012 held in
-		 conjunction with EvoCOP2012 EvoBIO2012, EvoMusArt2012
-		 and EvoApplications2012",
 }
 
 @InProceedings{miller:2001:bloat,
   author =	"Julian Miller",
   title =	"What Bloat? Cartesian Genetic Programming on {Boolean}
 		 Problems",
-  booktitle =	"2001 Genetic and Evolutionary Computation Conference
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference
 		 Late Breaking Papers",
   year = 	"2001",
   pages =	"295--302",
@@ -636,7 +745,6 @@
 		 redundancy is present, the genetic neutral drift
 		 simultaneously improves search and compresses program
 		 code.",
-  notes =	"GECCO-2001LB",
 }
 
 @InProceedings{payne:2009:bias,
@@ -703,7 +811,8 @@
 		 M. Hilss",
   title =	"What Makes a Problem {GP}-Hard? Validating a
 		 Hypothesis of Structural Causes",
-  booktitle =	"Genetic and Evolutionary Computation -- GECCO-2003",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   year = 	"2003",
   pages =	"1665--1677",
   address =	"Chicago",
@@ -724,18 +833,14 @@
 		 prediction of the hypothesis - that GP search space is
 		 significantly constrained as an outcome of structural
 		 mechanisms.",
-  notes =	"GECCO-2003. A joint meeting of the twelfth
-		 International Conference on Genetic Algorithms
-		 (ICGA-2003) and the eighth Annual Genetic Programming
-		 Conference (GP-2003)",
 }
 
 @InProceedings{goldman:2013:cgpwaste,
   author =       "Brian W. Goldman and William F. Punch",
   title =        "Reducing Wasted Evaluations in Cartesian Genetic
                  Programming",
-  booktitle =    "Proceedings of the 16th European Conference on Genetic
-                 Programming, EuroGP 2013",
+  booktitle =    "European Conference on Genetic
+		 Programming",
   year =         "2013",
   month =        "3-5 " # apr,
   series =       "LNCS",
@@ -761,16 +866,13 @@
                  in combination with the theoretical conclusions
                  supports the general need for avoiding these
                  unnecessary evaluations.",
-  notes =        "Part of \cite{Krawiec:2013:GP} EuroGP'2013 held in
-                 conjunction with EvoCOP2013, EvoBIO2013, EvoMusArt2013
-                 and EvoApplications2013",
 }
 
 @InProceedings{vassilev:2000:neutrality,
   author =	"Vesselin K. Vassilev and Julian F. Miller",
   title =	"The Advantages of Landscape Neutrality in Digital
 		 Circuit Evolution",
-  booktitle =	"Proceedings of the Third International Conference on
+  booktitle =	"Conference on
 		 Evolvable Systems",
   year = 	"2000",
   ISBN = 	"3-540-67338-5",
@@ -843,9 +945,8 @@
 @InProceedings{goldman:2013:ordering,
   author =       "Brian W. Goldman and William F. Punch",
   title =        "Length Bias and Search Limitations in Cartesian Genetic Programming",
-  booktitle =	"GECCO '13: Proceedings of the fifteenth international
-		 conference on Genetic and Evolutionary computation
-		 conference",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
 	year =         "2013",
 	isbn13 = "978-1-4503-1963-8",
   pages =	"933--940",
@@ -883,7 +984,8 @@
 @InProceedings{miller:2000:CGPorigin,
   author =	"Julian F. Miller and Peter Thomson",
   title =	"Cartesian Genetic Programming",
-  booktitle =	"Genetic Programming, Proceedings of EuroGP'2000",
+  booktitle =	"European Conference on Genetic
+		 Programming",
   year = 	"2000",
   volume =	"1802",
   series =	"LNCS",
@@ -916,14 +1018,13 @@
 		 examined and compared with non-neutral search for the
 		 Santa Fe ant problem. The neutral search proves to be
 		 much more effective.",
-  notes =	"EuroGP'2000, part of \cite{poli:2000:GP}",
 }
 
 @InProceedings{harding:2005:robots,
   author =	"Simon Harding and Julian F. Miller",
   title =	"Evolution of Robot Controller Using Cartesian Genetic
 		 Programming",
-  booktitle =	"Proceedings of the 8th European Conference on Genetic
+  booktitle =	"European Conference on Genetic
 		 Programming",
   publisher =	"Springer",
   series =	"Lecture Notes in Computer Science",
@@ -950,8 +1051,6 @@
 		 fitness function based on chemical gradients is
 		 presented as a means of improving evolvability in such
 		 tasks.",
-  notes =	"Part of \cite{keijzer:2005:GP} EuroGP'2005 held in
-		 conjunction with EvoCOP2005 and EvoWorkshops2005",
 }
 
 @InProceedings{khan:2010:cgpann,
@@ -959,7 +1058,7 @@
   title =	"A novel NeuroEvolutionary algorithm: Cartesian genetic
 		 programming evolved artificial neural network
 		 ({CGPANN})",
-  booktitle =	"Proceedings of the 8th International Conference on
+  booktitle =	"Conference on
 		 Frontiers of Information Technology",
   year = 	"2010",
   pages =	"48:1--48:4",
@@ -1032,8 +1131,8 @@
   author =	"Nicholas Freitag McPhee and Brian Ohs and Tyler
 		 Hutchison",
   bibdate =	"2008-04-15",
-  booktitle =	"Proceedings of the 11th European Conference on Genetic
-		 Programming, EuroGP 2008",
+  booktitle =	"European Conference on Genetic
+		 Programming",
   address =	"Naples",
   month =	"26-28 " # mar,
   publisher =	"Springer",
@@ -1057,27 +1156,14 @@
 		 contexts. These results then suggest several new,
 		 theoretically grounded, research areas.",
   keywords =	"genetic algorithms, genetic programming",
-  notes =	"Table 3: Function set Binary AND, OR, NAND, and NOR.
-		 Terminal set x0,x1, . . . ,xn-1, where n is the number
-		 of variables. Initialisation PTC2
-		 \cite{luke:2000:2ftcaGP}, with equal proportions of
-		 sizes 50, 70, and 100 nodes and maximum initial depth
-		 of 10 Number of generations 500. Tournament size 2. XO
-		 Probability 1. XO bias away from leaves None (all nodes
-		 are equally likely). Maximum size after XO 500 (If the
-		 resulting child is too large, then new parents are
-		 chosen independently and process begins again.). See
-		 also \cite{mcphee:2007:wps32}. Part of
-		 \cite{conf/eurogp/2008} EuroGP'2008 held in conjunction
-		 with EvoCOP2008, EvoBIO2008 and EvoWorkshops2008",
 }
 
 @InProceedings{goldman:2011:dynamic-parameters,
   author =	"Brian W. Goldman and Daniel R. Tauritz",
   title =	"Meta-evolved empirical evidence of the effectiveness
 		 of dynamic parameters",
-  booktitle =	"GECCO '11: Proceedings of the 13th annual conference
-		 companion on Genetic and evolutionary computation",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference Companion",
   year = 	"2011",
   ISBN = 	"978-1-4503-0690-4",
   keywords =	"Genetic algorithms: Poster",
@@ -1110,17 +1196,14 @@
 		 fitness by changing dynamically, and using multiple
 		 dynamic parameters was more effective than using each
 		 independently.",
-  notes =	"Also known as \cite{2001945} Distributed on CD-ROM at
-		 GECCO-2011. ACM Order Number 910112.",
 }
 
 @InProceedings{goldman:2012:ltga,
   author =	"Brian W. Goldman and Daniel R. Tauritz",
   title =	"Linkage tree genetic algorithms: variants and
 		 analysis",
-  booktitle =	"GECCO '12: Proceedings of the fourteenth international
-		 conference on Genetic and evolutionary computation
-		 conference",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   year = 	"2012",
   ISBN = 	"978-1-4503-1177-9",
   pages =	"625--632",
@@ -1135,19 +1218,14 @@
 		 Genetic Algorithm (LTGA) to maximize crossover
 		 effectiveness, greatly reducing both population size
 		 and total number of evaluations required to reach ...",
-  notes =	"Also known as \cite{2330252} GECCO-2012 A joint
-		 meeting of the twenty first international conference on
-		 genetic algorithms (ICGA-2012) and the seventeenth
-		 annual genetic programming conference (GP-2012)",
 }
 
 @InProceedings{doerr:2013:lambdalambda,
   author =	"Benjamin Doerr and Carola Doerr and Franziska Ebel",
   title =	"Lessons from the black-box: fast crossover-based
 		 genetic algorithms",
-  booktitle =	"GECCO '13: Proceeding of the fifteenth annual
-		 conference on Genetic and evolutionary computation
-		 conference",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   year = 	"2013",
   ISBN = 	"978-1-4503-1963-8",
   pages =	"781--788",
@@ -1191,19 +1269,14 @@
 		 sizes and broad parameter ranges. Also, a simple
 		 self-adaptive choice of these parameters gives
 		 surprisingly good results.",
-  notes =	"Also known as \cite{2463480} GECCO-2013 A joint
-		 meeting of the twenty second international conference
-		 on genetic algorithms (ICGA-2013) and the eighteenth
-		 annual genetic programming conference (GP-2013)",
 }
 
 @InProceedings{thierens:2013:ltgahiff,
   author =	"Dirk Thierens and Peter A. N. Bosman",
   title =	"Hierarchical problem solving with the linkage tree
 		 genetic algorithm",
-  booktitle =	"GECCO '13: Proceeding of the fifteenth annual
-		 conference on Genetic and evolutionary computation
-		 conference",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   year = 	"2013",
   ISBN = 	"978-1-4503-1963-8",
   pages =	"877--884",
@@ -1236,10 +1309,6 @@
 		 scalable algorithm for solving the randomly shuffled
 		 versions of HIFF and HTRAP, two hard, hierarchical
 		 problems.",
-  notes =	"Also known as \cite{2463477} GECCO-2013 A joint
-		 meeting of the twenty second international conference
-		 on genetic algorithms (ICGA-2013) and the eighteenth
-		 annual genetic programming conference (GP-2013)",
 }
 
 @Article{jovanovic:1997:ruleofthree,
@@ -1282,8 +1351,8 @@
   author =	"Gregory S. Hornby",
   title =	"{ALPS}: the age-layered population structure for
 		 reducing the problem of premature convergence",
-  booktitle =	"{GECCO 2006:} Proceedings of the 8th annual conference
-		 on Genetic and evolutionary computation",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   year = 	"2006",
   volume =	"1",
   ISBN = 	"1-59593-186-4",
@@ -1296,10 +1365,6 @@
   keywords =	"genetic algorithms, genetic programming, age,
 		 computer-automated design, evolutionary algorithm,
 		 open-ended design, premature convergence, reliability",
-  notes =	"GECCO-2006 A joint meeting of the fifteenth
-		 international conference on genetic algorithms
-		 (ICGA-2006) and the eleventh annual genetic programming
-		 conference (GP-2006). ACM Order Number 910060",
 }
 
 @article{saul:1994:spinglass,
@@ -1384,8 +1449,8 @@
   title =	"The roles of local search, model building and optimal
 		 mixing in evolutionary algorithms from a bbo
 		 perspective",
-  booktitle =	"Optimization by building and using probabilistic
-		 models (OBUPM-2011)",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference Companion",
   year = 	"2011",
   ISBN = 	"978-1-4503-0690-4",
   pages =	"663--670",
@@ -1418,8 +1483,6 @@
 		 indicates that operations in a variation operator are
 		 directly checked whether they lead to an improvement,
 		 is a superior combination of LS and EA.",
-  notes =	"Also known as \cite{2002065} Distributed on CD-ROM at
-		 GECCO-2011. ACM Order Number 910112.",
 }
 
 @InProceedings{posik:2011:parameterless,
@@ -1427,8 +1490,8 @@
   title =	"Parameter-less local optimizer with linkage
 		 identification for deterministic order-k decomposable
 		 problems",
-  booktitle =	"GECCO '11: Proceedings of the 13th annual conference
-		 on Genetic and evolutionary computation",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   year = 	"2011",
   ISBN = 	"978-1-4503-0557-0",
   pages =	"577--584",
@@ -1460,10 +1523,6 @@
 		 the estimation-of-distribution algorithms should be
 		 better for problem sizes under at least a few hundreds
 		 of bits.",
-  notes =	"Also known as \cite{2001656} GECCO-2011 A joint
-		 meeting of the twentieth international conference on
-		 genetic algorithms (ICGA-2011) and the sixteenth annual
-		 genetic programming conference (GP-2011)",
 }
 
 @incollection{thierens:2010:ltga,
@@ -1478,8 +1537,8 @@
 @InProceedings{thierens:2011:gomea,
   author =	"Dirk Thierens and Peter A. N. Bosman",
   title =	"Optimal mixing evolutionary algorithms",
-  booktitle =	"GECCO '11: Proceedings of the 13th annual conference
-		 on Genetic and evolutionary computation",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   year = 	"2011",
   ISBN = 	"978-1-4503-0557-0",
   pages =	"617--624",
@@ -1502,10 +1561,6 @@
 		 Recombinative Optimal Mixing Evolutionary Algorithm
 		 (ROMEA) and the Gene-pool Optimal Mixing Evolutionary
 		 Algorithm (GOMEA).",
-  notes =	"Also known as \cite{2001661} GECCO-2011 A joint
-		 meeting of the twentieth international conference on
-		 genetic algorithms (ICGA-2011) and the sixteenth annual
-		 genetic programming conference (GP-2011)",
 }
 
 @InProceedings{cai:2005:ircgp,
@@ -1548,8 +1603,8 @@
 @InProceedings{harik:1999:parameterlessga,
   author =	"Georges R. Harik and Fernando G. Lobo",
   title =	"A parameter-less genetic algorithm",
-  booktitle =	"Proceedings of the Genetic and Evolutionary
-		 Computation Conference",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   year = 	"1999",
   volume =	"1",
   pages =	"258--265",
@@ -1559,9 +1614,6 @@
   publisher =	"Morgan Kaufmann",
   keywords =	"genetic algorithms and classifier systems",
   ISBN = 	"1-55860-611-4",
-  notes =	"GECCO-99 A joint meeting of the eighth international
-		 conference on genetic algorithms (ICGA-99) and the
-		 fourth annual genetic programming conference (GP-99)",
 }
 
 
@@ -1588,8 +1640,8 @@
 @InProceedings{pelikan:2004:parameterlesshboa,
   author =	"Martin Pelikan and Tz-Kai Lin",
   title =	"Parameter-Less Hierarchical {BOA}",
-  booktitle =	"Genetic and Evolutionary Computation -- GECCO-2004,
-		 Part II",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   year = 	"2004",
   series =	"Lecture Notes in Computer Science",
   pages =	"24--35",
@@ -1602,10 +1654,6 @@
   ISBN = 	"3-540-22343-6",
   ISSN = 	"0302-9743",
   size = 	"12",
-  notes =	"GECCO-2004 A joint meeting of the thirteenth
-		 international conference on genetic algorithms
-		 (ICGA-2004) and the ninth annual genetic programming
-		 conference (GP-2004)",
 }
 
 @article{bechmann:2013:hummies,
@@ -1623,9 +1671,8 @@
 		 Heritier and Chit Hong Yam",
   title =	"Search for a grand tour of the jupiter galilean
 		 moons",
-  booktitle =	"GECCO '13: Proceeding of the fifteenth annual
-		 conference on Genetic and evolutionary computation
-		 conference",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   year = 	"2013",
   ISBN = 	"978-1-4503-1963-8",
   pages =	"1301--1308",
@@ -1646,10 +1693,6 @@
 		 the final score of 311/324. We apply our method to the
 		 very same problem finding new surprising designs and
 		 orbital strategies and a score of up to 316/324.",
-  notes =	"Also known as \cite{2463524} GECCO-2013 A joint
-		 meeting of the twenty second international conference
-		 on genetic algorithms (ICGA-2013) and the eighteenth
-		 annual genetic programming conference (GP-2013)",
 }
 
 @Article{oneill:2001:grammatical,
@@ -1682,8 +1725,8 @@
   author =	"Fernando G. Lobo",
   title =	"Idealized dynamic population sizing for uniformly
 		 scaled problems",
-  booktitle =	"GECCO '11: Proceedings of the 13th annual conference
-		 on Genetic and evolutionary computation",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   year = 	"2011",
   ISBN = 	"978-1-4503-0557-0",
   pages =	"917--924",
@@ -1703,17 +1746,13 @@
 		 lower bound in terms of what can be achieved,
 		 performance-wise, by self-adjusting population sizing
 		 algorithms for this class of problems.",
-  notes =	"Also known as \cite{2001702} GECCO-2011 A joint
-		 meeting of the twentieth international conference on
-		 genetic algorithms (ICGA-2011) and the sixteenth annual
-		 genetic programming conference (GP-2011)",
 }
 
 @InProceedings{goldman:2014:p3,
   author =	"Brian W. Goldman and William F. Punch",
   title =	"Parameter-less population pyramid",
-  booktitle =	"GECCO '14: Proceedings of the 2014 conference on
-		 Genetic and evolutionary computation",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   year = 	"2014",
   isbn13 =	"978-1-4503-2662-9",
   pages =	"785--792",
@@ -1745,10 +1784,6 @@
 		 the stage for future theory based conclusions. Based on
 		 over 1 trillion evaluations, our results suggest P3 has
 		 wide applicability to a broad class of problems.",
-  notes =	"Also known as \cite{2598350} GECCO-2014 A joint
-		 meeting of the twenty third international conference on
-		 genetic algorithms (ICGA-2014) and the nineteenth
-		 annual genetic programming conference (GP-2014)",
 }
 @InCollection{kannappan:2014:humies,
   author =	"Karthik Kannappan and Lee Spector and Moshe Sipper and
@@ -1794,16 +1829,12 @@
   pages =	"370",
   year = 	"2000",
   publisher =	"Morgan Kaufmann",
-  booktitle =	"Proceedings of the Genetic and Evolutionary
-		 Computation Conference (GECCO-2000)",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   address =	"Las Vegas, Nevada, USA",
   publisher_address = "San Francisco, CA 94104, USA",
   month =	"10-12 " # jul,
   ISBN = 	"1-55860-708-0",
-  notes =	"A joint meeting of the ninth International Conference
-		 on Genetic Algorithms (ICGA-2000) and the fifth Annual
-		 Genetic Programming Conference (GP-2000) Part of
-		 whitley:2000:GECCO",
 }
 
 @InProceedings{rana:1998:gamaxsat,
@@ -1830,8 +1861,8 @@
 		 Sutton",
   title =	"Efficient identification of improving moves in a ball
 		 for pseudo-boolean problems",
-  booktitle =	"GECCO '14: Proceedings of the 2014 conference on
-		 Genetic and evolutionary computation",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   year = 	"2014",
   isbn13 =	"978-1-4503-2662-9",
   pages =	"437--444",
@@ -1862,10 +1893,6 @@
 		 exploration method and we analyse its efficiency and
 		 efficacy using experiments with NKq-landscapes
 		 instances.",
-  notes =	"Also known as \cite{2598304} GECCO-2014 A joint
-		 meeting of the twenty third international conference on
-		 genetic algorithms (ICGA-2014) and the nineteenth
-		 annual genetic programming conference (GP-2014)",
 }
 
 @article{chen:2011:memetic,
@@ -1884,9 +1911,8 @@
 		 Thierens",
   title =	"On the usefulness of linkage processing for solving
 		 {MAX}-{SAT}",
-  booktitle =	"GECCO '13: Proceeding of the fifteenth annual
-		 conference on Genetic and evolutionary computation
-		 conference",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   year = 	"2013",
   ISBN = 	"978-1-4503-1963-8",
   pages =	"853--860",
@@ -1935,10 +1961,6 @@
 		 exist. We specifically consider Walksat and GSAT and
 		 show that combining LS with LTGA or SAT-GOMEA increases
 		 their performance.",
-  notes =	"Also known as \cite{2463474} GECCO-2013 A joint
-		 meeting of the twenty second international conference
-		 on genetic algorithms (ICGA-2013) and the eighteenth
-		 annual genetic programming conference (GP-2013)",
 }
 @inproceedings{een:2004:satsolver,
   title={An extensible SAT-solver},
@@ -2036,7 +2058,8 @@
   author =	"Martin Pelikan and David E. Goldberg",
   title =	"Hierarchical {BOA} Solves Ising Spin Glasses and
 		 {MAXSAT}",
-  booktitle =	"Genetic and Evolutionary Computation -- GECCO-2003",
+  booktitle =	"Genetic and Evolutionary Computation
+		 Conference",
   year = 	"2003",
   pages =	"1271--1282",
   address =	"Chicago",
@@ -2047,10 +2070,6 @@
   ISBN = 	"3-540-40603-4",
   publisher =	"Springer-Verlag",
   keywords =	"Genetic Algorithm",
-  notes =	"GECCO-2003. A joint meeting of the twelfth
-		 International Conference on Genetic Algorithms
-		 (ICGA-2003) and the eights Annual Genetic Programming
-		 Conference (GP-2003)",
 }
 
 @article{laporte:2014:adaptivepop,
@@ -2066,6 +2085,9 @@
   title={Fast and Efficient Black Box Optimization using the Parameter-less Population Pyramid},
   author={Brian W. Goldman and William F. Punch},
   journal={Evolutionary computation},
+  volume={23},
+  number={3},
+  pages={451--479},
   year={2015},
   publisher={MIT Press},
 }
@@ -2084,7 +2106,7 @@
 @InProceedings{deb:1992:trap,
   author =	"Kalyanmoy Deb and David E. Goldberg",
   title =	"Analyzing Deception in Trap Functions",
-  booktitle =	"FOGA-92, Foundations of Genetic Algorithms",
+  booktitle =	"Foundations of Genetic Algorithms Conference",
   year = 	"1992",
   address =	"Vail, Colorado",
   month =	"24--29 " # jul,
@@ -2093,7 +2115,8 @@
 @inproceedings{hsu:2015:dsmgaII,
   title={Optimization by Pairwise Linkage Detection, Incremental Linkage Set, and Restricted/Back Mixing: DSMGA-II},
   author={Hsu, Shih-Huan and Yu, Tian-Li},
-  booktitle={Proceedings of the 2015 on Genetic and Evolutionary Computation Conference},
+  booktitle={Genetic and Evolutionary Computation
+		 Conference},
   pages={519--526},
   year={2015},
   organization={ACM}
@@ -2102,7 +2125,8 @@
 @inproceedings{inoue:2015:adaptivep3,
   title={Adaptive Control of Parameter-less Population Pyramid on the Local Distribution of Inferior Individuals},
   author={Inoue, Kazuyuki and Hasegawa, Taku and Araki, Yuta and Mori, Naoki and Matsumoto, Keinosuke},
-  booktitle={Proceedings of the 2015 on Genetic and Evolutionary Computation Conference},
+  booktitle={Genetic and Evolutionary Computation
+		 Conference},
   pages={863--870},
   year={2015},
   organization={ACM}
@@ -2111,7 +2135,8 @@
 @inproceedings{goldman:2015:GBO,
   title={Gray-Box Optimization using the Parameter-less Population Pyramid},
   author={Goldman, Brian W and Punch, William F},
-  booktitle={Proceedings of the 2015 on Genetic and Evolutionary Computation Conference},
+  booktitle={Genetic and Evolutionary Computation
+		 Conference},
   pages={855--862},
   year={2015},
   organization={ACM}
@@ -2120,7 +2145,7 @@
 @inproceedings{tintos:2015:partitioncross,
   title={Partition crossover for pseudo-boolean optimization},
   author={Tintos, Renato and Whitley, Darrell and Chicano, Francisco},
-  booktitle={Proceedings of the 2015 ACM Conference on Foundations of Genetic Algorithms XIII},
+  booktitle={Foundations of Genetic Algorithms Conference},
   pages={137--149},
   year={2015},
   organization={ACM}
@@ -2129,7 +2154,8 @@
 @inproceedings{whitley:2015:mk,
   title={Mk Landscapes, NK Landscapes, MAX-kSAT: A Proof that the Only Challenging Problems are Deceptive},
   author={Whitley, Darrell},
-  booktitle={Proceedings of the 2015 on Genetic and Evolutionary Computation Conference},
+  booktitle={Genetic and Evolutionary Computation
+		 Conference},
   pages={927--934},
   year={2015},
   organization={ACM}
@@ -2138,7 +2164,8 @@
 @inproceedings{ochoa:2015:crossovernetworks,
   title={Tunnelling Crossover Networks},
   author={Ochoa, Gabriela and Chicano, Francisco and Tin{\'o}s, Renato and Whitley, Darrell},
-  booktitle={Proceedings of the 2015 on Genetic and Evolutionary Computation Conference},
+  booktitle={Genetic and Evolutionary Computation
+		 Conference},
   pages={449--456},
   year={2015},
   organization={ACM}
@@ -2169,7 +2196,9 @@
 @inproceedings{iclanzan:2014:somnetworks,
   title={Learning inherent networks from stochastic search methods},
   author={Iclanzan, David and Daolio, Fabio and Tomassini, Marco},
-  booktitle={Evolutionary Computation in Combinatorial Optimization: 14th European Conference, EvoCOP 2014, Granada, Spain, April 23-25, 2014, Revised Selected Papers},
+  booktitle={European Conference on Evolutionary Computation in Combinatorial Optimisation},
+  address={Granada, Spain},
+  month={April},
   volume={8600},
   pages={157},
   year={2014},
@@ -2179,8 +2208,32 @@
 @inproceedings{whitley:2012:constant,
   title={Constant time steepest descent local search with lookahead for NK-landscapes and MAX-kSAT},
   author={Whitley, Darrell and Chen, Wenxiang},
-  booktitle={Proceedings of the 14th annual conference on Genetic and evolutionary computation},
+  booktitle={Genetic and Evolutionary Computation
+		 Conference},
   pages={1357--1364},
   year={2012},
   organization={ACM}
 }
+
+@inproceedings{goldman:2016:hyperplane,
+  title={Hyperplane Elimination for Quickly Enumerating Local Optima},
+  author={Goldman, Brian W and Punch, William F},
+  booktitle={European Conference on Evolutionary Computation in Combinatorial Optimisation},
+  year={2016},
+  organization={Springer}
+}
+
+@inproceedings{goldman:2016:p3hiff,
+  title={Runtime Analysis for the Parameterless Population Pyramid},
+  author={Goldman, Brian W and Sudholt, Dirk},
+  booktitle={Genetic and Evolutionary Computation
+		 Conference},
+  organization={ACM}
+}
+
+@article{whitley:2016:mkl,
+  title={Gray Box Optimization for Mk Landscapes (NK Landscapes and MAX-3SAT):  Where the interesting problems are (and are not)},
+  author={L. Darrell Whitley and Francisco Chicano and Brian W. Goldman},
+  journal={Evolutionary computation},
+}
+
