@@ -86,7 +86,7 @@
 Examining the properties of local optima is a common method for understanding
 combinatorial-problem landscapes.
 Unfortunately,
-exhaustive methods for finding local optima are limited to very small problem sizes.
+exhaustive algorithms for finding local optima are limited to very small problem sizes.
 We propose a method for exploiting problem structure
 to skip hyperplanes
 that cannot contain local optima, allowing runtime to scale with
@@ -191,22 +191,22 @@ Here we set $k=5$ to ensure sufficient deceptiveness.
 
 NKq Landscapes specify a class of randomly generated problem instances using 3 paramters:
 (1) the number of problem variables $N$, (2) the amount of variable epistasis $K$ where $k=K+1$,
-and (3) the number of unique fitness values $q$. From these parameters a landscape is generated
+and (3) the number of unique subfunction values $q$. From these parameters a landscape is generated
 by creating $M=N$ subfunctions $f_i$, where $f_i$ uses variable $x_i$ and $K$ others to look up
 a fitness value in the range $[0..q-1]$ from a randomly generated table.
 As NKq Landscapes are structured as a sum of bounded subfunctions, they are a natural fit
 for Mk Landscapes
 and are the most studied problem class for Gray-Box
 optimization~\cite{whitley:2012:constant,chicano:2014:ball,goldman:2015:GBO,tintos:2015:partitioncross,ochoa:2015:crossovernetworks,whitley:2015:mk}.
-Here we choose $k=3$ with $q=2^{K+1}=2^{k}=8$ in line with previous research.
+We set $k=3$ and $q=2^{K+1}=2^{k}=8$ in line with previous work.
 
 We use two common variants of NKq in our experiments which specify how the $K$ additional
 variables in each subfunction are chosen: Adjacent and Random. In Adjacent NKq, $f_i$ depends
 on variable indices $[i..(i+k) \bmod N]$. In Random NKq, $f_i$ depends on $x_i$ and a random
 set of $K$ unique variables that does not include $x_i$. While Random NKq is NP-Hard,
-the structure of Adjacent NKq allows for a polynomial time dynamic programming solution~\cite{wright:2000:solvingnk}.
-Adjacent NKq is therefore often used to approximate a search algorithm's ability to
-solve Random NKq.
+the structure of Adjacent NKq allows for a polynomial time solution~\cite{wright:2000:solvingnk}.
+Adjacent NKq is therefore often used to test a search algorithm's ability to
+find the known global optimum.
 
 Ising Spin Glasses are a type of MAX-CUT problem derived from statistical physics.
 Each atom in the glass (vertex) can be assigned a spin, with the goal being to
@@ -288,7 +288,7 @@ domain, enumeration would progress as a binary counter, treating $index$ 0 (symb
 the least significant bit. This ordering ensures that before changing $index$ $i$, all possible settings of $index$
 0 through $i-1$ have been tested. This corresponds to examining the hyperplane where the lowest $i-1$ positions
 can vary and all other positions remain fixed. The Gray-Box domain makes it possible to skip hyperplanes
-that cannot contain local optima. In Figure~\ref{fig-enumerate}, move $m_i$ which flips variable $F$ is a fitness improvement
+that cannot contain local optima. In Figure~\ref{fig-enumerate}, move $m_i$, which flips variable $F$, is a fitness improvement
 when enumeration starts (all variables set to 0). Due to the known relationships between variables,
 we know that the quality of $m_i$ only depends on variables $C$, $E$, $F$, and $H$.
 Therefore, until one of those four variables is modified, the solution cannot be a local optimum.
@@ -367,7 +367,7 @@ decrease runtime.
 
 \section{Reordering Variables}
 \label{sec-reorder}
-As a final efficiency gain, the order in which variables in $solution$ are indexed can be reordered.
+Changing the order in which variables are indexed can provide further efficiency gains.
 When a move is fitness-improving,
 the amount of search space that is skipped depends on how high its lowest $index$ dependency is. Therefore,
 by rearranging the order to make its lowest $index$ dependency higher, more search space can be skipped. 
@@ -396,9 +396,9 @@ highest remaining position in the enumeration ordering.
 
 \begin{proof}
 Any ordering of variables that cannot be described by an ordering of moves
-must contain the following property. There must exist a position $j$
-such that $x_j$ is not a dependency of any move with
-a minimum dependency of $i$ or higher where $i$ is also the minimum dependency of a move $m$.
+must contain positions $i$ and $j$ with the following properties: (1) $i<j$
+(2) $i$ is the minimum dependency of a move $m$ (3) no move with minimum dependency
+of $i$ or higher depends on $x_j$.
 In this situation, swapping the order of $x_i$ and $x_j$ will raise $m$'s
 minimum dependency by at least one, but it will not lower the minimum dependency of any
 move. Therefore, any ordering which contains this property cannot be optimal.
@@ -460,19 +460,19 @@ no non-linear terms between variables. These functions are of the form:
   f(x) = \sum_{i=0}^{N-1} w_ix_i
   \label{eq-linear}
 \end{equation}
-In MK Landscape terms, $M=N$ and $k=1$. The most well known linear function is OneMax,
+In Mk Landscape terms, $M=N$ and $k=1$. The most well known linear function is OneMax,
 in which $w_i=1$ for all $i$.
 
 \begin{theorem}
 Algorithm~\ref{alg-enumerate} finds all local optima of any linear function
-in \BigO{N} time.
+where $\forall_i w_i \neq 0$ in \BigO{N} time.
 \end{theorem}
 
 \begin{proof}
 When Algorithm~\ref{alg-enumerate} is applied to a linear
 function, an index $i$ of $move\_bin$ is non-zero if and only if
 $x_i$ disagrees with the global optimum.
-Initially $index$ is set to $N-1$, and is decreased by at least one in any step after the first.
+Initially $index$ is set to $N-1$, and is decreased by at least one in every step after the first.
 Each step will flip a bit which disagrees with the global optimum.
 No carry operations can occur before finding the global optimum, meaning the
 cost of each iteration is equal to the amount by which $index$ is decreased.
@@ -521,7 +521,7 @@ this point, $f_1$ is enumerated such that each time $f_1$ contains no improving 
 $f_0$ is enumerated again. This finds all local optima in the hyperplane where $f_i, i>1$ remain
 fixed. We represent the time required to find all local optima in the hyperplane
 with $f_j, j>i$ fixed as $T(i)$. $T(0)=2^k$ as all values of $f_0$ must be enumerated.
-$T(i) = |l_i|*T(i-1)+2^k$ where $|l_i|$ is the number of ways $f_i$ can be set such
+$T(i) = |l_i|*T(i-1)+2^k$ where $l_i$ is the list of ways $f_i$ can be set such
 that it contains no fitness-improving moves.
 Each setting in $l_i$ exposes a new hyperplane
 that can contain local optima, which causes the recursive call to $T(i-1)$.
