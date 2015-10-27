@@ -247,7 +247,7 @@ The fitness effect of flipping $x_j$ only changes after flipping $x_i$ if
 there is a non-linear relationship between $x_i$ and $x_j$.
 In an Mk Landscape, variables
 can only have a non-linear relationship if they appear together in at least one $s_i$.
-Therefore by definition the total number of non-linear
+By definition the total number of non-linear
 relationships in an Mk Landscape is linear with $N$, meaning on average the amortized
 number of non-linear relationships per variable is \BigO{1}.
 
@@ -658,7 +658,7 @@ Hyper-Reorder scales at $2^k2^{N/k}$ as $\frac{1}{k}=0.2$.
 \end{table}
 
 This reduction in growth complexity translates into a substantial increase in the size of problems
-which can be enumerated. For instance, using the previous best enumeration methods~\cite{ochoa:2015:crossovernetworks},
+which can be enumerated in reasonable time. For instance, using the previous best enumeration methods~\cite{ochoa:2015:crossovernetworks},
 the largest Adjacent NKq problem size that can be enumerated in 4 hours is 34 bits. Given the same amount of time,
 Hyper-Reorder can enumerate problems with 77 bits. Using the regression model, we estimate solving
 a 77 bit problem using Gray-Box would require 900~million years. Similarly, Hyper-Reorder's largest
