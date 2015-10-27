@@ -10,3 +10,6 @@ main.ps
 *.lof
 *.toc
 *.lot
+*.bcf
+*.out
+*.run.xml
