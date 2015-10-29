@@ -310,7 +310,7 @@ move's dependencies fixed cannot contain any local optima.
     \State $found \leftarrow [~]$
     \State $index \leftarrow N-1$
     \While{$index < N$}
-      \While{$index > 0$ \textbf{and} $move\_bin[index] = 0$}\label{alg-enumerate-bincheck}
+      \While{$index \geq 0$ \textbf{and} $move\_bin[index] = 0$}\label{alg-enumerate-bincheck}
         \State $index \leftarrow index-1$
       \EndWhile
       \If{$index = -1$}
