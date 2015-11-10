@@ -35,7 +35,7 @@ three critical characteristics:
 \item There is no tractable method for finding the best solution.
 \end{itemize}
 I design algorithms for optimizing problems with these characteristics. Instead of
-attempting to create specialized heuristics for every possible problem,
+attempting to create specialized heuristics for every problem,
 my goal is to discover and utilize general principles which can
 then be applied to a large set of problems without further expert knowledge.
 
@@ -61,14 +61,16 @@ This quality is on top
 of the fact that the comparison algorithms used unrealistically ideal configurations while
 P3 requires no configuration.
 
-~\cite{goldman:2015:GBO}
-
-~\cite{goldman:2016:hyperplane}
-
-~\cite{whitley:2016:mkl}
-TODO Exact polynomial time
-
-TODO SAT compression
+By making slightly more information about the problem available to optimization, I was
+able to develop an even more efficient version of P3~\cite{goldman:2015:GBO}. Consider
+that many problems can be expressed as the sum of functions which use only a subset
+of problem variables. For example, Boolean Satisfiability is often expressed as the sum
+of clauses. The Maximum Cut of a graph is equal to the sum of checking each edge.
+Using this additional information, I was able to reduce P3's runtime by two
+orders of magnitude. I was also able to construct an efficient method
+for finding all local optima in an arbitrary problem~\cite{goldman:2016:hyperplane},
+and with a collaborator create a generic method which solves many common
+problems in the optimization literature in $O(N)$ time~\cite{whitley:2016:mkl}.
 
 \section{Interdisciplinary Applications}
 In order to apply these generic optimization methods, I have formed a number of
@@ -79,7 +81,7 @@ the quality of a given pallet, but he had no direct method for discovering the `
 P3 was able to find a solution which used less mass than the one found by the industry standard
 tool, and did so using 40\% of the time.
 
-TODO Statistical Physics somewhere
+%TODO Statistical Physics somewhere
 
 Working with a chemist, we set out to
 design better OLED molecules, which underly modern electronics displays.
@@ -94,14 +96,29 @@ how the wake of each turbine can effect the electrical output of the entire fiel
 While turbines are commonly arranged in grids, we found using optimization methods
 that fields with less regular layouts can be significantly more efficient.
 
-TODO Neuro-evolution
+A challenging task in machine learning is the training of large scale neural networks.
+I have recently been in collaboration with an evolutionary biologist
+who studies natural learning to develop better methods for training artificial brains.
 
 \section{Future Work}
-TODO Chemistry (Proteins / Batteries)
+In recently submitted work~\cite{whitley:2016:mkl}, we determined that many real-world
+instances of common NP-Hard problems contained a surprising amount of regularity.
+I believe this regularity can be exploited to significantly reduce the space
+which needs to be searched for high quality solutions. To that end, I plan to develop
+a problem independent technique for search space compression.
 
-TODO Multi-objectiveness
+A current limitation of P3 is the focus on single objective optimization. For many
+problems, there are many competing objectives which should be optimized. For example,
+strength, weight, and cost in an engineering task. Optimization gains significant
+benefits from treating this problem as having three separate goals instead of attempting
+to combine them into a single objective. I believe that integrating P3 with the concepts
+of multi-objective optimization will result in a powerful tool for real-world optimization.
 
-TODO Generalized search space compression
+Finally, and most critically, I plan to continue exploring interdisciplinary collaborations.
+As a tool for problem solving, optimization algorithms are only as useful as the problems they
+can solve. Some specific targets for future collaborations include better battery design,
+structural engineering tasks, and land use management.
+
 
 
 %\vspace{0.5cm}
