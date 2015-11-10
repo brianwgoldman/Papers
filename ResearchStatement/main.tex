@@ -1,0 +1,116 @@
+\documentclass[a4paper, 11pt]{article}
+
+\usepackage{fancyhdr}
+\usepackage[margin=1in]{geometry}
+\usepackage{titlesec}
+
+\titleformat{\section}
+{\normalfont\Large\bfseries}{}{0pt}{}
+\titleformat{\subsection}
+{\normalfont\itshape}{}{0pt}{}
+
+%\linespread{2.5}
+\begin{document}
+\thispagestyle{empty}
+
+\pagestyle{fancy}
+\lhead{Brian W. Goldman}
+\rhead{Research Statement}
+
+\begin{center}
+{\LARGE \bf RESEARCH STATEMENT}\\
+\vspace*{0.1cm}
+{\normalsize Brian W. Goldman (brianwgoldman@acm.org)}
+\end{center}
+
+\noindent
+For many problems in many disciplines, it is easier to determine the quality of a solution
+than to find the best possible solution. For example, this is true of NP-Hard problems,
+finite element analysis, chemical design, and physics simulations.
+While coming from very different fields, these problems share
+three critical characteristics:
+\begin{itemize}
+\item There is a defined set of possible solutions.
+\item We can measure the quality of a proposed solution.
+\item There is no tractable method for finding the best solution.
+\end{itemize}
+I design algorithms for optimizing problems with these characteristics. Instead of
+attempting to create specialized heuristics for every possible problem,
+my goal is to discover and utilize general principles which can
+then be applied to a large set of problems without further expert knowledge.
+
+\section{Algorithm Design}
+Many generic optimization algorithms require problem specific
+configuration. These algorithms are therefore of limited generality
+as expert knowledge is required to properly configure them.
+
+The primary focus of my dissertation was the creation of the
+Parameter-less Population Pyramid (P3), an optimization algorithm
+that requires no problem specific configuration~\cite{goldman:2014:p3,goldman:2015:fastp3}.
+P3 is comprised of three parts: Stochastic local search, entropy based model building, and
+population layering. The guiding principle behind its design is to exploit all previous
+knowledge the algorithm has about the problem before resorting to further stochastic exploration.
+Each iteration, P3 creates a new high quality solution using local search and a model of
+problem structure. The model is built by examining the mutual information between variables
+in previously found high quality solutions~\cite{goldman:2012:ltga}.
+By storing multiple populations of solutions, P3 is able to progressively guide search
+to better and better areas without becoming stuck or requiring large initial random search.
+P3 is able to find the global optimum in less time than other techniques, as well as
+maintain a better ``current best'' solution as optimization progresses across a diverse set of problems.
+This quality is on top
+of the fact that the comparison algorithms used unrealistically ideal configurations while
+P3 requires no configuration.
+
+~\cite{goldman:2015:GBO}
+
+~\cite{goldman:2016:hyperplane}
+
+~\cite{whitley:2016:mkl}
+TODO Exact polynomial time
+
+TODO SAT compression
+
+\section{Interdisciplinary Applications}
+In order to apply these generic optimization methods, I have formed a number of
+interdisciplinary collaborations. I first began a collaboration with a mechanical engineer
+at NASA. He was in the process of designing a lightweight pallet for carrying sensitive
+equipment to other planetary bodies. Using finite element analysis he could measure
+the quality of a given pallet, but he had no direct method for discovering the ``best'' pallet.
+P3 was able to find a solution which used less mass than the one found by the industry standard
+tool, and did so using 40\% of the time.
+
+TODO Statistical Physics somewhere
+
+Working with a chemist, we set out to
+design better OLED molecules, which underly modern electronics displays.
+Given a molecule, its possible to calculate its phosphorescence when excited. However,
+there is no direct method for finding molecules which maximize this property.
+By applying P3 and other generic optimization methods we found some interesting
+molecules for future analysis.
+
+Determining the placement of turbines in a wind farm is another candidate for
+generic optimization. Aerospace engineers have developed models which can calculate
+how the wake of each turbine can effect the electrical output of the entire field.
+While turbines are commonly arranged in grids, we found using optimization methods
+that fields with less regular layouts can be significantly more efficient.
+
+TODO Neuro-evolution
+
+\section{Future Work}
+TODO Chemistry (Proteins / Batteries)
+
+TODO Multi-objectiveness
+
+TODO Generalized search space compression
+
+
+%\vspace{0.5cm}
+%\newpage
+
+\small
+
+\bibliographystyle{abbrv}
+\bibliography{../main}
+
+\end{document}
+
