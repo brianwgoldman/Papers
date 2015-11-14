@@ -89,7 +89,7 @@
 % Bibliography categories
 \def\makebibcategory#1#2{\DeclareBibliographyCategory{#1}\defbibheading{#1}{\section*{#2}}}
 \makebibcategory{books}{Books}
-\makebibcategory{papers}{Refereed Conference Papers}
+\makebibcategory{papers}{Conference Papers}
 \makebibcategory{posters}{Conference Posters}
 \makebibcategory{chapters}{Book chapters}
 \makebibcategory{journals}{Journal Articles}
@@ -113,9 +113,14 @@
 {\endlist}
 {\bibitem}
 
-\newenvironment{publications}{\section{\LARGE Publications (\ref{sumpapers} Total)}\label{papersstart}\vspace*{0.2cm}
+\newenvironment{peer-publications}{\section{\LARGE Peer Reviewed Publications (\ref{sumpapers} Total)}\label{papersstart}\vspace*{0.2cm}
 \titlespacing{\section}{0pt}{1.5ex}{1ex}\itemsep=0.00cm
 }{\label{papersend}\addtocounter{sumpapers}{-1}\refstepcounter{sumpapers}\label{sumpapers}}
+
+\newenvironment{other-publications}{\section{\LARGE Other Publications}\vspace*{0.2cm}
+\titlespacing{\section}{0pt}{1.5ex}{1ex}\itemsep=0.00cm
+}{}
+
 
 \def\printbib#1{\printbibliography[category=#1,heading=#1]\lastref{sumpapers}}
 \renewcommand{\bibfont}{\normalfont\fontsize{11}{13.4}\rmfamily}
