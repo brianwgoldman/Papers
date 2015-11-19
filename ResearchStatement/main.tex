@@ -56,7 +56,7 @@ in previously found high quality solutions~\cite{goldman:2012:ltga}.
 By storing multiple populations of solutions, P3 is able to progressively guide search
 to better and better areas without becoming stuck or requiring large initial random search.
 P3 is able to find the global optimum in less time than other techniques, as well as
-maintain a better ``current best'' solution as optimization progresses across a diverse set of problems.
+maintain a better ``current best'' solution as optimization progresses, across a diverse set of problems.
 This quality is on top
 of the fact that the comparison algorithms used unrealistically ideal configurations while
 P3 requires no configuration.
@@ -92,24 +92,24 @@ molecules for future analysis.
 
 Determining the placement of turbines in a wind farm is another candidate for
 generic optimization. Aerospace engineers have developed models which can calculate
-how the wake of each turbine can effect the electrical output of the entire field.
+how the wake of each turbine effects the electrical output of the entire field.
 While turbines are commonly arranged in grids, we found using optimization methods
-that fields with less regular layouts can be significantly more efficient.
+that fields with less regular layouts can be substantially more efficient.
 
 A challenging task in machine learning is the training of large scale neural networks.
 I have recently been in collaboration with an evolutionary biologist
-who studies natural learning to develop better methods for training neural networks.
+who studies natural learning to develop better optimization methods for training neural networks.
 
 \section{Future Work}
 In recently submitted work~\cite{whitley:2016:mkl}, we determined that many real-world
 instances of common NP-Hard problems contained a surprising amount of regularity.
-I believe this regularity can be exploited to significantly reduce the space
+I believe this regularity can be exploited to reduce the space
 which needs to be searched for high quality solutions. To that end, I plan to develop
 a problem independent technique for search space compression.
 
 A current limitation of P3 is the focus on single objective optimization. For many
 problems, there are many competing objectives which should be optimized. For example,
-strength, weight, and cost in an engineering task. Optimization gains significant
+strength, weight, and cost in an engineering task. Optimization gains substantial
 benefits from treating this problem as having three separate goals instead of attempting
 to combine them into a single objective. I believe that integrating P3 with the concepts
 of multi-objective optimization will result in a powerful tool for real-world optimization.
