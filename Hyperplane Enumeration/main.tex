@@ -91,7 +91,7 @@ We propose a method for exploiting problem structure
 to skip hyperplanes
 that cannot contain local optima, allowing runtime to scale with
 the number of local optima instead of with the landscape size.
-We prove optimality for linear problems and the Concatenated Traps, and we provide
+We prove optimality for linear problems and Concatenated Traps, and we provide
 empirical evidence of optimality on NKq Landscapes and Ising Spin Glasses.
 We further refine this method to find solutions
 that cannot be improved by flipping $r$ or fewer bits, which counterintuitively
@@ -513,6 +513,8 @@ which is the lowest possible bound for this problem.
 A $k$-bound separable problem is any problem that is composed of non-overlapping
 subfunctions, each using using $k$ or fewer bits. Formally this means
 $\forall_i |s_i| \leq k$ and $\forall_{i \neq j} s_i \cap s_j = \emptyset$.
+Let $l_i$ be the set of ways $f_i$ can be set
+such that it contains no fitness improving moves.
 
 %TODO Reviewer 2: State blocks are contiguous.
 \begin{theorem}
@@ -540,8 +542,8 @@ is enumerated to find all local optima in the hyperplane where all $f_i, i>0$ re
 fixed. This process ends when a carry operation modifies a bit of $f_1$. At
 this point, $f_1$ is enumerated such that each time $f_1$ contains no improving moves
 $f_0$ is enumerated again. This finds all local optima in the hyperplane where $f_i, i>1$ remain
-fixed. We represent the time required to find all local optima in the hyperplane
-with $f_j, j>i$ fixed as $T(i)$. $T(0)=2^k$ as all values of $f_0$ must be enumerated, and
+fixed. $T(i)$ represents the time required to find all local optima in the hyperplane
+with $f_j, j>i$ fixed. $T(0)=2^k$ as all values of $f_0$ must be enumerated, and
 $T(i) = |l_i|*T(i-1)+2^k$.
 Each setting in $l_i$ exposes a new hyperplane
 that can contain local optima, which causes the recursive call to $T(i-1)$.
@@ -620,7 +622,7 @@ If the algorithm failed to complete in the alloted time for an instance,
 we declared it unsuccessful for that combination of $r$ and $N$ of that problem. All results
 we report are for successful combinations. For timing purposes, local optima were counted but not
 recorded. All of our code, data, and statistical analysis can be downloaded from our
-website.\footnote{\url{https://name.of.site/removed/to/be/anonymous/}}
+website.\footnote{\url{https://github.com/brianwgoldman/Enumerate-Local-Optima/releases}}
 %TODO Make this the actual web page
 
 \subsection{Finding Local Optima}
