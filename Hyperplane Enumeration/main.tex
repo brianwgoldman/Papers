@@ -56,8 +56,8 @@
 % their surnames. This ensures that the names appear correctly in
 % the running heads and the author index.
 %
-%\author{Brian W.~Goldman\and William F. Punch}
-\author{Anonymous Author\and Anonymous Author}
+\author{Brian W.~Goldman\and William F. Punch}
+%\author{Anonymous Author\and Anonymous Author}
 
 %
 %\authorrunning{Lecture Notes in Computer Science: Authors' Instructions}
@@ -91,7 +91,7 @@ We propose a method for exploiting problem structure
 to skip hyperplanes
 that cannot contain local optima, allowing runtime to scale with
 the number of local optima instead of with the landscape size.
-We prove optimality for linear and $k$-bounded separable problems, and we provide
+We prove optimality for linear problems and the Concatenated Traps, and we provide
 empirical evidence of optimality on NKq Landscapes and Ising Spin Glasses.
 We further refine this method to find solutions
 that cannot be improved by flipping $r$ or fewer bits, which counterintuitively
@@ -360,7 +360,7 @@ $index$ is only increased by carry operations which reset a position to 0 before
 
 Extending Algorithm~\ref{alg-enumerate} to search for $r$-bit optima only requires adding the
 necessary $r$-bit moves to $move\_bin$. As discussed in Section~\ref{sec-gray-box}, we know the number of these moves
-is \BigO{N} an can be kept updated in \BigO{1} time per flip. Therefore, for small $r$, the cost
+is \BigO{N} and can be kept updated in \BigO{1} time per flip. Therefore, for small $r$, the cost
 of finding $r$-bit local optima is no more than a constant slower than finding 1-bit local optima.
 In fact, we will provide evidence in Section~\ref{sec-r-bit} that increasing $r$ can actually
 decrease runtime.
@@ -376,10 +376,27 @@ improves $m_i$'s lowest $index$ dependency from two to four. Consider that befor
 **000000 to be skipped by Algorithm~\ref{alg-enumerate}, while after reordering the hyperplane that can be skipped is ****0000.
 Now, whenever $m_i$ is a fitness improvement, four times as many solutions are skipped.
 
+%TODO Reviewer 1: Explain how data structures allow this to be O(N).
 We perform this reordering in a greedy fashion, such that the move with the
 least-unmapped dependencies has all of its remaining dependencies mapped to the
-highest remaining indices. With proper bookkeeping, this algorithm requires
-\BigO{N} time. We argue below that the optimal bit ordering for skipping solutions
+highest remaining indices.
+%New
+Before iteration, each move is binned based on its number of dependencies, and mappings
+are created to convert a move to its bin location and a variable to the
+moves that depend on that variable. Each of these requires \BigO{N} time
+as you must consider for each move (\BigO{N}) all variables (\BigO{1})
+in all subfunctions (\BigO{1}) it overlaps.
+The algorithm then iteratively queries the move bins in ascending order
+(requiring at most $kM/N=$\BigO{1} steps) until the first non-empty bin
+is found. All dependencies of that move are assigned positions, and
+all moves that depend on that variable are updated in the move bin
+(requiring at most \BigO{1} amortized updates). Each iteration finishes
+a move, meaning after $M$ iterations the process is complete. Therefore
+reordering takes \BigO{N} time.
+%Old
+%With proper bookkeeping, this algorithm requires
+%\BigO{N} time.
+We argue below that the optimal bit ordering for skipping solutions
 is a greedy ordering.
 
 The quality of an ordering is determined by how many solutions
@@ -463,6 +480,7 @@ no non-linear terms between variables. These functions are of the form:
 In Mk Landscape terms, $M=N$ and $k=1$. The most well known linear function is OneMax,
 in which $w_i=1$ for all $i$.
 
+%TODO Reviewer 2: O(N) isn't O(1).
 \begin{theorem}
 Algorithm~\ref{alg-enumerate} finds all local optima of any linear function
 where $\forall_i w_i \neq 0$ in \BigO{N} time.
@@ -487,7 +505,8 @@ occur, and $index$ cannot be decreased. Iteration ends when $index$ exceeds $N$,
 which requires at most $N$ carry operations. Therefore, Algorithm~\ref{alg-enumerate}
 requires \BigO{N} time to reach termination after finding the global optimum. Combined
 with initialization and the time to find the global optimum, the total complexity is \BigO{N},
-which is optimal.
+%new
+which is the lowest possible bound for this problem.
 \end{proof}
 
 \subsection{$k$-Bound Separable Problems}
@@ -495,21 +514,23 @@ A $k$-bound separable problem is any problem that is composed of non-overlapping
 subfunctions, each using using $k$ or fewer bits. Formally this means
 $\forall_i |s_i| \leq k$ and $\forall_{i \neq j} s_i \cap s_j = \emptyset$.
 
+%TODO Reviewer 2: State blocks are contiguous.
 \begin{theorem}
-Algorithm~\ref{alg-enumerate} finds all \BigO{c^{M}} local optima of any $k$-bound separable function
-in \BigO{2^kc^{M}} time.
+\label{theorem-k-bound-general}
+Algorithm~\ref{alg-enumerate} with reordering finds all $\prod_{i=0}^{M-1} |l_i|$ local optima
+in at most $2^k\sum_{j=0}^{M-1} \prod_{i=M-j}^{M-1} |l_i|$ + \BigO{M} time.
 \end{theorem}
 
 \begin{proof}
 While there is no restriction on how variables are ordered in the problem,
 performing reordering will ensure that
-all variables which appear in the same $s_i$ are consecutive.
+all variables that appear in the same $s_i$ are consecutive.
 As such, it is possible to create a numbering of $f_i$ such that if $i < j$ then all of $s_i$'s
 variables appear before $s_j$'s in enumeration ordering.
 
 Algorithm~\ref{alg-enumerate} finds the $f_i$ with the highest $i$ that contains a
 fitness-improving move and enumerates its variables until it no longer
-contains an improving move. In total, enumerating $f_i$ requires $2^k$
+contains an improving move. In total, enumerating $f_i$ requires at most $2^k$
 steps. Each $f_i$ is considered sequentially until none contains an improving move,
 meaning the first local optimum is found in \BigO{2^kM} time.
 
@@ -520,17 +541,14 @@ fixed. This process ends when a carry operation modifies a bit of $f_1$. At
 this point, $f_1$ is enumerated such that each time $f_1$ contains no improving moves
 $f_0$ is enumerated again. This finds all local optima in the hyperplane where $f_i, i>1$ remain
 fixed. We represent the time required to find all local optima in the hyperplane
-with $f_j, j>i$ fixed as $T(i)$. $T(0)=2^k$ as all values of $f_0$ must be enumerated.
-$T(i) = |l_i|*T(i-1)+2^k$ where $l_i$ is the list of ways $f_i$ can be set such
-that it contains no fitness-improving moves.
+with $f_j, j>i$ fixed as $T(i)$. $T(0)=2^k$ as all values of $f_0$ must be enumerated, and
+$T(i) = |l_i|*T(i-1)+2^k$.
 Each setting in $l_i$ exposes a new hyperplane
 that can contain local optima, which causes the recursive call to $T(i-1)$.
-As all $|s_i| \leq k$ and $k$ is a
-constant, $\forall_i |l_i| \leq c \leq 2^k$ meaning that $c$ is a constant.
+%As all $|s_i| \leq k$ and $k$ is a
+%constant, $\forall_i |l_i| \leq c \leq 2^k$ meaning that $c$ is a constant.
 The time required to find all local optima is therefore
-$T(M-1)\leq \sum_0^{M-1}2^kc^i<2^kc^{M}$.
-The number of local optima in the landscape is \BigO{c^{M}}, meaning that Algorithm~\ref{alg-enumerate}
-is within a constant factor ($2^k$) of optimal.
+$T(M-1) = 2^k\sum_{j=0}^{M-1} \prod_{i=M-j}^{M-1} |l_i|$.
 \end{proof}
 
 When looking for only $r$-bit local optima of $k$-bound separable problems,
@@ -544,6 +562,18 @@ Therefore, even if $r=N-1$, the number of subsets only grows at \BigO{N}.
 Because $c=1$ in this case, the cost of finding the single global optimum
 only requires the \BigO{2^kM} time to find the first local optimum, which is
 optimal.
+
+\begin{theorem}
+If $\forall_i |l_i| = c$ and $c>1$ Algorithm~\ref{alg-enumerate} with reordering
+finds all $c^M$ local optima in at most $2^kc^M + $ \BigO{M} time.
+\end{theorem}
+
+\begin{proof}
+From Theorem~\ref{theorem-k-bound-general}, the number of local optima can
+be expressed as $\prod_{i=0}^{M-1} |l_i| = \prod_{i=0}^{M-1} c = c^M$. Similarly
+$2^k\sum_{j=0}^{M-1} \prod_{i=M-j}^{M-1} |l_i| = 2^k\sum_{j=0}^{M-1} c^{j-1} < 2^kc^M$.
+\end{proof}
+
 
 Concatenated Traps is a commonly used $k$-bound separable problem
 with $c=2$ and $M=N/k$.  Algorithm~\ref{alg-enumerate} requires $2^k2^{N/k}$ time
@@ -580,6 +610,7 @@ ordered in the genome for problems with natural structure. For example, variable
 of an Adjacent NKq instance are not likely to be consecutive in the genome. However, $s_i$ still overlaps
 $s_{i+1}$ in all but 1 variable.
 
+%TODO Reviewer 1: State programming language and statistical tools
 Each algorithm was given a maximum of four hours to find all $r$-bit local optima.
 Runs were distributed across a cluster using 2.5GHz Intel Xeon E5-2670v2 processors.
 Any run which failed was rerun once to prevent cluster issues from introducing
@@ -590,6 +621,7 @@ we declared it unsuccessful for that combination of $r$ and $N$ of that problem.
 we report are for successful combinations. For timing purposes, local optima were counted but not
 recorded. All of our code, data, and statistical analysis can be downloaded from our
 website.\footnote{\url{https://name.of.site/removed/to/be/anonymous/}}
+%TODO Make this the actual web page
 
 \subsection{Finding Local Optima}
 \label{sec-1-bit-optima}
