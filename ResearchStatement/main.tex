@@ -3,6 +3,7 @@
 \usepackage{fancyhdr}
 \usepackage[margin=1in]{geometry}
 \usepackage{titlesec}
+\usepackage{url}
 
 \titleformat{\section}
 {\normalfont\Large\bfseries}{}{0pt}{}
@@ -24,31 +25,32 @@
 \end{center}
 
 \noindent
-For many problems in many disciplines, it is easier to determine the quality of a solution
-than to find the best possible solution. For example, this is true of most NP-Hard problems,
-finite element analysis, chemical design, and physics simulations.
-While coming from very different fields, these problems share
-three critical characteristics:
-\begin{itemize}
-\item There is a defined set of possible solutions.
-\item We can measure the quality of a proposed solution.
-\item There is no tractable method for finding the best solution.
-\end{itemize}
-I design algorithms for optimizing problems with these characteristics. Instead of
-attempting to create specialized heuristics for every problem,
-my goal is to discover and utilize general principles which can
-then be applied to a large set of problems without further expert knowledge.
+Machine learning (ML) has made great advances in the last few years, and is gaining wide
+acceptance as a way to automate expertise at low cost. Yet most of ML's practical application has
+been by billion dollar companies to help them sell more products or reduce spending on labor.
+I believe machine learning has an untapped potential to help the poorest and most disadvantaged members
+of society by improving the effectiveness of underfunded social programs. However, effectively utilizing
+ML in these areas will require overcoming challenges not seen in most industrial uses: Sparsity of data,
+malicious manipulation of features, and a need to understand what unintentional biases exist in the model.
 
-\section{Algorithm Design}
-Many generic optimization algorithms require problem specific
-configuration. These algorithms are therefore of limited generality
-as expert knowledge is required to properly configure them.
+
+
+%NOTES:
+%Small grants to prevent homelessness -> reduce overhead http://science.sciencemag.org/content/353/6300/694
+%Social Workers overworked -> automatically filter cases
+%Automated Legal Help https://www.engadget.com/2016/06/29/ai-laywer-shoots-down-160000-parking-tickets/
+%Policing -> risk assessment http://fivethirtyeight.com/features/prison-reform-risk-assessment/
+
+\section{Previous Work}
+Many ML and Artificial intelligence (AI) algorithms require expert configuration
+to achieve high quality performance. This can make it very difficult for
+the benefits of these tools to spread beyond academics and well funded
+research departments.
 
 The primary focus of my dissertation was the creation of the
 Parameter-less Population Pyramid (P3), an optimization algorithm
-that requires no problem specific configuration~\cite{goldman:2014:p3,goldman:2015:fastp3}.
-P3 is comprised of three parts: Stochastic local search, entropy based model building, and
-population layering. The guiding principle behind its design is to exploit all previous
+that requires no problem specific configuration~\cite{goldman:2014:p3,goldman:2015:fastp3,goldman:2016:p3hiff}.
+The guiding principle behind its design is to exploit all previous
 knowledge the algorithm has about the problem before resorting to further stochastic exploration.
 Each iteration, P3 creates a new high quality solution using local search and a model of
 problem structure. The model is built by examining the mutual information between variables
@@ -61,63 +63,59 @@ This quality is on top
 of the fact that the comparison algorithms used unrealistically ideal configurations while
 P3 requires no configuration.
 
-By making slightly more information about the problem available to optimization, I was
-able to develop an even more efficient version of P3~\cite{goldman:2015:GBO}. Consider
-that many problems can be expressed as the sum of functions which use only a subset
-of problem variables. For example, Boolean Satisfiability is often expressed as the sum
-of clauses. The Maximum Cut of a graph is equal to the sum of checking each edge.
-Using this additional information, I was able to reduce P3's runtime by two
-orders of magnitude. I was also able to construct an efficient method
-for finding all local optima in an arbitrary problem~\cite{goldman:2016:hyperplane},
-and with a collaborator create a generic method which solves many common
-problems in the optimization literature in $O(N)$ time~\cite{whitley:2016:mkl}.
+By exploiting additional information on a subset of problems, I was able to further
+improve P3's efficiency by two orders of magnitude~\cite{goldman:2015:GBO}.
+Working with a collaborator, we were able to develop a generic method using the same principles
+that solves many of common problems in the optimization literature in $O(N)$ time~\cite{whitley:2016:mkl}.
 
-\section{Interdisciplinary Applications}
-In order to apply these generic optimization methods, I have formed a number of
-interdisciplinary collaborations. I first began a collaboration with a mechanical engineer
-at NASA. He was in the process of designing a lightweight pallet for carrying sensitive
-equipment to other planetary bodies. Using finite element analysis he could measure
-the quality of a given pallet, but he had no direct method for discovering the ``best'' pallet.
-P3 was able to find a solution which used less mass than the one found by the industry standard
-tool, and did so using 40\% of the time.
+\section{Transitioning Focus}
+Throughout my Ph.D. I focused on abstract theoretical work. While enjoyable, I began to feel my time would be
+better spent focusing instead on how I could do more than just satisfy my intellectual curiosity.
+My postdoc at Colorado State University helped me make this transition, as the topic was treatments for
+Post Traumatic Stress Disorder (PTSD).
 
-%TODO Statistical Physics somewhere
+PTSD is the result of extreme stress causing the body to develop a new
+normal, in which the body's hormones are in a constant state of stress response. The illness is resistant
+to treatment as natural homeostatic processes reinforce this state. One way to create a lasting improvement
+is to disrupt the complex interaction of hormones and return them to a healthy state. To understand how to
+do this, our collaborators needed to understand the what steady states are possible. By modeling this problem as a search for local optima,
+I was able to apply my previous work for understanding optimization landscapes~\cite{goldman:2016:hyperplane}.
+Unlike naive enumeration, which would have required decades of computing, my technique was able to find
+all steady states in their most complete model in seconds.
 
-Working with a chemist, we set out to
-design better OLED molecules, which underly modern electronics displays.
-Given a molecule, it is possible to calculate its phosphorescence when excited. However,
-there is no direct method for finding molecules which maximize this property.
-By applying P3 and other generic optimization methods we found some interesting
-molecules for future analysis.
 
-Determining the placement of turbines in a wind farm is another candidate for
-generic optimization. Aerospace engineers have developed models which can calculate
-how the wake of each turbine effects the electrical output of the entire field.
-While turbines are commonly arranged in grids, we found using optimization methods
-that fields with less regular layouts can be substantially more efficient.
-
-A challenging task in machine learning is the training of large scale neural networks.
-I have recently been in collaboration with an evolutionary biologist
-who studies natural learning to develop better optimization methods for training neural networks.
+Recently my interests have centered on deep neural networks (DNNs). As a side project I
+investigated new ways of training the output layer of decapitated DNNs, and I am currently in the
+process of drafting a publication on my findings. At Google I recently completed the internal course
+for ML, and plan to bring a new ML feature into production next year.
 
 \section{Future Work}
-In recently submitted work~\cite{whitley:2016:mkl}, we determined that many real-world
-instances of common NP-Hard problems contained a surprising amount of regularity.
-I believe this regularity can be exploited to reduce the space
-which needs to be searched for high quality solutions. To that end, I plan to develop
-a problem independent technique for search space compression.
+A recent study in Science~\cite{evans:2016:homelessness} found that
+giving a one time payout of about \$1,000 to someone on the brink of homelessness
+can keep them out of shelters for two years. Furthermore, this saves an estimated
+\$20,000 in welfare, policing, and other expenses. Unfortunately the cost
+of ensuring only the needy receive benefits creates almost \$10,00 in overhead.
+I believe that the proper application of ML can help improve the effectiveness
+of this program by improving fund allocation and automatically filtering applications
+to reduce operation expenses, resulting in more money going to those who need it.
 
-A current limitation of P3 is the focus on single objective optimization. For many
-problems, there are many competing objectives which should be optimized. For example,
-strength, weight, and cost in an engineering task. Optimization gains substantial
-benefits from treating this problem as having three separate goals instead of attempting
-to combine them into a single objective. I believe that integrating P3 with the concepts
-of multi-objective optimization will result in a powerful tool for real-world optimization.
 
-Finally, and most critically, I plan to continue exploring interdisciplinary collaborations.
-As a tool for problem solving, optimization algorithms are only as useful as the problems they
-can solve. Some specific targets for future collaborations include better battery design,
-structural engineering tasks, and land use management.
+Social workers are overworked and underpaid. When
+surveyed\footnote{\url{https://www.theguardian.com/society/2010/oct/06/overworked-social-workers-children-risk}},
+``95\% admitted that the increased pressure meant children's health and safety was at risk because social workers
+were having to make key decisions based on insufficient information.'' ML has repeatedly shown
+its ability to detect patterns and make decisions at or above human expert quality. With careful
+training, I believe ML could be used to help social workers make better decisions and rescue children
+from abusive homes.
+
+Unlike traditional product applications, using ML for these kind of social action requires that
+we have deep understanding of how the model works. We have to know it is making
+decisions for the right reasons. This poses many challenging research questions
+as currently many ML systems are treated as black boxes. It will also be necessary to
+learn from comparatively small training sets, which will likely result in new advancements
+in how to repurpose existing models from other tasks. However, if we can rise to the challenge
+I believe ML can help those who need it most.
+
 
 
 
