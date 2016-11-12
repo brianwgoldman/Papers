@@ -42,7 +42,7 @@ malicious manipulation of features, and a need to understand what unintentional 
 %Policing -> risk assessment http://fivethirtyeight.com/features/prison-reform-risk-assessment/
 
 \section{Previous Work}
-Many ML and Artificial intelligence (AI) algorithms require expert configuration
+Many ML and Artificial intelligence algorithms require expert configuration
 to achieve high quality performance. This can make it very difficult for
 the benefits of these tools to spread beyond academics and well funded
 research departments.
@@ -60,7 +60,7 @@ to better and better areas without becoming stuck or requiring large initial ran
 P3 is able to find the global optimum in less time than other techniques, as well as
 maintain a better ``current best'' solution as optimization progresses, across a diverse set of problems.
 This quality is on top
-of the fact that the comparison algorithms used unrealistically ideal configurations while
+of the fact that previous algorithms used unrealistically ideal configurations while
 P3 requires no configuration.
 
 By exploiting additional information on a subset of problems, I was able to further
@@ -70,7 +70,7 @@ that solves many of common problems in the optimization literature in $O(N)$ tim
 
 \section{Transitioning Focus}
 Throughout my Ph.D. I focused on abstract theoretical work. While enjoyable, I began to feel my time would be
-better spent focusing instead on how I could do more than just satisfy my intellectual curiosity.
+better spent focusing on how I could do more than just satisfy my intellectual curiosity.
 My postdoc at Colorado State University helped me make this transition, as the topic was treatments for
 Post Traumatic Stress Disorder (PTSD).
 
@@ -78,23 +78,23 @@ PTSD is the result of extreme stress causing the body to develop a new
 normal, in which the body's hormones are in a constant state of stress response. The illness is resistant
 to treatment as natural homeostatic processes reinforce this state. One way to create a lasting improvement
 is to disrupt the complex interaction of hormones and return them to a healthy state. To understand how to
-do this, our collaborators needed to understand the what steady states are possible. By modeling this problem as a search for local optima,
+do this, our collaborators needed to understand what steady states are possible. By modeling this problem as a search for local optima,
 I was able to apply my previous work for understanding optimization landscapes~\cite{goldman:2016:hyperplane}.
 Unlike naive enumeration, which would have required decades of computing, my technique was able to find
-all steady states in their most complete model in seconds.
+all steady states in our collaborators' most complete model in seconds.
 
 
 Recently my interests have centered on deep neural networks (DNNs). As a side project I
 investigated new ways of training the output layer of decapitated DNNs, and I am currently in the
 process of drafting a publication on my findings. At Google I recently completed the internal course
-for ML, and plan to bring a new ML feature into production next year.
+for ML, and plan to bring a new ML service into production next year.
 
 \section{Future Work}
 A recent study in Science~\cite{evans:2016:homelessness} found that
 giving a one time payout of about \$1,000 to someone on the brink of homelessness
 can keep them out of shelters for two years. Furthermore, this saves an estimated
 \$20,000 in welfare, policing, and other expenses. Unfortunately the cost
-of ensuring only the needy receive benefits creates almost \$10,00 in overhead.
+of ensuring only the needy receive benefits creates almost \$10,000 in overhead.
 I believe that the proper application of ML can help improve the effectiveness
 of this program by improving fund allocation and automatically filtering applications
 to reduce operation expenses, resulting in more money going to those who need it.
@@ -108,11 +108,12 @@ its ability to detect patterns and make decisions at or above human expert quali
 training, I believe ML could be used to help social workers make better decisions and rescue children
 from abusive homes.
 
-Unlike traditional product applications, using ML for these kind of social action requires that
-we have deep understanding of how the model works. We have to know it is making
-decisions for the right reasons. This poses many challenging research questions
-as currently many ML systems are treated as black boxes. It will also be necessary to
-learn from comparatively small training sets, which will likely result in new advancements
+Unlike traditional product applications, using ML for social action
+requires that we know the model is making decisions for the right reasons.
+Much of my work in optimization has been in understanding how complex systems work~\cite{goldman:2015:cgpanalysis,goldman:2016:p3hiff},
+and ML will require such analysis as currently much of its effectiveness is poorly understood.
+Social action ML will also require learning
+from comparatively small training sets, which will likely result in new advancements
 in how to repurpose existing models from other tasks. However, if we can rise to the challenge
 I believe ML can help those who need it most.
 
