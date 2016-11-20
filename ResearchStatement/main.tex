@@ -26,14 +26,11 @@
 
 \noindent
 Machine learning (ML) has made great advances in the last few years, and is gaining wide
-acceptance as a way to automate expertise at low cost. Yet most of ML's practical application has
-been by billion dollar companies to help them sell more products or reduce spending on labor.
-I believe machine learning has an untapped potential to help the poorest and most disadvantaged members
-of society by improving the effectiveness of underfunded social programs. However, effectively utilizing
-ML in these areas will require overcoming challenges not seen in most industrial uses: Sparsity of data,
-malicious manipulation of features, and a need to understand what unintentional biases exist in the model.
-
-
+acceptance as a way to automate expertise at low cost. Yet most of ML's great successes
+have required enormous amounts of training data, and have produced models that
+defy human understanding. I believe that overcoming these limitations will lead to the
+next big expansion in ML use, enabling applications ranging from fighting poverty and
+protecting children from abuse to intrusion detection and mapping the human brain.
 
 %NOTES:
 %Small grants to prevent homelessness -> reduce overhead http://science.sciencemag.org/content/353/6300/694
@@ -42,83 +39,88 @@ malicious manipulation of features, and a need to understand what unintentional 
 %Policing -> risk assessment http://fivethirtyeight.com/features/prison-reform-risk-assessment/
 
 \section{Previous Work}
-Many ML and Artificial intelligence algorithms require expert configuration
-to achieve high quality performance. This can make it very difficult for
-the benefits of these tools to spread beyond academics and well funded
-research departments.
+The quality of an ML or Artificial Intelligence algorithm is often measured
+not by its theoretical rigor but by its empirical effectiveness. This leads
+to two problems: its often hard to know why one algorithm is better than
+another, and many design decisions are often left up to the user. My previous
+work has focused on overcoming these two issues with the goal of making
+more powerful algorithms that require less expert involvement to apply.
+
+Cartesian Genetic Programming (CGP) is a method for evolving digital circuits
+and other functions that has had continual use for almost two decades. Part of its
+success is that unlike other methods it tends to produce terse results. Through
+careful analysis, I was able to determine the reason for this desirable outcome
+was actually an unintended consequence of a seemingly unrelated design
+decision~\cite{goldman:2013:ordering,goldman:2015:cgpanalysis}. From this finding
+I was able to tweak that decision to improve performance, maintain
+terse solutions, and remove a parameter from user configuration.
 
 The primary focus of my dissertation was the creation of the
 Parameter-less Population Pyramid (P3), an optimization algorithm
 that requires no problem specific configuration~\cite{goldman:2014:p3,goldman:2015:fastp3,goldman:2016:p3hiff}.
-The guiding principle behind its design is to exploit all previous
-knowledge the algorithm has about the problem before resorting to further stochastic exploration.
-Each iteration, P3 creates a new high quality solution using local search and a model of
-problem structure. The model is built by examining the mutual information between variables
-in previously found high quality solutions~\cite{goldman:2012:ltga}.
-By storing multiple populations of solutions, P3 is able to progressively guide search
-to better and better areas without becoming stuck or requiring large initial random search.
-P3 is able to find the global optimum in less time than other techniques, as well as
+Its design was inspired by my previous analysis of model building optimization algorithms~\cite{goldman:2012:ltga}.
+P3 combines model building, local search, and novel population structuring to minimize the amount
+of stochastic exploration.
+P3 is able to find the global optimum in less time than previous techniques, as well as
 maintain a better ``current best'' solution as optimization progresses, across a diverse set of problems.
 This quality is on top
-of the fact that previous algorithms used unrealistically ideal configurations while
-P3 requires no configuration.
-
+of the fact that P3 requires no configuration.
 By exploiting additional information on a subset of problems, I was able to further
 improve P3's efficiency by two orders of magnitude~\cite{goldman:2015:GBO}.
 Working with a collaborator, we were able to develop a generic method using the same principles
-that solves many of common problems in the optimization literature in $O(N)$ time~\cite{whitley:2016:mkl}.
+that solves many common problems in the optimization literature in $O(N)$ time~\cite{whitley:2016:mkl}.
 
 \section{Transitioning Focus}
-Throughout my Ph.D. I focused on abstract theoretical work. While enjoyable, I began to feel my time would be
-better spent focusing on how I could do more than just satisfy my intellectual curiosity.
-My postdoc at Colorado State University helped me make this transition, as the topic was treatments for
-Post Traumatic Stress Disorder (PTSD).
+During my postdoc at Colorado State University, my research interests move from abstract analysis
+and design of algorithms to how that pursuit could lead to practical societal benefits.
+The project was to investigate new methods for treating Post Traumatic Stress Disorder (PTSD).
 
 PTSD is the result of extreme stress causing the body to develop a new
 normal, in which the body's hormones are in a constant state of stress response. The illness is resistant
 to treatment as natural homeostatic processes reinforce this state. One way to create a lasting improvement
-is to disrupt the complex interaction of hormones and return them to a healthy state. To understand how to
-do this, our collaborators needed to understand what steady states are possible. By modeling this problem as a search for local optima,
-I was able to apply my previous work for understanding optimization landscapes~\cite{goldman:2016:hyperplane}.
-Unlike naive enumeration, which would have required decades of computing, my technique was able to find
-all steady states in our collaborators' most complete model in seconds.
+is to disrupt the complex interaction of hormones and return them to a healthy state. Our collaborators
+had developed a model for these interactions, but it was too complex for naive methods to determine what
+steady states were possible. In my previous work I developed a tool for analyzing optimization
+landscapes~\cite{goldman:2016:hyperplane}. By reformulating their model, my tool was able to complete
+the task in seconds.
 
-
-Recently my interests have centered on deep neural networks (DNNs). As a side project I
-investigated new ways of training the output layer of decapitated DNNs, and I am currently in the
+Recently my interests have centered on deep convolutional neural networks. As a side project I
+investigated new ways performing transfer learning, in which an existing highly trained network is
+repurposed to a new task with little training data. I am currently in the
 process of drafting a publication on my findings. At Google I recently completed the internal course
 for ML, and plan to bring a new ML service into production next year.
 
 \section{Future Work}
+Any application that requires a large number of expert decisions be made at low
+cost can potentially benefit from ML. Unfortunately, our inability to understand
+why ML makes the decisions it does can prevent acceptance of its use. This is
+especially true when it comes to using ML to help the poorest and most disadvantaged
+members of our society.
+
 A recent study in Science~\cite{evans:2016:homelessness} found that
 giving a one time payout of about \$1,000 to someone on the brink of homelessness
-can keep them out of shelters for two years. Furthermore, this saves an estimated
-\$20,000 in welfare, policing, and other expenses. Unfortunately the cost
+can keep them out of shelters for two years and save the state \$20,000. Unfortunately the cost
 of ensuring only the needy receive benefits creates almost \$10,000 in overhead.
-I believe that the proper application of ML can help improve the effectiveness
-of this program by improving fund allocation and automatically filtering applications
-to reduce operation expenses, resulting in more money going to those who need it.
+I believe this is a case where ML could help reduce costs and allow more money to go to
+those who need it, as long as we can make certain the model is making decisions for the right reasons.
+Similarly, I believe ML can help overworked social workers who are
+``having to make key decisions based on insufficient
+information''\footnote{\url{https://www.theguardian.com/society/2010/oct/06/overworked-social-workers-children-risk}}
+about children's safety.
+Leveraging my previous experience in understanding how complex systems achieve high performance
+will be critical to me in making these applications a reality.
 
-
-Social workers are overworked and underpaid. When
-surveyed\footnote{\url{https://www.theguardian.com/society/2010/oct/06/overworked-social-workers-children-risk}},
-``95\% admitted that the increased pressure meant children's health and safety was at risk because social workers
-were having to make key decisions based on insufficient information.'' ML has repeatedly shown
-its ability to detect patterns and make decisions at or above human expert quality. With careful
-training, I believe ML could be used to help social workers make better decisions and rescue children
-from abusive homes.
-
-Unlike traditional product applications, using ML for social action
-requires that we know the model is making decisions for the right reasons.
-Much of my work in optimization has been in understanding how complex systems work~\cite{goldman:2015:cgpanalysis,goldman:2016:p3hiff},
-and ML will require such analysis to better understand its effectiveness.
-Social action ML will also require learning
-from comparatively small training sets, which will likely result in new advancements
-in how to repurpose existing models from other tasks. However, if we can rise to the challenge
-I believe ML can help those who need it most.
-
-
-
+Beyond the need to understand the model, these applications are going to require training
+with far smaller datasets than normal; it is expensive to gather data about giving money
+to the homeless, and dangerous to experiment on child protective services. This
+task is perfect driving new advancements in transfer learning. Breakthroughs
+in this area will also benefit other domains that have very limited training samples,
+such as intrusion detection from security. Finally, the combination of model understanding
+and small training sizes could reach such seemingly unrelated applications as neuroscience
+by allowing researchers to build models mapping brain activity from FMRIs (very expensive per sample)
+to behavior, and then understanding how that model is making its predictions.
+If we can rise to these challenges, I believe ML can greatly expand its reach
+and help those who need it most.
 
 %\vspace{0.5cm}
 %\newpage
